@@ -1,0 +1,52 @@
+// styles/element/index.scss
+
+/* just override what you need */
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  $colors: (
+    'primary': (
+        'base': #003366
+    ),
+    'success': (
+        'base': #13c038,
+    ),
+    'warning': (
+        'base': #d30438,
+    ),
+    'danger': (
+        'base': #d30438,
+    ),
+    'error': (
+        'base': #d30438,
+    ),
+    'info': (
+        'base': #4693e0,
+    ),
+  ),
+
+  $text-color: (
+    'primary': #1d1d1d,
+    'regular': #666666,
+    'secondary': #999999,
+    'placeholder': #aaaaaa,
+    'disabled': #cccccc,
+  ),
+
+  $border-color: (
+    '': #003366,
+    'light': #0f4a85,
+    'lighter': #3e80c2,
+    'extra-light': #7cbeff,
+    'dark': #01203f,
+    'darker': #020305,
+  ),
+
+//    $bg-color: (
+//        '': #ffffff,
+//        'page': #f2f3f5,
+//        'overlay': #ffffff,
+//    ),
+
+);
+
+//@use "element-plus/theme-chalk/src/index.scss" as *;
+@import 'reset-css';

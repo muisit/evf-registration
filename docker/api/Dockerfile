@@ -48,3 +48,7 @@ RUN docker-php-ext-configure gd \
     --with-freetype
 RUN docker-php-ext-install gd
 
+RUN echo 'memory_limit = 512M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini;
+RUN echo 'upload_max_filesize = 128M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini;
+RUN echo 'post_max_size = 128M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini;
+

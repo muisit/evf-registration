@@ -2,6 +2,8 @@
 
 /** @var \Laravel\Lumen\Routing\Router $router */
 
+require_once('auth.php');
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes

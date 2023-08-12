@@ -1,0 +1,30 @@
+#!/bin/bash
+
+PW="d0TmWbUHiHO9X(vg"
+USER="michiel@muisit.nl"
+#PW="#Rq8BDpOB)(DsnUCan9jDAbTa"
+#USER="test@muisit.nl"
+EVENTID=32
+
+rm -f cookies
+# create a session first and retrieve the CSRF token
+DOC=`curl -c cookies -s -k http://localhost:9154/auth/me?eventid=$EVENTID`
+CSRF=`echo $DOC | jq -r '.token'`
+echo $DOC
+
+echo "Token is $CSRF"
+DOC=`curl -c cookies -b cookies -s -k -H "X-CSRF-Token: $CSRF" http://localhost:9154/auth/login -d "username=$USER" -d "password=$PW"`
+STATUS=`echo $DOC | jq -r '.status'`
+
+if [[ ! "x$STATUS" = "xok" ]]; then
+    echo "Error logging in"
+    exit 1
+fi
+
+DOC=`curl -c cookies -b cookies -s -k -H "X-CSRF-Token: $CSRF" http://localhost:9154/auth/me?eventid=$EVENTID`
+echo $DOC
+NAME=`echo $DOC | jq -r '.username'`
+ROLES=`echo $DOC | jq -r '.credentials'`
+echo "Name of user is '$NAME'"
+echo "Assigned roles: $ROLES"
+

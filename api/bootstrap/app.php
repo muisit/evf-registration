@@ -6,7 +6,7 @@ require_once __DIR__.'/../vendor/autoload.php';
     dirname(__DIR__)
 ))->bootstrap();
 
-date_default_timezone_set(env('APP_TIMEZONE', 'UTC'));
+date_default_timezone_set(env('APP_TIMEZONE', 'Europe/Paris'));
 
 /*
 |--------------------------------------------------------------------------
@@ -23,9 +23,8 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
-// $app->withFacades();
-
-// $app->withEloquent();
+$app->withFacades();
+$app->withEloquent();
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +47,25 @@ $app->singleton(
     App\Console\Kernel::class
 );
 
+$app->singleton('mailer', function ($app) {
+    $app->configure('services');
+    return $app->loadComponent('mail', 'Illuminate\Mail\MailServiceProvider', 'mailer');
+});
+
+$app->singleton(Illuminate\Session\SessionManager::class, function () use ($app) {
+    return $app->loadComponent('session', Illuminate\Session\SessionServiceProvider::class, 'session');
+});
+
+$app->singleton('session.store', function () use ($app) {
+    return $app->make('session')->driver();
+});
+
+// https://stackoverflow.com/questions/36642933/lumen-class-illuminate-cookie-middleware-addqueuedcookiestoresponse-does-not-ex
+$app->singleton('cookie', function () use ($app) {
+    return $app->loadComponent('session', 'Illuminate\Cookie\CookieServiceProvider', 'cookie');
+});
+$app->bind('Illuminate\Contracts\Cookie\QueueingFactory', 'cookie');
+
 /*
 |--------------------------------------------------------------------------
 | Register Config Files
@@ -60,6 +78,17 @@ $app->singleton(
 */
 
 $app->configure('app');
+$app->configure('swagger-lume');
+$app->configure('session'); // for session based authentication
+$app->configure('secure-headers');
+$app->configure('mail');    // for sending notifications
+
+// mail configuration
+$app->alias('mail.manager', Illuminate\Mail\MailManager::class);
+$app->alias('mail.manager', Illuminate\Contracts\Mail\Factory::class);
+$app->alias('mailer', Illuminate\Mail\Mailer::class);
+$app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
+$app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -72,13 +101,17 @@ $app->configure('app');
 |
 */
 
-// $app->middleware([
-//     App\Http\Middleware\ExampleMiddleware::class
-// ]);
+$app->middleware([
+    App\Http\Middleware\Cors::class,
+    \Illuminate\Session\Middleware\StartSession::class,        // required to initiate and save sessions
+    App\Http\Middleware\CSRFCheck::class,
+    App\Http\Middleware\GlobalParameters::class,
+]);
 
-// $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
+$app->routeMiddleware([
+    'auth' => App\Http\Middleware\Authenticate::class,
+    'throttle' => App\Http\Middleware\Throttle::class
+]);
 
 /*
 |--------------------------------------------------------------------------
@@ -91,9 +124,10 @@ $app->configure('app');
 |
 */
 
-// $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+$app->register(\SwaggerLume\ServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -105,6 +139,11 @@ $app->configure('app');
 | can respond to, as well as the controllers that may handle them.
 |
 */
+
+\Log::debug('opening log to get debugging to work');
+DB::listen(function ($query) {
+    \Log::debug($query->sql . ' [' . implode(', ', $query->bindings) . ']');
+});
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
