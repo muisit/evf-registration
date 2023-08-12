@@ -16,10 +16,10 @@ class GlobalParameters
      */
     public function handle(Request $request, \Closure $next)
     {
-        if ($request->has('event_id')) {
-            $event = Event::find($request->get('event_id'));
+        if ($request->has('event')) {
+            $event = Event::find($request->get('event'));
             if ($event->exists) {
-                $request->merge(['event' => $event]);
+                $request->merge(['eventObject' => $event]);
             }
         }
         return $next($request);

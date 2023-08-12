@@ -19,6 +19,17 @@ class Me extends Controller
      *
      * @OA\Get(
      *     path = "/auth/me",
+     *     @OA\Parameter(
+     *         in = "query",
+     *         name = "event",
+     *         description = "Event identifier to get authorization data on",
+     *         required = false,
+     *         style = "form",
+     *         explode = "false",
+     *         @OA\Schema(
+     *             type = "integer"
+     *         )
+     *     ),
      *     @OA\Response(
      *         response = "200",
      *         description = "Successful retrieval",
@@ -32,7 +43,7 @@ class Me extends Controller
             return response()->json(new MeSchema());
         }
         else {
-            return response()->json(new MeSchema(Auth::user(), $request->get('event')));
+            return response()->json(new MeSchema(Auth::user(), $request->get('eventObject')));
         }
     }
 }

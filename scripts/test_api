@@ -8,7 +8,7 @@ EVENTID=32
 
 rm -f cookies
 # create a session first and retrieve the CSRF token
-DOC=`curl -c cookies -s -k http://localhost:9154/auth/me?eventid=$EVENTID`
+DOC=`curl -c cookies -s -k http://localhost:9154/auth/me?event=$EVENTID`
 CSRF=`echo $DOC | jq -r '.token'`
 echo $DOC
 
@@ -21,7 +21,7 @@ if [[ ! "x$STATUS" = "xok" ]]; then
     exit 1
 fi
 
-DOC=`curl -c cookies -b cookies -s -k -H "X-CSRF-Token: $CSRF" http://localhost:9154/auth/me?eventid=$EVENTID`
+DOC=`curl -c cookies -b cookies -s -k -H "X-CSRF-Token: $CSRF" http://localhost:9154/auth/me?event=$EVENTID`
 echo $DOC
 NAME=`echo $DOC | jq -r '.username'`
 ROLES=`echo $DOC | jq -r '.credentials'`
