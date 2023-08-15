@@ -62,12 +62,12 @@ class Throttle
      */
     protected function resolveRequestSignature($request)
     {
-        return sha1(
-            $request->method() .
+        $key = $request->method() .
             '|' . $request->server('SERVER_NAME') .
             '|' . $request->path() .
-            '|' . $request->ip()
-        );
+            '|' . $request->ip();
+
+        return sha1($key);
     }
 
     /**

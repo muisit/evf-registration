@@ -7,10 +7,36 @@ if (! function_exists('prdump')) {
     }
 }
 
+if (! function_exists('tstlog')) {
+    if(!defined('STDERR')) define('STDERR', fopen('php://stderr', 'wb'));
+    function tstlog($value)
+    {
+        if (!is_string($value)) {
+            $value = json_encode($value);
+        }
+        fprintf(STDERR, $value . "\r\n");
+    }
+}
+
+if (! function_exists('tstlog2')) {
+    function tstlog2($value)
+    {
+        if (!is_string($value)) {
+            $value = json_encode($value);
+        }
+        if (app() && app()['log']) {
+            \Log::debug($value);
+        }
+        else {
+            tstlog($value);
+        }
+    }
+}
+
 if (! function_exists('validate_string')) {
     function validate_string($value)
     {
-        if ($value === null) {
+        if ($value === null || !is_string($value)) {
             return "";
         }
         if (mb_check_encoding($value, 'utf-8') === true) {
@@ -23,13 +49,17 @@ if (! function_exists('validate_string')) {
 if (! function_exists('validate_int')) {
     function validate_int($value)
     {
-        if (empty($value)) {
+        if ($value === null) {
             return -1;
         }
-        if (mb_check_encoding($value, 'utf-8') === true) {
+        if (is_numeric($value)) {
             return intval($value);
         }
-        return -1;
+        $value = validate_string($value);
+        if ($value === "") {
+            return -1;
+        }
+        return intval($value);
     }
 }
 
@@ -45,8 +75,8 @@ if (! function_exists('validate_name')) {
     function validate_name($value)
     {
         $value = validate_trim($value);
-        // only allow alphanumeric, -, apostrophe and spaces
-        return preg_replace("/[^-'\s\p{L}\p{N}]/u", "", $value);
+        // only allow alphanumeric, -, dot, apostrophe and spaces
+        return preg_replace("/[^-'\. \p{L}\p{N}]/us", "", $value);
     }
 }
 
@@ -61,7 +91,7 @@ if (! function_exists('validate_email')) {
     }
 }
 
-if (! function_exists('validate_intlist')) {
+if (! function_exists('validtest_that_base_endpoint_returns_a_successful_response()ate_intlist')) {
     function validate_intlist($value)
     {
         if (!is_array($value)) {
@@ -73,10 +103,18 @@ if (! function_exists('validate_intlist')) {
             }
             $value = $lst;
         }
-        if (!is_array($value)) {
+        if (!is_array($value) || count($value) == 0) {
             return [];
         }
-        return array_map(fn ($itm) => intval($itm), $value);
+        return array_values(array_map(
+            fn ($itm) => is_numeric($itm)
+                            ? intval($itm)
+                            : (is_string($itm) 
+                                ? intval(trim($itm, "'\" \n\r\t\v\x00"))
+                                : 0
+                              ),
+            array_filter($value, fn ($item) => !empty($item))
+        ));
     }
 }
 
@@ -104,6 +142,7 @@ if (! function_exists('csrf_token')) {
      */
     function csrf_token()
     {
+        \Log::debug("getting csrf token from session");
         $session = app('session');
 
         if (isset($session)) {

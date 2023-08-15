@@ -17,7 +17,16 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        // register this here, because the SessionGuard will register another provider that needs
+        // to be booted. If we register in the boot() method, the new provider is not booted properly
+        $this->app['auth']->extend('evf', function ($app, $name, $config) {
+            $guard = new SessionGuard($name, new UserProvider(), $app['session.store']);
+            $guard->setCookieJar($this->app['cookie']);
+            $guard->setDispatcher($this->app['events']);
+            $guard->setRequest($this->app->refresh('request', $guard, 'setRequest'));
+    
+            return $guard;
+        });
     }
 
     /**
@@ -27,21 +36,5 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app['auth']->extend('evf', function ($app, $name, $config) {
-            $guard = new SessionGuard($name, new UserProvider(), $app['session.store']);
-            if (method_exists($guard, 'setCookieJar')) {
-                $guard->setCookieJar($this->app['cookie']);
-            }
-    
-            if (method_exists($guard, 'setDispatcher')) {
-                $guard->setDispatcher($this->app['events']);
-            }
-    
-            if (method_exists($guard, 'setRequest')) {
-                $guard->setRequest($this->app->refresh('request', $guard, 'setRequest'));
-            }
-    
-            return $guard;
-        });
     }
 }

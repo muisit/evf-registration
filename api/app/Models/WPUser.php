@@ -40,10 +40,10 @@ class WPUser extends Model implements AuthenticatableContract, AuthorizableContr
 
     public function getAuthRoles(Event $event): array
     {
+        $retval = ["user"];
         $row = DB::table(env('WPDBPREFIX') . "usermeta")->where('user_id', $this->getKey())->where('meta_key', 'wp_capabilities')->first();
         if (is_object($row) && is_string($row->meta_value)) {
             $obj = unserialize($row->meta_value, ['allowed_classes' => false]);
-            $retval = [];
             foreach ($obj as $key => $val) {
                 if ($val && $key == 'administrator') {
                     $retval[] = "sysop";

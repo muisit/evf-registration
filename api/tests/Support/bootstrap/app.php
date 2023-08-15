@@ -1,10 +1,8 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
-(new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
-    dirname(__DIR__)
-))->bootstrap();
+(new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(__DIR__, '.env.testing'))->bootstrap();
 
 date_default_timezone_set(env('APP_TIMEZONE', 'Europe/Paris'));
 
@@ -20,7 +18,7 @@ date_default_timezone_set(env('APP_TIMEZONE', 'Europe/Paris'));
 */
 
 $app = new Laravel\Lumen\Application(
-    dirname(__DIR__)
+    dirname(realpath(__DIR__ . '/../..'))
 );
 
 $app->withFacades();
@@ -52,11 +50,8 @@ $app->singleton('mailer', function ($app) {
     return $app->loadComponent('mail', 'Illuminate\Mail\MailServiceProvider', 'mailer');
 });
 
-$app->singleton(Illuminate\Session\SessionManager::class, function () use ($app) {
-    return $app->loadComponent('session', Illuminate\Session\SessionServiceProvider::class, 'session');
-});
-
 $app->singleton('session.store', function () use ($app) {
+    tstlog("resolving session.store " .json_encode(debug_backtrace()));
     return $app->make('session')->driver();
 });
 
@@ -149,7 +144,7 @@ DB::listen(function ($query) {
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
-    require __DIR__.'/../routes/web.php';
+    require __DIR__.'/../../../routes/web.php';
 });
 
 return $app;
