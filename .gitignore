@@ -17,6 +17,7 @@ api/public_html/hot
 
 api/storage/*.key
 .env
+.env.*
 .phpunit.result.cache
 
 wordpress

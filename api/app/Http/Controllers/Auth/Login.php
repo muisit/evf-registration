@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\WPUser;
 use App\Models\Event;
-use App\Schemas\ReturnStatus;
+use App\Models\Schemas\ReturnStatus;
 use Auth;
 
 class Login extends Controller

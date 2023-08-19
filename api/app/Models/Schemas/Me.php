@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Schemas;
+namespace App\Models\Schemas;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Support\Traits\EVFUser;

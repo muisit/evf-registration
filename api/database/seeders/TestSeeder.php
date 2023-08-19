@@ -23,6 +23,7 @@ class TestSeeder extends Seeder
             SeedRoleTypes::class,
             SeedRoles::class,
             SeedWeapons::class,
+            SeedEventTypes::class,
         ]);
     }
 }
