@@ -13,7 +13,7 @@ class LoginTest extends TestCase
         UserData::create();
 
         $this
-            ->withSession(['_token' => 'aaa'])
+            ->session(['_token' => 'aaa'])
             ->post(
                 route('auth.login'),
                 ['username' => 'test@example.com', 'password' => 'password123'],
@@ -34,7 +34,7 @@ class LoginTest extends TestCase
         UserData::create();
 
         $this
-            ->withSession(['_token' => 'aaa'])
+            ->session(['_token' => 'aaa'])
             ->post(
                 route('auth.login'),
                 ['username' => 'test@example.com', 'password' => 'nosuchpass'],
@@ -55,28 +55,28 @@ class LoginTest extends TestCase
         RateLimiter::clear(sha1('POST|localhost|auth/login|127.0.0.1'));
 
         $this
-            ->withSession(['_token' => 'aaa'])
+            ->session(['_token' => 'aaa'])
             ->post(
                 route('auth.login'),
                 ['username' => 'test@example.com', 'password' => 'nosuchpass'],
                 ['X-CSRF-Token' => 'aaa']
             );
         $this
-            ->withSession(['_token' => 'aaa'])
+            ->session(['_token' => 'aaa'])
             ->post(
                 route('auth.login'),
                 ['username' => 'test@example.com', 'password' => 'nosuchpass'],
                 ['X-CSRF-Token' => 'aaa']
             );
         $this
-            ->withSession(['_token' => 'aaa'])
+            ->session(['_token' => 'aaa'])
             ->post(
                 route('auth.login'),
                 ['username' => 'test@example.com', 'password' => 'nosuchpass'],
                 ['X-CSRF-Token' => 'aaa']
             );
         $this
-            ->withSession(['_token' => 'aaa'])
+            ->session(['_token' => 'aaa'])
             ->post(
                 route('auth.login'),
                 ['username' => 'test@example.com', 'password' => 'nosuchpass'],
@@ -84,7 +84,7 @@ class LoginTest extends TestCase
             );
 
         $this
-            ->withSession(['_token' => 'aaa'])
+            ->session(['_token' => 'aaa'])
             ->post(
                 route('auth.login'),
                 ['username' => 'test@example.com', 'password' => 'nosuchpass'],
@@ -95,7 +95,7 @@ class LoginTest extends TestCase
             ->assertHeader('X-Ratelimit-Remaining', 0);
 
         $this
-            ->withSession(['_token' => 'aaa'])
+            ->session(['_token' => 'aaa'])
             ->post(
                 route('auth.login'),
                 ['username' => 'test@example.com', 'password' => 'nosuchpass'],

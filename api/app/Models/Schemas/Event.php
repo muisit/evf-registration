@@ -140,6 +140,28 @@ class Event
      */
     public ?string $config;
 
+    /**
+     * Related side events
+     * 
+     * @var SideEvent[]
+     * @OA\Property(
+     *   type="array",
+     *   @OA\Items(type="SideEvent")
+     * )
+     */
+    public array $sideEvents;
+
+    /**
+     * Related competitions
+     * 
+     * @var Competition[]
+     * @OA\Property(
+     *   type="array",
+     *   @OA\Items(type="Competition")
+     * )
+     */
+    public array $competitions;
+
     public function __construct(?BaseModel $event = null)
     {
         if (!empty($event)) {
@@ -164,6 +186,16 @@ class Event
             // $event->event_in_ranking
             // $event->event_factor
             // $event->event_frontend
+
+            $this->sideEvents = [];
+            foreach ($event->sideEvents() as $sideEvent) {
+                $this->sideEvents[] = new SideEvent($sideEvent);
+            }
+
+            $this->competitions = [];
+            foreach ($event->competitions() as $competition) {
+                $this->competitions[] = new Competition($competition);
+            }
         }
     }
 }

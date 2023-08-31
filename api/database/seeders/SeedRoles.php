@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\Role;
 
 class SeedRoles extends Seeder
 {
@@ -19,12 +20,12 @@ class SeedRoles extends Seeder
     {
         DB::table('TD_Role')->insert([
             [
-                'role_id' => 2,
+                'role_id' => Role::HOD,
                 'role_name' => 'Head of Delegation',
-                'role_type' => 1 
+                'role_type' => 1
             ],
             [
-                'role_id' => 4,
+                'role_id' => Role::COACH,
                 'role_name' => 'Coach',
                 'role_type' => 1
             ],
@@ -39,7 +40,7 @@ class SeedRoles extends Seeder
                 'role_type' => 1
             ],
             [
-                'role_id' => 7,
+                'role_id' => Role::REFEREE,
                 'role_name' => 'Referee',
                 'role_type' => 2
             ],
@@ -59,7 +60,7 @@ class SeedRoles extends Seeder
                 'role_type' => 2
             ],
             [
-                'role_id' => 11,
+                'role_id' => Role::VOLUNTEER,
                 'role_name' => 'Volunteer',
                 'role_type' => 2
             ],
@@ -74,7 +75,7 @@ class SeedRoles extends Seeder
                 'role_type' => 2
             ],
             [
-                'role_id' => 14,
+                'role_id' => Role::DIRECTOR,
                 'role_name' => 'EVFC Director',
                 'role_type' => 3
             ],
@@ -89,7 +90,7 @@ class SeedRoles extends Seeder
                 'role_type' => 2
             ],
             [
-                'role_id' => 18,
+                'role_id' => Role::DT,
                 'role_name' => 'DT',
                 'role_type' => 2
             ],

@@ -5,8 +5,9 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\EventType;
 
-class SeedWeapons extends Seeder
+class SeedEventTypes extends Seeder
 {
     use WithoutModelEvents;
 
@@ -17,27 +18,27 @@ class SeedWeapons extends Seeder
      */
     public function run()
     {
-        DB::table('TD_EVent_Type')->insert([
+        DB::table('TD_Event_Type')->insert([
             [
-                'event_type_id' => 1,
+                'event_type_id' => EventType::INDIVIDUAL,
                 'event_type_abbr' => 'E',
                 'event_type_name' => 'European Individual',
                 'event_type_group' => 'Fencer'
             ],
             [
-                'event_type_id' => 2,
+                'event_type_id' => EventType::WORLD,
                 'event_type_abbr' => 'W',
                 'event_type_name' => 'World',
                 'event_type_group' => 'Fencer'
             ],
             [
-                'event_type_id' => 3,
+                'event_type_id' => EventType::TEAM,
                 'event_type_abbr' => 'ET',
                 'event_type_name' => 'Team Championships',
                 'event_type_group' => 'Team'
             ],
             [
-                'event_type_id' => 4,
+                'event_type_id' => EventType::CIRCUIT,
                 'event_type_abbr' => 'C',
                 'event_type_name' => 'Circuit',
                 'event_type_group' => 'Individual'

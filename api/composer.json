@@ -13,6 +13,7 @@
         "bepsvpt/secure-headers": "^7.4",
         "darkaonline/swagger-lume": "10.*",
         "illuminate/cookie": "^10.18",
+        "kirschbaum-development/eloquent-power-joins": "^3.2",
         "laravel/lumen-framework": "^10.0",
         "zircote/swagger-php": "3.*"
     },

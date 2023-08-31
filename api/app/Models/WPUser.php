@@ -18,6 +18,8 @@ class WPUser extends Model implements AuthenticatableContract, AuthorizableContr
     use Authorizable;
     use EVFUser;
 
+    public $timestamps = false;
+
     public function getAuthPassword()
     {
         return $this->user_pass;
@@ -38,7 +40,7 @@ class WPUser extends Model implements AuthenticatableContract, AuthorizableContr
         return $this->display_name ?? '';
     }
 
-    public function getAuthRoles(Event $event): array
+    public function getAuthRoles(?Event $event = null): array
     {
         $retval = ["user"];
         $row = DB::table(env('WPDBPREFIX') . "usermeta")->where('user_id', $this->getKey())->where('meta_key', 'wp_capabilities')->first();
@@ -53,6 +55,7 @@ class WPUser extends Model implements AuthenticatableContract, AuthorizableContr
 
         $registrars = Registrar::where('user_id', $this->getKey())->get();
         foreach ($registrars as $entry) {
+            $retval[] = "hod";
             if (!empty($entry->country_id)) {
                 $retval[] = "hod:" . $entry->country_id;
             }
@@ -61,13 +64,21 @@ class WPUser extends Model implements AuthenticatableContract, AuthorizableContr
             }
         }
 
-        if (!empty($event)) {
-            $roles = EventRole::where('user_id', $this->getKey())->where('event_id', $event->getKey())->get();
+        if (!empty($event) && $event->exists) {
+            $roles = $event->roles()->where('user_id', $this->getKey())->get();
+        }
+        else {
+            $roles = EventRole::where('user_id', $this->getKey())->get();
+        }
+            
+        if (!emptyResult($roles)) {
             foreach ($roles as $row) {
-                $retval[] = $row->role_type . ':' . $eventid;
+                $retval[] = 'organisation:' . $row->event_id;
+                $retval[] = $row->role_type . ':' . $row->event_id;
             }
         }
-        return $retval;
+
+        return array_unique($retval);
     }
 
     /**

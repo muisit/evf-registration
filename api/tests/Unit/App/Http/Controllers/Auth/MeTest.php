@@ -9,6 +9,11 @@ use Tests\Support\Data\WPUser as UserData;
 
 class MeTest extends TestCase
 {
+    public function fixtures()
+    {
+        UserData::create();
+    }
+
     /**
      * Testing the Me route
      *
@@ -16,7 +21,7 @@ class MeTest extends TestCase
      */
     public function testUnauthRoute()
     {
-        $response = $this->withSession([])->call('GET', route('auth.me'));
+        $response = $this->session([])->call('GET', route('auth.me'));
         $this->assertNotEmpty($response);
         $output = $response->json();
         $this->assertTrue($output !== false);
@@ -29,8 +34,7 @@ class MeTest extends TestCase
 
     public function testAuthRoute()
     {
-        UserData::create();
-        $response = $this->withSession(['wpuser' => UserData::TESTUSER])->call('GET', route('auth.me'));
+        $response = $this->session(['wpuser' => UserData::TESTUSER])->call('GET', route('auth.me'));
 
         $this->assertNotEmpty($response);
         $output = $response->json();

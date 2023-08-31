@@ -141,6 +141,20 @@ class HelpersTest extends TestCase
 
     public function testCsrfToken()
     {
-        $this->withSession([])->assertNotEmpty(csrf_token());
+        $this->session([])->assertNotEmpty(csrf_token());
+    }
+
+    public function testIsEmptyResult()
+    {
+        $this->assertTrue(emptyResult(null));
+        $this->assertTrue(emptyResult(0));
+        $this->assertTrue(emptyResult([]));
+        $this->assertTrue(emptyResult(''));
+
+        $this->assertTrue(emptyResult((object)[]));
+        $this->assertFalse(empty((object)[]));
+
+        $this->assertTrue(emptyResult(collect([])));
+        $this->assertFalse(empty(collect([])));
     }
 }

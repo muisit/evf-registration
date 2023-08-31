@@ -25,5 +25,11 @@ interface EVFUser
      * 
      * @return string[]
      */
-    public function getAuthRoles(Event $event): array;
+    public function getAuthRoles(?Event $event = null): array;
+
+    /**
+     * Determine if a user has an authorization role
+     * @return bool
+     */
+    public function hasRole(string | array $role): bool;
 }

@@ -62,7 +62,7 @@ class Me
         else {
             $this->status = true;
             $this->username = $user->getAuthName();
-            $this->credentials = $user->getAuthRoles($event ?? new Event());
+            $this->credentials = $user->getAuthRoles($event);
         }
     }
 }

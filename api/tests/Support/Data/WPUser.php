@@ -4,13 +4,16 @@ namespace Tests\Support\Data;
 
 use DB;
 
-class WPUser
+class WPUser extends Fixture
 {
     public const TESTUSER = 1045;
     public const TESTUSER2 = 2879;
+    public const TESTUSER3 = 65535;
+    public const TESTUSER4 = 123126;
 
-    public static function create()
+    protected static function boot()
     {
+        self::booted();
         DB::table(env('WPDBPREFIX') . 'users')->insert([
             [
                 'ID' => self::TESTUSER,
@@ -24,6 +27,20 @@ class WPUser
                 'user_email' => 'test2@example.com',
                 'user_nicename' => 'Test2',
                 'display_name' => 'Test User2',
+                'user_pass' => '$P$BhcAyppZbEsO8p93h4kPSbYd1wVbMO1' // SuperSecretPassword
+            ],
+            [
+                'ID' => self::TESTUSER3,
+                'user_email' => 'test3@example.com',
+                'user_nicename' => 'Test3',
+                'display_name' => 'Test User3',
+                'user_pass' => '$P$BhcAyppZbEsO8p93h4kPSbYd1wVbMO1' // SuperSecretPassword
+            ],
+            [
+                'ID' => self::TESTUSER4,
+                'user_email' => 'test4@example.com',
+                'user_nicename' => 'Test4',
+                'display_name' => 'Test User4',
                 'user_pass' => '$P$BhcAyppZbEsO8p93h4kPSbYd1wVbMO1' // SuperSecretPassword
             ]
         ]);
@@ -39,6 +56,16 @@ class WPUser
                 'meta_key' => 'wp_capabilities',
                 'meta_value' => serialize(['subscriber' => true, 'author' => true, 'editor' => true, 'contributor' => true])
             ],
+            [
+                'user_id' => self::TESTUSER3,
+                'meta_key' => 'wp_capabilities',
+                'meta_value' => serialize(['subscriber' => true])
+            ],
+            [
+                'user_id' => self::TESTUSER4,
+                'meta_key' => 'wp_capabilities',
+                'meta_value' => serialize(['subscriber' => true])
+            ]
         ]);
     }
 }

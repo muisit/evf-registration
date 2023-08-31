@@ -5,10 +5,20 @@ namespace Tests\Unit;
 use Laravel\Lumen\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Session;
 use Laravel\Lumen\Testing\DatabaseTransactions;
+use Tests\Support\Data\Fixture;
 
 abstract class TestCase extends BaseTestCase
 {
     use DatabaseTransactions;
+
+    public function setUp(): void
+    {
+        Fixture::clear();
+        parent::setUp();
+        if (method_exists($this, 'fixtures')) {
+            $this->fixtures();
+        }
+    }
 
     /**
      * Creates the application.
@@ -18,12 +28,6 @@ abstract class TestCase extends BaseTestCase
     public function createApplication()
     {
         return require __DIR__ . '/../Support/bootstrap/app.php';
-    }
-
-    public function withSession(array $data)
-    {
-        $this->session($data);
-        return $this;
     }
 
     public function session(array $data)

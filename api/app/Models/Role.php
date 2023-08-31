@@ -3,9 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Role extends Model
 {
     protected $table = 'TD_Role';
     protected $primaryKey = 'role_id';
+    public $timestamps = false;
+
+    public const HOD = 2;
+    public const COACH = 4;
+    public const REFEREE = 7;
+    public const VOLUNTEER = 11;
+    public const DIRECTOR = 14;
+    public const DT = 18;
+
+    public function type(): BelongsTo
+    {
+        return $this->belongsTo(RoleType::class, 'role_type', 'role_type_id');
+    }
 }

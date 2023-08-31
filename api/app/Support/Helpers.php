@@ -12,7 +12,7 @@ if (! function_exists('tstlog')) {
     function tstlog($value)
     {
         if (!is_string($value)) {
-            $value = json_encode($value);
+            $value = json_encode((array)$value);
         }
         fprintf(STDERR, $value . "\r\n");
     }
@@ -164,5 +164,17 @@ if (!function_exists('object_implements')) {
         }
     
         return count(array_intersect($interfaces, class_uses_recursive(get_class($object)))) > 0;
+    }
+}
+
+if (!function_exists('emptyResult')) {
+    /**
+     * Check that a result is not NULL, false, an empty object/array or an empty collection
+     */
+    function emptyResult($result = null)
+    {
+        return empty($result)
+            || (is_countable($result) && count($result) == 0)
+            || (is_object($result) && count(get_class_methods($result)) == 0 && count(get_object_vars($result)) == 0);
     }
 }

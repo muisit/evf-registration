@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Models\Policies;
+
+use App\Models\Event as Model;
+use App\Support\Contracts\EVFUser;
+
+class Event
+{
+    /**
+     * Perform pre-authorization checks.
+     */
+    public function before(EVFUser $user, string $ability): bool | null
+    {
+        if ($user->hasRole("sysop")) return true;
+        return null;
+    }
+
+    /**
+     * @param User $user
+     * @param Model $model
+     * 
+     * @return bool
+     */
+    public function view(EVFUser $user, Model $model): bool
+    {
+        // people cannot view it after it has finished
+        if ($event->hasFinished()) return false;
+
+        // organisation can view it if it has not finished
+        if ($user->hasRole('organisation:' . $model->getKey())) return true;
+
+        // hods can view it if the registration period has started and the event is not finished
+        if ($model->registrationHasStarted() && $user->hasRole("hod")) return true;
+
+        // all other people cannot view it
+        return false;
+    }
+
+    // at the moment, this application does not allow update/delete for Events
+}

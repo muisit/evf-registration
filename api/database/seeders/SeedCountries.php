@@ -351,14 +351,14 @@ class SeedCountries extends Seeder
                 'country_id' => 49,
                 'country_abbr' => 'OTH',
                 'country_name' => 'Other',
-                'country_flag_path' => NULL,
+                'country_flag_path' => null,
                 'country_registered' => 'Y'
             ],
             [
                 'country_id' => 50,
                 'country_abbr' => 'MDA',
                 'country_name' => 'Moldova',
-                'country_flag_path' => NULL,
+                'country_flag_path' => null,
                 'country_registered' => 'Y'
             ],
         ]);
