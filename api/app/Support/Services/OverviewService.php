@@ -11,11 +11,12 @@ use DB;
 class OverviewService
 {
     public Event $event;
+    public array $overview;
 
-    private $sideEventsById = [];
-    private $teamEvents = [];
-    private $rolesById = [];
-    private $roleTypesById = [];
+    public $sideEventsById = [];
+    public $teamEvents = [];
+    public $rolesById = [];
+    public $roleTypesById = [];
 
     public function __construct(Event $event)
     {
@@ -25,8 +26,6 @@ class OverviewService
     public function create()
     {
         // provide an overview of the registrations for this event
-        $retval = [];
-
         $this->initialise();
 
         // create an overview of participants per country per sideevent
@@ -43,84 +42,93 @@ class OverviewService
                 $sideEventId = $row->registration_event;
 
                 $ckey = "c" . $countryId;
-                if (!isset($retval[$ckey])) {
-                    $retval[$ckey] = [];
+                if (!isset($this->overview[$ckey])) {
+                    $this->overview[$ckey] = [];
                 }
                 $skey = empty($sideEventId) ? "sorg" : "s" . $sideEventId;
 
                 if (intval($roleId) == 0 && isset($this->sidesById[$skey])) {
-                    if (isset($this->teamEvents[$skey])) {
-                        if (!empty($row->registration_team)) {
-                            $prevcount = isset($retval[$ckey][$skey]) ? $retval[$ckey][$skey] : [0, 0];
-                            $prevcount[0] += $count; // total participants
-                            $prevcount[1] += 1; // each row is a team
-                            $retval[$ckey][$skey] = $prevcount;
-                        }
-                        // else empty team name for a team event, but not an event-wide role... error?
-                    }
-                    else {
-                        // individual athlete or participant
-                        $retval[$ckey][$skey] = ($retval[$ckey][$skey] ?? 0) + $count;
-                    }
+                    $this->addEventRole($ckey, $skey, $count, $row->registration_team);
                 }
                 else {
-                    $skey = 'ssup'; // support role
-                    $rkey = "r" . $roleId;
-                    if (isset($this->roleById[$rkey])) {
-                        // registration with a specific role
-                        $role = $this->roleById[$rkey];
-                        $rtkey = "r" . $role->role_type;
-                        if (isset($this->roleTypeById[$rtkey])) {
-                            $roleType = $this->roleTypeById[$rtkey];
-                            switch ($roleType->org_declaration) {
-                                default:
-                                case 'Country':
-                                    break;
-                                case 'Org':
-                                    $ckey = 'corg';
-                                    $skey = $rkey;
-                                    break;
-                                case 'EVF':
-                                    // fall through, both officials
-                                case 'FIE':
-                                    $ckey = 'coff';
-                                    $skey = $rkey;
-                                    break;
-                            }
-                        }
-                        // else keep the ckey set to the country and the skey as ssup
-                        // to mark this as a support role
-                    }
-                    // else: no role and no side event... this would be an error, but treat it as
-                    // a generic country support role
-                    $retval[$ckey][$skey] = (isset($retval[$ckey][$skey]) ? $retval[$ckey][$skey] : 0) + $tot;
+                    $this->addSupportRole($roleId, $ckey, $count);
                 }
             }
         }
-        return $retval;
+        return $this->overview;
     }
 
-    private function initialise()
+    public function addEventRole(string $ckey, string $skey, int $tot, ?string $team = null)
     {
+        if (isset($this->teamEvents[$skey])) {
+            if (!empty($team)) {
+                $prevcount = isset($this->overview[$ckey][$skey]) ? $this->overview[$ckey][$skey] : [0, 0];
+                $prevcount[0] += $tot; // total participants
+                $prevcount[1] += 1; // each row is a team
+                $this->overview[$ckey][$skey] = $prevcount;
+            }
+            // else empty team name for a team event, but not an event-wide role... error?
+        }
+        else {
+            // individual athlete or participant
+            $this->overview[$ckey][$skey] = ($this->overview[$ckey][$skey] ?? 0) + $tot;
+        }
+    }
+
+    public function addSupportRole(int $roleId, string $ckey, int $tot)
+    {
+        $skey = 'ssup'; // support role
+        $rkey = "r" . $roleId;
+        if (isset($this->roleById[$rkey])) {
+            // registration with a specific role
+            $role = $this->roleById[$rkey];
+            $rtkey = "r" . $role->role_type;
+            if (isset($this->roleTypeById[$rtkey])) {
+                $roleType = $this->roleTypeById[$rtkey];
+                switch ($roleType->org_declaration) {
+                    default:
+                    case 'Country':
+                        break;
+                    case 'Org':
+                        $ckey = 'corg';
+                        $skey = $rkey;
+                        break;
+                    case 'EVF':
+                        // fall through, both officials
+                    case 'FIE':
+                        $ckey = 'coff';
+                        $skey = $rkey;
+                        break;
+                }
+            }
+            // else keep the ckey set to the country and the skey as ssup
+            // to mark this as a support role
+        }
+        // else: no role and no side event... this would be an error, but treat it as
+        // a generic country support role
+        $this->overview[$ckey][$skey] = ($this->overview[$ckey][$skey] ?? 0) + $tot;
+    }
+
+    public function initialise()
+    {
+        $this->overview = [];
         $this->sidesById = [];
         $this->teamEvents = [];
         foreach ($this->event->sides as $sideEvent) {
-            $this->sidesById[$sideEvent->getKey()] = $sideEvent;
+            $this->sidesById['s' . $sideEvent->getKey()] = $sideEvent;
             if ($sideEvent->competition?->category->category_type == 'T') {
-                $this->teamEvents[$sideEvent->getKey()] = $sideEvent;
+                $this->teamEvents['s' . $sideEvent->getKey()] = $sideEvent;
             }
         }
 
         $this->roleTypeById = [];
         foreach (RoleType::all() as $type) {
-            $this->roleTypeById[$type->getKey()] = $type;
+            $this->roleTypeById['r' . $type->getKey()] = $type;
         }
 
         $this->roleById = [];
         foreach (Role::all() as $role) {
-            $this->roleById[$role->getKey()] = $role;
+            $this->roleById['r' . $role->getKey()] = $role;
         }
-
     }
-
 }
