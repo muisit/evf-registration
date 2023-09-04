@@ -30,4 +30,12 @@ trait EVFUser {
         if (!is_array($role)) $role = [$role];
         return count(array_intersect($role, $this->_role_cache)) > 0;
     }
+
+    public function rolesLike(string $rolePart): array
+    {
+        if (count($this->_role_cache) == 0) {
+            $this->_role_cache = $this->getAuthRoles();
+        }
+        return array_values(array_filter($this->_role_cache, fn ($role) => strpos($role, $rolePart) !== false));
+    }
 }

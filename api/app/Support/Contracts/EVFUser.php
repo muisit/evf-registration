@@ -32,4 +32,10 @@ interface EVFUser
      * @return bool
      */
     public function hasRole(string | array $role): bool;
+
+    /**
+     * Find roles that match a certain pattern
+     * @return array list of matched roles
+     */
+    public function rolesLike(string $rolePart): array;
 }

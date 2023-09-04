@@ -34,7 +34,6 @@ class Overview extends Controller
 
         $retval = [];
         if ($request->user()->can("view", $event)) {
-            \Log::debug("user can see event");
             $isOrganiser = $request->user()->hasRole(['sysop','organisation:' . $event->getKey(), 'superhod']);
             $lines = $event->overview($isOrganiser);
             foreach ($lines as $key => $line) {

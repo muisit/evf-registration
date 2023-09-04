@@ -84,7 +84,6 @@ class WPUser extends Model implements AuthenticatableContract, AuthorizableContr
             }
         }
 
-        \Log::debug("returning " . $this->getKey() . '=>' . json_encode($retval));
         return array_unique($retval);
     }
 

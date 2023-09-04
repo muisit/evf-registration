@@ -50,8 +50,7 @@ class EventTest extends TestCase
         $this->assertEmpty($policy->before($unpriv, 'view'));
     }
 
-
-    public function testViewRegistrationOpen()
+    public function testViewWhenRegistrationOpen()
     {
         $policy = new Policy();
         $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
@@ -74,7 +73,7 @@ class EventTest extends TestCase
         $this->assertFalse($policy->view($unpriv, $event));
     }
 
-    public function testViewRegistrationNotYet()
+    public function testViewWhenRegistrationNotYetOpen()
     {
         $policy = new Policy();
         $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
@@ -86,9 +85,9 @@ class EventTest extends TestCase
         $event = Event::where('event_id', EventData::EVENT1)->first();
         $event->event_registration_open = Carbon::now()->addDays(2)->toDateString();
 
-        // a hod and superhod cannot see it
-        $this->assertFalse($policy->view($superhod, $event));
-        $this->assertFalse($policy->view($gerhod, $event));
+        // a hod and superhod can see the event, but not the list of registrations
+        $this->assertTrue($policy->view($superhod, $event));
+        $this->assertTrue($policy->view($gerhod, $event));
 
         // organisation can see it always
         $this->assertTrue($policy->view($cashier, $event));
@@ -98,7 +97,7 @@ class EventTest extends TestCase
         $this->assertFalse($policy->view($unpriv, $event));
     }
 
-    public function testViewRegistrationClosed()
+    public function testViewWhenRegistrationClosed()
     {
         $policy = new Policy();
         $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
@@ -122,7 +121,30 @@ class EventTest extends TestCase
         $this->assertFalse($policy->view($unpriv, $event));
     }
 
-    public function testViewStarted()
+    public function testViewRegistrationWhenRegistrationClosed()
+    {
+        $policy = new Policy();
+        $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
+        $gerhod = WPUser::where("ID", UserData::TESTUSERHOD)->first();
+        $unpriv = WPUser::where("ID", UserData::TESTUSER5)->first();
+        $cashier = WPUser::where("ID", UserData::TESTUSER3)->first();
+        $accred = WPUser::where("ID", UserData::TESTUSER4)->first();
+
+        $event = Event::where('event_id', EventData::EVENT1)->first();
+        $event->event_registration_close = Carbon::now()->subDays(2)->toDateString();
+
+        // a hod and superhod can see it
+        $this->assertTrue($policy->view($superhod, $event));
+        $this->assertTrue($policy->view($gerhod, $event));
+
+        // organisation can see it always
+        $this->assertTrue($policy->view($cashier, $event));
+        $this->assertTrue($policy->view($accred, $event));
+
+        // unprivileged cannot
+        $this->assertFalse($policy->view($unpriv, $event));
+    }
+        public function testViewStarted()
     {
         $policy = new Policy();
         $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();

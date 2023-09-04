@@ -27,7 +27,27 @@ class Event
         // people cannot view it after it has finished
         if ($model->isFinished()) return false;
 
-        // organisation can view it if it has not finished
+        // organisation and HoD can view it if it has not finished
+        if ($user->hasRole(['organisation:' . $model->getKey(), "hod"])) {
+            return true;
+        }
+
+        // all other people cannot view it
+        return false;
+    }
+
+    /**
+     * @param User $user
+     * @param Model $model
+     * 
+     * @return bool
+     */
+    public function viewRegistrations(EVFUser $user, Model $model): bool | null
+    {
+        // people cannot view it after the event has finished
+        if ($model->isFinished()) return false;
+
+        // organisation can view all registrations
         if ($user->hasRole('organisation:' . $model->getKey())) {
             return true;
         }
@@ -40,6 +60,4 @@ class Event
         // all other people cannot view it
         return false;
     }
-
-    // at the moment, this application does not allow update/delete for Events
 }
