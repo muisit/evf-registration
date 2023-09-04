@@ -25,18 +25,25 @@ class Overview extends Controller
      *     )
      * )
      */
-    public function index(Request $request)
+    public function index(Request $request, string $event)
     {
-        $event = $request->get('eventObject');
+        $event = Event::where('event_id', $event)->first();
         if (empty($event) || !$event->exists || get_class($event) != Event::class) {
-            $request->user()->authorize("not/ever");
+            $this->authorize("not/ever");
         }
-        $request->user()->authorize("view", $event);
 
-        $lines = $event->overview($user->hasRole(['sysop','organisation:' . $event->getKey(), 'superhod']));
-        foreach ($lines as $line) {
-            $retval[] = new OverviewSchema($line);
+        $retval = [];
+        if ($request->user()->can("view", $event)) {
+            \Log::debug("user can see event");
+            $isOrganiser = $request->user()->hasRole(['sysop','organisation:' . $event->getKey(), 'superhod']);
+            $lines = $event->overview($isOrganiser);
+            foreach ($lines as $key => $line) {
+                $retval[] = new OverviewSchema($key, $line);
+            }
+            return response()->json($retval);
         }
-        return response()->json($retval);
+        else {
+            $this->authorize("not/ever");
+        }
     }
 }

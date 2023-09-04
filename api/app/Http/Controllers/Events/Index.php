@@ -29,7 +29,7 @@ class Index extends Controller
     public function index(Request $request)
     {
         $now = Carbon::now()->subDays(14);
-        $events = Event::where('event_open', '>', $now->toDateTimeString())->all();
+        $events = Event::where('event_open', '>', $now->toDateTimeString())->get();
         $retval = [];
         foreach ($events as $event) {
             if ($request->user()->can('view', $event)) {

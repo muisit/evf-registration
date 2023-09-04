@@ -18,7 +18,7 @@ class Event
      * @var integer
      * @OA\Property()
      */
-    public int $id;
+    public ?int $id = null;
 
     /**
      * Name (title) of the event
@@ -26,7 +26,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public string $name;
+    public ?string $name = null;
 
     /**
      * Date the event starts
@@ -34,7 +34,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public ?string $opens;
+    public ?string $opens = null;
 
     /**
      * Date registration for this event is open
@@ -42,7 +42,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public ?string $reg_open;
+    public ?string $reg_open = null;
 
     /**
      * Date registration for this event closes
@@ -50,7 +50,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public ?string $reg_close;
+    public ?string $reg_close = null;
 
     /**
      * Year of the event
@@ -58,7 +58,7 @@ class Event
      * @var int
      * @OA\Property()
      */
-    public ?int $year;
+    public ?int $year = null;
 
     /**
      * Duration in days of the event
@@ -66,7 +66,7 @@ class Event
      * @var integer
      * @OA\Property()
      */
-    public ?int $duration;
+    public ?int $duration = null;
 
     /**
      * E-mail address of the event organisation
@@ -74,7 +74,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public ?string $email;
+    public ?string $email = null;
 
     /**
      * Website of the event organisation
@@ -82,7 +82,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public ?string $web;
+    public ?string $web = null;
 
     /**
      * Name and address of the event venue
@@ -90,7 +90,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public ?string $location;
+    public ?string $location = null;
 
     /**
      * Country where the venue is located
@@ -98,7 +98,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public ?Country $country;
+    public ?Country $country = null;
 
     /**
      * Type of the event
@@ -106,7 +106,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public ?string $type;
+    public ?EventType $type = null;
 
     /**
      * Bank and financial information on this event
@@ -114,7 +114,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public ?Bank $bank;
+    public ?Bank $bank = null;
 
     /**
      * Value indicating the way payments are to be processed
@@ -122,7 +122,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public ?string $payments;
+    public ?string $payments = null;
 
     /**
      * Live feed for the event
@@ -130,7 +130,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public ?string $feed;
+    public ?string $feed = null;
 
     /**
      * JSON configuration settings
@@ -138,7 +138,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public ?string $config;
+    public ?string $config = null;
 
     /**
      * Related side events
@@ -149,7 +149,7 @@ class Event
      *   @OA\Items(type="SideEvent")
      * )
      */
-    public array $sideEvents;
+    public ?array $sideEvents = null;
 
     /**
      * Related competitions
@@ -160,7 +160,7 @@ class Event
      *   @OA\Items(type="Competition")
      * )
      */
-    public array $competitions;
+    public ?array $competitions = null;
 
     public function __construct(?BaseModel $event = null)
     {
@@ -188,12 +188,12 @@ class Event
             // $event->event_frontend
 
             $this->sideEvents = [];
-            foreach ($event->sideEvents() as $sideEvent) {
+            foreach ($event->sides as $sideEvent) {
                 $this->sideEvents[] = new SideEvent($sideEvent);
             }
 
             $this->competitions = [];
-            foreach ($event->competitions() as $competition) {
+            foreach ($event->competitions as $competition) {
                 $this->competitions[] = new Competition($competition);
             }
         }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\App\Support;
+namespace Tests\Unit\App\Models;
 
 use App\Models\Country;
 use App\Models\Event;
@@ -33,29 +33,42 @@ class WPUserTest extends TestCase
 
     public function testRoles()
     {
+        // administrator, only user and sysop
         $user = WPUser::where('id', Data::TESTUSER)->first();
         $roles = $user->getAuthRoles();
         $this->assertCount(2, $roles);
         $this->assertContains("sysop", $roles);
         $this->assertContains("user", $roles);
 
+        // editor, which is a user and a sysop, an organiser and organisation
         $user = WPUser::where('id', Data::TESTUSER2)->first();
         $roles = $user->getAuthRoles();
-        $this->assertCount(5, $roles);
+        $this->assertCount(4, $roles);
         $this->assertContains("user", $roles);
-        $this->assertContains("hod", $roles);
-        $this->assertContains("superhod", $roles);
+        $this->assertContains("sysop", $roles);
         $this->assertContains("organisation:" . EventData::EVENT1, $roles);
         $this->assertContains("organiser:" . EventData::EVENT1, $roles);
 
         $user = WPUser::where('id', Data::TESTUSER3)->first();
         $roles = $user->getAuthRoles();
-        $this->assertCount(5, $roles);
+        $this->assertCount(3, $roles);
+        $this->assertContains("user", $roles);
+        $this->assertContains("organisation:" . EventData::EVENT1, $roles);
+        $this->assertContains("cashier:" . EventData::EVENT1, $roles);
+
+        $user = WPUser::where('id', Data::TESTUSERGENHOD)->first();
+        $roles = $user->getAuthRoles();
+        $this->assertCount(3, $roles);
+        $this->assertContains("user", $roles);
+        $this->assertContains("hod", $roles);
+        $this->assertContains("superhod", $roles);
+
+        $user = WPUser::where('id', Data::TESTUSERHOD)->first();
+        $roles = $user->getAuthRoles();
+        $this->assertCount(3, $roles);
         $this->assertContains("user", $roles);
         $this->assertContains("hod", $roles);
         $this->assertContains("hod:" . Country::GER, $roles);
-        $this->assertContains("organisation:" . EventData::EVENT1, $roles);
-        $this->assertContains("cashier:" . EventData::EVENT1, $roles);
 
         $user = WPUser::where('id', Data::TESTUSER4)->first();
         $roles = $user->getAuthRoles();

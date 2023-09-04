@@ -10,7 +10,7 @@ class EventRole extends Fixture
     protected static function boot()
     {
         Event::create();
-        Fencer::create();
+        WPUser::create();
         self::booted();
 
         Model::create([

@@ -35,6 +35,11 @@ class Event extends Model
         return $this->hasMany(SideEvent::class, 'event_id', 'event_id');
     }
 
+    public function competitions(): HasMany
+    {
+        return $this->hasMany(Competition::class, 'competition_event', 'event_id');
+    }
+
     public function overview(): array
     {
         return (new OverviewService($this))->create();

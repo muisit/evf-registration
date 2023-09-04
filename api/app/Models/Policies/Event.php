@@ -22,16 +22,20 @@ class Event
      * 
      * @return bool
      */
-    public function view(EVFUser $user, Model $model): bool
+    public function view(EVFUser $user, Model $model): bool | null
     {
         // people cannot view it after it has finished
-        if ($event->hasFinished()) return false;
+        if ($model->isFinished()) return false;
 
         // organisation can view it if it has not finished
-        if ($user->hasRole('organisation:' . $model->getKey())) return true;
+        if ($user->hasRole('organisation:' . $model->getKey())) {
+            return true;
+        }
 
         // hods can view it if the registration period has started and the event is not finished
-        if ($model->registrationHasStarted() && $user->hasRole("hod")) return true;
+        if ($model->registrationHasStarted() && $user->hasRole("hod")) {
+            return true;
+        }
 
         // all other people cannot view it
         return false;

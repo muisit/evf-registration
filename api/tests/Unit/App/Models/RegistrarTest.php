@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\App\Support;
+namespace Tests\Unit\App\Models;
 
 use App\Models\Country;
 use App\Models\Registrar;
@@ -18,12 +18,12 @@ class RegistrarTest extends TestCase
 
     public function testRelations()
     {
-        $role = Registrar::where('user_id', WPUserData::TESTUSER2)->first();
+        $role = Registrar::where('user_id', WPUserData::TESTUSERGENHOD)->first();
         $this->assertNotEmpty($role);
         $this->assertInstanceOf(BelongsTo::class, $role->country());
         $this->assertEmpty($role->country);
 
-        $role = Registrar::where('user_id', WPUserData::TESTUSER3)->first();
+        $role = Registrar::where('user_id', WPUserData::TESTUSERHOD)->first();
         $this->assertNotEmpty($role);
         $this->assertInstanceOf(Country::class, $role->country()->first());
         $this->assertInstanceOf(Country::class, $role->country);

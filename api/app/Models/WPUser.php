@@ -42,12 +42,18 @@ class WPUser extends Model implements AuthenticatableContract, AuthorizableContr
 
     public function getAuthRoles(?Event $event = null): array
     {
+        $capabilitiesValue = DB::table(env('WPDBPREFIX') . "options")->where('option_name', env('WPDBPREFIX') . 'user_roles')->first();
+        $capabilities = !emptyResult($capabilitiesValue) && is_string($capabilitiesValue->option_value) ? unserialize($capabilitiesValue->option_value) : [];
+
         $retval = ["user"];
         $row = DB::table(env('WPDBPREFIX') . "usermeta")->where('user_id', $this->getKey())->where('meta_key', 'wp_capabilities')->first();
         if (is_object($row) && is_string($row->meta_value)) {
             $obj = unserialize($row->meta_value, ['allowed_classes' => false]);
             foreach ($obj as $key => $val) {
-                if ($val && $key == 'administrator') {
+                if ($this->matchCapabilities($key, 'manage_ranking', $capabilities)) {
+                    $retval[] = "sysop";
+                }
+                if ($this->matchCapabilities($key, 'manage_registration', $capabilities)) {
                     $retval[] = "sysop";
                 }
             }
@@ -78,7 +84,13 @@ class WPUser extends Model implements AuthenticatableContract, AuthorizableContr
             }
         }
 
+        \Log::debug("returning " . $this->getKey() . '=>' . json_encode($retval));
         return array_unique($retval);
+    }
+
+    private function matchCapabilities($role, $capability, $options)
+    {
+        return isset($options[$role]) && isset($options[$role]['capabilities'][$capability]) && $options[$role]['capabilities'][$capability] === true;
     }
 
     /**

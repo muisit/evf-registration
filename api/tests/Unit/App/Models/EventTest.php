@@ -1,7 +1,8 @@
 <?php
 
-namespace Tests\Unit\App\Support;
+namespace Tests\Unit\App\Models;
 
+use App\Models\Competition;
 use App\Models\Country;
 use App\Models\Event;
 use App\Models\EventType;
@@ -41,6 +42,9 @@ class EventTest extends TestCase
         $this->assertInstanceOf(HasMany::class, $event->roles());
         $this->assertCount(3, $event->roles()->get());
         $this->assertInstanceOf(EventRole::class, $event->roles[0]);
+        $this->assertInstanceOf(HasMany::class, $event->competitions());
+        $this->assertCount(4, $event->competitions()->get());
+        $this->assertInstanceOf(Competition::class, $event->competitions[0]);
     }
 
     public function testRegistrationHasStarted()

@@ -17,7 +17,7 @@ class GlobalParameters
     public function handle(Request $request, \Closure $next)
     {
         if ($request->has('event')) {
-            $event = Event::find($request->get('event'));
+            $event = Event::where('event_id', $request->get('event'))->first();
             if ($event->exists) {
                 $request->merge(['eventObject' => $event]);
             }

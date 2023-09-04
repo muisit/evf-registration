@@ -10,6 +10,10 @@ class WPUser extends Fixture
     public const TESTUSER2 = 2879;
     public const TESTUSER3 = 65535;
     public const TESTUSER4 = 123126;
+    public const TESTUSER5 = 8912;
+    public const TESTUSERHOD = 3883;
+    public const TESTUSERGENHOD = 3886;
+    public const NOSUCHID = 894772;
 
     protected static function boot()
     {
@@ -42,6 +46,27 @@ class WPUser extends Fixture
                 'user_nicename' => 'Test4',
                 'display_name' => 'Test User4',
                 'user_pass' => '$P$BhcAyppZbEsO8p93h4kPSbYd1wVbMO1' // SuperSecretPassword
+            ],
+            [
+                'ID' => self::TESTUSER5,
+                'user_email' => 'test5@example.com',
+                'user_nicename' => 'Test5',
+                'display_name' => 'Test User5',
+                'user_pass' => '$P$BhcAyppZbEsO8p93h4kPSbYd1wVbMO1' // SuperSecretPassword
+            ],
+            [
+                'ID' => self::TESTUSERHOD,
+                'user_email' => 'test6@example.com',
+                'user_nicename' => 'Test6',
+                'display_name' => 'Test User6',
+                'user_pass' => '$P$BhcAyppZbEsO8p93h4kPSbYd1wVbMO1' // SuperSecretPassword
+            ],
+            [
+                'ID' => self::TESTUSERGENHOD,
+                'user_email' => 'test6@example.com',
+                'user_nicename' => 'Test6',
+                'display_name' => 'Test User6',
+                'user_pass' => '$P$BhcAyppZbEsO8p93h4kPSbYd1wVbMO1' // SuperSecretPassword
             ]
         ]);
 
@@ -65,6 +90,74 @@ class WPUser extends Fixture
                 'user_id' => self::TESTUSER4,
                 'meta_key' => 'wp_capabilities',
                 'meta_value' => serialize(['subscriber' => true])
+            ],
+            [
+                'user_id' => self::TESTUSERHOD,
+                'meta_key' => 'wp_capabilities',
+                'meta_value' => serialize(['subscriber' => true])
+            ],
+            [
+                'user_id' => self::TESTUSERGENHOD,
+                'meta_key' => 'wp_capabilities',
+                'meta_value' => serialize(['subscriber' => true])
+            ]
+        ]);
+
+        DB::table(env('WPDBPREFIX') . 'options')->insert([
+            [
+                'option_id' => 1,
+                'option_name' => env('WPDBPREFIX') . 'user_roles',
+                'option_value' => serialize([
+                        "administrator" => [
+                            "name" => "Administrator",
+                            "capabilities" => [
+                                "read" => true,
+                                "publish_posts" => true,
+                                "edit_posts" => true,
+                                "manage_ranking" => true,
+                                "manage_registration" => true,
+                            ]
+                        ],
+                        "editor" => [
+                            "name" => "Editor",
+                            "capabilities" => [
+                                "publish_posts" => true,
+                                "edit_posts" => true,
+                                "delete_posts" => true,
+                                "manage_ranking" => true,
+                                "manage_registration" => true,
+                            ]
+                        ],
+                        "author" => [
+                            "name" => "Author",
+                            "capabilities" => [
+                                "upload_files" => true,
+                                "edit_posts" => true,
+                                "edit_published_posts" => true,
+                                "publish_posts" => true,
+                                "read" => true,
+                            ]
+                        ],
+                        "contributor" => [
+                            "name" => "Contributor",
+                            "capabilities" => [
+                                "edit_posts" => true,
+                                "read" => true,
+                            ]
+                        ],
+                        "subscriber" => [
+                            "name" => "Subscriber",
+                            "capabilities" => [
+                                "read" => true,
+                            ]
+                        ],
+                        "member" => [
+                            "name" => "Member",
+                            "capabilities" => [
+                                "read" => true,
+                            ]
+                        ]
+                ])
             ]
         ]);
     }

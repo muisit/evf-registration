@@ -11,6 +11,7 @@ use Carbon\Carbon;
 class Event extends Fixture
 {
     public const EVENT1 = 1;
+    public const NOSUCHEVENT = 992;
 
     protected static function boot()
     {

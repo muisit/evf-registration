@@ -3,6 +3,7 @@
 /** @var \Laravel\Lumen\Routing\Router $router */
 
 require('auth.php');
+require('events.php');
 
 /*
 |--------------------------------------------------------------------------

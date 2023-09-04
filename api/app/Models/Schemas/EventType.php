@@ -18,12 +18,12 @@ class EventType
      * @var string
      * @OA\Property()
      */
-    public string $name;
+    public ?string $name = null;
 
     public function __construct(?Event $event = null)
     {
         if (!empty($event)) {
-            $this->name = $event->type?->name;
+            $this->name = $event->type?->event_type_name;
         }
     }
 }

@@ -15,17 +15,17 @@ class Registrar extends Fixture
     protected static function boot()
     {
         self::booted();
-        Fencer::create();
+        WPUser::create();
 
         Model::create([
             'id' => self::REGGEN,
-            'user_id' => WPUser::TESTUSER2,
+            'user_id' => WPUser::TESTUSERGENHOD,
             'country_id' => null
         ])->save();
 
         Model::create([
             'id' => self::REGGER,
-            'user_id' => WPUser::TESTUSER3,
+            'user_id' => WPUser::TESTUSERHOD,
             'country_id' => Country::GER
         ])->save();
     }

@@ -18,7 +18,7 @@ class Country
      * @var integer
      * @OA\Property()
      */
-    public int $id;
+    public ?int $id = null;
 
     /**
      * Name of the country
@@ -26,7 +26,7 @@ class Country
      * @var string
      * @OA\Property()
      */
-    public string $name;
+    public ?string $name = null;
 
     /**
      * Abbreviation of the country
@@ -34,7 +34,7 @@ class Country
      * @var $string
      * @OA\Property()
      */
-    public string $abbr;
+    public ?string $abbr = null;
 
     /**
      * Path to the flag image
@@ -42,7 +42,7 @@ class Country
      * @var string
      * @OA\Property()
      */
-    public ?string $path;
+    public ?string $path = null;
 
 
     public function __construct(?BaseModel $country = null)

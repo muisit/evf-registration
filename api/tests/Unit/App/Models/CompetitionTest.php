@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\App\Support;
+namespace Tests\Unit\App\Models;
 
 use App\Models\Category;
 use App\Models\Competition;

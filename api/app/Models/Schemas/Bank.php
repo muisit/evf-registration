@@ -18,7 +18,7 @@ class Bank
      * @var string
      * @OA\Property()
      */
-    public ?string $symbol;
+    public ?string $symbol = null;
 
     /**
      * Currency name for the currency required for paying for this event
@@ -26,7 +26,7 @@ class Bank
      * @var string
      * @OA\Property()
      */
-    public ?string $currency;
+    public ?string $currency = null;
 
     /**
      * Name of the bank of the event organisation
@@ -34,7 +34,7 @@ class Bank
      * @var string
      * @OA\Property()
      */
-    public ?string $bank;
+    public ?string $bank = null;
 
     /**
      * Account name with the bank of the organisation
@@ -42,7 +42,7 @@ class Bank
      * @var string
      * @OA\Property()
      */
-    public ?string $account;
+    public ?string $account = null;
 
     /**
      * Address of the organisation as far as the bank account is concerned
@@ -50,7 +50,7 @@ class Bank
      * @var string
      * @OA\Property()
      */
-    public ?string $address;
+    public ?string $address = null;
 
     /**
      * IBAN code for the organisation bank account
@@ -58,7 +58,7 @@ class Bank
      * @var string
      * @OA\Property()
      */
-    public ?string $iban;
+    public ?string $iban = null;
 
     /**
      * SWIFT code for the bank of the organisation
@@ -66,7 +66,7 @@ class Bank
      * @var string
      * @OA\Property()
      */
-    public ?string $swift;
+    public ?string $swift = null;
 
     /**
      * Reference text for transfers to the organisation bank
@@ -74,8 +74,24 @@ class Bank
      * @var string
      * @OA\Property()
      */
-    public ?string $reference;
+    public ?string $reference = null;
 
+    /**
+     * Base fee for participation
+     *
+     * @var float
+     * @OA\Property()
+     */
+    public ?float $baseFee = null;
+
+    /**
+     * Additional competition fee for each competition
+     *
+     * @var float
+     * @OA\Property()
+     */
+    public ?float $competitionFee = null;
+    
     public function __construct(?Event $event = null)
     {
         if (!empty($event)) {
@@ -83,7 +99,7 @@ class Bank
             $this->currency = $event->event_currency_name;
             $this->baseFee = floatval($event->event_base_fee);
             $this->competitionFee = floatval($event->event_competition_fee);
-            $this->bank = $event->bank;
+            $this->bank = $event->event_bank;
             $this->account = $event->event_account_name;
             $this->address = $event->event_organisers_address;
             $this->iban = $event->event_iban;

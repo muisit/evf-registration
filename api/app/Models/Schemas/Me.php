@@ -39,7 +39,7 @@ class Me
      * @var string
      * @OA\Property()
      */
-    public ?string $username;
+    public ?string $username = null;
 
     /**
      * Credentials defined in the back-end system. This should be an indication about what
@@ -51,7 +51,7 @@ class Me
      *   @OA\Items(type="string")
      * )
      */
-    public ?array $credentials;
+    public ?array $credentials = null;
     
     public function __construct(?Model $user = null, ?Event $event = null)
     {
