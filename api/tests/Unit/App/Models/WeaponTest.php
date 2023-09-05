@@ -5,7 +5,7 @@ namespace Tests\Unit\App\Models;
 use App\Models\Weapon;
 use Tests\Unit\TestCase;
 
-class WeaponTes extends TestCase
+class WeaponTest extends TestCase
 {
     public function testRelations()
     {

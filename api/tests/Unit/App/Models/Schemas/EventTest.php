@@ -36,7 +36,7 @@ class EventTest extends TestCase
         $this->assertEmpty($schema->email);
         $this->assertEmpty($schema->web);
         $this->assertEmpty($schema->location);
-        $this->assertEmpty($schema->country);
+        $this->assertEmpty($schema->countryId);
         $this->assertEmpty($schema->type);
         $this->assertEmpty($schema->bank);
         $this->assertEmpty($schema->payments);
@@ -64,10 +64,10 @@ class EventTest extends TestCase
         $this->assertEquals($event->event_payments, $schema->payments);
         $this->assertEquals($event->event_feed, $schema->feed);
         $this->assertEquals($event->event_config, $schema->config);
+        $this->assertEquals($event->event_country, $schema->countryId);
 
         $this->assertInstanceOf(EventTypeSchema::class, $schema->type);
         $this->assertInstanceOf(BankSchema::class, $schema->bank);
-        $this->assertInstanceOf(CountrySchema::class, $schema->country);
 
         $this->assertCount(6, $schema->sideEvents);
         $this->assertInstanceOf(SideEventSchema::class, $schema->sideEvents[0]);

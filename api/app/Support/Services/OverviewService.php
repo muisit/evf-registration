@@ -42,7 +42,7 @@ class OverviewService
                 $sideEventId = $row->registration_event;
 
                 $ckey = "c" . $countryId;
-                if (!isset($this->overview[$ckey])) {
+                if (!empty($countryId) && !isset($this->overview[$ckey])) {
                     $this->overview[$ckey] = [];
                 }
                 $skey = empty($sideEventId) ? "sorg" : "s" . $sideEventId;

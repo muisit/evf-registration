@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Country;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -229,7 +230,7 @@ class SeedCountries extends Seeder
                 'country_registered' => 'Y'
             ],
             [
-                'country_id' => 32,
+                'country_id' => Country::UKR,
                 'country_abbr' => 'UKR',
                 'country_name' => 'Ukraine',
                 'country_flag_path' => 'wp-content/uploads/2021/07/ua.png',
@@ -334,7 +335,7 @@ class SeedCountries extends Seeder
                 'country_registered' => 'N'
             ],
             [
-                'country_id' => 47,
+                'country_id' => Country::ALB,
                 'country_abbr' => 'ALB',
                 'country_name' => 'Albania',
                 'country_flag_path' => 'wp-content/uploads/2021/07/al.png',

@@ -98,7 +98,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public ?Country $country = null;
+    public ?int $countryId = null;
 
     /**
      * Type of the event
@@ -167,7 +167,7 @@ class Event
         if (!empty($event)) {
             $this->type = new EventType($event);
             $this->bank = new Bank($event);
-            $this->country = new Country($event->country);
+            $this->countryId = $event->event_country;
 
             $this->id = $event->getKey();
             $this->name = $event->event_name;

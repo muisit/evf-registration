@@ -16,6 +16,8 @@ class Country extends Model
     public const FRA = 11;
     public const GER = 12;
     public const NED = 21;
+    public const UKR = 32;
     public const TST = 46;
+    public const ALB = 47;
     public const OTH = 49;
 }
