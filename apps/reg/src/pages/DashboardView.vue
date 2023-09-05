@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { useAuthStore } from '../../../common/stores/auth';
-import { login } from '../../../common/api/login';
+import { useDataStore } from '../stores/data';
 
 const authStore = useAuthStore();
+const dataStore = useDataStore();
 const loginVisible = ref(waitAsGuest());
 
 function waitAsGuest()
@@ -40,6 +41,8 @@ function onLogin(credentials:object)
             loginVisible.value = true;
         });
 }
+
+dataStore.getBasicData();
 
 import { ElIcon, ElContainer, ElHeader, ElFooter, ElMain } from 'element-plus';
 import HeaderBar from '../components/HeaderBar.vue';

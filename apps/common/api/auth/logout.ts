@@ -1,5 +1,5 @@
-import { fetchJson } from './interface';
-import { ReturnStatusSchema } from './schemas/returnstatus';
+import { fetchJson } from '../interface';
+import { ReturnStatusSchema } from '../schemas/returnstatus';
 
 export const logout = function() {
     return new Promise<ReturnStatusSchema>((resolve, reject) =>  {

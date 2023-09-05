@@ -1,5 +1,5 @@
-import { fetchJson } from './interface';
-import { MeSchema } from './schemas/me';
+import { fetchJson } from '../interface';
+import { MeSchema } from '../schemas/me';
 
 export const me = function(retries:number = 0) {
     console.log('calling ME');
