@@ -1,10 +1,14 @@
 <script lang="ts" setup>
+import { ref } from 'vue';
 import { useAuthStore } from '../../../common/stores/auth';
+import { login } from '../../../common/api/login';
+
 const authStore = useAuthStore();
+const loginVisible = ref(waitAsGuest());
 
 function waitAsGuest()
 {
-    return false;// && !authStore || (authStore.isGuest && authStore.userId == -1);
+    return !authStore || authStore.isGuest;
 }
 
 function getVersion()
@@ -17,10 +21,31 @@ function eventTitle()
     return "Just an event";
 }
 
+function onCloseLogin()
+{
+    loginVisible.value = waitAsGuest();
+}
+
+function onLogin(credentials:object)
+{
+    authStore.logIn(credentials.username, credentials.password)
+        .then((data) => {
+            if (data.status == 'error') {
+                alert('There was an error with the supplied credentials. Please try again.');
+                loginVisible.value = true;
+            }
+        })
+        .catch((e) => {
+            alert('There was a network error. Please try again.' + e);
+            loginVisible.value = true;
+        });
+}
+
 import { ElIcon, ElContainer, ElHeader, ElFooter, ElMain } from 'element-plus';
 import HeaderBar from '../components/HeaderBar.vue';
 import TabInterface from '../components/TabInterface.vue';
 import FooterBar from '../components/FooterBar.vue';
+import LoginDialog from '../components/LoginDialog.vue';
 import { Loading } from '@element-plus/icons-vue';
 </script>
 <template>
@@ -31,10 +56,13 @@ import { Loading } from '@element-plus/icons-vue';
         <ElMain>
             <div v-if="waitAsGuest()">
                 <h3>Login</h3>
-                <p>Please wait while loading</p>
-                <ElIcon class="is-loading">
-                    <Loading />
-                </ElIcon>
+                <LoginDialog @on-close="onCloseLogin" @on-save="onLogin" v-if="loginVisible"/>
+                <div v-if="!loginVisible">
+                    <p>Please wait while loading</p>
+                    <ElIcon class="is-loading">
+                        <Loading />
+                    </ElIcon>
+                </div>
             </div>
             <div v-else class="full">
                 <div class="main-header">

@@ -54,4 +54,17 @@ class SessionGuard extends SessionGuardBase
         $this->fireLoginEvent($user, $remember);
         $this->setUser($user);
     }
+
+    /**
+     * Remove the user data from the session and cookies.
+     *
+     * @return void
+     */
+    protected function clearUserDataFromStorage()
+    {
+        if ($this->user && object_implements($this->user, EVFUser::class)) {
+            $this->session->remove($this->user->getAuthSessionName());
+        }
+        parent::clearUserDataFromStorage();
+    }
 }
