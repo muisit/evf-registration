@@ -11,74 +11,75 @@ export const useAuthStore = defineStore('auth', () => {
     const credentials = ref([]);
 
     function sendMe() {
-        const self = this;
         me().then((data) => {
-            self.token = data.token || '';
+            token.value = data.token || '';
             if (data.status && data.username && data.username.length) {
-                self.isGuest = false;
-                self.userName = data.username;
-                self.credentials = data.credentials;
+                isGuest.value = false;
+                userName.value = data.username;
+                credentials.value = data.credentials;
             }
         });
     }
 
     function logIn(username:string, password: string) {
-        const self = this;
         return login(username, password)
             .finally(() => {
-                self.sendMe();
+                sendMe();
             });
     }
 
     function logOut() {
-        const self = this;
         logout()
             .then(() => {
-                self.isGuest = true;
-                self.userName = '';
-                self.sendMe();
+                isGuest.value = true;
+                userName.value = '';
+                sendMe();
             })
             .catch(() => {
-                self.sendMe();
+                sendMe();
             });
     }
 
     function isSysop() {
-        return this.credentials.includes('sysop');
+        return credentials.value.includes('sysop');
     }
 
     function isHod() {
-        return this.credentials.includes('hod');
+        return credentials.value.includes('hod');
+    }
+
+    function isSuperHod() {
+        if (credentials.value.includes("superhod")) return true;
     }
 
     function isHodFor(countryId:number) {
-        if (this.credentials.includes("superhod")) return true;
-        return this.credentials.includes('hod:' + countryId);
+        if (isSuperHod()) return true;
+        return credentials.value.includes('hod:' + countryId);
     }
 
     function isOrganisation(eventId:number) {
-        return this.credentials.includes('organisation:' + eventId);
+        return credentials.value.includes('organisation:' + eventId);
     }
 
     function isOrganiser(eventId:number) {
-        return this.credentials.includes('organiser:' + eventId);
+        return credentials.value.includes('organiser:' + eventId);
     }
 
     function isRegistrar(eventId:number) {
-        return this.credentials.includes('registrar:' + eventId);
+        return credentials.value.includes('registrar:' + eventId);
     }
 
     function isCashier(eventId:number) {
-        return this.credentials.includes('cashier:' + eventId);
+        return credentials.value.includes('cashier:' + eventId);
     }
 
     function isAccreditor(eventId:number) {
-        return this.credentials.includes('accreditation:' + eventId);
+        return credentials.value.includes('accreditation:' + eventId);
     }
 
     return {
         userName, isGuest, token, credentials,
         sendMe, logIn, logOut,
-        isSysop, isHod, isHodFor, isOrganisation, isOrganiser, isRegistrar, isCashier, isAccreditor,
+        isSysop, isHod, isSuperHod, isHodFor, isOrganisation, isOrganiser, isRegistrar, isCashier, isAccreditor,
     }
 })
