@@ -18,10 +18,13 @@ function onTabChange(name:string)
 }
 
 import  { ElTabs, ElTabPane } from 'element-plus';
+import OverviewPage from '../pages/OverviewPage.vue';
 </script>
 <template>
     <ElTabs type="card" @tab-change="onTabChange" v-model="activeTab">
-        <ElTabPane label="Overview" name="overview">Pane 1</ElTabPane>
+        <ElTabPane label="Overview" name="overview">
+            <OverviewPage />
+        </ElTabPane>
         <ElTabPane label="Registration" name="registration">Pane 2</ElTabPane>
         <ElTabPane label="Cashier" name="cashier">Pane 3</ElTabPane>
         <ElTabPane label="Badges" name="badges">Pane 4</ElTabPane>

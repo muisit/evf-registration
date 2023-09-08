@@ -21,8 +21,8 @@ function submitForm()
     if (form.password.length < 8) {
         alert('Please enter a valid password of at least 8 characters');
     }
-    if (form.name.indexOf('@') < 1) {
-        alert('Please enter your e-mail address');
+    if (form.name.length < 3) {
+        alert('Please enter a valid e-mail address or username');
     }
     emits('onSave', {username: form.name, password: form.password});
     closeForm();
@@ -32,13 +32,13 @@ import { ElDialog, ElForm, ElFormItem, ElInput, ElButton } from 'element-plus';
 </script>
 <template>
     <ElDialog v-model="isVisible" title="Login" :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false">
-      <p>To use this application, please enter your e-mail address connected to your
+      <p>To use this application, please enter your username or e-mail address connected to your
         website account on the <a href="https://www.veteransfencing.eu">EVF</a> website.<br/>
         If you do not remember that password, please reset the password first using 
         the 'Lost your Password' option on the <a href="https://www.veteransfencing.eu/wp-login.php?action=lostpassword">login page</a>.
       </p>
       <ElForm>
-        <ElFormItem label="E-mail address">
+        <ElFormItem label="Name/E-mail address">
           <ElInput v-model="form.name" />
         </ElFormItem>
         <ElFormItem label="Password">

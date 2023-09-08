@@ -1,0 +1,36 @@
+.overview-page {
+    table {
+        thead {
+            background-color: var(--el-color-primary);
+            color: white;
+        }
+    }
+
+    .country-overview {
+        overflow-y: auto;
+        height: 600px;
+
+        table {
+            thead {
+                position: sticky;
+                top: 0px;
+            }
+
+            .totalHeader {
+                td {
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+
+    .competition {
+        .list {
+            tbody {
+                td { 
+                    white-space: nowrap;
+                }
+            }
+        }
+    }
+}
