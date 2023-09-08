@@ -5,6 +5,7 @@ namespace App\Models\Schemas;
 use Illuminate\Database\Eloquent\Model;
 use App\Support\Traits\EVFUser;
 use App\Models\Event;
+use App\Support\Services\DefaultCountryService;
 
 /**
  * Basic return value
@@ -42,6 +43,14 @@ class Me
     public ?string $username = null;
 
     /**
+     * Country associated with this user
+     *
+     * @var int
+     * @OA\Property()
+     */
+    public ?int $countryId = null;
+
+    /**
      * Credentials defined in the back-end system. This should be an indication about what
      * operations are allowed by the back-end system and which are not.
      *
@@ -63,6 +72,16 @@ class Me
             $this->status = true;
             $this->username = $user->getAuthName();
             $this->credentials = $user->getAuthRoles($event);
+
+            // For HoDs, set the default country for all interactions
+            // The countryObject is also influenced by a ?country=<value> parameter,
+            // but we recheck if the user actually has the hod:<country-id> role as well
+            if ($user->hasRole('hod')) {
+                $country = DefaultCountryService::determineCountry($user);
+                if (!empty($country)) {
+                    $this->countryId = $country->getKey();
+                }
+            }
         }
     }
 }

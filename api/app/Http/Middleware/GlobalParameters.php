@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use App\Models\Country;
 use App\Models\Event;
+use App\Support\Services\DefaultCountryService;
 
 class GlobalParameters
 {
@@ -35,13 +36,9 @@ class GlobalParameters
     private function determineCountry(Request $request)
     {
         $country = null;
+        \Log::debug("determining country");
         if (!empty($request->user())) {
-            $countryRoles = $request->user()->rolesLike("hod:");
-            if (count($countryRoles) > 0) {
-                // only support 1 country, no double representations allowed
-                $cid = intval(substr($countryRoles[0], 4));
-                $country = Country::where("country_id", $cid)->first();
-            }
+            $country = DefaultCountryService::determineCountry($request->user());
         }
 
         if (empty($country)) {
