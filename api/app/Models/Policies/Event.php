@@ -12,7 +12,9 @@ class Event
      */
     public function before(EVFUser $user, string $ability): bool | null
     {
+        \Log::debug("policy test: event, before");
         if ($user->hasRole("sysop")) return true;
+        \Log::debug("user is not sysop");
         return null;
     }
 
@@ -24,6 +26,7 @@ class Event
      */
     public function view(EVFUser $user, Model $model): bool | null
     {
+        \Log::debug("policy test: view event " . $model->getKey());
         // people cannot view it after it has finished
         if ($model->isFinished()) return false;
 

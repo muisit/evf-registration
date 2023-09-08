@@ -36,7 +36,7 @@ class BasicDataService
 
     private function getCountries()
     {
-        return Country::orderBy('country_abbr', 'asc')->get();
+        return Country::orderBy('country_name', 'asc')->get();
     }
 
     private function getRoles()

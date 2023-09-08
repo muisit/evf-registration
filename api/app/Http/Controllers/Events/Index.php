@@ -21,7 +21,7 @@ class Index extends Controller
      *         description = "List of accessible events",
      *         @OA\JsonContent(
      *             type="array",
-     *             @OA\Items(ref="#/components/schemas/EventList")
+     *             @OA\Items(ref="#/components/schemas/Event")
      *         )
      *     )
      * )
@@ -32,10 +32,13 @@ class Index extends Controller
         $events = Event::where('event_open', '>', $now->toDateTimeString())->get();
         $retval = [];
         foreach ($events as $event) {
+            \Log::debug("testing to see if user can view event ". $event->title);
             if ($request->user()->can('view', $event)) {
+                \Log::debug("adding event to list");
                 $retval[] = new EventSchema($event);
             }
         }
+        \Log::debug("returning list of " . count($retval). ' events');
         return response()->json($retval);
     }
 }

@@ -19,8 +19,8 @@ class CompetitionTest extends TestCase
         $schema = new Schema($competition);
 
         $this->assertEquals($competition->competition_id, $schema->id);
-        $this->assertEquals($competition->competition_weapon, $schema->weapon);
-        $this->assertEquals($competition->competition_category, $schema->category);
+        $this->assertEquals($competition->competition_weapon, $schema->weaponId);
+        $this->assertEquals($competition->competition_category, $schema->categoryId);
         $this->assertEquals($competition->competition_opens, $schema->starts);
         $this->assertEquals($competition->competition_weapon_check, $schema->weaponsCheck);
     }

@@ -188,7 +188,7 @@ class Event
             // $event->event_frontend
 
             $this->sideEvents = [];
-            foreach ($event->sides as $sideEvent) {
+            foreach ($event->sides()->orderBy('title')->get() as $sideEvent) {
                 $this->sideEvents[] = new SideEvent($sideEvent);
             }
 

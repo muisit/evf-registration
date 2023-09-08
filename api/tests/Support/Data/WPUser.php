@@ -21,6 +21,7 @@ class WPUser extends Fixture
         DB::table(env('WPDBPREFIX') . 'users')->insert([
             [
                 'ID' => self::TESTUSER,
+                'user_login' => 'test',
                 'user_email' => 'test@example.com',
                 'user_nicename' => 'Test',
                 'display_name' => 'Test User',
@@ -28,6 +29,7 @@ class WPUser extends Fixture
             ],
             [
                 'ID' => self::TESTUSER2,
+                'user_login' => 'test2',
                 'user_email' => 'test2@example.com',
                 'user_nicename' => 'Test2',
                 'display_name' => 'Test User2',
@@ -35,6 +37,7 @@ class WPUser extends Fixture
             ],
             [
                 'ID' => self::TESTUSER3,
+                'user_login' => 'test3',
                 'user_email' => 'test3@example.com',
                 'user_nicename' => 'Test3',
                 'display_name' => 'Test User3',
@@ -42,6 +45,7 @@ class WPUser extends Fixture
             ],
             [
                 'ID' => self::TESTUSER4,
+                'user_login' => 'test4',
                 'user_email' => 'test4@example.com',
                 'user_nicename' => 'Test4',
                 'display_name' => 'Test User4',
@@ -49,6 +53,7 @@ class WPUser extends Fixture
             ],
             [
                 'ID' => self::TESTUSER5,
+                'user_login' => 'test5',
                 'user_email' => 'test5@example.com',
                 'user_nicename' => 'Test5',
                 'display_name' => 'Test User5',
@@ -56,16 +61,18 @@ class WPUser extends Fixture
             ],
             [
                 'ID' => self::TESTUSERHOD,
+                'user_login' => 'germany',
                 'user_email' => 'test6@example.com',
-                'user_nicename' => 'Test6',
+                'user_nicename' => 'Germany',
                 'display_name' => 'Test User6',
                 'user_pass' => '$P$BhcAyppZbEsO8p93h4kPSbYd1wVbMO1' // SuperSecretPassword
             ],
             [
                 'ID' => self::TESTUSERGENHOD,
-                'user_email' => 'test6@example.com',
-                'user_nicename' => 'Test6',
-                'display_name' => 'Test User6',
+                'user_login' => 'testgenhod',
+                'user_email' => 'test7@example.com',
+                'user_nicename' => 'Test7',
+                'display_name' => 'Test User7',
                 'user_pass' => '$P$BhcAyppZbEsO8p93h4kPSbYd1wVbMO1' // SuperSecretPassword
             ]
         ]);

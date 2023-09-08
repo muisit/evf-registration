@@ -17,7 +17,7 @@ class Basic extends Controller
      *         response = "200",
      *         description = "List of basic data",
      *         @OA\JsonContent(
-    *             ref="#/components/schemas/BasicData
+    *             ref="#/components/schemas/BasicData"
      *         )
      *     )
      * )

@@ -87,7 +87,11 @@ class UserProvider implements UserProviderBase
         }
 
         if (isset($credentials['user_email'])) {
-            return WPUser::where('user_email', $credentials['user_email'])->first();
+            $user = WPUser::where('user_email', $credentials['user_email'])->first();
+            if (empty($user)) {
+                $user = WPUser::where('user_login', $credentials['user_email'])->first();
+            }
+            return $user;
         }
         return null;
     }

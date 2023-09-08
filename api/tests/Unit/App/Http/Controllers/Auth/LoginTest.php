@@ -29,6 +29,27 @@ class LoginTest extends TestCase
         $this->assertEmpty($output['message']);
     }
 
+    public function testLoginWithName()
+    {
+        UserData::create();
+
+        $this
+            ->session(['_token' => 'aaa'])
+            ->post(
+                route('auth.login'),
+                ['username' => 'test@example.com', 'password' => 'password123'],
+                ['X-CSRF-Token' => 'aaa']
+            );
+
+        $this->assertNotEmpty($this->response);
+        $output = $this->response->json();
+        $this->assertTrue($output !== false);
+        $this->assertTrue(is_array($output));
+        $this->assertTrue(isset($output['status']));
+        $this->assertEquals("ok", $output['status']);
+        $this->assertEmpty($output['message']);
+    }
+
     public function testRouteUnauth()
     {
         UserData::create();

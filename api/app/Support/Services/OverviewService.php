@@ -71,7 +71,9 @@ class OverviewService
         }
         else {
             // individual athlete or participant
-            $this->overview[$ckey][$skey] = ($this->overview[$ckey][$skey] ?? 0) + $tot;
+            $prevcount = isset($this->overview[$ckey][$skey]) ? $this->overview[$ckey][$skey] : [0, 0];
+            $prevcount[0] += $tot; // total participants
+            $this->overview[$ckey][$skey] = $prevcount;
         }
     }
 
@@ -80,7 +82,7 @@ class OverviewService
         $skey = 'ssup'; // support role
         $rkey = "r" . $roleId;
         if (isset($this->roleById[$rkey])) {
-            // registration with a specific role
+            // registration with a specific role (which all registrations ought to have)
             $role = $this->roleById[$rkey];
             $rtkey = "r" . $role->role_type;
             if (isset($this->roleTypeById[$rtkey])) {
@@ -105,8 +107,12 @@ class OverviewService
             // to mark this as a support role
         }
         // else: no role and no side event... this would be an error, but treat it as
-        // a generic country support role
-        $this->overview[$ckey][$skey] = ($this->overview[$ckey][$skey] ?? 0) + $tot;
+        // a generic country support role (skey = ssup)
+
+        // finally add the count to the determined key
+        $prevcount = isset($this->overview[$ckey][$skey]) ? $this->overview[$ckey][$skey] : [0, 0];
+        $prevcount[0] += $tot; // total participants
+        $this->overview[$ckey][$skey] = $prevcount;
     }
 
     public function initialise()

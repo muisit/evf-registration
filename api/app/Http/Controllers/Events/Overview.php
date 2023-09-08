@@ -14,7 +14,7 @@ class Overview extends Controller
      * Event registration overview
      *
      * @OA\Get(
-     *     path = "/events",
+     *     path = "/events/{eventId}/overview",
      *     @OA\Response(
      *         response = "200",
      *         description = "List of accessible events",

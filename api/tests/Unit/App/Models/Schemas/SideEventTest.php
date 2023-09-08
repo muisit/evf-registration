@@ -24,10 +24,10 @@ class SideEventTest extends TestCase
         $this->assertEquals($data->description, $schema->description);
         $this->assertEquals($data->starts, $schema->starts);
         $this->assertEquals($data->costs, $schema->costs);
-        $this->assertEmpty($schema->competition);
+        $this->assertEmpty($schema->competitionId);
 
         $data->competition_id = 3312;
         $schema = new Schema($data);
-        $this->assertEquals($data->competition_id, $schema->competition);
+        $this->assertEquals($data->competition_id, $schema->competitionId);
     }
 }

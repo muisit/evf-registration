@@ -26,7 +26,7 @@ class Competition
      * @var integer
      * @OA\Property()
      */
-    public int $category;
+    public int $categoryId;
 
     /**
      * Weapon ID
@@ -34,7 +34,7 @@ class Competition
      * @var integer
      * @OA\Property()
      */
-    public int $weapon;
+    public int $weaponId;
 
     /**
      * Start date for this competition
@@ -55,8 +55,8 @@ class Competition
     public function __construct(BaseModel $model)
     {
         $this->id = $model->getKey();
-        $this->category = $model->competition_category;
-        $this->weapon = $model->competition_weapon;
+        $this->categoryId = $model->competition_category;
+        $this->weaponId = $model->competition_weapon;
         $this->starts = $model->competition_opens;
         $this->weaponsCheck = $model->competition_weapon_check;
     }

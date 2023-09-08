@@ -15,7 +15,6 @@ class Cors
      */
     public function handle($request, Closure $next)
     {
-        \Log::debug("CORS middleware");
         $headers = [
             'Access-Control-Allow-Origin'      => $this->getOrigin(),
             'Access-Control-Allow-Methods'     => 'POST, GET, OPTIONS, PUT, DELETE',
@@ -26,13 +25,12 @@ class Cors
         ];
 
         if ($request->isMethod('OPTIONS')) {
-            \Log::debug("method OPTIONS, returning quickly");
             return response()->json('{"method":"OPTIONS"}', 200, $headers);
         }
 
         $response = $next($request);
         foreach ($headers as $key => $value) {
-            $response->header($key, $value);
+            $response->headers->set($key, $value);
         }
 
         return $response;

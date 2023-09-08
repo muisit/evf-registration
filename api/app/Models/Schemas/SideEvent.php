@@ -58,7 +58,7 @@ class SideEvent
      * @var int
      * @OA\Property()
      */
-    public ?int $competition;
+    public ?int $competitionId;
 
     public function __construct(BaseModel $model)
     {
@@ -67,6 +67,6 @@ class SideEvent
         $this->description = $model->description;
         $this->starts = $model->starts;
         $this->costs = floatval($model->costs);
-        $this->competition = empty($model->competition_id) ? null : $model->competition_id;
+        $this->competitionId = empty($model->competition_id) ? null : $model->competition_id;
     }
 }

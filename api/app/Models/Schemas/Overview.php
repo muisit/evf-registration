@@ -27,7 +27,7 @@ class Overview
      *   @OA\Items(
      *       type="object",
      *       @OA\Property(property="id", type="string"),
-     *       @OA\Property(property="count", type="integer"),
+     *       @OA\Property(property="count", type="array", @OA\Items(type="integer")),
      *   )
      * )
      */
