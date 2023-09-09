@@ -2,6 +2,9 @@
 import { ref, watch } from 'vue';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
+const props = defineProps<{
+    visible:boolean;
+}>();
 
 const auth = useAuthStore();
 const data = useDataStore();

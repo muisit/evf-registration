@@ -1,8 +1,10 @@
 import type { SideEvent } from "../../../../common/api/schemas/sideevent";
 import { is_valid } from "../../../../common/functions";
+import { useDataStore } from "../data";
 
-export function abbreviateSideEvent(se:SideEvent, dataStore)
+export function abbreviateSideEvent(se:SideEvent)
 {
+    const dataStore = useDataStore();
     var abbr='??';
     if(is_valid(se.competition)) {
         var wpn = se.competition.weapon ? se.competition.weapon : {abbr:'?'};

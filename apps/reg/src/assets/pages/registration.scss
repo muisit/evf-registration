@@ -1,0 +1,42 @@
+.registration-page {
+    .registration-header {
+        .country-switch {
+            float: right;
+
+            label {
+                padding-right: 10px;
+                line-height: 24px;
+            }
+
+        }
+    }
+
+    .participant-list {
+        table {
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+
+            thead {
+                background-color: var(--el-color-primary);
+                color: white;    
+            }           
+        }
+    }
+
+    .photoAccepted {
+        color: green;
+    }
+
+    .photoReplace {
+        color: red;
+    }
+
+    .photoPending {
+        color: blue;
+    }
+
+    .photoAbsent {
+        color: red;
+    }
+}

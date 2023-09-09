@@ -33,7 +33,8 @@ class Registrations extends Controller
 
         if ($request->user()->can("viewRegistrations", $event)) {
             $country = $request->get('countryObject');
-            $isOrganiser = $request->user()->hasRole(['sysop','organisation:' . $event->getKey(), 'superhod']);
+            // superhod cannot set org roles
+            $isOrganiser = $request->user()->hasRole(['sysop', 'organiser:' . $event->getKey(), 'reistrar:' . $event->getKey()]);
 
             // country should be implicitely or explicitely set, except for organisers
             if (empty($country) && !$isOrganiser) {

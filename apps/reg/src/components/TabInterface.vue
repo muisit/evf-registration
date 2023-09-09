@@ -42,13 +42,16 @@ function canOrganise()
 
 import  { ElTabs, ElTabPane } from 'element-plus';
 import OverviewPage from '../pages/OverviewPage.vue';
+import RegistrationPage from '../pages/RegistrationPage.vue';
 </script>
 <template>
     <ElTabs type="card" @tab-change="onTabChange" v-model="activeTab">
         <ElTabPane label="Overview" name="overview">
-            <OverviewPage />
+            <OverviewPage :visible="activeTab == 'overview'"/>
         </ElTabPane>
-        <ElTabPane v-if="canRegister()" label="Registration" name="registration">Pane 2</ElTabPane>
+        <ElTabPane v-if="canRegister()" label="Registration" name="registration">
+            <RegistrationPage :visible="activeTab == 'registration'"/>
+        </ElTabPane>
         <ElTabPane v-if="canCashier()" label="Cashier" name="cashier">Pane 3</ElTabPane>
         <ElTabPane v-if="canAccredit()" label="Badges" name="badges">Pane 4</ElTabPane>
         <ElTabPane v-if="canOrganise()" label="Actions" name="actions">Pane 5</ElTabPane>

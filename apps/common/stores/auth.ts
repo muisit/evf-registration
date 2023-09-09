@@ -9,6 +9,8 @@ export const useAuthStore = defineStore('auth', () => {
     const isGuest = ref(true);
     const token = ref('');
     const credentials = ref([]);
+    const countryId = ref(0);
+    const country = ref({});
 
     function sendMe() {
         me().then((data) => {
@@ -17,6 +19,7 @@ export const useAuthStore = defineStore('auth', () => {
                 isGuest.value = false;
                 userName.value = data.username;
                 credentials.value = data.credentials;
+                if (data.countryId) countryId.value = data.countryId;
             }
         });
     }
@@ -78,7 +81,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     return {
-        userName, isGuest, token, credentials,
+        userName, isGuest, token, credentials, countryId, country,
         sendMe, logIn, logOut,
         isSysop, isHod, isSuperHod, isHodFor, isOrganisation, isOrganiser, isRegistrar, isCashier, isAccreditor,
     }

@@ -4,8 +4,10 @@ import { is_valid } from '../../../common/functions';
 import { basicData } from '../../../common/api/basicdata';
 import { eventlist } from '../../../common/api/event/eventlist';
 import { overview } from '../../../common/api/event/overview';
+import { registrations } from '../../../common/api/event/registrations';
 import { abbreviateSideEvent } from './lib/abbreviateSideEvent';
 import { overviewToCountry } from './lib/overviewToCountry';
+import { registrationToFencers } from './lib/registrationToFencers';
 import { SideEvent } from '../../../common/api/schemas/sideevent';
 import { Competition } from '../../../common/api/schemas/competition';
 
@@ -33,6 +35,9 @@ export const useDataStore = defineStore('data', () => {
 
     const overviewData = ref([]);
     const overviewPerCountry = ref([]);
+
+    const currentCountry = ref({id: 0, name: 'Organisation', abbr: 'Org'});
+    const fencerData = ref({});
 
     function hasBasicData() {
         return categories.value.length > 0;
@@ -150,7 +155,7 @@ export const useDataStore = defineStore('data', () => {
             else {
                 ses.push(se);
             }
-            se.abbr = abbreviateSideEvent(se, this);
+            se.abbr = abbreviateSideEvent(se);
         });
         competitionEvents.value = comps;
         nonCompetitionEvents.value = ses;
@@ -158,21 +163,103 @@ export const useDataStore = defineStore('data', () => {
         sideEventsById.value = {};
         sideEvents.value.forEach((data) => sideEventsById.value['s' + data.id] = data);
 
-        console.log('resetting overview data');
         overviewData.value = [];
+        fencerData.value = {};
     } 
 
     function getOverview() {
         if (!is_valid(currentEvent.value)) return [];
 
-        console.log("requesting overviewData");
         overview(currentEvent.value.id)
             .then((data) => {
                 console.log('setting overviewData', data);
                 overviewData.value = data;
-                overviewPerCountry.value = overviewToCountry(data, this);
+                overviewPerCountry.value = overviewToCountry(data);
                 return data;
+            }, (e) => {
+                console.log(e);
+                alert("There was an error retrieving the general overview. Please reload the page. If this problem persists, please contact the webmaster");
+            })
+            .catch((e) => {
+                console.log(e);
+                alert("There was an error retrieving the general overview. Please reload the page. If this problem persists, please contact the webmaster");
             });
+    }
+
+    function setCountry(cid:number) {
+        console.log('setting country to ', cid);
+        if (!is_valid(cid) || !countriesById.value['c' + cid]) {
+            console.log('this is the organisation');
+            currentCountry.value = {id: 0, name: 'Organisation', abbr:'Org'};
+        }
+        else {
+            console.log('this is a valid country');
+            currentCountry.value = countriesById.value['c' + cid];
+        }
+        fencerData.value = {};
+        console.log('receiving registrations because country has changed', currentCountry.value, cid);
+        getRegistrations();
+    }
+
+    function getRegistrations() {
+        console.log('getting registrations', currentCountry.value);
+        var cid = currentCountry.value.id;
+        if (!is_valid(cid)) cid = 0;
+        registrations(currentEvent.value.id, cid)
+            .then((data) => {
+                console.log('received registrations, creating data structure', data);
+                registrationToFencers(data);
+                console.log('fencerdata should have changed now', Object.keys(fencerData.value).length);
+            }, (e) => {
+                console.log(e);
+                alert("There was an error retrieving the registration data. Please reload the page. If this problem persists, please contact the webmaster");
+            })
+            .catch((e) => {
+                console.log(e);
+                alert("There was an error retrieving the registration data. Please reload the page. If this problem persists, please contact the webmaster");
+            });
+    }
+
+    function fencerList(sorter:Array<string>)
+    {
+        console.log('creating list of fencers, sorted', sorter, Object.keys(fencerData.value).length);
+        var keylist = Object.keys(fencerData.value).sort((aId, bId) => {
+            var a = fencerData.value[aId];
+            var b = fencerData.value[bId];
+            if (a && !b) return 1;
+            if (b && !a) return -1;
+            if (!a && !b) return 0;
+
+            var result = 0;
+            sorter.forEach((s:string) => {
+                if (result == 0) {
+                    var v1 = '';
+                    var v2 = '';
+                    switch (s) {
+                        default:
+                        case 'n': v1 = a.lastName; v2 = b.lastName; break; 
+                        case 'N': v2 = a.lastName; v1 = b.lastName; break;
+                        case 'f': v1 = a.firstName; v2 = b.firstName; break; 
+                        case 'F': v2 = a.firstName; v1 = b.firstName; break;
+                        case 'y': v1 = a.birthYear; v2 = b.birthYear; break; 
+                        case 'Y': v2 = a.birthYear; v1 = b.birthYear; break;
+                        case 'c': v1 = a.category; v2 = b.category; break; 
+                        case 'C': v2 = a.category; v1 = b.category; break;
+                        case 'g': v1 = a.fullGender; v2 = b.fullGender; break; 
+                        case 'G': v2 = a.fullGender; v1 = b.fullGender; break;
+                    }
+                    if (v1 > v2) result = 1;
+                    if (v1 < v2) result = -1;
+                }
+            });
+            return result === 0 ? (a.id > b.id ? 1 : -1) : result;
+        });
+
+        var retval = [];
+        keylist.forEach((id) => {
+            retval.push(fencerData.value[id]);
+        });
+        return retval;
     }
 
     return {
@@ -190,5 +277,7 @@ export const useDataStore = defineStore('data', () => {
         overviewData, overviewPerCountry,
         getOverview,
 
+        currentCountry, fencerData,
+        setCountry, getRegistrations, fencerList,
     }
 })

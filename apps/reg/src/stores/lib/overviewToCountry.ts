@@ -1,10 +1,12 @@
 import { is_valid } from "../../../../common/functions";
 import type { OverviewLine } from "../../../../common/api/schemas/overviewline";
+import { useDataStore } from "../data";
 
-export function overviewToCountry(overviewData: Array<OverviewLine>, dataStore)
+export function overviewToCountry(overviewData: Array<OverviewLine>)
 {
     var retval = {};
     if (!overviewData) return {};
+    const dataStore = useDataStore();
 
     overviewData.forEach((line) => {
         var ckey = line.country;

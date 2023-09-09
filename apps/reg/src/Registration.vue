@@ -6,9 +6,11 @@ import { useDataStore } from './stores/data';
 const authStore = useAuthStore();
 const dataStore = useDataStore();
 
-// this function calls for a new token and status update if
-// we determined the current user is a guest at some point,
-// for example due to network issues
+// This is the place to deal with changes in the login state
+// of the user
+// We make sure we have retrieved all basic data
+// Then we set the default country
+// And we retrieve all events this user has access to
 watch(
     () => authStore.isGuest,
     (nw) => {
@@ -16,7 +18,13 @@ watch(
             authStore.sendMe();
         }
         else {
-            dataStore.getBasicData().then(() => dataStore.getEvents());
+            dataStore.getBasicData().then(
+                () => {
+                    if (authStore.countryId && dataStore.countriesById['c' + authStore.countryId]) {
+                        authStore.country = dataStore.countriesById['c' + authStore.countryId];
+                    }
+                    dataStore.getEvents();
+                });
         }
     },
     { immediate: true }
