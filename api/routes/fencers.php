@@ -8,9 +8,17 @@ $router->group(
     ],
     function () use ($router) {
         $router->get(
+            '/',
+            [
+                'as' => 'fencers.index',
+                'uses' => 'Fencers\Index@index'
+            ]
+        );
+
+        $router->get(
             '/autocomplete',
             [
-                'as' => 'events.ac',
+                'as' => 'fencers.ac',
                 'uses' => 'Fencers\Autocomplete@index'
             ]
         );
