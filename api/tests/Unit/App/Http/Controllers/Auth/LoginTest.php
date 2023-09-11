@@ -8,10 +8,14 @@ use Illuminate\Support\Facades\RateLimiter;
 
 class LoginTest extends TestCase
 {
+    public function fixtures()
+    {
+        RateLimiter::clear(sha1('POST|localhost|auth/login|127.0.0.1'));
+        UserData::create();
+    }
+
     public function testRoute()
     {
-        UserData::create();
-
         $this
             ->session(['_token' => 'aaa'])
             ->post(
@@ -31,8 +35,6 @@ class LoginTest extends TestCase
 
     public function testLoginWithName()
     {
-        UserData::create();
-
         $this
             ->session(['_token' => 'aaa'])
             ->post(
@@ -52,8 +54,6 @@ class LoginTest extends TestCase
 
     public function testRouteUnauth()
     {
-        UserData::create();
-
         $this
             ->session(['_token' => 'aaa'])
             ->post(
@@ -73,8 +73,6 @@ class LoginTest extends TestCase
 
     public function testRateLimited()
     {
-        RateLimiter::clear(sha1('POST|localhost|auth/login|127.0.0.1'));
-
         $this
             ->session(['_token' => 'aaa'])
             ->post(

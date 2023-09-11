@@ -7,8 +7,6 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use App\Support\SessionGuard;
 use App\Support\UserProvider;
-use App\Models\Event;
-use App\Models\Policies\Event as EventPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -38,6 +36,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Gate::policy(Event::class, EventPolicy::class);
+        Gate::policy(\App\Models\Event::class, \App\Models\Policies\Event::class);
+        Gate::policy(\App\Models\Fencer::class, \App\Models\Policies\Fencer::class);
+        Gate::policy(\App\Models\Country::class, \App\Models\Policies\Country::class);
     }
 }

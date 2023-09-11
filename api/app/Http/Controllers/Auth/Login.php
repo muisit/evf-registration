@@ -19,6 +19,7 @@ class Login extends Controller
      *
      * @OA\Post(
      *     path = "/auth/login",
+     *     @OA\RequestBody(ref="#/components/requestBodies/login"),
      *     @OA\Response(
      *         response = "200",
      *         description = "Successful login",

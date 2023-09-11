@@ -28,5 +28,15 @@ class EventRole extends Fixture
             'user_id' => WPUser::TESTUSER4,
             'role_type' => 'accreditation'
         ]);
+        Model::create([
+            'event_id' => Event::EVENT1,
+            'user_id' => WPUser::TESTUSERORGANISER,
+            'role_type' => 'organiser'
+        ]);
+        Model::create([
+            'event_id' => Event::EVENT1,
+            'user_id' => WPUser::TESTUSERREGISTRAR,
+            'role_type' => 'registrar'
+        ]);
     }
 }

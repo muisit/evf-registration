@@ -40,7 +40,7 @@ class EventTest extends TestCase
         $this->assertCount(6, $event->sides()->get());
         $this->assertInstanceOf(SideEvent::class, $event->sides[0]);
         $this->assertInstanceOf(HasMany::class, $event->roles());
-        $this->assertCount(3, $event->roles()->get());
+        $this->assertCount(5, $event->roles()->get());
         $this->assertInstanceOf(EventRole::class, $event->roles[0]);
         $this->assertInstanceOf(HasMany::class, $event->competitions());
         $this->assertCount(4, $event->competitions()->get());

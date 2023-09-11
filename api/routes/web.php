@@ -4,6 +4,7 @@
 
 require('auth.php');
 require('events.php');
+require('fencers.php');
 
 /*
 |--------------------------------------------------------------------------

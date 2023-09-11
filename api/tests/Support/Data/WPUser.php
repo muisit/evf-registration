@@ -11,6 +11,8 @@ class WPUser extends Fixture
     public const TESTUSER3 = 65535;
     public const TESTUSER4 = 123126;
     public const TESTUSER5 = 8912;
+    public const TESTUSERREGISTRAR = 89123;
+    public const TESTUSERORGANISER = 89124;
     public const TESTUSERHOD = 3883;
     public const TESTUSERGENHOD = 3886;
     public const NOSUCHID = 894772;
@@ -73,6 +75,22 @@ class WPUser extends Fixture
                 'user_email' => 'test7@example.com',
                 'user_nicename' => 'Test7',
                 'display_name' => 'Test User7',
+                'user_pass' => '$P$BhcAyppZbEsO8p93h4kPSbYd1wVbMO1' // SuperSecretPassword
+            ],
+            [
+                'ID' => self::TESTUSERREGISTRAR,
+                'user_login' => 'testregistrar',
+                'user_email' => 'test8@example.com',
+                'user_nicename' => 'Test8',
+                'display_name' => 'Test User8',
+                'user_pass' => '$P$BhcAyppZbEsO8p93h4kPSbYd1wVbMO1' // SuperSecretPassword
+            ],
+            [
+                'ID' => self::TESTUSERORGANISER,
+                'user_login' => 'testcashier',
+                'user_email' => 'test9@example.com',
+                'user_nicename' => 'Test9',
+                'display_name' => 'Test User9',
                 'user_pass' => '$P$BhcAyppZbEsO8p93h4kPSbYd1wVbMO1' // SuperSecretPassword
             ]
         ]);

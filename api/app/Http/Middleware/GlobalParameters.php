@@ -36,7 +36,6 @@ class GlobalParameters
     private function determineCountry(Request $request)
     {
         $country = null;
-        \Log::debug("determining country");
         if (!empty($request->user())) {
             $country = DefaultCountryService::determineCountry($request->user());
         }

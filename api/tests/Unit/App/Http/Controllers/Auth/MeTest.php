@@ -39,10 +39,10 @@ class MeTest extends TestCase
 
     public function testAuthRoute()
     {
-        $response = $this->session(['wpuser' => UserData::TESTUSER])->call('GET', route('auth.me'));
+        $response = $this->session(['wpuser' => UserData::TESTUSER])->get('/auth/me');
 
         $this->assertNotEmpty($response);
-        $output = $response->json();
+        $output = $this->response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['status']));
@@ -56,10 +56,10 @@ class MeTest extends TestCase
 
     public function testHodRoute()
     {
-        $response = $this->session(['wpuser' => UserData::TESTUSERHOD])->call('GET', route('auth.me'));
+        $response = $this->session(['wpuser' => UserData::TESTUSERHOD])->get('/auth/me');
 
         $this->assertNotEmpty($response);
-        $output = $response->json();
+        $output = $this->response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['status']));
