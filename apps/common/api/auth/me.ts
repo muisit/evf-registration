@@ -1,17 +1,22 @@
-import { fetchJson } from '../interface';
+import { fetchJson, FetchResponse } from '../interface';
 import { MeSchema } from '../schemas/me';
 
 export const me = function(retries:number = 0) {
-    console.log('calling ME');
     return new Promise<MeSchema>((resolve, reject) => {       
         return fetchJson('GET', '/auth/me')
-            .then( (data) => {                
-                console.log("ME return data is ",data);
-                if(!data) {
+            .then( (data:FetchResponse) => {                
+                if(!data || data.status != 200) {
                     return reject("No response data");
                 }
 
-                return resolve({ token: data.token, username: data.username, status: data.status, credentials: data.credentials});
+                console.log('resolving me using token ', data, data.data.token);
+                return resolve({
+                    token: data.data.token,
+                    username: data.data.username,
+                    status: data.data.status,
+                    credentials: data.data.credentials,
+                    countryId: data.data.countryId
+                });
         }, (err) => {
             reject(err);
         }).catch(() => {

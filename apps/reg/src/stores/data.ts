@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { Ref, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { is_valid } from '../../../common/functions';
 import { basicData } from '../../../common/api/basicdata';
@@ -10,6 +10,7 @@ import { overviewToCountry } from './lib/overviewToCountry';
 import { registrationToFencers } from './lib/registrationToFencers';
 import { SideEvent } from '../../../common/api/schemas/sideevent';
 import { Competition } from '../../../common/api/schemas/competition';
+import { CountrySchema } from '../../../common/api/schemas/country';
 
 export const useDataStore = defineStore('data', () => {
     const categories = ref([]);
@@ -36,7 +37,7 @@ export const useDataStore = defineStore('data', () => {
     const overviewData = ref([]);
     const overviewPerCountry = ref([]);
 
-    const currentCountry = ref({id: 0, name: 'Organisation', abbr: 'Org'});
+    const currentCountry:Ref<CountrySchema> = ref({id: 0, name: 'Organisation', abbr: 'Org', path: ''});
     const fencerData = ref({});
 
     function hasBasicData() {
@@ -220,48 +221,6 @@ export const useDataStore = defineStore('data', () => {
             });
     }
 
-    function fencerList(sorter:Array<string>)
-    {
-        console.log('creating list of fencers, sorted', sorter, Object.keys(fencerData.value).length);
-        var keylist = Object.keys(fencerData.value).sort((aId, bId) => {
-            var a = fencerData.value[aId];
-            var b = fencerData.value[bId];
-            if (a && !b) return 1;
-            if (b && !a) return -1;
-            if (!a && !b) return 0;
-
-            var result = 0;
-            sorter.forEach((s:string) => {
-                if (result == 0) {
-                    var v1 = '';
-                    var v2 = '';
-                    switch (s) {
-                        default:
-                        case 'n': v1 = a.lastName; v2 = b.lastName; break; 
-                        case 'N': v2 = a.lastName; v1 = b.lastName; break;
-                        case 'f': v1 = a.firstName; v2 = b.firstName; break; 
-                        case 'F': v2 = a.firstName; v1 = b.firstName; break;
-                        case 'y': v1 = a.birthYear; v2 = b.birthYear; break; 
-                        case 'Y': v2 = a.birthYear; v1 = b.birthYear; break;
-                        case 'c': v1 = a.category; v2 = b.category; break; 
-                        case 'C': v2 = a.category; v1 = b.category; break;
-                        case 'g': v1 = a.fullGender; v2 = b.fullGender; break; 
-                        case 'G': v2 = a.fullGender; v1 = b.fullGender; break;
-                    }
-                    if (v1 > v2) result = 1;
-                    if (v1 < v2) result = -1;
-                }
-            });
-            return result === 0 ? (a.id > b.id ? 1 : -1) : result;
-        });
-
-        var retval = [];
-        keylist.forEach((id) => {
-            retval.push(fencerData.value[id]);
-        });
-        return retval;
-    }
-
     return {
         categories, categoriesById,
         roles, rolesById, countryRoles, organisationRoles, officialRoles,
@@ -278,6 +237,6 @@ export const useDataStore = defineStore('data', () => {
         getOverview,
 
         currentCountry, fencerData,
-        setCountry, getRegistrations, fencerList,
+        setCountry, getRegistrations
     }
 })

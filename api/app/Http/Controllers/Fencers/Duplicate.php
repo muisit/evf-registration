@@ -53,9 +53,11 @@ class Duplicate extends Controller
         $duplicateCheck = $service->check($fencer);
         
         if (!empty($duplicateCheck)) {
+            \Log::debug("found duplicate");
             return response()->json(new FencerSchema($duplicateCheck), 406);
         }
         else {
+            \Log::debug("found no duplicate");
             return response()->json(null);
         }
     }

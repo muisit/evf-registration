@@ -1,13 +1,16 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
+import type { Ref } from 'vue';
 import { is_valid } from '../../../../common/functions';
 import type { Fencer } from '../../../../common/api/schemas/fencer';
 import type { Registration } from '../../../../common/api/schemas/registration';
+import { sortAndFilterFencers } from './lib/sortAndFilterFencers';
 import { useDataStore } from '../../stores/data';
 const data = useDataStore();
 
-const sorter = ref(['n', 'f']);
-const dataList = ref([]);
+const sorter:Ref<Array<string>> = ref(['n', 'f']);
+const filter:Ref<Array<string>> = ref([]);
+const dataList:Ref<Array<Fencer>> = ref([]);
 
 function getRolesAndEvents(fencer:Fencer)
 {
@@ -43,7 +46,7 @@ watch (
     () => data.fencerData,
     () => {
         console.log('fencer data has changed, creating new participant list');
-        dataList.value = data.fencerList(sorter.value);
+        dataList.value = sortAndFilterFencers(sorter.value, filter.value);
     },
     { immediate: true }
 )
@@ -63,14 +66,30 @@ function onSort(newSorter:Array<string>)
 {
     sorter.value = newSorter;
     console.log('sorting has changed, creating new participant list');
-    dataList.value = data.fencerList(sorter.value);
+    dataList.value = sortAndFilterFencers(sorter.value, filter.value);
+}
+
+function onFilter(filterState)
+{
+    var newFilter:Array<string> = filter.value.filter((f) => f != filterState.name);
+    if (filterState.state) {
+        newFilter.push(filterState.name);
+    }
+    filter.value = newFilter;
+    dataList.value = sortAndFilterFencers(sorter.value, filter.value);
 }
 
 import PhotoIcon from './PhotoIcon.vue';
 import SortingIcon from './SortingIcon.vue';
+import FilterButton from './FilterButton.vue';
 </script>
 <template>
     <div class="participant-list">
+        <div class="participant-filters">
+            <FilterButton v-for="item in data.weapons" :key="item.id" :name="item.abbr" :filter="filter" @onFilter="onFilter"/>
+            <FilterButton v-for="item in data.nonCompetitionEvents" :key="item.id" :name="item.abbr" :filter="filter" @onFilter="onFilter"/>
+            <FilterButton name="Support" :filter="filter" @onFilter="onFilter"/>
+        </div>
         <table class="style-stripes">
             <thead>
                 <tr>

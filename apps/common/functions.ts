@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-export function is_valid(id:string|number|object|undefined)
+export function is_valid(id:any)
 {
     if (!id) return false;
     if (id.id) return is_valid(id.id);
@@ -8,13 +8,25 @@ export function is_valid(id:string|number|object|undefined)
     return false;
 }
 
-export function parse_date(dt:string|object|null|undefined) {
+export function parse_date(dt:any = null) {
     var retval=dayjs(dt);
     if(!retval || !retval.isValid()) retval=dayjs();
     return retval;
 }
 
-export function date_to_category_num(dt:string|object, wrt:string|object|null|undefined) {
+export function format_date(date:any = null)
+{
+    var date2 = parse_date(date);
+    return date2.format('YYYY-MM-DD');
+}
+
+export function format_datetime(date:any = null)
+{
+    var date2 = parse_date(date);
+    return date2.format('YYYY-MM-DD HH:mm:ss');
+}
+
+export function date_to_category_num(dt:string|object, wrt:any = null) {
     var date=dayjs(dt);
     var date2=dayjs(wrt);
     var yearold=date.year();

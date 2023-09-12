@@ -1,3 +1,5 @@
+import { Competition } from "./competition";
+
 export interface SideEvent {
     id: number;
     title: string;
@@ -8,5 +10,5 @@ export interface SideEvent {
 
     // front-end data
     abbr: string|null;
-    competition: object|null;
+    competition: Competition|null;
 }

@@ -1,15 +1,15 @@
-import { fetchJson } from '../interface';
+import { fetchJson, FetchResponse } from '../interface';
 import { Event } from '../schemas/event';
 
 export const eventlist = function() {
     return new Promise<Array<Event>>((resolve, reject) => {       
         return fetchJson('GET', '/events')
-            .then( (data) => {
-                if(!data) {
+            .then( (data:FetchResponse) => {
+                if(!data || data.status != 200) {
                     return reject("No response data");
                 }
 
-                return resolve(data);
+                return resolve(data.data);
         }, (err) => {
             reject(err);
         }).catch((err) => {

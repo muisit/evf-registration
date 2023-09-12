@@ -12,6 +12,12 @@
     }
 
     .participant-list {
+        .participant-filters {
+            display: flex;
+            justify-content: center;
+            padding-bottom: 6px;
+        }
+
         table {
             width: 90%;
             margin-left: auto;
@@ -38,5 +44,12 @@
 
     .photoAbsent {
         color: red;
+    }
+
+}
+
+.el-dialog {
+    .suggestion-list {
+        width: 80%;
     }
 }

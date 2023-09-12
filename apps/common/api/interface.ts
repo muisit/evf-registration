@@ -2,6 +2,11 @@ import { useAuthStore } from '../stores/auth';
 
 let controller:AbortController|null = null;
 
+export interface FetchResponse {
+    data: any;
+    status: number;
+};
+
 export function abortAllCalls() {
     if(controller) {
         controller.abort();
@@ -34,6 +39,17 @@ function simpleFetch(method: string, path:string, data:object|null|undefined, op
     if (data && (method == 'POST' || method == 'PUT' || method == 'DELETE')) {
         fetchOptions.body = JSON.stringify(data);
     }
+    if (data && method == 'GET') {
+        console.log('adding data to query');
+        var glue='?';
+        if (path.indexOf('?') > 0) {
+            glue = '&';
+        }
+        var elements = Object.keys(data).map((key) => {
+            return key + '=' + data[key];
+        });
+        path = path + glue + elements.join('&');
+    }
 
     return fetch(import.meta.env.VITE_API_URL + path, fetchOptions as RequestInit)
         .then(postprocessor())
@@ -47,11 +63,17 @@ function simpleFetch(method: string, path:string, data:object|null|undefined, op
 }
 
 function validateResponse() {
-    return res => res.json();
+    return async (res:any) => {
+        var dt = {
+            data: await res.json(),
+            status: res.status
+        };
+        return dt;
+    };
 }
 
-export function fetchJson(method:string, path:string, data={}, options = {}, headers = {}) {
-    return simpleFetch(method, path, data, options, headers, validateResponse);
+export function fetchJson(method:string, path:string, data={}, options = {}, headers = {}): Promise<FetchResponse> {
+    return (simpleFetch(method, path, data, options, headers, validateResponse) as unknown) as Promise<FetchResponse>;
 }
 
 function attachmentResponse() {

@@ -8,5 +8,5 @@ export interface MeSchema {
     countryId: number|null;
 
     // front end data
-    country: CountrySchema | null;
+    country?: CountrySchema;
 };

@@ -1,3 +1,6 @@
+import { CategorySchema } from "./category";
+import { WeaponSchema } from "./weapon";
+
 export interface Competition {
     id: number;
     categoryId: number;
@@ -6,6 +9,6 @@ export interface Competition {
     weaponsCheck: string;
 
     // front-end data
-    category: object|null;
-    weapon: object|null;
+    category: CategorySchema|null;
+    weapon: WeaponSchema|null;
 }

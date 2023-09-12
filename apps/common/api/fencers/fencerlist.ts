@@ -1,9 +1,10 @@
 import { fetchJson, FetchResponse } from '../interface';
-import { OverviewLine } from '../schemas/overviewline';
+import { CountrySchema } from '../schemas/country';
+import { FencerList } from '../schemas/fencer';
 
-export const overview = function(eventId: number) {
-    return new Promise<Array<OverviewLine>>((resolve, reject) => {       
-        return fetchJson('GET', '/events/' + eventId + '/overview')
+export const fencerlist = function(country:CountrySchema) {
+    return new Promise<FencerList>((resolve, reject) => {       
+        return fetchJson('GET', '/fencers', { country: country.id})
             .then( (data:FetchResponse) => {
                 if(!data || data.status != 200) {
                     return reject("No response data");
