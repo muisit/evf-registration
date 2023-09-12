@@ -21,6 +21,7 @@ class Fencer extends Fixture
     public const WCAT5 = 10;
     public const MCAT1B = 11;
     public const MCAT1C = 12;
+    public const NOSUCHFENCER = 2882;
 
     protected static function boot()
     {

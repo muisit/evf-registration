@@ -22,5 +22,13 @@ $router->group(
                 'uses' => 'Fencers\Autocomplete@index'
             ]
         );
+
+        $router->post(
+            '/duplicate',
+            [
+                'as' => 'fencers.duplicate',
+                'uses' => 'Fencers\Duplicate@index'
+            ]
+        );
     }
 );
