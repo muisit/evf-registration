@@ -4,12 +4,12 @@ namespace App\Models\Schemas\Requests;
 
 /**
  * @OA\RequestBody(
- *     request="duplicate",
+ *     request="fencer",
  *     required=true,
- *     description="Checking for fencer information duplication",
+ *     description="Fencer data",
  *     @OA\JsonContent(ref="#/components/schemas/Fencer")
  * )
  */
-class DuplicateRequestBody
+class Fencer
 {
 }

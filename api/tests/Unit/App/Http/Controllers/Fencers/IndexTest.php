@@ -51,11 +51,6 @@ class IndexTest extends TestCase
         $this->session(['wpuser' => UserData::NOSUCHID])
             ->get('/fencers?country=' . Country::GER)
             ->assertStatus(403);
-
-        // GET route only
-        $this->session(['wpuser' => UserData::NOSUCHID])
-            ->post('/fencers', ["country" => Country::GER])
-            ->assertStatus(400);
     }
 
     public function testCountryOverride()

@@ -54,7 +54,7 @@ class DuplicateTest extends TestCase
         $output = $this->response->json();
         $this->assertNotEmpty($output);
         $this->assertEquals(FencerData::MCAT1, $output['id']);
-        $this->assertStatus(406);
+        $this->assertStatus(409);
 
         $fencer['id'] = FencerData::MCAT1;
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSERORGANISER])

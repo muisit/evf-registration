@@ -17,13 +17,13 @@ class Duplicate extends Controller
      *
      * @OA\Post(
      *     path = "/fencers/autocomplete",
-     *     @OA\RequestBody(ref="#/components/requestBodies/duplicate"),
+     *     @OA\RequestBody(ref="#/components/requestBodies/fencer"),
      *     @OA\Response(
      *         response = "200",
      *         description = "Successful check",
      *     ),
      *     @OA\Response(
-     *         response = "401",
+     *         response = "409",
      *         description = "Duplicate found",
      *         @OA\JsonContent(ref="#/components/schemas/Fencer")
      *     ),
@@ -54,7 +54,7 @@ class Duplicate extends Controller
         
         if (!empty($duplicateCheck)) {
             \Log::debug("found duplicate");
-            return response()->json(new FencerSchema($duplicateCheck), 406);
+            return response()->json(new FencerSchema($duplicateCheck), 409);
         }
         else {
             \Log::debug("found no duplicate");

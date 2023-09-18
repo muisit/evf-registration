@@ -58,4 +58,57 @@ class Fencer
         // all other people cannot see individual fencer data
         return false;
     }
+
+    /**
+     * @param User $user
+     *
+     * @return bool
+     */
+    public function create(EVFUser $user): bool
+    {
+        // organisers with registration rights can create a fencer model
+        $isOrganiser = $user->rolesLike('organiser:') + $user->rolesLike('registrar:');
+        if (count($isOrganiser) > 0) {
+            return true;
+        }
+
+        // heads-of-delegation can create fencers
+        $countryObject = request()->get('countryObject');
+        if ($user->hasRole(['hod:' . empty($countryObject) ? '?' : $countryObject->getKey(), 'superhod'])) {
+            return true;
+        }
+
+        // all other people cannot create fencer data
+        return false;
+    }
+
+    /**
+     * @param User $user
+     * @param Model $model
+     * 
+     * @return bool
+     */
+    public function update(EVFUser $user, Model $model): bool
+    {
+        // anyone that can create a fencer can update it
+        return $this->create($user);
+    }
+
+    /**
+     * @param User $user
+     * 
+     * @return bool
+     */
+    public function pictureState(EVFUser $user): bool
+    {
+        // picture state can only be updated by organisers and registrars
+        $isOrganiser = $user->rolesLike('organiser:') + $user->rolesLike('registrar:');
+        if (count($isOrganiser) > 0) {
+            return true;
+        }
+
+        // all other people cannot change the state of pictures
+        return false;
+    }
+
 }

@@ -69,11 +69,11 @@ class CountryTest extends TestCase
         $this->assertTrue($policy->view($superhod, $countryGER));
         $this->assertTrue($policy->view($superhod, $countryITA));
 
-        // organiser and registrar cannot see countries
+        // organiser and registrar can see countries
         $this->assertFalse($policy->view($cashier, $countryGER));
         $this->assertFalse($policy->view($accred, $countryITA));
-        $this->assertFalse($policy->view($organiser, $countryGER));
-        $this->assertFalse($policy->view($registrar, $countryITA));
+        $this->assertTrue($policy->view($organiser, $countryGER));
+        $this->assertTrue($policy->view($registrar, $countryITA));
 
         // gerhod can only see ger
         $this->assertTrue($policy->view($gerhod, $countryGER));

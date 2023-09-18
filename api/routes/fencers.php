@@ -30,5 +30,13 @@ $router->group(
                 'uses' => 'Fencers\Duplicate@index'
             ]
         );
+
+        $router->post(
+            '/',
+            [
+                'as' => 'fencers.save',
+                'uses' => 'Fencers\Save@index'
+            ]
+        );
     }
 );

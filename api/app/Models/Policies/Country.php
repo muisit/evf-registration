@@ -31,6 +31,12 @@ class Country
             return true;
         }
 
+        // organisers can switch between countries and see country-related data
+        $isOrganiser = $user->rolesLike('organiser:') + $user->rolesLike('registrar:');
+        if (count($isOrganiser) > 0) {
+            return true;
+        }
+
         // all other people cannot see country related data
         return false;
     }
