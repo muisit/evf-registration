@@ -27,7 +27,7 @@ class GlobalParameters
     {
         if ($request->has('event')) {
             $event = Event::where('event_id', $request->get('event'))->first();
-            if ($event->exists) {
+            if (!empty($event) && !$event->isFinished()) {
                 $request->merge(['eventObject' => $event]);
             }
         }

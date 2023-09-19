@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Events;
+namespace App\Http\Controllers\Registrations;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -10,13 +10,35 @@ use App\Models\Registration;
 use App\Models\Schemas\Registrations as RegistrationsSchema;
 use Auth;
 
-class Registrations extends Controller
+class Index extends Controller
 {
     /**
      * Event registration overview
      *
      * @OA\Get(
-     *     path = "/events/{eventId}/registrations",
+     *     path = "/registrations",
+     *     @OA\Parameter(
+     *         in = "query",
+     *         name = "event",
+     *         description = "Event identifier to get registration data on",
+     *         required = false,
+     *         style = "form",
+     *         explode = "false",
+     *         @OA\Schema(
+     *             type = "integer"
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         in = "query",
+     *         name = "country",
+     *         description = "Country identifier to get authorization data on",
+     *         required = false,
+     *         style = "form",
+     *         explode = "false",
+     *         @OA\Schema(
+     *             type = "integer"
+     *         )
+     *     ),
      *     @OA\Response(
      *         response = "200",
      *         description = "List of registrations",
@@ -24,9 +46,9 @@ class Registrations extends Controller
      *     )
      * )
      */
-    public function index(Request $request, string $event)
+    public function index(Request $request)
     {
-        $event = Event::where('event_id', $event)->first();
+        $event = $request->get('eventObject');
         if (empty($event) || !$event->exists || get_class($event) != Event::class) {
             $this->authorize("not/ever");
         }
@@ -34,7 +56,7 @@ class Registrations extends Controller
         if ($request->user()->can("viewRegistrations", $event)) {
             $country = $request->get('countryObject');
             // superhod cannot set org roles
-            $isOrganiser = $request->user()->hasRole(['sysop', 'organiser:' . $event->getKey(), 'reistrar:' . $event->getKey()]);
+            $isOrganiser = $request->user()->hasRole(['sysop', 'organiser:' . $event->getKey(), 'registrar:' . $event->getKey()]);
 
             // country should be implicitely or explicitely set, except for organisers
             if (empty($country) && !$isOrganiser) {

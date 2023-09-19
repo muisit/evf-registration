@@ -3,11 +3,13 @@
 namespace Tests\Unit\App\Models\Policies;
 
 use App\Models\Country;
+use App\Models\Event;
 use App\Models\WPUser;
 use App\Models\Policies\Country as Policy;
 use Tests\Support\Data\EventRole as RoleData;
 use Tests\Support\Data\Registrar as RegistrarData;
 use Tests\Support\Data\WPUser as UserData;
+use Tests\Support\Data\Event as EventData;
 use Tests\Unit\TestCase;
 use Carbon\Carbon;
 
@@ -21,6 +23,10 @@ class CountryTest extends TestCase
 
     public function testBefore()
     {
+        request()->merge([
+            'eventObject' => Event::where('event_id', EventData::EVENT1)->first(),
+            'countryObject' => Country::where('country_id', Country::GER)->first()
+        ]);
         $policy = new Policy();
         $admin = WPUser::where("ID", UserData::TESTUSER)->first();
         $editor = WPUser::where("ID", UserData::TESTUSER2)->first();
@@ -53,6 +59,11 @@ class CountryTest extends TestCase
 
     public function testView()
     {
+        request()->merge([
+            'eventObject' => Event::where('event_id', EventData::EVENT1)->first(),
+            'countryObject' => Country::where('country_id', Country::GER)->first()
+        ]);
+
         $countryGER = Country::where("country_id", Country::GER)->first();
         $countryITA = Country::where("country_id", Country::ITA)->first();
 
@@ -81,5 +92,35 @@ class CountryTest extends TestCase
 
         // unprivileged cannot
         $this->assertFalse($policy->view($unpriv, $countryGER));
+    }
+
+    public function testInvalidEvent()
+    {
+        request()->merge([
+            'eventObject' => null,
+            'countryObject' => Country::where('country_id', Country::GER)->first()
+        ]);
+
+        $countryGER = Country::where("country_id", Country::GER)->first();
+        $countryITA = Country::where("country_id", Country::ITA)->first();
+
+        $policy = new Policy();
+        $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
+        $gerhod = WPUser::where("ID", UserData::TESTUSERHOD)->first();
+        $unpriv = WPUser::where("ID", UserData::TESTUSER5)->first();
+        $cashier = WPUser::where("ID", UserData::TESTUSER3)->first();
+        $accred = WPUser::where("ID", UserData::TESTUSER4)->first();
+        $organiser = WPUser::where("ID", UserData::TESTUSERORGANISER)->first();
+        $registrar = WPUser::where("ID", UserData::TESTUSERREGISTRAR)->first();
+
+        // organiser and registrar are no longer recognised as organisers
+        $this->assertFalse($policy->view($cashier, $countryGER));
+        $this->assertFalse($policy->view($accred, $countryITA));
+        $this->assertFalse($policy->view($organiser, $countryGER));
+        $this->assertFalse($policy->view($registrar, $countryITA));
+
+        // request object for country has no effect on policy
+        $this->assertTrue($policy->view($gerhod, $countryGER));
+        $this->assertFalse($policy->view($gerhod, $countryITA));
     }
 }

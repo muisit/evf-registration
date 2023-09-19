@@ -24,7 +24,6 @@ class Country
      */
     public function view(EVFUser $user, Model $model): bool | null
     {
-        \Log::debug("testing country::view policy for " . $model->getKey());
         // someone can 'see' a country if he/she is the HoD of the country
         // or is a super-HoD
         if ($user->hasRole(['hod:' . $model->getKey(), 'superhod'])) {
@@ -32,8 +31,10 @@ class Country
         }
 
         // organisers can switch between countries and see country-related data
-        $isOrganiser = $user->rolesLike('organiser:') + $user->rolesLike('registrar:');
-        if (count($isOrganiser) > 0) {
+        $event = request()->get('eventObject');
+        $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
+        \Log::debug('event ' . json_encode(request()->all()));
+        if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId, 'registrar:' . $eventId])) {
             return true;
         }
 

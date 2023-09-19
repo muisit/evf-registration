@@ -36,6 +36,14 @@ class Registration
     public ?int $roleId = null;
 
     /**
+     * Event identifier
+     *
+     * @var int
+     * @OA\Property()
+     */
+    public ?int $eventId = null;
+
+    /**
      * Side event identifier
      *
      * @var int
@@ -95,6 +103,7 @@ class Registration
     {
         $this->id = $registration->getKey();
         $this->fencerId = $registration->registration_fencer;
+        $this->eventId = $registration->registration_mainevent;
         $this->sideEventId = $registration->registration_event;
         $this->roleId = intval($registration->registration_role) > 0 ? $registration->registration_role : null;
         $this->dateTime = $registration->registration_date;

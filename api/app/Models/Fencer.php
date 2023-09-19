@@ -25,4 +25,10 @@ class Fencer extends Model
     {
         return $this->belongsTo(Country::class, 'fencer_country', 'country_id');
     }
+
+    public function image()
+    {
+        $path = storage_path('app/fencers/fencer_' . $this->getKey() . '.dat');
+        return $path;
+    }
 }

@@ -16,6 +16,22 @@ $router->group(
         );
 
         $router->get(
+            '/{fencerId}/photo',
+            [
+                'as' => 'fencers.photo',
+                'uses' => 'Fencers\Photo@index'
+            ]
+        );
+
+        $router->post(
+            '/{fencerId}/photo',
+            [
+                'as' => 'fencers.photosave',
+                'uses' => 'Fencers\PhotoSave@index'
+            ]
+        );
+
+        $router->get(
             '/autocomplete',
             [
                 'as' => 'fencers.ac',

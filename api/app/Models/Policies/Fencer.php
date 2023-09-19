@@ -16,6 +16,38 @@ class Fencer
         return null;
     }
 
+    private function isOrganiserOrRegistrar(EVFUser $user)
+    {
+        // see if we have a global request object for the event
+        $event = request()->get('eventObject');
+        $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
+
+        // someone can see a fencer if he/she is an organiser or a registrar
+        // for a valid event. We can remove these roles to restrict the number
+        // of people with broad fencer access
+        if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId, 'registrar:' . $eventId])) {
+            return true;
+        }
+        return false;
+    }
+
+    private function isHodForCountry(EVFUser $user, int $testForId = null)
+    {
+        // super-heads-of-delegation are always HoD
+        if ($user->hasRole('superhod')) {
+            return true;
+        }
+
+        $countryObject = request()->get('countryObject');
+        $countryId = !empty($countryObject) ? $countryObject->getKey() : null;
+        if (!empty($countryId)) {
+            if ($user->hasRole(['hod:' . $countryId, 'superhod'])) {
+                return $testForId == null || $countryId == $testForId;
+            }
+        }
+        return false;
+    }
+
     /**
      * @param User $user
      * @param Model $model
@@ -24,11 +56,7 @@ class Fencer
      */
     public function viewAny(EVFUser $user): bool | null
     {
-        // someone can see a fencer if he/she is an organiser or a registrar
-        // for any event. We can remove these roles to restrict the number
-        // of people with broad fencer access
-        $isOrganiser = $user->rolesLike('organiser:') + $user->rolesLike('registrar:');
-        if (count($isOrganiser) > 0) {
+        if ($this->isOrganiserOrRegistrar($user)) {
             return true;
         }
 
@@ -51,7 +79,7 @@ class Fencer
 
         // someone can see a fencer if he/she is the HoD of the country
         // of that fencer, or a super-HoD
-        if ($user->hasRole(['hod:' . $model->fencer_country, 'superhod'])) {
+        if ($this->isHodForCountry($user, $model->fencer_country)) {
             return true;
         }
 
@@ -66,15 +94,12 @@ class Fencer
      */
     public function create(EVFUser $user): bool
     {
-        // organisers with registration rights can create a fencer model
-        $isOrganiser = $user->rolesLike('organiser:') + $user->rolesLike('registrar:');
-        if (count($isOrganiser) > 0) {
+        if ($this->isOrganiserOrRegistrar($user)) {
             return true;
         }
 
         // heads-of-delegation can create fencers
-        $countryObject = request()->get('countryObject');
-        if ($user->hasRole(['hod:' . empty($countryObject) ? '?' : $countryObject->getKey(), 'superhod'])) {
+        if ($this->isHodForCountry($user)) {
             return true;
         }
 
@@ -90,8 +115,18 @@ class Fencer
      */
     public function update(EVFUser $user, Model $model): bool
     {
-        // anyone that can create a fencer can update it
-        return $this->create($user);
+        // organisers with registration rights can update a fencer model
+        if ($this->isOrganiserOrRegistrar($user)) {
+            return true;
+        }
+
+        // a regular HoD can only update fencers of their own country
+        if ($this->isHodForCountry($user, $model->fencer_country)) {
+            return true;
+        }
+
+        // all other people cannot create fencer data
+        return false;
     }
 
     /**
@@ -101,14 +136,12 @@ class Fencer
      */
     public function pictureState(EVFUser $user): bool
     {
-        // picture state can only be updated by organisers and registrars
-        $isOrganiser = $user->rolesLike('organiser:') + $user->rolesLike('registrar:');
-        if (count($isOrganiser) > 0) {
+        // organisers with registration rights can update the picture state
+        if ($this->isOrganiserOrRegistrar($user)) {
             return true;
         }
 
         // all other people cannot change the state of pictures
         return false;
     }
-
 }

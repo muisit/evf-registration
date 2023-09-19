@@ -22,13 +22,5 @@ $router->group(
                 'uses' => 'Events\Overview@index'
             ]
         );
-
-        $router->get(
-            '/{event}/registrations',
-            [
-                'as' => 'events.registrations',
-                'uses' => 'Events\Registrations@index'
-            ]
-        );
     }
 );

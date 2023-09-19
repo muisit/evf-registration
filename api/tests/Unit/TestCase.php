@@ -18,6 +18,8 @@ abstract class TestCase extends BaseTestCase
         if (method_exists($this, 'fixtures')) {
             $this->fixtures();
         }
+        $request = request();
+        app()->instance('request', $request);
     }
 
     /**

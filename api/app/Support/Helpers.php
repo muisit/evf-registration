@@ -91,7 +91,7 @@ if (! function_exists('validate_email')) {
     }
 }
 
-if (! function_exists('validtest_that_base_endpoint_returns_a_successful_response()ate_intlist')) {
+if (! function_exists('validtate_intlist')) {
     function validate_intlist($value)
     {
         if (!is_array($value)) {

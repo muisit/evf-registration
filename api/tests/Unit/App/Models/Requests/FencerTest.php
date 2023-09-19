@@ -3,9 +3,11 @@
 namespace Tests\Unit\App\Models\Requests;
 
 use App\Models\Country;
+use App\Models\Event;
 use App\Models\Fencer;
 use App\Models\WPUser;
 use App\Models\Requests\Fencer as FencerRequest;
+use Tests\Support\Data\Event as EventData;
 use Tests\Support\Data\Fencer as FencerData;
 use Tests\Support\Data\WPUser as UserData;
 use Tests\Support\Data\Registrar as RegistrarData;
@@ -115,6 +117,10 @@ class FencerTest extends TestCase
 
     public function testAuthorization()
     {
+        request()->merge([
+            'eventObject' => Event::where('event_id', EventData::EVENT1)->first(),
+            'countryObject' => Country::where('country_id', Country::GER)->first()
+        ]);
         $testData = [
             'id' => 0,
             'firstName' => 'aa',
