@@ -4,11 +4,11 @@ import { CountrySchema } from "./country";
 import { Registration } from "./registration";
 
 export interface Fencer {
-    id: number|null;
-    firstName: string|null;
-    lastName: string|null;
+    id: number;
+    firstName: string;
+    lastName: string;
     countryId: number|null;
-    gender?: string|null;
+    gender?: string;
     dateOfBirth: string|null;
     photoStatus?: string|null;
 

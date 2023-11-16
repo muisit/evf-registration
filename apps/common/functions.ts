@@ -14,6 +14,11 @@ export function parse_date(dt:any = null) {
     return retval;
 }
 
+export function valid_date(dt:any) {
+    var retval=dayjs(dt);
+    return retval.isValid();
+}
+
 export function format_date(date:any = null)
 {
     var date2 = parse_date(date);
@@ -24,6 +29,10 @@ export function format_datetime(date:any = null)
 {
     var date2 = parse_date(date);
     return date2.format('YYYY-MM-DD HH:mm:ss');
+}
+
+export function random_hash() {
+    return dayjs().format("YYYYMMDDHHmmss");
 }
 
 export function date_to_category_num(dt:string|object, wrt:any = null) {

@@ -30,6 +30,8 @@
         }
     }
 
+
+
     .photoAccepted {
         color: green;
     }
@@ -51,5 +53,13 @@
 .el-dialog {
     .suggestion-list {
         width: 80%;
+    }
+
+    .photoid-element {
+        .photo-id {
+            img {
+                width: 60%;
+            }
+        }
     }
 }

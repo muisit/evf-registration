@@ -3,6 +3,7 @@ import { SideEvent } from '../../../../common/api/schemas/sideevent';
 const props = defineProps<{
     filter:Array<string>;
     name: string;
+    label: string;
 }>();
 const emits = defineEmits(['onFilter']);
 
@@ -16,8 +17,10 @@ function onClick()
     emits('onFilter', {name: props.name, state: !isSet()});
 }
 
-import { ElCheckboxButton } from 'element-plus';
+import { ElCheckboxButton, ElTooltip } from 'element-plus';
 </script>
 <template>
-  <ElCheckboxButton @change="onClick" :model-value="isSet()">{{ props.name }}</ElCheckboxButton>
+    <ElTooltip :content="props.label" placement="bottom">
+        <ElCheckboxButton @change="onClick" :model-value="isSet()">{{ props.name }}</ElCheckboxButton>
+    </ElTooltip>
 </template>

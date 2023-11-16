@@ -6,7 +6,7 @@ use App\Models\Country;
 use App\Models\Fencer;
 use App\Models\Event;
 use App\Models\SideEvent;
-use App\Models\Registration as BaseModel;
+use App\Models\Registration as RegistrationModel;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -16,12 +16,24 @@ class Registration extends Base
     public function rules(): array
     {
         return [
+            'event' => ['required', 'exists:TD_Event,event_id'],
+            'country' => ['nullable', 'exists:TD_Country,country_id'],
             'registration.id' => ['nullable', 'int', 'min:0'],
             'registration.fencerId' => ['required','exists:TD_Fencer,fencer_id'],
-            'registration.eventId' => ['required','exists:TD_Event,event_id'],
-            'registration.sideEventId' => ['nullable','exists:TD_Event_Side,id'],
+            'registration.sideEventId' => ['nullable','exists:TD_Event_Side,id', function ($a, $v, $f) {
+                return $this->checkSideEvent($a, $v, $f);
+            }],
             'registration.roleId' => ['nullable','exists:TD_Role,role_id'],
         ];
+    }
+
+    private function checkSideEvent($attribute, $value, $fail)
+    {
+        $se = SideEvent::where('id', $value)->first();
+        $event = request()->get('eventObject');
+        if (empty($event) || empty($se) || ($event->getKey() != $se->event_id)) {
+            $fail('side event does not match main event');
+        }
     }
 
     protected function authorize(EVFUser $user, array $data): bool
@@ -51,21 +63,19 @@ class Registration extends Base
             $this->controller->authorize('not/ever');
             return false;
         }
-
-        $this->canChangePictureState = $user->can('pictureState', Fencer::class);
         return true;
     }
 
     protected function createModel(Request $request): ?Model
     {
-        $fencer = $request->get('fencer');
+        $registration = $request->get('registration');
         $id = 0;
-        if (!empty($fencer)) $id = $fencer['id'] ?? 0;
+        if (!empty($registration)) $id = $registration['id'] ?? 0;
         $id = intval($id);
 
-        $model = FencerModel::where('fencer_id', $id)->first();
+        $model = RegistrationModel::where('registration_id', $id)->first();
         if (empty($model)) {
-            $model = new FencerModel();
+            $model = new RegistrationModel();
         }
         return $model;
     }
@@ -73,14 +83,22 @@ class Registration extends Base
     protected function updateModel(array $data): ?Model
     {
         if ($this->model) {
-            $this->model->fencer_firstname = $data['fencer']['firstName'];
-            $this->model->fencer_surname = $data['fencer']['lastName'];
-            $this->model->fencer_gender = $data['fencer']['gender'];
-            $this->model->fencer_country = $data['fencer']['countryId'];
-            $this->model->fencer_dob = $data['fencer']['dateOfBirth'] ?? null;
+            $event = request()->get('eventObject');
+            $this->model->registration_event = $event->getKey();
+            $this->model->registration_mainevent = $data['registration']['eventId'];
+            $this->model->registration_fencer = $data['registration']['fencerId'];
+            $this->model->registration_role = $data['registration']['roleId'];
+            $this->model->registration_team = $data['registration']['team'] ?? null;
 
-            if ($this->canChangePictureState) {
-                $this->model->fencer_picture = $data['fencer']['photoStatus'] ?? null;
+            $country = request()->get('countryObject');
+            if (!empty($country)) {
+                // this links the registration to the requesting country, irrespective of
+                // the fencer country
+                $this->model->registration_country = $country->getKey();
+            }
+
+            if (!$this->model->exists) {
+                $this->model->registration_date = Carbon::now()->toDateTimeString();
             }
         }
         return $this->model;

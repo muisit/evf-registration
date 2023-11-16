@@ -86,9 +86,9 @@ import FilterButton from './FilterButton.vue';
 <template>
     <div class="participant-list">
         <div class="participant-filters">
-            <FilterButton v-for="item in data.weapons" :key="item.id" :name="item.abbr" :filter="filter" @onFilter="onFilter"/>
-            <FilterButton v-for="item in data.nonCompetitionEvents" :key="item.id" :name="item.abbr" :filter="filter" @onFilter="onFilter"/>
-            <FilterButton name="Support" :filter="filter" @onFilter="onFilter"/>
+            <FilterButton v-for="item in data.weapons" :key="item.id" :name="item.abbr" :label="item.name" :filter="filter" @onFilter="onFilter"/>
+            <FilterButton v-for="item in data.nonCompetitionEvents" :key="item.id" :name="item.abbr" :label="item.title" :filter="filter" @onFilter="onFilter"/>
+            <FilterButton name="Support" label="Support roles" :filter="filter" @onFilter="onFilter"/>
         </div>
         <table class="style-stripes">
             <thead>

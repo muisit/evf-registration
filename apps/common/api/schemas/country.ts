@@ -1,6 +1,6 @@
 export interface CountrySchema {
-    id: number|null;
-    name: string|null;
-    abbr: string|null;
+    id: number;
+    name: string;
+    abbr: string;
     path: string|null;
 };

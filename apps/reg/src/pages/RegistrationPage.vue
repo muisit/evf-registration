@@ -18,15 +18,8 @@ function canSwitchCountry()
     return auth.isSysop() || auth.isOrganiser(data.currentEvent.id) || auth.isSuperHod() || auth.isRegistrar(data.currentEvent.id);
 }
 
-function canAssignOrgRoles()
-{
-    // sysop, organiser and registrars, not HoD or superHoD
-    return auth.isSysop() || auth.isOrganiser(data.currentEvent.id) || auth.isRegistrar(data.currentEvent.id);
-}
-
 function onChangeCountry(newValue)
 {
-    console.log('on change of country in registration page', newValue);
     data.setCountry(newValue.countryId);
 }
 
@@ -34,7 +27,6 @@ watch(
     () => props.visible,
     (nw) => {
         if (nw) {
-            console.log('getting registrations on visible');
             data.getRegistrations();
         }
     },
@@ -61,25 +53,37 @@ function saveSearchDialog(el:Fencer)
 const fencerDialog = ref(false);
 const selectedFencer:Ref<Fencer> = ref(defaultFencer());
 
-function closeFencerDialog() {
+function closeFencerDialog()
+{
     console.log('closing fencer dialog');
     fencerDialog.value = false;
 }
 
-function saveFencerDialog(form:object) {
-    console.log('saving fencers from dialog');
+function saveFencerDialog()
+{
+    addFencerToRegistrationData(selectedFencer.value);
 }
 
-function changeFencerDialog(field:any)
+function updateFencerDialog(fieldDef:any)
 {
-    //selectedFencer.value[field.fieldName] = field.value;
+    switch (fieldDef.field) {
+        case 'id':
+        case 'lastName':
+        case 'firstName':
+        case 'gender':
+        case 'countryId':
+        case 'dateOfBirth':
+        case 'photoStatus':
+            console.log('setting field ', fieldDef.field, fieldDef.value);
+            selectedFencer.value[fieldDef.field] = fieldDef.value;
+            break;
+    }
 }
 
 const allfencers:Ref<FencerList> = ref([]);
 watch(
     () => data.currentCountry,
     (nw) => {
-        console.log('retrieving new list of fencers for this country', nw);
         if (is_valid(nw)) {
             fencerlist(nw)
                 .then((data) => {
@@ -87,7 +91,6 @@ watch(
                 });
         }
         else {
-            console.log('not a valid country');
             allfencers.value = [];
         }
     },
@@ -108,6 +111,6 @@ import { ElButton } from 'element-plus';
         </div>
         <ParticipantList />
         <SearchDialog @onClose="closeSearchDialog" @onSave="saveSearchDialog" :visible="searchDialog" :fencers="allfencers" />
-        <FencerDialog @onClose="closeFencerDialog" @onSave="saveFencerDialog" @onChange="changeFencerDialog" :visible="fencerDialog" :fencer="selectedFencer" />
+        <FencerDialog @onClose="closeFencerDialog" @onUpdate="updateFencerDialog" @onSave="saveFencerDialog" :visible="fencerDialog" :fencer="selectedFencer" :changeCountry="canSwitchCountry()"/>
     </div>
 </template>

@@ -5,7 +5,7 @@ import { useDataStore } from "../data";
 export function decorateFencer(fencer:Fencer)
 {
     const dataStore = useDataStore();
-    if (is_valid(fencer.countryId) && dataStore.countries['c' + fencer.countryId]) {
+    if (is_valid(fencer.countryId) && dataStore.countriesById['c' + fencer.countryId]) {
         fencer.country = dataStore.countriesById['c' + fencer.countryId];
     }
     else {

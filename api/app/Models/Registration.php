@@ -40,4 +40,30 @@ class Registration extends Model
     {
         return $this->belongsTo(Country::class, 'registration_country', 'country_id');
     }
+
+    public function save(array $options = [])
+    {
+        if (empty($this->registration_role)) {
+            $this->registration_role = 0;
+        }
+
+        // make sure only one registration for a fencer for a side-event or role exists
+        // either role is 0, or side-event is null at the moment
+        if (!$this->model->exists) {
+            $query = Registration::where('registration_id', '<>', $this->getKey())
+                ->where('registration_fencer', $this->registration_fencer)
+                ->where('registration_role', $this->registration_role);
+            if (empty($this->registration_event)) {
+                $query->where('registration_event', null);
+            }
+            else {
+                $query->where('registration_event', $this->registration_event);
+            }
+            $query->delete();
+        }
+
+        if (parent::save($options)) {
+            Accreditation::makeDirty($this->fencer, $this->event);
+        }
+    }
 }

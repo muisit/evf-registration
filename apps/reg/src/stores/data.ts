@@ -4,13 +4,14 @@ import { is_valid } from '../../../common/functions';
 import { basicData } from '../../../common/api/basicdata';
 import { eventlist } from '../../../common/api/event/eventlist';
 import { overview } from '../../../common/api/event/overview';
-import { registrations } from '../../../common/api/event/registrations';
+import { registrations } from '../../../common/api/registrations/registrations';
 import { abbreviateSideEvent } from './lib/abbreviateSideEvent';
 import { overviewToCountry } from './lib/overviewToCountry';
 import { registrationToFencers } from './lib/registrationToFencers';
 import { SideEvent } from '../../../common/api/schemas/sideevent';
 import { Competition } from '../../../common/api/schemas/competition';
 import { CountrySchema } from '../../../common/api/schemas/country';
+import { useAuthStore } from '../../../common/stores/auth';
 
 export const useDataStore = defineStore('data', () => {
     const categories = ref([]);
@@ -120,7 +121,6 @@ export const useDataStore = defineStore('data', () => {
     }
 
     function setEvent(eventId:number) {
-        console.log('setting event', eventId);
         if (!is_valid(eventId)) return;
 
         var eventFound = { id: -1, title: 'Please wait while loading', competitions: [], sideEvents: []};
@@ -130,7 +130,6 @@ export const useDataStore = defineStore('data', () => {
             }
         });
 
-        console.log('mapping competitions for new event');
         currentEvent.value = eventFound;
         competitions.value = eventFound.competitions.map((comp:Competition) => {
             if (is_valid(comp.categoryId)) {
@@ -144,13 +143,13 @@ export const useDataStore = defineStore('data', () => {
         competitionsById.value = {};
         competitions.value.forEach((data) => competitionsById.value['c' + data.id] = data);
 
-        console.log('mapping side events for new event');
-        // sort side events in competion based events and side events
+        // sort side events in competition based events and side events
         var comps = [];
         var ses = [];
         eventFound.sideEvents.map((se:SideEvent) => {
             if (is_valid(se.competitionId)) {
                 se.competition = competitionsById.value['c' + se.competitionId];
+                //se.title = se.competition?.weapon?.name + " " + se.competition?.category.name;
                 comps.push(se);
             }
             else {
@@ -166,6 +165,9 @@ export const useDataStore = defineStore('data', () => {
 
         overviewData.value = [];
         fencerData.value = {};
+
+        const authStore = useAuthStore();
+        authStore.eventId = currentEvent.value.id;
     } 
 
     function getOverview() {
@@ -188,17 +190,16 @@ export const useDataStore = defineStore('data', () => {
     }
 
     function setCountry(cid:number) {
-        console.log('setting country to ', cid);
         if (!is_valid(cid) || !countriesById.value['c' + cid]) {
-            console.log('this is the organisation');
-            currentCountry.value = {id: 0, name: 'Organisation', abbr:'Org'};
+            currentCountry.value = {id: 0, name: 'Organisation', abbr:'Org', path: ''};
         }
         else {
-            console.log('this is a valid country');
             currentCountry.value = countriesById.value['c' + cid];
         }
         fencerData.value = {};
-        console.log('receiving registrations because country has changed', currentCountry.value, cid);
+
+        const authStore = useAuthStore();
+        authStore.countryId = currentCountry.value.id || 0;
         getRegistrations();
     }
 

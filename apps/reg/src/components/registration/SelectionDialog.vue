@@ -1,11 +1,8 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { is_valid, random_hash, valid_date } from '../../../../common/functions';
 import { Fencer } from '../../../../common/api/schemas/fencer';
 import { useDataStore } from '../../stores/data';
-import { duplicateFencerCheck } from './lib/duplicateFencerCheck';
-import { savefencer } from '../../../../common/api/fencers/savefencer';
-import { uploadphoto } from '../../../../common/api/fencers/uploadphoto';
+import { saveregistration } from '../../../../common/api/registrations/saveregistration';
 
 const props = defineProps<{
     visible:boolean;

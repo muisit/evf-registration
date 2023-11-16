@@ -21,8 +21,9 @@ function simpleFetch(method: string, path:string, data:object|null|undefined, op
 
     const auth = useAuthStore();
     const contentHeaders = Object.assign({
-        "Accept": "application/json",
-        "Content-Type": "application/json"},
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
         headers,
         {
             'X-CSRF-Token': auth ? auth.token : ''
@@ -36,11 +37,13 @@ function simpleFetch(method: string, path:string, data:object|null|undefined, op
         signal: controller.signal
     });
 
+    if (!data.event) data.event = auth.eventId;
+    if (!data.country) data.country = auth.countryId;
+
     if (data && (method == 'POST' || method == 'PUT' || method == 'DELETE')) {
         fetchOptions.body = JSON.stringify(data);
     }
     if (data && method == 'GET') {
-        console.log('adding data to query');
         var glue='?';
         if (path.indexOf('?') > 0) {
             glue = '&';
@@ -89,32 +92,43 @@ export function fetchAttachment(path:string, data={}, options={}, headers={}) {
     return simpleFetch('GET', path, data, options, headers, attachmentResponse);
 }
 
-export function uploadFile(selectedFile, add_data, options={}, headers={}) {
+export function uploadFile(path, selectedFile, add_data, options={}, headers={}): Promise<FetchResponse> {
+    return (doUploadFile(path, selectedFile, add_data, options, headers) as unknown) as Promise<FetchResponse>;
+}
+
+function doUploadFile(path, selectedFile, add_data, options={}, headers={}) {
     if(!controller) {
         controller = new AbortController();
     }
 
+    const auth = useAuthStore();
     const contentHeaders = Object.assign({
-        "Accept": "application/json",
+            "Accept": "application/json",
         },
-        headers
+        headers,
+        {
+            'X-CSRF-Token': auth ? auth.token : ''
+        }
     );
 
     var data = new FormData()
     data.append('picture', selectedFile);
+
+    if (!add_data.event) add_data.event = auth.eventId;
+    if (!add_data.country) add_data.country = auth.countryId;
     Object.keys(add_data).map((key)=> {
         data.append(key, add_data[key]);
-    })
+    });
 
     const fetchOptions = Object.assign({}, {headers: contentHeaders}, options, {
-        credentials: "same-origin",
+        credentials: "include",
         redirect: "manual",
         method: 'POST',
         signal: controller.signal,
         body: data
     });
 
-    return fetch(import.meta.env.VITE_API_URL + "/upload", fetchOptions)
+    return fetch(import.meta.env.VITE_API_URL + path, fetchOptions)
         .then(validateResponse())
         .catch(err => {
             if(err.name !== "AbortError") {

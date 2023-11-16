@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { Ref, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { me } from '../api/auth/me';
 import { login } from '../api/auth/login';
@@ -8,9 +8,9 @@ export const useAuthStore = defineStore('auth', () => {
     const userName = ref('');
     const isGuest = ref(true);
     const token = ref('');
-    const credentials = ref([]);
+    const credentials:Ref<Array<string>> = ref([]);
     const countryId = ref(0);
-    const country = ref({});
+    const eventId = ref(0);
 
     function sendMe() {
         me().then((data) => {
@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('auth', () => {
             if (data.status && data.username && data.username.length) {
                 isGuest.value = false;
                 userName.value = data.username;
-                credentials.value = data.credentials;
+                credentials.value = data.credentials || [];
                 if (data.countryId) countryId.value = data.countryId;
             }
         });
@@ -55,33 +55,33 @@ export const useAuthStore = defineStore('auth', () => {
         if (credentials.value.includes("superhod")) return true;
     }
 
-    function isHodFor(countryId:number) {
+    function isHodFor() {
         if (isSuperHod()) return true;
-        return credentials.value.includes('hod:' + countryId);
+        return credentials.value.includes('hod:' + countryId.value);
     }
 
-    function isOrganisation(eventId:number) {
-        return credentials.value.includes('organisation:' + eventId);
+    function isOrganisation() {
+        return credentials.value.includes('organisation:' + eventId.value);
     }
 
-    function isOrganiser(eventId:number) {
-        return credentials.value.includes('organiser:' + eventId);
+    function isOrganiser() {
+        return credentials.value.includes('organiser:' + eventId.value);
     }
 
-    function isRegistrar(eventId:number) {
-        return credentials.value.includes('registrar:' + eventId);
+    function isRegistrar() {
+        return credentials.value.includes('registrar:' + eventId.value);
     }
 
-    function isCashier(eventId:number) {
-        return credentials.value.includes('cashier:' + eventId);
+    function isCashier() {
+        return credentials.value.includes('cashier:' + eventId.value);
     }
 
-    function isAccreditor(eventId:number) {
-        return credentials.value.includes('accreditation:' + eventId);
+    function isAccreditor() {
+        return credentials.value.includes('accreditation:' + eventId.value);
     }
 
     return {
-        userName, isGuest, token, credentials, countryId, country,
+        userName, isGuest, token, credentials, countryId, eventId,
         sendMe, logIn, logOut,
         isSysop, isHod, isSuperHod, isHodFor, isOrganisation, isOrganiser, isRegistrar, isCashier, isAccreditor,
     }

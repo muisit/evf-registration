@@ -49,18 +49,25 @@ function onChange()
                 country: data.currentCountry.id
             };
 
-            autocomplete(autocompleteData)
-                .then((results) => {
-                    if (autocompleteData.name == name.value) {
-                        suggestions.value = results.map((fencer) => {
-                            decorateFencer(fencer);
-                            return fencer;
+            window.setTimeout(() => {
+                console.log('testing ', name.value, 'vs ', autocompleteData.name);
+                if (name.value == autocompleteData.name) {
+                    autocomplete(autocompleteData)
+                        .then((results) => {
+                            if (autocompleteData.name == name.value) {
+                                suggestions.value = results.map((fencer) => {
+                                    console.log('fencer country is ', fencer.countryId);
+                                    decorateFencer(fencer);
+                                    console.log('fencer country is ', fencer.countryId);
+                                    return fencer;
+                                });
+                            }
+                            else {
+                                console.log('skipping setting suggestions');
+                            }
                         });
                     }
-                    else {
-                        console.log('skipping setting suggestions');
-                    }
-                });
+                }, 500);
         }
         else {
             suggestions.value = filterSuggestionsFromFencerList(name.value, props.fencers);
@@ -69,7 +76,6 @@ function onChange()
     else {
         suggestions.value = [];
     }
-    console.log('suggestions is ', suggestions.value);
 }
 
 watch (
