@@ -33,6 +33,7 @@ class Registration extends Fixture
         Event::create();
         Fencer::create();
         SideEvent::create();
+        AccreditationTemplate::create();
         self::booted();
 
         $opens = Carbon::now()->addDays(11)->toDateString();

@@ -31,6 +31,39 @@ export function format_datetime(date:any = null)
     return date2.format('YYYY-MM-DD HH:mm:ss');
 }
 
+var months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+export function format_date_fe(dt) {
+    var mmt = dayjs(dt);
+    return mmt.date() + " " + months[mmt.month()] + " " + mmt.year();
+}
+var short_months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+export function format_date_fe_short(dt) {
+    var mmt = dayjs(dt);
+    return mmt.date() + " " + short_months[mmt.month()];
+}
+
+export function random_token(length, charlist?:string) {
+    if (!charlist) charlist = "abcdefghijklmnopqrstuvwxyz0123456789";
+    if (length > 100) length = 100;
+    if (length < 0) return null;
+    var retval = '';
+    for (var i=0;i < length; i++) {
+        retval += random_from_list(charlist);
+    }
+    return retval;
+}
+
+export function random_from_list(lst) {
+    if (!lst || !lst.length) return null;
+    var index = random_int(lst.length);
+    return lst[index];
+}
+
+export function random_int(max) {
+    if (!max) max = 0x7fffffff;
+    return Math.floor(Math.random() * max);
+}
+
 export function random_hash() {
     return dayjs().format("YYYYMMDDHHmmss");
 }

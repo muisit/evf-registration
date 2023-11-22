@@ -6,8 +6,9 @@ import type { Fencer } from '../../../../common/api/schemas/fencer';
 import type { Registration } from '../../../../common/api/schemas/registration';
 import { sortAndFilterFencers } from './lib/sortAndFilterFencers';
 import { useDataStore } from '../../stores/data';
-const data = useDataStore();
+const emits = defineEmits(['onEdit', 'onSelect']);
 
+const data = useDataStore();
 const sorter:Ref<Array<string>> = ref(['n', 'f']);
 const filter:Ref<Array<string>> = ref([]);
 const dataList:Ref<Array<Fencer>> = ref([]);
@@ -54,12 +55,12 @@ watch (
 
 function fencerSelect(item:Fencer)
 {
-    return '';
+    emits('onEdit', item);
 }
 
 function eventSelect(item:Fencer)
 {
-    return '';
+    emits('onSelect', item);
 }
 
 function onSort(newSorter:Array<string>)
@@ -82,6 +83,8 @@ function onFilter(filterState)
 import PhotoIcon from './PhotoIcon.vue';
 import SortingIcon from './SortingIcon.vue';
 import FilterButton from './FilterButton.vue';
+import { ElIcon } from 'element-plus';
+import { Edit, Trophy } from '@element-plus/icons-vue';
 </script>
 <template>
     <div class="participant-list">
@@ -114,10 +117,14 @@ import FilterButton from './FilterButton.vue';
                         <PhotoIcon :fencer="item" />
                     </td>
                     <td class='text-center'>
-                        {{ fencerSelect(item) }}
+                        <ElIcon>
+                            <Edit @click="() => fencerSelect(item)"/>
+                        </ElIcon>
                     </td>
                     <td class='text-center'>
-                        {{ eventSelect(item) }}
+                        <ElIcon>
+                            <Trophy @click="() => eventSelect(item)"/>
+                        </ElIcon>
                     </td>
                 </tr>
             </tbody>

@@ -18,6 +18,12 @@ function canSwitchCountry()
     return auth.isSysop() || auth.isOrganiser(data.currentEvent.id) || auth.isSuperHod() || auth.isRegistrar(data.currentEvent.id);
 }
 
+function isAdmin()
+{
+    // administrators are sysop and event organisers
+    return auth.isSysop() || auth.isOrganiser(data.currentEvent.id) || auth.isRegistrar(data.currentEvent.id);
+}
+
 function onChangeCountry(newValue)
 {
     data.setCountry(newValue.countryId);
@@ -80,6 +86,24 @@ function updateFencerDialog(fieldDef:any)
     }
 }
 
+function editFencer(fencer:Fencer)
+{
+    fencerDialog.value = true;
+    selectedFencer.value = fencer;
+}
+
+const selectionDialog = ref(false);
+function closeSelectionDialog()
+{
+    selectionDialog.value = false;
+}
+
+function selectFencer(fencer:Fencer)
+{
+    selectionDialog.value = true;
+    selectedFencer.value = fencer;
+}
+
 const allfencers:Ref<FencerList> = ref([]);
 watch(
     () => data.currentCountry,
@@ -101,6 +125,7 @@ import RegistrationHeader from '../components/registration/RegistrationHeader.vu
 import ParticipantList from '../components/registration/ParticipantList.vue';
 import FencerDialog from '../components/registration/FencerDialog.vue';
 import SearchDialog from '../components/registration/SearchDialog.vue';
+import SelectionDialog from '../components/registration/SelectionDialog.vue';
 import { ElButton } from 'element-plus';
 </script>
 <template>
@@ -109,8 +134,9 @@ import { ElButton } from 'element-plus';
         <div class='registration-buttons'>
             <ElButton type="primary" @click="openSearchDialog">Add Registration</ElButton>
         </div>
-        <ParticipantList />
+        <ParticipantList @on-edit="editFencer" @on-select="selectFencer"/>
         <SearchDialog @onClose="closeSearchDialog" @onSave="saveSearchDialog" :visible="searchDialog" :fencers="allfencers" />
         <FencerDialog @onClose="closeFencerDialog" @onUpdate="updateFencerDialog" @onSave="saveFencerDialog" :visible="fencerDialog" :fencer="selectedFencer" :changeCountry="canSwitchCountry()"/>
+        <SelectionDialog @onClose="closeSelectionDialog" :visible="selectionDialog" :fencer="selectedFencer" :isadmin="isAdmin()"/>
     </div>
 </template>

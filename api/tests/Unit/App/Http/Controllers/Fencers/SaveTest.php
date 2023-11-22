@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\App\Http\Controllers\Auth;
+namespace Tests\Unit\App\Http\Controllers\Fencers;
 
 use App\Models\Country;
 use App\Models\Fencer;

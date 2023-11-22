@@ -6,6 +6,7 @@ require('auth.php');
 require('events.php');
 require('fencers.php');
 require('registrations.php');
+require('accreditations.php');
 
 /*
 |--------------------------------------------------------------------------

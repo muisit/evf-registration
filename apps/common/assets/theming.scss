@@ -52,3 +52,15 @@
 @import 'reset-css';
 @import './common.scss';
 @import './components.scss';
+
+#app {
+    .el-checkbox {
+        --el-checkbox-input-width: 18px;
+        --el-checkbox-input-height: 18px;
+
+        .el-checkbox__inner::after {
+            height: 11px;
+            left: 7px;
+        }
+    }
+}

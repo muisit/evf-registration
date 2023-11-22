@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Kirschbaum\PowerJoins\PowerJoins;
 
 class Fencer extends Model
@@ -30,5 +31,10 @@ class Fencer extends Model
     {
         $path = storage_path('app/fencers/fencer_' . $this->getKey() . '.dat');
         return $path;
+    }
+
+    public function accreditations(): HasMany
+    {
+        return $this->hasMany(Accreditation::class, 'fencer_id', 'fencer_id');
     }
 }

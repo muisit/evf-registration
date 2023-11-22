@@ -20,7 +20,11 @@ class CSRFCheck
             $csrfToken = $request->header('X-CSRF-Token');
 
             if (empty($csrfToken) || $csrfToken != csrf_token()) {
+                \Log::debug("CSRF fails");
                 throw new BadRequestHttpException('X-CSRF-Token header must be set');
+            }
+            else {
+                \Log::debug("CSRF succeeds");
             }
         }
 

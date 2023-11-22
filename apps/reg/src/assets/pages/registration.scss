@@ -63,3 +63,35 @@
         }
     }
 }
+
+.selection-dialog {
+    h3 {
+        margin:20px 0px 5px 0px;
+    }
+
+    .fencer-select-events, .fencer-select-roles {
+        .el-checkbox {
+            height: auto;
+        }
+    }
+
+    .state-icons {
+        font-size: large;
+    }
+
+    .state-error { 
+        color: red;
+    }
+    .state-saved {
+        color: green;
+    }
+    .state-saving {
+        color: blue;
+    }
+
+    .payment-selection {
+        display: flex;
+        justify-content: end;
+        flex-direction: row;
+    }
+}

@@ -14,7 +14,7 @@ export function abortAllCalls() {
     }
 }
 
-function simpleFetch(method: string, path:string, data:object|null|undefined, options:object|null = {}, headers={}, postprocessor:any = null) {
+function simpleFetch(method: string, path:string, data:any, options:object|null = {}, headers={}, postprocessor:any = null) {
     if(!controller) {
         controller = new AbortController();
     }
@@ -81,10 +81,15 @@ export function fetchJson(method:string, path:string, data={}, options = {}, hea
 
 function attachmentResponse() {
     return res => {
-        return res.blob().then((blob)=> {
-            var file = window.URL.createObjectURL(blob);
-            window.location.assign(file);
-        });
+        if (res.status == 200) {
+            return res.blob().then((blob)=> {
+                var file = window.URL.createObjectURL(blob);
+                window.location.assign(file);
+            });
+        }
+        else {
+            alert("Failed to download attachment");
+        }
     };
 }
 

@@ -16,13 +16,13 @@ export const savefencer = function(fencer:Fencer) {
         return fetchJson('POST', '/fencers', { fencer: data })
             .then( (data:FetchResponse) => {
                 if(!data || data.status != 200) {
-                    return reject("No response data");
+                    return reject(data);
                 }
                 resolve(data.data);
         }, (err) => {
             reject(err);
         }).catch((err) => {
-                return reject(err);
+            return reject(err);
         });
     });
 }

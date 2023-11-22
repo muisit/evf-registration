@@ -49,7 +49,7 @@ class Registration extends Model
 
         // make sure only one registration for a fencer for a side-event or role exists
         // either role is 0, or side-event is null at the moment
-        if (!$this->model->exists) {
+        if (!$this->exists) {
             $query = Registration::where('registration_id', '<>', $this->getKey())
                 ->where('registration_fencer', $this->registration_fencer)
                 ->where('registration_role', $this->registration_role);

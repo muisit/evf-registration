@@ -1,173 +1,74 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { Fencer } from '../../../../common/api/schemas/fencer';
+import { CountrySchema } from '../../../../common/api/schemas/country';
 import { useDataStore } from '../../stores/data';
-import { saveregistration } from '../../../../common/api/registrations/saveregistration';
+import { useAuthStore } from '../../../../common/stores/auth';
+import { is_valid } from '../../../../common/functions';
 
 const props = defineProps<{
     visible:boolean;
-    changeCountry:boolean;
     fencer:Fencer;
+    isadmin: boolean;
 }>();
-const emits = defineEmits(['onClose', 'onUpdate', 'onSave']);
+const emits = defineEmits(['onClose', 'onUnregister', 'onUpdate', 'onSave']);
 const data = useDataStore();
-const reloadHash = ref(random_hash());
+const auth = useAuthStore();
+const payments = ref('G');
+
+watch(
+    () => data.currentCountry,
+    () => {
+        payments.value = determineDefaultPayment(data.currentEvent.payments || 'group');
+    },
+    { immediate: true }
+)
+
+function determineDefaultPayment(eventPayment:string)
+{
+    if (!is_valid(data.currentCountry.id)) {
+        return 'O';
+    }
+    else if (eventPayment == 'all' || eventPayment == 'group') {
+        return 'G'; // by default, pay per group
+    }
+    // else eventPayment is not group and we are not on the Org page
+    return 'I';
+}
 
 function closeForm()
 {
     emits('onClose');
 }
 
-function submitForm()
+function unregister()
 {
-    duplicateFencerCheck(props.fencer)
-        .then((result) => {
-            if (result && result.id) {
-                var country = data.countriesById['c' + result.countryId];
-                var genderPronoun = result.gender == 'M' ? 'his' : 'her';
-
-                if (props.changeCountry) {
-                    alert('There already is a person with the exact name and date of birth ' +
-                        'registered for ' + country.name + '.\r\nEither select that person if this is a ' +
-                        'duplicate entry, or adjust the name data with initials or suffixes to ' +
-                        'distinguish the persons.');
-                }
-                else if (result.countryId == props.fencer.countryId) {
-                    alert('There already is a person with the exact name and date of birth ' +
-                        'registered for this country.\r\nEither select that person if this is a ' +
-                        'duplicate entry, or adjust the name data with initials or suffixes to ' +
-                        'distinguish the persons.');
-                }
-                else {
-                    alert('The database contains an entry of a person with the same name and date ' +
-                        'of birth, but registered for ' + country.name + '.\r\nIf this person wants to ' +
-                        'enter, please have the HoD of ' + country.name + ' enter ' + genderPronoun +
-                        ' registration.\r\n\r\nIf the person wants to represent another country, please contact ' +
-                        'the webmaster@veteransfencing.eu to have the person\'s country changed before ' +
-                        'entering registrations.\r\n\r\nIf this really is a new person, please adjust the name ' +
-                        'by adding initials or suffixes, or contact webmaster@veteransfencing.eu');
-                }
-            }
-            else {
-                saveFencerData()
-                  .then(() => {
-                      emits('onSave');
-                      closeForm();
-                  });
-            }
-        });
+    emits('onUnregister');
+    emits('onClose');
 }
 
-function saveFencerData()
-{
-    return savefencer(props.fencer)
-        .then((fencer:Fencer|null) => {
-            if(fencer) {
-                // update fields to account for back-office field validation changes
-                update('lastName', fencer.lastName);
-                update('firstName', fencer.firstName);
-                update('gender', fencer.gender);
-                update('dateOfBirth', fencer.dateOfBirth);
-                update('id', fencer.id);
-            }
-        });
-}
-
-function saveFencerPhoto(fileObject:any)
-{
-    return uploadphoto(props.fencer, fileObject)
-        .then((data) => {
-            if (data && data.status == "ok") {
-                update('photoStatus', 'Y');
-            }
-        });
-}
-
-function update(fieldName:string, value: any)
-{
-    emits('onUpdate', {field: fieldName, value: value});
-}
-
-function onSavePhoto(fileObject:any)
-{
-    if (!dataComplete()) {
-        // should not occur, as dataComplete() is blocking for the input button
-        alert("Please fill out the name and date fields before submitting a photo");
-    }
-    else {
-        if (!is_valid(props.fencer.id)) {
-            saveFencerData()
-              .then(() => saveFencerPhoto(fileObject))
-              .then(() => {
-                  emits('onSave');
-                  reloadHash.value = random_hash();
-              });
-        }
-        else {
-            saveFencerPhoto(fileObject)
-              .then(() => {
-                  emits('onSave');
-                  reloadHash.value = random_hash();
-              });
-        }
-    }
-}
-
-function dataComplete()
-{
-    if (!props.fencer.lastName || props.fencer.lastName.length < 2) {
-        return false;
-    }
-    if (!props.fencer.firstName || props.fencer.firstName.length < 2) {
-        return false;
-    }
-    if (!['F', 'M'].includes(props.fencer.gender || '')) {
-        return false;
-    }
-    if (props.fencer.dateOfBirth && !valid_date(props.fencer.dateOfBirth)) {
-        return false;
-    }
-    return true;
-}
-
+import PaymentSelection from './PaymentSelection.vue';
+import EventSelection from './EventSelection.vue';
+import RoleSelection from './RoleSelection.vue';
+import AccreditationSelection from './AccreditationSelection.vue';
 import { ElDialog, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton, ElDatePicker } from 'element-plus';
-import PhotoId from './PhotoId.vue';
 </script>
 <template>
-    <ElDialog :model-value="props.visible" title="Edit Fencer Information" :close-on-click-modal="false"  :before-close="(done) => { closeForm(); done(false); }">
-      {{ props.fencer.id }} - {{  props.fencer.photoStatus }} - {{ props.fencer.lastName }}, {{ props.fencer.firstName }}<br/>
+    <ElDialog class='selection-dialog' :model-value="props.visible" title="Registration Selection" :close-on-click-modal="false"  :before-close="(done) => { closeForm(); done(false); }">
+      <div class='selection-header'>
+        <h3>{{ props.fencer.lastName }}, {{ props.fencer.firstName }}</h3>
+        <h3 v-if="is_valid(data.currentCountry.id)">Year of birth: {{ props.fencer.birthYear }} Gender: {{ props.fencer.gender == 'F' ? 'Woman' : 'Man'}} Category: {{ props.fencer.category }}</h3>
+      </div>
       <ElForm>
-        <ElFormItem label="Last name">
-          <ElInput :model-value="props.fencer.lastName" @update:model-value="(e) => update('lastName', e)"/>
-        </ElFormItem>
-        <ElFormItem label="First name">
-          <ElInput :model-value="props.fencer.firstName" @update:model-value="(e) => update('firstName', e)"/>
-        </ElFormItem>
-        <ElFormItem label="Gender">
-          <ElSelect :model-value="props.fencer.gender" @update:model-value="(e) => update('gender', e)">
-            <ElOption value="M" label="Man" />
-            <ElOption value="F" label="Woman" />
-          </ElSelect>
-        </ElFormItem>
-        <ElFormItem label="Date of birth">
-          <ElDatePicker :model-value="props.fencer.dateOfBirth" format="YYYY-MM-DD" value-format="YYYY-MM-DD"  @update:model-value="(e) => update('dateOfBirth', e)"/>
-        </ElFormItem>
-        <ElFormItem label="Country">
-          <ElSelect :model-value="props.fencer.countryId" @update:model-value="(e) => update('countryId', e)"  v-if="props.changeCountry">
-            <ElOption v-for="country in data.countries" :key="country.id" :value="country.id" :label="country.name"/>
-          </ElSelect>
-          <label v-else>
-            {{ data.countriesById['c' + props.fencer.countryId] ? data.countriesById['c' + props.fencer.countryId].name : 'Not set'}}
-          </label>
-        </ElFormItem>
-        <elFormItem label="Photo ID">
-          <PhotoId @onSave="onSavePhoto" :fencer="props.fencer" :dataComplete="dataComplete()" @onStateChange="(e) => update('photoStatus', e)" :reloadHash="reloadHash"/>
-        </elFormItem>
+        <PaymentSelection :payments="payments" @on-update="(e) => payments = e" :isadmin="props.isadmin"/>
+        <EventSelection :fencer="props.fencer" :payments="payments"/>
+        <RoleSelection :fencer="props.fencer" :payments="payments"/>
+        <AccreditationSelection v-if="auth.isOrganisation()" :fencer="props.fencer"/>
       </ElForm>
       <template #footer>
         <span class="dialog-footer">
-          <ElButton type="warning" @click="closeForm">Cancel</ElButton>
-          <ElButton type="primary" @click="submitForm">Save</ElButton>
+          <ElButton v-if="props.isadmin" type="warning" @click="unregister">Unregister</ElButton>
+          <ElButton type="primary" @click="closeForm">Close</ElButton>
         </span>
       </template>
     </ElDialog>

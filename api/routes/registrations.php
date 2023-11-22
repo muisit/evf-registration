@@ -22,5 +22,13 @@ $router->group(
                 'uses' => 'Registrations\Save@index'
             ]
         );
+
+        $router->post(
+            '/delete',
+            [
+                'as' => 'registrations.delete',
+                'uses' => 'Registrations\Delete@index'
+            ]
+        );
     }
 );

@@ -60,24 +60,29 @@ export const useAuthStore = defineStore('auth', () => {
         return credentials.value.includes('hod:' + countryId.value);
     }
 
-    function isOrganisation() {
-        return credentials.value.includes('organisation:' + eventId.value);
+    function isOrganisation(eid?:number|null|undefined) {
+        if (!eid) eid = eventId.value;
+        return credentials.value.includes('organisation:' + eid) || isSysop();
     }
 
-    function isOrganiser() {
-        return credentials.value.includes('organiser:' + eventId.value);
+    function isOrganiser(eid?:number|null|undefined) {
+        if (!eid) eid = eventId.value;
+        return credentials.value.includes('organiser:' + eid);
     }
 
-    function isRegistrar() {
-        return credentials.value.includes('registrar:' + eventId.value);
+    function isRegistrar(eid?:number|null|undefined) {
+        if (!eid) eid = eventId.value;
+        return credentials.value.includes('registrar:' + eid);
     }
 
-    function isCashier() {
-        return credentials.value.includes('cashier:' + eventId.value);
+    function isCashier(eid?:number|null|undefined) {
+        if (!eid) eid = eventId.value;
+        return credentials.value.includes('cashier:' + eid);
     }
 
-    function isAccreditor() {
-        return credentials.value.includes('accreditation:' + eventId.value);
+    function isAccreditor(eid?:number|null|undefined) {
+        if (!eid) eid = eventId.value;
+        return credentials.value.includes('accreditation:' + eid);
     }
 
     return {

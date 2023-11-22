@@ -11,4 +11,9 @@ export interface SideEvent {
     // front-end data
     abbr: string|null;
     competition: Competition|null;
+    isAthleteEvent?: boolean;
+    isTeamEvent?: boolean;
+    isNonCompetitionEvent?: boolean;
+    isRegistered?: boolean;
+    defaultRole?: string;
 }

@@ -20,6 +20,8 @@ class BaseTest extends TestCase
 
         $stub = $this->createMock(Request::class);
         $stub->expects($this->any())->method('user')->willReturn(new WPUser());
+        $stub->expects($this->any())->method('all')->willReturn(['a' => 12]);
+        $stub->expects($this->any())->method('only')->willReturn(['a' => 12]);
         $model = $request->validate($stub);
 
         $this->assertEmpty($model);

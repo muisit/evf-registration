@@ -45,7 +45,6 @@ class FencerTest extends TestCase
     {
         $this->authorizeCalls = [];
         $stubController = $this->createMock(Controller::class);
-        $stubController->method('validate')->willReturn(['fencer' => $testData]);
         $stubController
             ->method('authorize')
             ->with(
@@ -62,6 +61,8 @@ class FencerTest extends TestCase
         $stub = $this->createMock(Request::class);
         $stub->expects($this->any())->method('user')->willReturn($user);
         $stub->expects($this->once())->method('get')->with('fencer')->willReturn($testData);
+        $stub->expects($this->any())->method('all')->willReturn(['fencer' => $testData]);
+        $stub->expects($this->any())->method('only')->willReturn(['fencer' => $testData]);
         return $request->validate($stub);
     }
 

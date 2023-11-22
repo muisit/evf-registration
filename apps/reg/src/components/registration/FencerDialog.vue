@@ -138,7 +138,6 @@ import PhotoId from './PhotoId.vue';
 </script>
 <template>
     <ElDialog :model-value="props.visible" title="Edit Fencer Information" :close-on-click-modal="false"  :before-close="(done) => { closeForm(); done(false); }">
-      {{ props.fencer.id }} - {{  props.fencer.photoStatus }} - {{ props.fencer.lastName }}, {{ props.fencer.firstName }}<br/>
       <ElForm>
         <ElFormItem label="Last name">
           <ElInput :model-value="props.fencer.lastName" @update:model-value="(e) => update('lastName', e)"/>
@@ -163,9 +162,9 @@ import PhotoId from './PhotoId.vue';
             {{ data.countriesById['c' + props.fencer.countryId] ? data.countriesById['c' + props.fencer.countryId].name : 'Not set'}}
           </label>
         </ElFormItem>
-        <elFormItem label="Photo ID">
+        <ElFormItem label="Photo ID">
           <PhotoId @onSave="onSavePhoto" :fencer="props.fencer" :dataComplete="dataComplete()" @onStateChange="(e) => update('photoStatus', e)" :reloadHash="reloadHash"/>
-        </elFormItem>
+        </ElFormItem>
       </ElForm>
       <template #footer>
         <span class="dialog-footer">

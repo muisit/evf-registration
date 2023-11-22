@@ -25,6 +25,7 @@ class GlobalParameters
 
     private function determineEvent(Request $request)
     {
+        \Log::debug("determining global event");
         if ($request->has('event')) {
             $event = Event::where('event_id', $request->get('event'))->first();
             if (!empty($event) && !$event->isFinished()) {
@@ -35,6 +36,7 @@ class GlobalParameters
 
     private function determineCountry(Request $request)
     {
+        \Log::debug("determining global country");
         $country = null;
         if (!empty($request->user())) {
             $country = DefaultCountryService::determineCountry($request->user());

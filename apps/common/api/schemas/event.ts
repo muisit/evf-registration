@@ -24,3 +24,26 @@ export interface Event {
     competitions: Array<Competition>|null;
 }
 
+export function defaultEvent(): Event
+{
+    return {
+        id: -1,
+        name: 'Please wait while loading',
+        competitions: [],
+        sideEvents: [],
+        opens: '',
+        reg_open: '',
+        reg_close: '',
+        year: 0,
+        duration: 0,
+        email: '',
+        web: '',
+        location: '',
+        countryId: 0,
+        type: { name: ''},
+        bank: {symbol: '', currency:'', bank: '', account: '', address:'', iban: '', swift: '', reference: '', baseFee: 0, competitionFee: 0},
+        payments: 'group',
+        feed: '',
+        config: {}
+    };
+}

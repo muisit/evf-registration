@@ -13,21 +13,10 @@ use Carbon\Carbon;
 class Index extends Controller
 {
     /**
-     * List fencers matching the search term(s)
+     * List fencers of a country
      *
      * @OA\Get(
-     *     path = "/fencers/autocomplete",
-     *     @OA\Parameter(
-     *         in = "query",
-     *         name = "country",
-     *         description = "Country to restrict search to",
-     *         required = false,
-     *         style = "form",
-     *         explode = "false",
-     *         @OA\Schema(
-     *             type = "integer"
-     *         )
-     *     ),
+     *     path = "/fencers",
      *     @OA\Response(
      *         response = "200",
      *         description = "List of accessible fencers",

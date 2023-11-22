@@ -39,5 +39,7 @@ class AuthServiceProvider extends ServiceProvider
         Gate::policy(\App\Models\Event::class, \App\Models\Policies\Event::class);
         Gate::policy(\App\Models\Fencer::class, \App\Models\Policies\Fencer::class);
         Gate::policy(\App\Models\Country::class, \App\Models\Policies\Country::class);
+        Gate::policy(\App\Models\Registration::class, \App\Models\Policies\Registration::class);
+        Gate::policy(\App\Models\Accreditation::class, \App\Models\Policies\Accreditation::class);
     }
 }

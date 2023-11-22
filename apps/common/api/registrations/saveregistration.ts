@@ -1,24 +1,26 @@
 import { fetchJson, FetchResponse } from '../interface';
 import { Registration } from '../schemas/registration';
 
-export const saveregistration = function(eventId: number, fencerId:number, sideEventId: number, roleId: number) {
+export const saveregistration = function(registration:Registration) {
     return new Promise<Registration|null>((resolve, reject) => {     
         // restrict the data we are sending over
         var data = {
-            fencer: fencerId,
-            sideEvent: sideEventId,
-            role: roleId
+            fencerId: registration.fencerId,
+            sideEventId: registration.sideEventId,
+            roleId: registration.roleId,
+            payment: registration.payment,
+            team: registration.team,
         };
-        return fetchJson('POST', '/registrations', data)
+        return fetchJson('POST', '/registrations', { registration: data })
             .then( (data:FetchResponse) => {
                 if(!data || data.status != 200) {
-                    return reject("No response data");
+                    return reject(data);
                 }
                 resolve(data.data);
         }, (err) => {
             reject(err);
         }).catch((err) => {
-                return reject(err);
+            return reject(err);
         });
     });
 }

@@ -14,6 +14,7 @@ class SideEvent extends Fixture
     public const WSCAT1 = 4;
     public const DINATOIRE = 5;
     public const GALA = 6;
+    public const NOSUCHEVENT = 2883;
 
     protected static function boot()
     {

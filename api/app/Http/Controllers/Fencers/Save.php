@@ -34,8 +34,9 @@ class Save extends Controller
     {
         $form = new FencerRequest($this);
         $model = $form->validate($request);
-        if (!empty($model)) {
+        if (!empty($model) && $model !== false) {
             return response()->json(new FencerSchema($model));
         }
+        return response()->json([]);
     }
 }

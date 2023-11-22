@@ -23,6 +23,14 @@ $router->group(
             ]
         );
 
+        $router->get(
+            '/{fencerId}/accreditations',
+            [
+                'as' => 'fencers.accreditations',
+                'uses' => 'Fencers\Accreditations@index'
+            ]
+        );
+
         $router->post(
             '/{fencerId}/photo',
             [
