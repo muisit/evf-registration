@@ -15,6 +15,14 @@ function fencerData()
     let myregs = props.registrations.slice();
     const data = useDataStore();
     myregs.sort((a:Registration, b:Registration) => {
+        // first sort by competition category
+        let sa = data.sideEventsById['s' + a.sideEventId] || null;
+        let sb = data.sideEventsById['s' + b.sideEventId] || null;
+        if (sa && sb && sa.title != sb.title) {
+            console.log('sorting on event title');
+            return sa.title > sb.title ? 1 : -1;
+        }
+
         if (a.team && !b.team) return -1;
         if (b.team && !a.team) return 1;
         if (a.team && b.team && a.team != b.team) return a.team > b.team ? 1 : -1;

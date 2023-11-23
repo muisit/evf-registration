@@ -13,12 +13,7 @@ const props = defineProps<{
 const data = useDataStore();
 function displayTeamColumn()
 {
-    return props.weapon && is_valid(props.weapon.id) && (hasTeam(data.currentEvent) && allowMoreTeams(data.currentEvent));
-}
-function displayRoleColumn()
-{
-    // not displaying per weapon, unless we have team events
-    return !props.weapon || (hasTeam(data.currentEvent) && allowMoreTeams(data.currentEvent));
+    return props.weapon && is_valid(props.weapon.id) && hasTeam(data.currentEvent);
 }
 
 import SortingIcon from './SortingIcon.vue';
@@ -26,7 +21,7 @@ import SortingIcon from './SortingIcon.vue';
 <template>
     <thead>
         <tr v-if="props.weapon" class="preheader">
-            <th colspan="9">
+            <th colspan="10">
                 {{ props.weapon.name || 'Support' }}
             </th>
         </tr>
@@ -36,13 +31,12 @@ import SortingIcon from './SortingIcon.vue';
             <th class="text-center">Gender <SortingIcon v-if="props.sortable" :sorter="props.sorter" name="g" @onSort="(e) => $emit('onSort', e)"/></th>
             <th class="text-center">YOB <SortingIcon v-if="props.sortable" :sorter="props.sorter" name="y" @onSort="(e) => $emit('onSort', e)"/></th>
             <th class="text-center">Category <SortingIcon v-if="props.sortable" :sorter="props.sorter" name="c" @onSort="(e) => $emit('onSort', e)"/></th>
-            <th class="text-left" v-if="displayRoleColumn()">
+            <th class="text-left">
                 <span v-if="!props.weapon">Role/Events</span>
                 <span v-if="displayTeamColumn()">Team</span>
                 <span v-if="props.weapon && !is_valid(props.weapon.id)">Role</span>
             </th>
-            <th colspan="3"></th>
-            <th v-if="!displayRoleColumn()"></th>
+            <th colspan="4"></th>
         </tr>
     </thead>
 </template>

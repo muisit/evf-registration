@@ -1,14 +1,13 @@
 import { Fencer } from "../../../../../common/api/schemas/fencer";
-import { Registration } from "../../../../../common/api/schemas/registration";
 import { SideEvent } from "../../../../../common/api/schemas/sideevent";
 import { useDataStore } from "../../../stores/data";
-import { useAuthStore } from "../../../../../common/stores/auth";
 import { selectRolesForFencer } from "./selectRolesForFencer";
 import { filterEventTeamGrandVeterans } from "./filterEventTeamGrandVeterans";
 import { filterEventTeamVeterans } from "./filterEventTeamVeterans";
 import { filterEventCategory } from "./filterEventCategory";
 import { filterEventCategoryYounger } from "./filterEventCategoryYounger";
 import { is_valid } from "../../../../../common/functions";
+import { allowYoungerCategory } from "../../../../../common/lib/event";
 import { RoleSchema } from "../../../../../common/api/schemas/role";
 
 function fencerIsRegisteredForEvent(fencer:Fencer, event:SideEvent)
@@ -25,7 +24,7 @@ function fencerIsRegisteredForEvent(fencer:Fencer, event:SideEvent)
 
 export function selectEventsForFencer(fencer:Fencer) {
     const data = useDataStore();
-    let allow_registration_lower_age = data.currentEvent.config && data.currentEvent.config.allow_registration_lower_age;
+    let allow_registration_lower_age = allowYoungerCategory(data.currentEvent);
 
     // filter the available events based on category and gender
     let events:SideEvent[] = [];
@@ -98,7 +97,7 @@ export function selectEventsForFencer(fencer:Fencer) {
                     var hasOwnCat = openevents[event.competition.weapon.abbr || ''];
                     if(hasOwnCat && event.competition.weapon.gender == fencer.gender && event.competition.category.value == hasOwnCat) {
                         event.isAthleteEvent = true;
-                        event.defaultRole="0"; // default role for athlete events is athlete
+                        event.defaultRole=null; // default role for athlete events is athlete
                     }
                 }
                 return event;

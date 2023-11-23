@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref, Ref, watch } from 'vue';
 import { Fencer } from '../../../../../common/api/schemas/fencer';
+import { hasTeam } from '../../../../../common/lib/event';
 import { useDataStore } from '../../../stores/data';
 import { sortAndFilterFencers } from '../lib/sortAndFilterFencers';
 const emits = defineEmits(['onEdit', 'onSelect']);
@@ -20,6 +21,14 @@ function onFilter(filterState)
     filter.value = newFilter;
 }
 
+watch(
+    () => data.currentEvent.id,
+    () => {
+        byweapon.value = hasTeam(data.currentEvent);
+    },
+    { immediate: true }
+)
+
 watch (
     () => [data.fencerData, filter.value, sorter.value],
     () => {
@@ -33,7 +42,6 @@ function onSort(newSorter:Array<string>)
     sorter.value = newSorter;
     dataList.value = sortAndFilterFencers(sorter.value, filter.value);
 }
-
 
 import FilterButton from '../FilterButton.vue';
 import BasicParticipantList from './BasicParticipantList.vue';

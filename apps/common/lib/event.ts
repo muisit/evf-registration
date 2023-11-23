@@ -8,6 +8,14 @@ export function allowMoreTeams(event:Event|null)
     return false;
 }
 
+export function allowYoungerCategory(event:Event|null)
+{
+    if (event && event.config && event.config.allow_registration_lower_age) {
+        return true;
+    }
+    return false;
+}
+
 export function hasTeam(event:Event|null)
 {
     let hasTeams = false;

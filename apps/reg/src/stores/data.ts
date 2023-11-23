@@ -230,7 +230,21 @@ export const useDataStore = defineStore('data', () => {
 
     function addFencer(fencer:Fencer)
     {
+        console.log('inserting fencer', fencer.fullName);
+        let fid = 'f' + fencer.id;
+        if (fencerData.value[fid]) {
+            console.log('fencer in list ', fencer.fullName, ' has ', fencerData.value[fid].registrations?.length,'registrations');
+        }
+        else {
+            console.log('fencer not found in list before insert');
+        }
         insertFencer(fencer);
+        if (fencerData.value[fid]) {
+            console.log('fencer in list ', fencer.fullName, ' now has ', fencerData.value[fid].registrations?.length,'registrations');
+        }
+        else {
+            console.log('fencer not found in list after insert');
+        }
     }
 
     function saveRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:string|null, teamName:string|null, payment:string|null)
@@ -265,6 +279,7 @@ export const useDataStore = defineStore('data', () => {
     {
         console.log('looking for ', pFencer.id, sideEvent?.id, roleId, state, teamName);
         let found:Registration|null = null;
+        let newData = {};
         Object.keys(fencerData.value).map((key:string) => {
             let fencer = fencerData.value[key];
             if (fencer.id == pFencer.id) {
@@ -315,10 +330,10 @@ export const useDataStore = defineStore('data', () => {
                     };
                     fencer.registrations.push(found);
                 }
-                fencerData.value['f' + fencer.id] = fencer;
             }
+            newData['f' + fencer.id] = fencer;
         });
-
+        fencerData.value = newData;
         return found;
     }
 

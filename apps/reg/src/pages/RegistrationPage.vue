@@ -29,9 +29,9 @@ function onChangeCountry(newValue)
 }
 
 watch(
-    () => props.visible,
-    (nw) => {
-        if (nw) {
+    () => [props.visible, data.currentEvent],
+    () => {
+        if (props.visible) {
             data.getRegistrations();
         }
     },

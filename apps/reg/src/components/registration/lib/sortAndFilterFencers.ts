@@ -3,6 +3,12 @@ import { SideEvent } from "../../../../../common/api/schemas/sideevent";
 import { Fencer } from "../../../../../common/api/schemas/fencer";
 import { useDataStore } from "../../../stores/data";
 import { is_valid } from "../../../../../common/functions";
+import { ruleYoungerCategory } from "./ruleYoungerCategory";
+import { ruleCategory } from './ruleCategory';
+import { ruleGender } from "./ruleGender";
+import { ruleEventTeamGrandVeterans } from './ruleEventTeamGrandVeterans';
+import { ruleEventTeamVeterans } from './ruleEventTeamVeterans';
+import { allowYoungerCategory } from "../../../../../common/lib/event";
 
 function sortFencers(aId:string, bId:string, data:any, sorter:Array<string>)
 {
@@ -49,7 +55,7 @@ function filterFencers(aId:string, data:any, filterEvents:Array<number>, filterS
             retval = retval || filterEvents.includes(reg.sideEventId || 0);
 
             if (filterSupportRoles && is_valid(reg.roleId)) {
-                console.log('filtering registration ', reg, ' because roleId is valid');
+                console.log('filtering in registration ', reg, ' because roleId is valid');
                 retval = true;
             }
         });
@@ -57,10 +63,30 @@ function filterFencers(aId:string, data:any, filterEvents:Array<number>, filterS
     return retval;
 }
 
+function validateFencerState(fencer:Fencer, sepByEvent:any, youngerCategory:boolean)
+{
+    fencer.registrations = fencer.registrations?.map((reg:Registration) => {
+        reg.errors = [];
+        if (youngerCategory) {
+            ruleYoungerCategory(fencer, reg, sepByEvent['s' + reg.sideEventId]);
+        }
+        else {
+            ruleCategory(fencer, reg, sepByEvent['s' + reg.sideEventId]);
+        }
+        ruleGender(fencer, reg, sepByEvent['s' + reg.sideEventId]);
+        ruleEventTeamGrandVeterans(fencer, reg, sepByEvent['s' + reg.sideEventId]);
+        ruleEventTeamVeterans(fencer, reg, sepByEvent['s' + reg.sideEventId]);
+        return reg;
+    });
+
+    return fencer;
+}
+
 export function sortAndFilterFencers(sorters:Array<string>, filters:Array<string>)
 {
-    console.log('sorting and filtering active fencer list', sorters, filters);
+    console.log('sorting and filtering based on ', sorters, filters);
     const data = useDataStore();
+    let allow_registration_lower_age = allowYoungerCategory(data.currentEvent);
 
     var filterEvents:Array<number> = [];
     data.competitionEvents.forEach((se:SideEvent) => {
@@ -77,10 +103,28 @@ export function sortAndFilterFencers(sorters:Array<string>, filters:Array<string
     var keylist = Object.keys(data.fencerData)
         .filter((aId) => filterFencers(aId, data, filterEvents, filters.includes('Support')))
         .sort((aId, bId) => sortFencers(aId, bId, data, sorters));
-    
+
     var retval:Array<Fencer> = [];
     keylist.forEach((id) => {
         retval.push(data.fencerData[id]);
     });
-    return retval;
+    var sepByEvent = {};
+    retval.map((fencer:Fencer) => {
+        if (fencer.registrations && fencer.registrations.length) {
+            fencer.registrations.map((reg:Registration) => {
+                let sideEvent = data.sideEventsById['s' + reg.sideEventId];
+                if (sideEvent && sideEvent.competition) {
+                    if (!sepByEvent['s' + sideEvent.id]) {
+                        sepByEvent['s' + sideEvent.id] = [];
+                    }
+                    sepByEvent['s' + sideEvent.id].push(reg);
+                }
+            });
+        }
+        else {
+            console.log('fencer ', fencer.fullName, ' has no registrations');
+        }
+    })
+    console.log('validating fencerlist');
+    return retval.map((fencer:Fencer) => validateFencerState(fencer, sepByEvent, allow_registration_lower_age));
 }

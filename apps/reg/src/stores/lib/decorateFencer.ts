@@ -32,6 +32,8 @@ export function decorateFencer(fencer:Fencer)
         fencer.category = date_to_category(fencer.dateOfBirth, dataStore.currentEvent.opens);
         fencer.categoryNum = date_to_category_num(fencer.dateOfBirth, dataStore.currentEvent.opens);
     }
-    fencer.registrations = []; // clear out any existing registrations
+    if (!fencer.registrations) {
+        fencer.registrations = [];
+    }
     fencer.fullGender = fencer.gender == 'M' ? 'M' : 'W';
 }

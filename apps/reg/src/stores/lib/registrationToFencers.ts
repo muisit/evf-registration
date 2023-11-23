@@ -18,6 +18,7 @@ export function registrationToFencers(registrationData:Registrations)
                 fencer = mergeFencer(allFencers[fid], fencer);
             }
             decorateFencer(fencer);
+            fencer.registrations = []; // clear out old registrations
             allFencers[fid] = fencer;
         });
     }

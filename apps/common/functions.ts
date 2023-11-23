@@ -80,6 +80,7 @@ export function date_to_category_num(dt:string|object, wrt:any = null) {
         diff += 1;
     }
     var catnum =  Math.floor(diff / 10) - 3;
+    console.log('year difference is ', dt, wrt, diff, ' catnum', catnum);
 
     // category 5 was removed, the highest category is now 4
     if(catnum > 4) catnum = 4;

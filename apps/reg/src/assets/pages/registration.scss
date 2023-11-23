@@ -37,7 +37,13 @@
                 thead {
                     background-color: var(--el-color-primary);
                     color: white;    
-                }           
+                }
+                
+                tbody {
+                    tr.hasErrors {
+                        background-color: #faa;
+                    }
+                }
             }
             .registrations-per-weapon {
                 margin-bottom: 20px;
