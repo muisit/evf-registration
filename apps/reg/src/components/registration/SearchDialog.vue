@@ -25,13 +25,7 @@ watch(
             // allow rendering to settle, then focus
             // this did not work with a mere nextTick
             window.setTimeout(() => {
-                console.log('calling focus on ', searchbox.value);
                 if (searchbox.value) searchbox.value.focus();
-                let el = document.getElementById(searchbox.value?.input?.id);
-                if (el) {
-                    console.log('calling focus on ', searchbox.value?.input?.id, el);
-                    el.focus();
-                }
             }, 10);
         }
     }
