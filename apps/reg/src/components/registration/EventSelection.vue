@@ -3,36 +3,26 @@ import { ref } from 'vue';
 import { Fencer } from '../../../../common/api/schemas/fencer';
 import { SideEvent } from '../../../../common/api/schemas/sideevent';
 import { useDataStore } from '../../stores/data';
-import { selectEventsForFencer } from './lib/selectEventsForFencer';
-import { is_valid } from '../../../../common/functions';
+import { StringKeyedStringList } from '../../../common/types';
 const props = defineProps<{
     fencer: Fencer;
-    teams: string[];
+    teams: StringKeyedStringList;
     payments: string;
+    availableEvents: SideEvent[];
 }>();
 
 const data = useDataStore();
 
-function availableEvents()
-{
-    return selectEventsForFencer(props.fencer).filter((event:SideEvent) => {
-        if (!(event.isAthleteEvent || event.isNonCompetitionEvent || event.isRegistered)) return false;
-
-        // if we are organisation, allow selecting the side-events, but not the competitions
-        if(!is_valid(data.currentCountry.id) && !event.isNonCompetitionEvent) return false;
-
-        return true;        
-    });
-}
-
 function saveRegistration(event:SideEvent, state:any)
 {
-    console.log('save registration', event, state);
+    // state is null, the empty string, true/false or a team name
     if (state) {
         if (event.isAthleteEvent && event.isTeamEvent) {
+            // state is the team-name
             data.saveRegistration(props.fencer, event, event.defaultRole || null, state, props.payments);
         }
         else {
+            // individual tournament, no team name
             data.saveRegistration(props.fencer, event, event.defaultRole || null, null, props.payments);
         }
     }
@@ -53,6 +43,16 @@ function isRegistered(event:SideEvent)
     return null;
 }
 
+function getTeamsForEvent(event:SideEvent):string[]
+{
+    if (event.competition?.weapon?.name) {
+        if (props.teams[event.competition.weapon.name || '']) {
+            return props.teams[event.competition.weapon.name || ''];
+        }
+    }
+    return [];
+}
+
 import SelectableEvent from './SelectableEvent.vue';
 </script>
 <template>
@@ -60,10 +60,10 @@ import SelectableEvent from './SelectableEvent.vue';
         <h3>Competitions and Side Events</h3>
         <table class='fencer-select-events'>
             <SelectableEvent
-                v-for="event in availableEvents()" :key="event.id"
+                v-for="event in props.availableEvents" :key="event.id"
                 :event="event"
                 :registration="isRegistered(event)"
-                :teams="props.teams"
+                :teams="getTeamsForEvent(event)"
                 @on-update="(e) => saveRegistration(event, e)"
             />
         </table>

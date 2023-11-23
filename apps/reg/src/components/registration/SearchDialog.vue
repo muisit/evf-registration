@@ -6,7 +6,7 @@ import { autocomplete } from '../../../../common/api/fencers/autocomplete';
 import { filterSuggestionsFromFencerList } from './lib/filterSuggestionsFromFencerList';
 import { decorateFencer } from '../../stores/lib/decorateFencer';
 import { is_valid } from '../../../../common/functions';
-
+import type { InputInstance } from 'element-plus'
 const props = defineProps<{
     visible:boolean;
     fencers:FencerList;
@@ -16,6 +16,26 @@ const emits = defineEmits(['onClose','onSave']);
 const data = useDataStore();
 const name = ref('');
 const suggestions:Ref<FencerList> = ref([]);
+const searchbox:Ref<InputInstance|null> = ref(null);
+
+watch(
+    () => props.visible,
+    (nw) => {
+        if (nw) {
+            // allow rendering to settle, then focus
+            // this did not work with a mere nextTick
+            window.setTimeout(() => {
+                console.log('calling focus on ', searchbox.value);
+                if (searchbox.value) searchbox.value.focus();
+                let el = document.getElementById(searchbox.value?.input?.id);
+                if (el) {
+                    console.log('calling focus on ', searchbox.value?.input?.id, el);
+                    el.focus();
+                }
+            }, 10);
+        }
+    }
+);
 
 function closeForm()
 {
@@ -83,11 +103,12 @@ watch (
     () => onChange()
 );
 
+
 import { ElDialog, ElInput, ElButton } from 'element-plus';
 </script>
 <template>
     <ElDialog :model-value="props.visible" title="Search Fencer" :close-on-click-modal="false" :before-close="(done) => { closeForm(); done(false); }">
-        <ElInput v-model="name"/>
+        <ElInput v-model="name" ref="searchbox"/>
 
         <table v-if="name.length>1" class="suggestion-list">
             <thead>

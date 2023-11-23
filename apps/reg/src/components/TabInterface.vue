@@ -39,7 +39,6 @@ function canOrganise()
     return auth.isSysop() || auth.isOrganiser(data.currentEvent.id);
 }
 
-
 import  { ElTabs, ElTabPane } from 'element-plus';
 import OverviewPage from '../pages/OverviewPage.vue';
 import RegistrationPage from '../pages/RegistrationPage.vue';
@@ -47,7 +46,7 @@ import RegistrationPage from '../pages/RegistrationPage.vue';
 <template>
     <ElTabs type="card" @tab-change="onTabChange" v-model="activeTab">
         <ElTabPane label="Overview" name="overview">
-            <OverviewPage :visible="activeTab == 'overview'"/>
+            <OverviewPage :visible="activeTab == 'overview'" @change-tab="(e) => activeTab = e"/>
         </ElTabPane>
         <ElTabPane v-if="canRegister()" label="Registration" name="registration">
             <RegistrationPage :visible="activeTab == 'registration'"/>

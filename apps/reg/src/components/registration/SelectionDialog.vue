@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import { Fencer } from '../../../../common/api/schemas/fencer';
-import { CountrySchema } from '../../../../common/api/schemas/country';
+import { SideEvent } from '../../../../common/api/schemas/sideevent';
+import { Registration } from '../../../../common/api/schemas/registration';
 import { useDataStore } from '../../stores/data';
 import { useAuthStore } from '../../../../common/stores/auth';
 import { is_valid } from '../../../../common/functions';
+import { selectEventsForFencer } from './lib/selectEventsForFencer';
 
 const props = defineProps<{
     visible:boolean;
@@ -47,6 +49,42 @@ function unregister()
     emits('onClose');
 }
 
+function availableEvents()
+{
+    return selectEventsForFencer(props.fencer).filter((event:SideEvent) => {
+        if (!(event.isAthleteEvent || event.isNonCompetitionEvent || event.isRegistered)) return false;
+
+        // if we are organisation, allow selecting the side-events, but not the competitions
+        if(!is_valid(data.currentCountry.id) && !event.isNonCompetitionEvent) return false;
+
+        return true;        
+    });
+}
+
+function findTeams()
+{
+    let teamNames = {};
+    let eventIds = availableEvents().map((event:SideEvent) => { return event.id });
+    Object.keys(data.fencerData).map((fid:string) => {
+        let fencer = data.fencerData[fid];
+        fencer.registrations?.map((reg:Registration) =>{
+            if (eventIds.includes(reg.sideEventId || 0) && reg.team !== null) {
+                let sideEvent = data.sideEventsById['s' + reg.sideEventId];
+                if (sideEvent.competition) {
+                    if (!teamNames[sideEvent.competition.weapon.name]) {
+                        teamNames[sideEvent.competition.weapon.name] = {};
+                    }
+                    teamNames[sideEvent.competition.weapon.name][reg.team] = true;
+                }
+            }
+        })
+    });
+    Object.keys(teamNames).map((weaponId:string) => {
+        teamNames[weaponId] = Object.keys(teamNames[weaponId]);
+    });
+    return teamNames;
+}
+
 import PaymentSelection from './PaymentSelection.vue';
 import EventSelection from './EventSelection.vue';
 import RoleSelection from './RoleSelection.vue';
@@ -61,7 +99,7 @@ import { ElDialog, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton, El
       </div>
       <ElForm>
         <PaymentSelection :payments="payments" @on-update="(e) => payments = e" :isadmin="props.isadmin"/>
-        <EventSelection :fencer="props.fencer" :payments="payments"/>
+        <EventSelection :fencer="props.fencer" :payments="payments" :teams="findTeams()" :available-events="availableEvents()"/>
         <RoleSelection :fencer="props.fencer" :payments="payments"/>
         <AccreditationSelection v-if="auth.isOrganisation()" :fencer="props.fencer"/>
       </ElForm>

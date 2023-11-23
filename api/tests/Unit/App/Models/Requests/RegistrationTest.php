@@ -116,7 +116,7 @@ class RegistrationTest extends TestCase
             'fencerId' => FencerData::MCAT1,
             'roleId' => null,
             'sideEventId' => SideEventData::MFCAT1,
-            'team' => null,
+            'team' => 'team-12',
             'payment' => 'G'
         ];
         $user = WPUser::where('ID', UserData::TESTUSER)->first();
@@ -469,7 +469,7 @@ class RegistrationTest extends TestCase
         $testData['payment'] = null;
         $request = $this->mockRequest($testData, null);
         $validator = $regRequest->createValidator($request);
-        $this->assertTrue($validator->passes());
+        $this->assertFalse($validator->passes());
 
         $testData['payment'] = PaymentOptions::Group;
         $request = $this->mockRequest($testData, null);

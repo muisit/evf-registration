@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useDataStore } from '../../stores/data';
 import { is_valid } from '../../../../common/functions';
+const emits = defineEmits(['changeTab']);
 
 const data = useDataStore();
 
@@ -51,7 +52,7 @@ import CountryLine from './CountryLine.vue';
         <CountryHeader />
         <tbody>
             <CountryLine :line="getTotalLines()" :is-total="true"/>
-            <CountryLine v-for="country in data.countries" :key="country.id" :line="getLines(country)"  :is-total="false"/>
+            <CountryLine v-for="country in data.countries" :key="country.id" :line="getLines(country)" :country="country" :is-total="false" @change-tab="(e) => $emit('changeTab', e)"/>
         </tbody>
       </table>
     </div>

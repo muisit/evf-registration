@@ -7,7 +7,6 @@ import { selectRolesForFencer } from './lib/selectRolesForFencer';
 import { is_valid } from '../../../../common/functions';
 const props = defineProps<{
     fencer: Fencer;
-    teams: string[];
     payments: string;
 }>();
 

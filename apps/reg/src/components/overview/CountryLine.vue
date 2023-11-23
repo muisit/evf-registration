@@ -1,11 +1,17 @@
 <script lang="ts" setup>
+import { CountrySchema } from '../../../../common/api/schemas/country';
 import { is_valid } from '../../../../common/functions';
+import { useAuthStore } from '../../../../common/stores/auth';
 const props = defineProps<{
     line:any;
     isTotal: boolean;
+    country: CountrySchema;
 }>();
 import { useDataStore } from '../../stores/data';
+const emits = defineEmits(['changeTab']);
+
 const data = useDataStore();
+const auth = useAuthStore();
 
 function calculateTotal()
 {
@@ -41,9 +47,17 @@ function outputCount(sideEvent:any)
         return '';
     }
 }
+
+function selectForRegistration()
+{
+    if (auth.isOrganisation() && !props.isTotal) {
+        data.setCountry(props.country.id);
+        emits('changeTab', 'registration');
+    }
+}
 </script>
 <template>
-    <tr v-if="line.country" :class="{totalHeader:isTotal}">
+    <tr v-if="line.country" :class="{totalHeader:props.isTotal}" @click="selectForRegistration">
         <td class="text-left">{{ line.country.name }}</td>
         <td class="text-right" v-for="se in data.competitionEvents" :key="se.id">{{ outputCount(se) }}</td>
         <td class="text-right"><b>{{ calculateTotal() }}</b></td>

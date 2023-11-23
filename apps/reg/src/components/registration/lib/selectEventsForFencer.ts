@@ -40,19 +40,18 @@ export function selectEventsForFencer(fencer:Fencer) {
         events = data.sideEvents.map((event:SideEvent) => {
             event.isAthleteEvent = false; // is this a competition event selectable for this specific athlete
             event.isTeamEvent = false; // is this a competition event selectable for this specific athlete AND a team event
-            event.defaultRole = "0"; // regular participant
+            event.defaultRole = null; // regular participant
             event.isNonCompetitionEvent = false; // is this a non-competition event
             event.isRegistered = fencerIsRegisteredForEvent(fencer, event);
 
             if (event.competition) {
                 event.defaultRole = '' + roles[0].id; // any non-athlete role
-                if (event.competition.category && event.competition.weapon) {
+                if (event.competition.category && event.competition.weapon) { // should always be true
                     event.isAthleteEvent = filterEventCategory(fencer,event)
                             || filterEventTeamVeterans(fencer,event)
                             || filterEventTeamGrandVeterans(fencer,event);
-
                     if(event.isAthleteEvent) {
-                        event.defaultRole = "0";
+                        event.defaultRole = null;
                         if(event.competition.category.type == 'T') {
                             event.isTeamEvent = true;
                             // allow individual and team events in the same tournament by prefixing with 'T'

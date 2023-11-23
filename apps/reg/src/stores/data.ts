@@ -10,6 +10,7 @@ import { registrations } from '../../../common/api/registrations/registrations';
 import { abbreviateSideEvent } from './lib/abbreviateSideEvent';
 import { overviewToCountry } from './lib/overviewToCountry';
 import { registrationToFencers } from './lib/registrationToFencers';
+import { insertFencer } from './lib/insertFencer';
 import { Event, defaultEvent } from '../../../common/api/schemas/event';
 import { SideEvent } from '../../../common/api/schemas/sideevent';
 import { Fencer } from '../../../common/api/schemas/fencer';
@@ -227,6 +228,11 @@ export const useDataStore = defineStore('data', () => {
             });
     }
 
+    function addFencer(fencer:Fencer)
+    {
+        insertFencer(fencer);
+    }
+
     function saveRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:string|null, teamName:string|null, payment:string|null)
     {
         console.log('saving registration for ', pFencer.id, sideEvent?.id, roleId);
@@ -235,7 +241,7 @@ export const useDataStore = defineStore('data', () => {
             saveregistration(registration).then((data) => {
                     console.log('saved registration for ', pFencer.id, sideEvent?.id, roleId);
                     if (data && is_valid(data.id)) {
-                        updateRegistration(pFencer, sideEvent, '' +data.roleId, data.team, data.payment, 'saved', data.id);
+                        updateRegistration(pFencer, sideEvent, roleId, data.team, data.payment, 'saved', data.id);
                         window.setTimeout(() => {
                             console.log('clearing state of registration for ', pFencer.id, sideEvent?.id, roleId);
                             // do not overwrite teamName or payment 
@@ -257,22 +263,32 @@ export const useDataStore = defineStore('data', () => {
 
     function updateRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:string|null, teamName:string|null, payment:string|null, state:string|null, id:number|null = null)
     {
+        console.log('looking for ', pFencer.id, sideEvent?.id, roleId, state, teamName);
         let found:Registration|null = null;
-        fencerData.value = Object.keys(fencerData.value).map((key:string) => {
+        Object.keys(fencerData.value).map((key:string) => {
             let fencer = fencerData.value[key];
             if (fencer.id == pFencer.id) {
                 fencer.registrations.map((registration) => {
-                    if (   (roleId || sideEvent) // either one is set, both allowed
-                        && (!sideEvent || registration.sideEventId == sideEvent.id) // unset or it matches
-                        && (!roleId || registration.roleId == roleId) // unset or it matches
+                    console.log('checking ', registration.sideEventId,sideEvent?.id, registration.roleId, roleId, registration.roleId == roleId, roleId === null);
+                    if (   (roleId != null|| sideEvent != null) // either one is set, both allowed
+                        && (sideEvent === null || registration.sideEventId == sideEvent.id) // unset or it matches
+                        && (roleId === null || registration.roleId == roleId) // unset or it matches
                     ) {
-                        console.log('sideEvent, roleId match', state, id, sideEvent, roleId, registration.sideEventId, registration.roleId,);
-                        if (teamName) {
-                            registration.team = teamName;
+                        console.log('sideEvent, roleId match', state, id, sideEvent, roleId, registration.sideEventId, registration.roleId,teamName);
+                        if (teamName !== null) {
+                            // we use '' as a replacement for 'null, yes, really null' instead of 'null, do not replace'
+                            if (teamName == '') {
+                                console.log('setting team name to null explicitely');
+                                registration.team = null;
+                            }
+                            else {
+                                console.log('replacing teamname with ', teamName);
+                                registration.team = teamName;
+                            }
                         }
                         registration.sideEventId = sideEvent ? sideEvent.id : null;
                         registration.roleId = is_valid(roleId) ? parseInt(roleId || '') : null;
-                        if (payment) {
+                        if (payment !== null) {
                             registration.payment = payment;
                         }
                         if (id !== null) {
@@ -299,8 +315,8 @@ export const useDataStore = defineStore('data', () => {
                     };
                     fencer.registrations.push(found);
                 }
+                fencerData.value['f' + fencer.id] = fencer;
             }
-            return fencer;
         });
 
         return found;
@@ -324,8 +340,9 @@ export const useDataStore = defineStore('data', () => {
             }
         });
         if (found) {
+            console.log('deleting registration', found, found.team ? '' : null);
             let regId = found?.id || 0;
-            updateRegistration(pFencer, sideEvent, roleId, null, null, 'saving', 0); // set the id to 0
+            updateRegistration(pFencer, sideEvent, roleId, found.team ? '' : null, null, 'saving', 0); // set the id to 0
             deleteregistration(regId)
                 .then((data) => {
                     if (data && data.status == 'ok') {
@@ -352,7 +369,7 @@ export const useDataStore = defineStore('data', () => {
 
     function filterOutRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:string|null)
     {
-        fencerData.value = Object.keys(fencerData.value).map((key:string) => {
+        Object.keys(fencerData.value).map((key:string) => {
             let fencer = fencerData.value[key];
             if (fencer.id == pFencer.id) {
                 fencer.registrations = fencer.registrations.filter((registration) => {
@@ -367,8 +384,8 @@ export const useDataStore = defineStore('data', () => {
                     }
                     return true;
                 });
+                fencerData.value['f' + fencer.id] = fencer;
             }
-            return fencer;
         });
     }
 
@@ -388,6 +405,6 @@ export const useDataStore = defineStore('data', () => {
         getOverview,
 
         currentCountry, fencerData,
-        setCountry, getRegistrations, saveRegistration, deleteRegistration
+        setCountry, getRegistrations, addFencer, saveRegistration, deleteRegistration
     }
 })

@@ -1,97 +1,125 @@
-.registration-page {
-    .registration-header {
-        .country-switch {
-            float: right;
+#app {
+    .registration-page {
+        .registration-header {
+            .country-switch {
+                float: right;
 
-            label {
-                padding-right: 10px;
-                line-height: 24px;
+                label {
+                    padding-right: 10px;
+                    line-height: 24px;
+                }
+
+            }
+        }
+
+        .participant-list {
+            .participant-header {
+                display: flex;
+                justify-content: center;
+
+                .participant-filters {
+                    display: flex;
+                    justify-content: center;
+                    padding-bottom: 6px;
+                }
+
+                .last {
+                    padding-left: 20px;
+                    align-self: flex-end;
+                }
             }
 
+            table {
+                width: auto;
+                margin-left: auto;
+                margin-right: auto;
+
+                thead {
+                    background-color: var(--el-color-primary);
+                    color: white;    
+                }           
+            }
+            .registrations-per-weapon {
+                margin-bottom: 20px;
+
+                thead {
+                    tr.preheader {
+                        border-width: 0px;
+                    }
+                }
+                tbody {
+                    tr.filler {
+                        background-color: transparent;
+
+                        td {
+                            height: 15px;
+                        }
+                    }
+                }
+            }
+        }
+
+        .photoAccepted {
+            color: green;
+        }
+
+        .photoReplace {
+            color: red;
+        }
+
+        .photoPending {
+            color: blue;
+        }
+
+        .photoAbsent {
+            color: red;
+        }
+
+    }
+
+    .el-dialog {
+        .suggestion-list {
+            width: 80%;
+        }
+
+        .photoid-element {
+            .photo-id {
+                img {
+                    width: 60%;
+                }
+            }
         }
     }
 
-    .participant-list {
-        .participant-filters {
+    .selection-dialog {
+        h3 {
+            margin:20px 0px 5px 0px;
+        }
+
+        .fencer-select-events, .fencer-select-roles {
+            .el-checkbox {
+                height: auto;
+            }
+        }
+
+        .state-icons {
+            font-size: large;
+        }
+
+        .state-error { 
+            color: red;
+        }
+        .state-saved {
+            color: green;
+        }
+        .state-saving {
+            color: blue;
+        }
+
+        .payment-selection {
             display: flex;
-            justify-content: center;
-            padding-bottom: 6px;
+            justify-content: end;
+            flex-direction: row;
         }
-
-        table {
-            width: 90%;
-            margin-left: auto;
-            margin-right: auto;
-
-            thead {
-                background-color: var(--el-color-primary);
-                color: white;    
-            }           
-        }
-    }
-
-
-
-    .photoAccepted {
-        color: green;
-    }
-
-    .photoReplace {
-        color: red;
-    }
-
-    .photoPending {
-        color: blue;
-    }
-
-    .photoAbsent {
-        color: red;
-    }
-
-}
-
-.el-dialog {
-    .suggestion-list {
-        width: 80%;
-    }
-
-    .photoid-element {
-        .photo-id {
-            img {
-                width: 60%;
-            }
-        }
-    }
-}
-
-.selection-dialog {
-    h3 {
-        margin:20px 0px 5px 0px;
-    }
-
-    .fencer-select-events, .fencer-select-roles {
-        .el-checkbox {
-            height: auto;
-        }
-    }
-
-    .state-icons {
-        font-size: large;
-    }
-
-    .state-error { 
-        color: red;
-    }
-    .state-saved {
-        color: green;
-    }
-    .state-saving {
-        color: blue;
-    }
-
-    .payment-selection {
-        display: flex;
-        justify-content: end;
-        flex-direction: row;
     }
 }

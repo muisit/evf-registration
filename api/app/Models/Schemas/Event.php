@@ -138,7 +138,7 @@ class Event
      * @var string
      * @OA\Property()
      */
-    public ?string $config = null;
+    public $config = null;
 
     /**
      * Related side events
@@ -181,7 +181,7 @@ class Event
             $this->location = $event->event_location;
             $this->payments = $event->event_payments;
             $this->feed = $event->event_feed;
-            $this->config = $event->event_config;
+            $this->config = json_decode($event->event_config);
 
             // $event->event_in_ranking
             // $event->event_factor

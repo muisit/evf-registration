@@ -5,7 +5,6 @@ import { useDataStore } from '../stores/data';
 import { Fencer, FencerList, defaultFencer } from '../../../common/api/schemas/fencer';
 import { fencerlist } from '../../../common/api/fencers/fencerlist';
 import { is_valid } from '../../../common/functions';
-import { addFencerToRegistrationData } from '../components/registration/lib/addFencerToRegistrationData';
 const props = defineProps<{
     visible:boolean;
 }>();
@@ -40,34 +39,49 @@ watch(
 )
 
 const searchDialog = ref(false);
+const isSearching = ref(false);
+const selectedFencer:Ref<Fencer> = ref(defaultFencer());
+const fencerDialog = ref(false);
+const selectionDialog = ref(false);
 
 function openSearchDialog()
 {
     searchDialog.value = true;
+    selectedFencer.value = defaultFencer();
+    isSearching.value = true;
 }
 function closeSearchDialog()
 {
     searchDialog.value = false;
+    // if we opened the fencerDialog, assume we are still searching
+    isSearching.value = fencerDialog.value;
 }
+
 function saveSearchDialog(el:Fencer) 
 {
-    console.log('setting selectedFencer to ', el);
     selectedFencer.value = el;
     fencerDialog.value = true;
 }
 
-const fencerDialog = ref(false);
-const selectedFencer:Ref<Fencer> = ref(defaultFencer());
-
 function closeFencerDialog()
 {
-    console.log('closing fencer dialog');
     fencerDialog.value = false;
+    // if we opened the selection dialog, we are still searching
+    isSearching.value = selectionDialog.value;
 }
 
 function saveFencerDialog()
 {
-    addFencerToRegistrationData(selectedFencer.value);
+    data.addFencer(selectedFencer.value);
+    if (isSearching.value) {
+        selectionDialog.value = true;
+    }
+}
+
+function closeSelectionDialog()
+{
+    selectionDialog.value = false;
+    isSearching.value = false;
 }
 
 function updateFencerDialog(fieldDef:any)
@@ -90,12 +104,6 @@ function editFencer(fencer:Fencer)
 {
     fencerDialog.value = true;
     selectedFencer.value = fencer;
-}
-
-const selectionDialog = ref(false);
-function closeSelectionDialog()
-{
-    selectionDialog.value = false;
 }
 
 function selectFencer(fencer:Fencer)
@@ -122,7 +130,7 @@ watch(
 )
 
 import RegistrationHeader from '../components/registration/RegistrationHeader.vue';
-import ParticipantList from '../components/registration/ParticipantList.vue';
+import ParticipantList from '../components/registration/participantList/ParticipantList.vue';
 import FencerDialog from '../components/registration/FencerDialog.vue';
 import SearchDialog from '../components/registration/SearchDialog.vue';
 import SelectionDialog from '../components/registration/SelectionDialog.vue';

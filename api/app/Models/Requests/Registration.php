@@ -137,7 +137,7 @@ class Registration extends Base
             $this->model->registration_event = $data['registration']['sideEventId'];
             $this->model->registration_fencer = $data['registration']['fencerId'];
             $this->model->registration_role = $data['registration']['roleId'] == null ? null : intval($data['registration']['roleId']);
-            $this->model->registration_team = $data['registration']['registration']['team'] ?? null;
+            $this->model->registration_team = $data['registration']['team'] ?? null;
             $this->model->registration_payment = $data['registration']['payment'] ?? null;
 
             $event = request()->get('eventObject');

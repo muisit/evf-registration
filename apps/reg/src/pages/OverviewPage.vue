@@ -5,6 +5,7 @@ import { useDataStore } from '../stores/data';
 const props = defineProps<{
     visible:boolean;
 }>();
+const emits = defineEmits(['changeTab']);
 
 const auth = useAuthStore();
 const data = useDataStore();
@@ -28,7 +29,7 @@ import OrgOverview from '../components/overview/OrgOverview.vue';
 </script>
 <template>
     <div class="overview-page">
-        <EventOverview />
+        <EventOverview @change-tab="(e) => $emit('changeTab', e)"/>
         <OrgOverview v-if="canSeeOrgOverview()" />
     </div>
 </template>
