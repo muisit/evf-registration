@@ -85,9 +85,18 @@ export const useAuthStore = defineStore('auth', () => {
         return credentials.value.includes('accreditation:' + eid);
     }
 
+    function canRegister(eid?:number|null|undefined) {
+        return isSysop() || isOrganiser(eid) || isRegistrar(eid);
+    }
+
+    function canCashier(eid?:number|null|undefined) {
+        return isSysop() || isOrganiser(eid) || isCashier(eid);
+    }
+
     return {
         userName, isGuest, token, credentials, countryId, eventId,
         sendMe, logIn, logOut,
         isSysop, isHod, isSuperHod, isHodFor, isOrganisation, isOrganiser, isRegistrar, isCashier, isAccreditor,
+        canRegister, canCashier,
     }
 })

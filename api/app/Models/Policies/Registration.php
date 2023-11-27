@@ -62,21 +62,37 @@ class Registration
         return false;
     }
 
-    // can perform cashier functions on the model
-    public function cashier(EVFUser $user, Model $model)
+    public function hod(EVFUser $user)
+    {
+        return $this->isHodForCountry($user);
+    }
+
+    // can perform registration functions for the current event
+    public function register(EVFUser $user)
     {
         // see if we have a global request object for the event
         $event = request()->get('eventObject');
         $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
-        $eventId2 = $model->registration_mainevent;
-        if (!empty($eventId) && $eventId == $eventId2 && $user->hasRole(['organiser:' . $eventId, 'cashier:' . $eventId])) {
+        if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId, 'registrar:' . $eventId])) {
             return true;
         }
         return false;
     }
 
-    // can perform accreditation functions on the model
-    public function accredit(EVFUser $user, Model $model)
+    // can perform cashier functions for the current event
+    public function cashier(EVFUser $user)
+    {
+        // see if we have a global request object for the event
+        $event = request()->get('eventObject');
+        $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
+        if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId, 'cashier:' . $eventId])) {
+            return true;
+        }
+        return false;
+    }
+
+    // can perform accreditation functions for the current event
+    public function accredit(EVFUser $user)
     {
         // see if we have a global request object for the event
         $event = request()->get('eventObject');

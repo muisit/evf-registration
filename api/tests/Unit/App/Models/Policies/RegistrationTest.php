@@ -307,8 +307,6 @@ class RegistrationTest extends TestCase
             'countryObject' => Country::where('country_id', Country::GER)->first()
         ]);
 
-        $regGER = Registration::where("registration_id", RegistrationData::REG1)->first();
-
         $policy = new Policy();
         $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
         $gerhod = WPUser::where("ID", UserData::TESTUSERHOD)->first();
@@ -319,41 +317,41 @@ class RegistrationTest extends TestCase
         $registrar = WPUser::where("ID", UserData::TESTUSERREGISTRAR)->first();
 
         // a superhod is not a cashier or accreditor
-        $this->assertFalse($policy->cashier($superhod, $regGER));
-        $this->assertFalse($policy->accredit($superhod, $regGER));
+        $this->assertFalse($policy->cashier($superhod));
+        $this->assertFalse($policy->accredit($superhod));
 
         // organiser can do all
-        $this->assertTrue($policy->cashier($cashier, $regGER));
-        $this->assertFalse($policy->cashier($accred, $regGER));
-        $this->assertTrue($policy->cashier($organiser, $regGER));
-        $this->assertFalse($policy->cashier($registrar, $regGER));
+        $this->assertTrue($policy->cashier($cashier));
+        $this->assertFalse($policy->cashier($accred));
+        $this->assertTrue($policy->cashier($organiser));
+        $this->assertFalse($policy->cashier($registrar));
 
-        $this->assertFalse($policy->accredit($cashier, $regGER));
-        $this->assertTrue($policy->accredit($accred, $regGER));
-        $this->assertTrue($policy->accredit($organiser, $regGER));
-        $this->assertFalse($policy->accredit($registrar, $regGER));
+        $this->assertFalse($policy->accredit($cashier));
+        $this->assertTrue($policy->accredit($accred));
+        $this->assertTrue($policy->accredit($organiser));
+        $this->assertFalse($policy->accredit($registrar));
 
         // gerhod is not a cashier or accreditor
-        $this->assertFalse($policy->cashier($gerhod, $regGER));
-        $this->assertFalse($policy->accredit($gerhod, $regGER));
+        $this->assertFalse($policy->cashier($gerhod));
+        $this->assertFalse($policy->accredit($gerhod));
 
         // unprivileged cannot
-        $this->assertFalse($policy->cashier($unpriv, $regGER));
-        $this->assertFalse($policy->accredit($unpriv, $regGER));
+        $this->assertFalse($policy->cashier($unpriv));
+        $this->assertFalse($policy->accredit($unpriv));
 
         request()->merge([
             'eventObject' => null,
             'countryObject' => Country::where('country_id', Country::ITA)->first()
         ]);
         // organisation is no longer recognised as such
-        $this->assertFalse($policy->cashier($cashier, $regGER));
-        $this->assertFalse($policy->cashier($accred, $regGER));
-        $this->assertFalse($policy->cashier($organiser, $regGER));
-        $this->assertFalse($policy->cashier($registrar, $regGER));
+        $this->assertFalse($policy->cashier($cashier));
+        $this->assertFalse($policy->cashier($accred));
+        $this->assertFalse($policy->cashier($organiser));
+        $this->assertFalse($policy->cashier($registrar));
 
-        $this->assertFalse($policy->accredit($cashier, $regGER));
-        $this->assertFalse($policy->accredit($accred, $regGER));
-        $this->assertFalse($policy->accredit($organiser, $regGER));
-        $this->assertFalse($policy->accredit($registrar, $regGER));
+        $this->assertFalse($policy->accredit($cashier));
+        $this->assertFalse($policy->accredit($accred));
+        $this->assertFalse($policy->accredit($organiser));
+        $this->assertFalse($policy->accredit($registrar));
     }
 }

@@ -20,7 +20,6 @@ export const ruleEventTeamVeterans = (fencer:Fencer, registration:Registration, 
         })
 
         if(team.length < 3 || team.length>5) {
-            console.log('fencer ', fencer.fullName,' has incorrect team size', team.length);
             registration.errors?.push('Team size incorrect');
         }
 
@@ -34,11 +33,9 @@ export const ruleEventTeamVeterans = (fencer:Fencer, registration:Registration, 
             }
         });
         if (!has_a_cat2_fencer) {
-            console.log('fencer ', fencer.fullName,' is missing cat 2');
             registration.errors?.push("Team is missing a category 2 fencer");
         }
         if (has_a_cat34_fencer) {
-            console.log('fencer ', fencer.fullName,' has a non cat-1-2 fencer');
             registration.errors?.push("Team has a fencer from an invalid category");
         }
     }

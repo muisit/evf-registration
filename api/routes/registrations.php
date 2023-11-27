@@ -30,5 +30,13 @@ $router->group(
                 'uses' => 'Registrations\Delete@index'
             ]
         );
+
+        $router->post(
+            '/pay',
+            [
+                'as' => 'registrations.pay',
+                'uses' => 'Registrations\Pay@index'
+            ]
+        );
     }
 );

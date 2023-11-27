@@ -18,6 +18,7 @@ import { Competition } from '../../../common/api/schemas/competition';
 import { CountrySchema } from '../../../common/api/schemas/country';
 import { Registration } from '../../../common/api/schemas/registration';
 import { useAuthStore } from '../../../common/stores/auth';
+import { payregistration } from '../../../common/api/registrations/payregistration';
 
 export const useDataStore = defineStore('data', () => {
     const categories = ref([]);
@@ -277,19 +278,16 @@ export const useDataStore = defineStore('data', () => {
 
     function updateRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:string|null, teamName:string|null, payment:string|null, state:string|null, id:number|null = null)
     {
-        console.log('looking for ', pFencer.id, sideEvent?.id, roleId, state, teamName);
         let found:Registration|null = null;
         let newData = {};
         Object.keys(fencerData.value).map((key:string) => {
             let fencer = fencerData.value[key];
             if (fencer.id == pFencer.id) {
                 fencer.registrations.map((registration) => {
-                    console.log('checking ', registration.sideEventId,sideEvent?.id, registration.roleId, roleId, registration.roleId == roleId, roleId === null);
                     if (   (roleId != null|| sideEvent != null) // either one is set, both allowed
                         && (sideEvent === null || registration.sideEventId == sideEvent.id) // unset or it matches
                         && (roleId === null || registration.roleId == roleId) // unset or it matches
                     ) {
-                        console.log('sideEvent, roleId match', state, id, sideEvent, roleId, registration.sideEventId, registration.roleId,teamName);
                         if (teamName !== null) {
                             // we use '' as a replacement for 'null, yes, really null' instead of 'null, do not replace'
                             if (teamName == '') {
@@ -309,7 +307,10 @@ export const useDataStore = defineStore('data', () => {
                         if (id !== null) {
                             registration.id = id;
                         }
-                        registration.state = state;
+                        // only overwrite if we are not re-saving the entry
+                        if (payment != null || registration.state == 'saved') {
+                            registration.state = state;
+                        }
                         found = registration;
                     }
                 });
@@ -339,7 +340,6 @@ export const useDataStore = defineStore('data', () => {
 
     function deleteRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:string|null)
     {
-        console.log("data deleteRegistration", pFencer.id, sideEvent?.id, roleId);
         let found:Registration|null = null;
         Object.keys(fencerData.value).map((key:string) => {
             let fencer = fencerData.value[key];
@@ -355,7 +355,6 @@ export const useDataStore = defineStore('data', () => {
             }
         });
         if (found) {
-            console.log('deleting registration', found, found.team ? '' : null);
             let regId = found?.id || 0;
             updateRegistration(pFencer, sideEvent, roleId, found.team ? '' : null, null, 'saving', 0); // set the id to 0
             deleteregistration(regId)
@@ -404,6 +403,59 @@ export const useDataStore = defineStore('data', () => {
         });
     }
 
+    function forEachRegistrationDo(callback)
+    {
+        Object.keys(fencerData.value).map((key:string) => {
+            let fencer = fencerData.value[key];
+            if (fencer && fencer.registrations) {
+                fencer.registrations.map((reg:Registration) => callback(fencer, reg));
+            }
+        });
+    }
+
+    function updatePayment(registrationList:Registration[], paidHod:boolean|null, paidOrg:boolean|null, state:string)
+    {
+        let fencerIds = registrationList.map((reg) => reg.fencerId);
+        let regIds = registrationList.map((reg) => reg.id);
+        var newData = {};
+        Object.keys(fencerData.value).map((key:string) => {
+            let fencer = fencerData.value[key];
+            if (fencerIds.includes(fencer.id) && fencer.registrations) {
+                fencer.registrations = fencer.registrations.map((reg:Registration) => {
+                    if (regIds.includes(reg.id)) {
+                        if (paidOrg !== null) {
+                            reg.paid = paidOrg ? 'Y': 'N';
+                        }
+                        if (paidHod !== null) {
+                            reg.paidHod = paidHod ? 'Y' : 'N';
+                        }
+                        // only overwrite state if we are not re-saving it
+                        if ((paidHod !== null || paidOrg !== null) || reg.state == 'saved') {
+                            reg.state = state;
+                        }
+                    }
+                    return reg;
+                });
+            }
+            newData[key] = fencer;
+        });
+        fencerData.value = newData;
+    }
+
+    function markPayments(registrations:Registration[], paidHod:boolean|null, paidOrg:boolean|null)
+    {
+        updatePayment(registrations, paidHod, paidOrg, 'saving');
+        payregistration(registrations, paidHod, paidOrg)
+            .then((data) => {
+                if (data && data.status == 'ok') {
+                    updatePayment(registrations, paidHod, paidOrg, 'saved');
+                    window.setTimeout(() => {
+                        updatePayment(registrations, null, null, '');
+                    }, 3000);
+                }
+            })
+    }
+
     return {
         categories, categoriesById,
         roles, rolesById, countryRoles, organisationRoles, officialRoles,
@@ -420,6 +472,7 @@ export const useDataStore = defineStore('data', () => {
         getOverview,
 
         currentCountry, fencerData,
-        setCountry, getRegistrations, addFencer, saveRegistration, deleteRegistration
+        setCountry, getRegistrations, addFencer, saveRegistration, deleteRegistration,
+        forEachRegistrationDo, markPayments
     }
 })

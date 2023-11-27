@@ -137,7 +137,7 @@ import SelectionDialog from '../components/registration/SelectionDialog.vue';
 import { ElButton } from 'element-plus';
 </script>
 <template>
-    <div class="registration-page">
+    <div class="registration-page" v-if="props.visible">
         <RegistrationHeader :country-switch="canSwitchCountry()" @onChangeCountry="onChangeCountry"/>
         <div class='registration-buttons'>
             <ElButton type="primary" @click="openSearchDialog">Add Registration</ElButton>

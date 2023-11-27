@@ -7,7 +7,6 @@ export const ruleGender = (fencer:Fencer, registration:Registration, competition
     let sideEvent = data.sideEventsById['s' + registration.sideEventId];
     if(sideEvent && sideEvent.competition && sideEvent.competition.weapon) {
         if (!fencer.gender || fencer.gender != sideEvent.competition.weapon.gender) {
-            console.log('fencer ', fencer.fullName,' is of wrong gender ', fencer.gender, sideEvent.competition.weapon.gender);
             registration.errors?.push("Fencer has the wrong gender for this competition");
         }
     }

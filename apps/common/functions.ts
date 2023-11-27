@@ -42,6 +42,10 @@ export function format_date_fe_short(dt) {
     return mmt.date() + " " + short_months[mmt.month()];
 }
 
+export function format_currency(val) {
+    return parseFloat(val).toFixed(2);
+}
+
 export function random_token(length, charlist?:string) {
     if (!charlist) charlist = "abcdefghijklmnopqrstuvwxyz0123456789";
     if (length > 100) length = 100;
@@ -80,7 +84,6 @@ export function date_to_category_num(dt:string|object, wrt:any = null) {
         diff += 1;
     }
     var catnum =  Math.floor(diff / 10) - 3;
-    console.log('year difference is ', dt, wrt, diff, ' catnum', catnum);
 
     // category 5 was removed, the highest category is now 4
     if(catnum > 4) catnum = 4;

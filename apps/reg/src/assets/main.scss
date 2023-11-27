@@ -8,9 +8,6 @@
     padding: 0px;
 
     .el-container {
-        min-height: 100vh;
-        min-width: 100vw;
-
         .el-header {
             width: 100%;
             min-width: 1080px;
@@ -138,5 +135,10 @@
     font-size: larger;
 }
 
+.el-dialog .el-form.login label {
+    width: 150px;
+}
+
 @import 'pages/overview.scss';
 @import 'pages/registration.scss';
+@import 'pages/cashier.scss';

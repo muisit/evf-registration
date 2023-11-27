@@ -1,0 +1,50 @@
+#app {
+    .cashier-page {
+        .cashier-header {
+            .country-switch {
+                float: right;
+
+                label {
+                    padding-right: 10px;
+                    line-height: 24px;
+                }
+
+            }
+        }
+
+        .team-list {
+            margin-bottom: 20px;
+
+            .team-constituants {
+                padding-left: 30px;
+            }
+        }
+
+        .individual-list {
+            margin-bottom: 20px;
+
+            .individual-details { 
+                padding-left: 40px;
+            }
+        }
+
+        .cashier-footer {
+            .payment-details {
+                margin-bottom: 25px;
+
+                tr {
+                    .label {
+                        font-weight: bold;
+                    }
+                }
+
+                .cashier-detail-header {
+                    background-color: var(--el-color-primary);
+                    color: white;
+                    font-size: large;
+                    padding: 4px 10px;
+                }
+            }
+        }
+    }
+}

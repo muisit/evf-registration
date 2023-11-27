@@ -19,7 +19,8 @@ function saveRegistration(event:SideEvent, state:any)
     if (state) {
         if (event.isAthleteEvent && event.isTeamEvent) {
             // state is the team-name
-            data.saveRegistration(props.fencer, event, event.defaultRole || null, state, props.payments);
+            // always mark this as a group-payment, if we have a choice
+            data.saveRegistration(props.fencer, event, event.defaultRole || null, state, data.currentEvent.payments == 'all' ? 'G' : props.payments);
         }
         else {
             // individual tournament, no team name

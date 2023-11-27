@@ -37,7 +37,7 @@ import { ElDialog, ElForm, ElFormItem, ElInput, ElButton } from 'element-plus';
         If you do not remember that password, please reset the password first using 
         the 'Lost your Password' option on the <a href="https://www.veteransfencing.eu/wp-login.php?action=lostpassword">login page</a>.
       </p>
-      <ElForm>
+      <ElForm class="login">
         <ElFormItem label="Name/E-mail address">
           <ElInput v-model="form.name" />
         </ElFormItem>

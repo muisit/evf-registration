@@ -7,7 +7,6 @@ export const ruleYoungerCategory = (fencer:Fencer, registration:Registration, co
     let sideEvent = data.sideEventsById['s' + registration.sideEventId];
     if(sideEvent && sideEvent.competition && sideEvent.competition.category && sideEvent.competition.category.type != 'T') {
         if (!fencer.categoryNum || fencer.categoryNum < sideEvent.competition.category.value) {
-            console.log('fencer ', fencer.fullName,' is in wrong (older) category', fencer.categoryNum, sideEvent.competition.categoryNum);
             registration.errors?.push("Fencer is too young for this competition");
         }
     }

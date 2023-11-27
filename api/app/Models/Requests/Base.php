@@ -38,13 +38,17 @@ class Base
         }
         else {
             $model = $this->updateModel($data);
-
-            if (!empty($this->model)) {
-                $this->model->save();
-            }
+            $this->postProcess();
         }
 
         return $this->model;
+    }
+
+    protected function postProcess()
+    {
+        if (!empty($this->model)) {
+            $this->model->save();
+        }
     }
 
     public function createValidator(Request $request)
