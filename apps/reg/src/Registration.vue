@@ -20,8 +20,8 @@ watch(
         else {
             dataStore.getBasicData().then(
                 () => {
-                    if (authStore.countryId && dataStore.countriesById['c' + authStore.countryId]) {
-                        authStore.country = dataStore.countriesById['c' + authStore.countryId];
+                    if (authStore.countryId && dataStore.countriesById['c' + authStore.countryId] && !authStore.canSwitchCountry()) {
+                        dataStore.setCountry(authStore.countryId);
                     }
                     dataStore.getEvents();
                 });

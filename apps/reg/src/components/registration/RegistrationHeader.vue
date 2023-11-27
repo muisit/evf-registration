@@ -1,15 +1,11 @@
 <script lang="ts" setup>
-import {watch,  ref } from 'vue';
 import { is_valid } from '../../../../common/functions';
+import { useDataStore } from '../../stores/data';
 const props = defineProps<{
     countrySwitch: boolean;
 }>();
-const emits = defineEmits(['onChangeCountry']);
 
-import { useAuthStore } from '../../../../common/stores/auth';
-import { useDataStore } from '../../stores/data';
 const data = useDataStore();
-const auth = useAuthStore();
 
 function updateCountry(id:string)
 {
@@ -31,7 +27,7 @@ import { ElSelect, ElOption } from 'element-plus';
             <h3 class="text-center">Registration for {{ data.currentCountry.name }}</h3>
         </div>
         <div v-else>
-            <h3 class="text-center">Head of Delegation <span v-if="is_valid(auth.country)">{{ auth.country.name }}</span></h3>
+            <h3 class="text-center">Head of Delegation of <span v-if="is_valid(data.currentCountry)">{{ data.currentCountry.name }}</span></h3>
         </div>
     </div>
 </template>

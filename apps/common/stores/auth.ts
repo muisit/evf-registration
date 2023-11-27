@@ -85,6 +85,11 @@ export const useAuthStore = defineStore('auth', () => {
         return credentials.value.includes('accreditation:' + eid);
     }
 
+    function canSwitchCountry(eid?:number|null|undefined) {
+        if (!eid) eid = eventId.value;
+        return isSysop() || isOrganiser(eid) || isRegistrar(eid) || isSuperHod();
+    }
+
     function canRegister(eid?:number|null|undefined) {
         return isSysop() || isOrganiser(eid) || isRegistrar(eid);
     }
@@ -97,6 +102,6 @@ export const useAuthStore = defineStore('auth', () => {
         userName, isGuest, token, credentials, countryId, eventId,
         sendMe, logIn, logOut,
         isSysop, isHod, isSuperHod, isHodFor, isOrganisation, isOrganiser, isRegistrar, isCashier, isAccreditor,
-        canRegister, canCashier,
+        canRegister, canCashier, canSwitchCountry
     }
 })

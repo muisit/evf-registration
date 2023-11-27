@@ -206,8 +206,9 @@ export const useDataStore = defineStore('data', () => {
         fencerData.value = {};
 
         const authStore = useAuthStore();
-        authStore.countryId = currentCountry.value.id || 0;
-        getRegistrations();
+        if (authStore.canSwitchCountry()) {
+            authStore.countryId = currentCountry.value.id || 0;
+        }
     }
 
     function getRegistrations() {

@@ -11,23 +11,6 @@ const props = defineProps<{
 const auth = useAuthStore();
 const data = useDataStore();
 
-function canSwitchCountry()
-{
-    // system administrators, super-HoDs (general administrators), the event organiser and the event registrar can change countries
-    return auth.isSysop() || auth.isOrganiser(data.currentEvent.id) || auth.isSuperHod() || auth.isRegistrar(data.currentEvent.id);
-}
-
-function isAdmin()
-{
-    // administrators are sysop and event organisers
-    return auth.isSysop() || auth.isOrganiser(data.currentEvent.id) || auth.isRegistrar(data.currentEvent.id);
-}
-
-function onChangeCountry(newValue)
-{
-    data.setCountry(newValue.countryId);
-}
-
 watch(
     () => [props.visible, data.currentEvent],
     () => {
@@ -138,13 +121,13 @@ import { ElButton } from 'element-plus';
 </script>
 <template>
     <div class="registration-page" v-if="props.visible">
-        <RegistrationHeader :country-switch="canSwitchCountry()" @onChangeCountry="onChangeCountry"/>
+        <RegistrationHeader :country-switch="auth.canSwitchCountry() || false"/>
         <div class='registration-buttons'>
             <ElButton type="primary" @click="openSearchDialog">Add Registration</ElButton>
         </div>
         <ParticipantList @on-edit="editFencer" @on-select="selectFencer"/>
         <SearchDialog @onClose="closeSearchDialog" @onSave="saveSearchDialog" :visible="searchDialog" :fencers="allfencers" />
-        <FencerDialog @onClose="closeFencerDialog" @onUpdate="updateFencerDialog" @onSave="saveFencerDialog" :visible="fencerDialog" :fencer="selectedFencer" :changeCountry="canSwitchCountry()"/>
-        <SelectionDialog @onClose="closeSelectionDialog" :visible="selectionDialog" :fencer="selectedFencer" :isadmin="isAdmin()"/>
+        <FencerDialog @onClose="closeFencerDialog" @onUpdate="updateFencerDialog" @onSave="saveFencerDialog" :visible="fencerDialog" :fencer="selectedFencer" :changeCountry="auth.canSwitchCountry() || false"/>
+        <SelectionDialog @onClose="closeSelectionDialog" :visible="selectionDialog" :fencer="selectedFencer" :isadmin="auth.canRegister()"/>
     </div>
 </template>

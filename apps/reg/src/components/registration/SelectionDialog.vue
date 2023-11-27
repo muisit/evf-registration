@@ -52,10 +52,14 @@ function unregister()
 function availableEvents()
 {
     return selectEventsForFencer(props.fencer).filter((event:SideEvent) => {
-        if (!(event.isAthleteEvent || event.isNonCompetitionEvent || event.isRegistered)) return false;
+        if (!(event.isAthleteEvent || event.isNonCompetitionEvent || event.isRegistered)) {
+            return false;
+        }
 
         // if we are organisation, allow selecting the side-events, but not the competitions
-        if(!is_valid(data.currentCountry.id) && !event.isNonCompetitionEvent) return false;
+        if(!is_valid(data.currentCountry.id) && !event.isNonCompetitionEvent) {
+            return false;
+        }
 
         return true;        
     });

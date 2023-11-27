@@ -36,6 +36,9 @@ function onLogin(credentials:object)
                 loginVisible.value = true;
             }
             else {
+                if (authStore.isHod() && authStore.countryId && dataStore.countries.length) {
+                    dataStore.setCountry(authStore.countryId);
+                }
                 // retrieve the list of events
                 dataStore.getEvents();
             }
