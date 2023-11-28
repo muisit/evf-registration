@@ -63,7 +63,7 @@ class EventTest extends TestCase
         $this->assertEquals($event->event_location, $schema->location);
         $this->assertEquals($event->event_payments, $schema->payments);
         $this->assertEquals($event->event_feed, $schema->feed);
-        $this->assertEquals($event->event_config, $schema->config);
+        $this->assertEquals($event->event_config, json_encode($schema->config));
         $this->assertEquals($event->event_country, $schema->countryId);
 
         $this->assertInstanceOf(EventTypeSchema::class, $schema->type);

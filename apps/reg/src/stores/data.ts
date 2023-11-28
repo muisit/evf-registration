@@ -118,7 +118,7 @@ export const useDataStore = defineStore('data', () => {
     }
 
     function getEvents() {
-        eventlist()
+        return eventlist()
             .then((data) => {
                 events.value = data;
                 if (events.value && events.value.length > 0) {
@@ -180,9 +180,8 @@ export const useDataStore = defineStore('data', () => {
     function getOverview() {
         if (!is_valid(currentEvent.value)) return [];
 
-        overview(currentEvent.value.id)
+        return overview(currentEvent.value.id)
             .then((data) => {
-                console.log('setting overviewData', data);
                 overviewData.value = data;
                 overviewPerCountry.value = overviewToCountry(data);
                 return data;
@@ -212,10 +211,7 @@ export const useDataStore = defineStore('data', () => {
     }
 
     function getRegistrations() {
-        console.log('getting registrations', currentCountry.value);
-        var cid = currentCountry.value.id;
-        if (!is_valid(cid)) cid = 0;
-        registrations(currentEvent.value.id, cid)
+        return registrations()
             .then((data) => {
                 console.log('received registrations, creating data structure', data);
                 registrationToFencers(data);

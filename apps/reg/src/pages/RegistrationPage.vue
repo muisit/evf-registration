@@ -12,10 +12,11 @@ const auth = useAuthStore();
 const data = useDataStore();
 
 watch(
-    () => [props.visible, data.currentEvent],
+    () => [props.visible, data.currentEvent, data.currentCountry],
     () => {
         if (props.visible) {
-            data.getRegistrations();
+            auth.isLoading = true;
+            data.getRegistrations().then(() => { auth.isLoading = false; });
         }
     },
     { immediate: true }
@@ -97,10 +98,10 @@ function selectFencer(fencer:Fencer)
 
 const allfencers:Ref<FencerList> = ref([]);
 watch(
-    () => data.currentCountry,
+    () => [props.visible, data.currentCountry],
     (nw) => {
-        if (is_valid(nw)) {
-            fencerlist(nw)
+        if (is_valid(data.currentCountry.id) && props.visible) {
+            fencerlist(data.currentCountry)
                 .then((data) => {
                     allfencers.value = data;
                 });
