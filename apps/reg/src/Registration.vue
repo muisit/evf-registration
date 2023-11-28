@@ -18,12 +18,13 @@ watch(
             authStore.sendMe();
         }
         else {
+            authStore.isLoading = true;
             dataStore.getBasicData().then(
                 () => {
                     if (authStore.countryId && dataStore.countriesById['c' + authStore.countryId] && !authStore.canSwitchCountry()) {
                         dataStore.setCountry(authStore.countryId);
                     }
-                    dataStore.getEvents();
+                    dataStore.getEvents().then(() => { authStore.isLoading = false;});
                 });
         }
     },
@@ -31,7 +32,9 @@ watch(
 );
 
 import DashboardView from './pages/DashboardView.vue';
+import LoadingService from './components/special/LoadingService.vue';
 </script>
 <template>
     <DashboardView/>
+    <LoadingService/>
 </template>

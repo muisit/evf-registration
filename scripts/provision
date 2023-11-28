@@ -1,0 +1,56 @@
+#!/bin/bash
+
+WD=$1
+DMN=$2
+
+if [[ ! -e "$WD.zip" ]]
+then
+    echo "No upload detected, bailing"
+    exit 1
+fi
+
+cd /opt/websites/$DMN
+
+echo "Making sure we can create a release directory"
+sudo chown michiel.www-data releases
+echo "Unpacking release"
+mkdir -p releases/$WD
+cd releases/$WD
+unzip -q $HOME/$WD.zip
+sudo chmod u+x ./artisan
+
+USER='michiel'
+GROUP='www-data'
+echo "Adjusting file permissions"
+sudo find ./ -type f -exec chmod 644 {} \;
+
+echo "Adjusting directory permissions"
+sudo find ./ -type d -exec chmod 755 {} \;
+
+echo "Setting sticky bit"
+sudo chmod 2777 bootstrap/cache
+sudo rm -rf storage
+sudo ln -sf ../../storage .
+
+echo "Creating caches"
+php8.2 ./artisan config:clear
+php8.2 ./artisan route:clear
+php8.2 ./artisan view:clear
+
+echo "Taking application down"
+php8.2 ./artisan down
+
+echo "Switching releases"
+cd /opt/websites/$DMN
+sudo rm -rf public
+sudo ln -sf releases/$WD/public ./public
+
+echo "Migrating database"
+cd /opt/websites/$DMN/releases/$WD
+php8.2 ./artisan migrate --force
+
+echo "Application up"
+php8.2 ./artisan up
+
+echo "Cleanup"
+rm $HOME/$WD.zip $HOME/provision

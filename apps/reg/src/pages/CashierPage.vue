@@ -23,10 +23,11 @@ function onChangeCountry(newValue)
 }
 
 watch(
-    () => [props.visible, data.currentEvent],
+    () => [props.visible, data.currentEvent, data.currentCountry],
     () => {
         if (props.visible) {
-            data.getRegistrations();
+            auth.isLoading = true;
+            data.getRegistrations().then(() => { auth.isLoading = false });
         }
     },
     { immediate: true }

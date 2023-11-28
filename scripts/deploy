@@ -1,0 +1,116 @@
+#!/bin/bash
+
+configureEnvironment () {
+  if [ -f .env ]; then
+    while read line; do
+      if [[ ! "$line" =~ ^\# ]] && [[ "$line" =~ .*= ]]; then
+        export "${line//[$'\r\n']}"
+      fi
+    done < .env
+  fi
+}
+
+configureEnvironment $@
+
+EXT=`date +'%Y%m%d%H%M%S'`
+USER='michiel'
+GROUP='www-data'
+
+WD=`pwd`
+WD="$WD/$EXT"
+LOG=".release.$EXT"
+
+if [[ -e $WD ]]
+then
+    echo "Path '$WD' exists, not releasing"
+    exit 1
+fi
+
+echo "Checking out latest '$GIT_BRANCH' branch to '$WD'"
+echo "Checking out latest '$GIT_BRANCH' branch to '$WD'" >>$LOG
+git clone $GIT_ROOT --branch $GIT_BRANCH $WD >>$LOG 2>&1
+
+echo "Copying production .env file for build process" >>$LOG
+cp env.production $WD/api/.env
+cp env.testing $WD/api/tests/Support/bootstrap/.env.testing
+
+cd $WD/api
+
+echo "Building API"
+echo "Building API" >>$LOG
+echo "Pre-install cleanup" >>$LOG
+rm -rf vendor >>$LOG
+find ./ -iname \*~ -delete -print >>$LOG
+
+# adjust all permissions
+echo "Adjusting file permissions" >>$LOG
+sudo find ./ -type f -exec chown $USER.$GROUP {} \; >>$LOG
+sudo find ./ -type f -exec chmod 664 {} \; >>$LOG
+
+echo "Adjusting directory permissions" >>$LOG
+sudo find ./ -type d -exec chown $USER.$GROUP {} \; >>$LOG
+sudo find ./ -type d -exec chmod 775 {} \; >>$LOG
+
+echo "Setting sticky bit" >>$LOG
+#sudo chmod 2775 bootstrap/cache >>$LOG
+sudo find ./storage -type d -exec chmod 2775 {} \; >>$LOG
+
+echo "Make stuff executable" >>$LOG
+chmod u+x artisan >>$LOG
+
+echo "Installing composer modules" >>$LOG
+php8.2 /usr/bin/composer install >>$LOG 2>&1
+
+echo "Running tests"
+echo "Running tests" >>$LOG
+
+mkdir storage/framework/sessions
+FULLPATH=`realpath ../scripts/create-testing-database.sh`
+docker run -d --name unittests --rm -p 10306:3306 --env MYSQL_USER=$MYSQL_USER --env MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD --env MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD -v "$FULLPATH:/docker-entrypoint-initdb.d/10-create-testing-database.sh" mysql/mysql-server:8.0 
+CID=`docker inspect unittests | jq -r '.[0].Config.Hostname'`
+echo "determining state of docker container"
+STATE=`docker inspect unittests | jq -r '.[0].State.Status'`
+while [[ ! "$STATE" = "running" ]]
+do
+    sleep 1
+    echo "determining state of docker container"
+    STATE=`docker inspect unittests | jq -r '.[0].State.Status'`
+done
+vendor/bin/codecept -c tests/codeception.yml run Unit
+
+echo "Cleaning up docker container" >>$LOG
+docker container stop $CID
+
+exit 0
+
+# recreate the autoloader files for production
+echo "Installing composer modules"  >> .release.$EXT 2>&1
+php8.2 /usr/bin/composer install --optimize-autoloader --no-dev  >> .release.$EXT 2>&1
+
+echo "Clearing caches"  >> .release.$EXT 2>&1
+./artisan cache:clear  >> .release.$EXT 2>&1
+
+
+
+# install/require all modules
+echo "Installing NPM modules"
+npm install --production=false
+chmod u+x node_modules/.bin/*
+
+echo "Creating application files"
+npm run build
+
+echo "Removing node, Vue and other build files from resources"
+rm -rf node_modules resources/js resources/css resources/images resources/vue
+
+echo "Adjusting .env file"
+cat .env | sed "s/DEPLOY_EXT/$EXT/" > tmp.txt
+mv tmp.txt .env
+
+echo "Ready to create deployment file"
+zip -r -q ../$EXT.zip .env composer.json app artisan bootstrap config database lang public resources routes storage vendor
+
+cd ..
+echo -e "put $EXT.zip\r\nput provision\r\nquit" | sftp -b - $DEPLOY_SERVER
+sudo ssh $DEPLOY_SERVER -i $DEPLOY_KEY "/bin/bash \$HOME/provision $EXT $DEPLOY_DOMAIN"
+

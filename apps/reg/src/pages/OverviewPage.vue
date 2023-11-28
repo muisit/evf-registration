@@ -11,10 +11,12 @@ const auth = useAuthStore();
 const data = useDataStore();
 
 watch (
-    () => data.currentEvent,
+    () => [props.visible, data.currentEvent, data.currentCountry],
     () => {
-        console.log('currentEvent changed, getting overview from page');
-        data.getOverview(data.currentEvent.id);
+        if (props.visible) {
+            auth.isLoading = true;        
+            data.getOverview().then(() => { auth.isLoading = false; });
+        }
     },
     { immediate: true }
 );

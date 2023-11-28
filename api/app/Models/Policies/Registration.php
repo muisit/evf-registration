@@ -97,8 +97,7 @@ class Registration
         // see if we have a global request object for the event
         $event = request()->get('eventObject');
         $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
-        $eventId2 = $model->registration_mainevent;
-        if (!empty($eventId) && $eventId == $eventId2 && $user->hasRole(['organiser:' . $eventId, 'accreditation:' . $eventId])) {
+        if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId, 'accreditation:' . $eventId])) {
             return true;
         }
         return false;

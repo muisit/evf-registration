@@ -73,6 +73,9 @@ import { Loading } from '@element-plus/icons-vue';
                     </ElIcon>
                 </div>
             </div>
+            <div v-else-if="noEventsAvailable() && authStore.isLoading">
+                <p>Please wait while loading data</p>
+            </div>
             <div v-else-if="noEventsAvailable()">
                 <h3 class="textcenter">No events found</h3>
                 <p>It seems no events are currently available to manage. Please contact the

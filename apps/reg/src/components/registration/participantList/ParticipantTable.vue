@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
-import type { Ref } from 'vue';
 import { is_valid } from '../../../../../common/functions';
 import type { Fencer } from '../../../../../common/api/schemas/fencer';
 import type { Registration } from '../../../../../common/api/schemas/registration';
-import { hasTeam, allowMoreTeams } from '../../../../../common/lib/event';
+import { allowMoreTeams } from '../../../../../common/lib/event';
+import { WeaponSchema } from '../../../../../common/api/schemas/weapon';
 import { useDataStore } from '../../../stores/data';
 const emits = defineEmits(['onEdit', 'onSelect']);
 const props = defineProps<{
@@ -127,9 +126,9 @@ function filterErrors(fencer:Fencer)
     return errors;
 }
 
+import PhotoIcon from './PhotoIcon.vue';
 import { ElIcon, ElTooltip } from 'element-plus';
-import { Edit, Trophy, Bell } from '@element-plus/icons-vue';
-import { WeaponSchema } from '../../../../../common/api/schemas/weapon';
+import { Edit, Trophy, Bell, Camera, Close } from '@element-plus/icons-vue';
 </script>
 <template>
     <tbody>

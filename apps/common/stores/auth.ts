@@ -11,6 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
     const credentials:Ref<Array<string>> = ref([]);
     const countryId = ref(0);
     const eventId = ref(0);
+    const isLoading = ref(false);
 
     function sendMe() {
         me().then((data) => {
@@ -99,7 +100,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     return {
-        userName, isGuest, token, credentials, countryId, eventId,
+        userName, isGuest, token, credentials, countryId, eventId, isLoading,
         sendMe, logIn, logOut,
         isSysop, isHod, isSuperHod, isHodFor, isOrganisation, isOrganiser, isRegistrar, isCashier, isAccreditor,
         canRegister, canCashier, canSwitchCountry
