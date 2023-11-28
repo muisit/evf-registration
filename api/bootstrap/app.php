@@ -142,11 +142,6 @@ $app->register(Kirschbaum\PowerJoins\PowerJoinsServiceProvider::class);
 |
 */
 
-\Log::debug('start of application');
-DB::listen(function ($query) {
-    \Log::debug($query->sql . ' [' . implode(', ', $query->bindings) . ']');
-});
-
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
