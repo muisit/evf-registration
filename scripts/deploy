@@ -17,8 +17,8 @@ USER='michiel'
 GROUP='www-data'
 
 WD=`pwd`
+LOG="$WD/.release.$EXT"
 WD="$WD/$EXT"
-LOG=".release.$EXT"
 
 if [[ -e $WD ]]
 then
@@ -37,80 +37,127 @@ cp env.testing $WD/api/tests/Support/bootstrap/.env.testing
 cd $WD/api
 
 echo "Building API"
-echo "Building API" >>$LOG
-echo "Pre-install cleanup" >>$LOG
-rm -rf vendor >>$LOG
-find ./ -iname \*~ -delete -print >>$LOG
+echo "Building API" >> $LOG
+echo "Pre-install cleanup" >> $LOG
+rm -rf vendor >> $LOG
+find ./ -iname \*~ -delete -print >> $LOG
 
 # adjust all permissions
-echo "Adjusting file permissions" >>$LOG
-sudo find ./ -type f -exec chown $USER.$GROUP {} \; >>$LOG
-sudo find ./ -type f -exec chmod 664 {} \; >>$LOG
+echo "Adjusting file permissions" >> $LOG
+sudo find ./ -type f -exec chown $USER.$GROUP {} \; >> $LOG
+sudo find ./ -type f -exec chmod 664 {} \; >> $LOG
 
-echo "Adjusting directory permissions" >>$LOG
-sudo find ./ -type d -exec chown $USER.$GROUP {} \; >>$LOG
-sudo find ./ -type d -exec chmod 775 {} \; >>$LOG
+echo "Adjusting directory permissions" >> $LOG
+sudo find ./ -type d -exec chown $USER.$GROUP {} \; >> $LOG
+sudo find ./ -type d -exec chmod 775 {} \; >> $LOG
 
-echo "Setting sticky bit" >>$LOG
-#sudo chmod 2775 bootstrap/cache >>$LOG
-sudo find ./storage -type d -exec chmod 2775 {} \; >>$LOG
+echo "Setting sticky bit" >> $LOG
+#sudo chmod 2775 bootstrap/cache >> $LOG
+sudo find ./storage -type d -exec chmod 2775 {} \; >> $LOG
 
-echo "Make stuff executable" >>$LOG
-chmod u+x artisan >>$LOG
+echo "Make stuff executable" >> $LOG
+chmod u+x artisan >> $LOG
 
-echo "Installing composer modules" >>$LOG
-php8.2 /usr/bin/composer install >>$LOG 2>&1
+echo "Installing composer modules" >> $LOG
+php8.2 /usr/bin/composer install >> $LOG 2>&1
 
 echo "Running tests"
-echo "Running tests" >>$LOG
+echo "Running tests" >> $LOG
 
 mkdir storage/framework/sessions
 FULLPATH=`realpath ../scripts/create-testing-database.sh`
-docker run -d --name unittests --rm -p 10306:3306 --env MYSQL_USER=$MYSQL_USER --env MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD --env MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD -v "$FULLPATH:/docker-entrypoint-initdb.d/10-create-testing-database.sh" mysql/mysql-server:8.0 
+docker run -d --name unittests --rm -p 10306:3306 --env MYSQL_USER=$MYSQL_USER --env MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD --env MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD -v "$FULLPATH:/docker-entrypoint-initdb.d/10-create-testing-database.sh" mysql/mysql-server:8.0 >> $LOG 2>&1
 CID=`docker inspect unittests | jq -r '.[0].Config.Hostname'`
-echo "determining state of docker container"
-STATE=`docker inspect unittests | jq -r '.[0].State.Status'`
-while [[ ! "$STATE" = "running" ]]
+STATE=`docker inspect unittests | jq -r '.[0].State.Health.Status'`
+while [[ ! "$STATE" = "healthy" ]]
 do
     sleep 1
-    echo "determining state of docker container"
-    STATE=`docker inspect unittests | jq -r '.[0].State.Status'`
+    STATE=`docker inspect unittests | jq -r '.[0].State.Health.Status'`
 done
-vendor/bin/codecept -c tests/codeception.yml run Unit
+vendor/bin/codecept -q -c tests/codeception.yml run Unit >> $LOG 2>&1
+EC="$?"
 
-echo "Cleaning up docker container" >>$LOG
-docker container stop $CID
+echo "Cleaning up docker container" >> $LOG
+docker container stop $CID >> $LOG 2>&1
 
-exit 0
+if [[ ! "x$EC" = "x0" ]]
+then
+    echo "Failure running tests"
+    echo "Test exit code $EC" >> $LOG
+    exit 1
+fi
 
 # recreate the autoloader files for production
-echo "Installing composer modules"  >> .release.$EXT 2>&1
-php8.2 /usr/bin/composer install --optimize-autoloader --no-dev  >> .release.$EXT 2>&1
+rm -rf vendor >>$LOG
+echo "Re-installing composer modules"  >> $LOG
+php8.2 /usr/bin/composer install --optimize-autoloader --no-dev  >> $LOG 2>&1
 
-echo "Clearing caches"  >> .release.$EXT 2>&1
-./artisan cache:clear  >> .release.$EXT 2>&1
+echo "Clearing caches"  >> $LOG
+./artisan cache:clear  >> $LOG
 
+echo "Removing unrequired files" >> $LOG
+rm -rf tests phpunit.xml README.md .styleci.yml .editorconfig .gitignore storage/app
 
+echo "Creating archive for API" >> $LOG
+cd ..
+zip -r -q ../API.zip api/*
+
+echo "Building Front Side Applications"
+echo "Building Front Side Applications" >> $LOG
+
+cd apps
+
+echo "Cleanup" >> $LOG
+rm -rf README.md node_modules reg/node_modules >> $LOG
 
 # install/require all modules
-echo "Installing NPM modules"
-npm install --production=false
-chmod u+x node_modules/.bin/*
+echo "Installing NPM modules" >> $LOG
+npm install --production=false >> $LOG
+chmod u+x node_modules/.bin/* >> $LOG
+
+echo "Building Registration Application"
+echo "Building Registration Application" >> $LOG
+
+cd reg
+echo "Installing NPM modules" >> $LOG
+npm install --production=false >> $LOG
+chmod u+x node_modules/.bin/* >> $LOG
+
+echo "Running tests for Registration Application" >> $LOG
+npm run type-check >> $LOG 2>&1
+EC="$?"
+
+if [[ ! "x$EC" = "x0" ]]
+then
+    echo "Error running type-check tests"
+    echo "Exit code on type-check $EC" >> $LOG
+    exit 1
+fi
 
 echo "Creating application files"
 npm run build
 
-echo "Removing node, Vue and other build files from resources"
-rm -rf node_modules resources/js resources/css resources/images resources/vue
+cd dist
+zip -r -q registration.zip index.html assets
+mv registration.zip ../../..
+cd ..
 
-echo "Adjusting .env file"
-cat .env | sed "s/DEPLOY_EXT/$EXT/" > tmp.txt
-mv tmp.txt .env
+echo "Finished building Registration application"
+echo "Finished building Registration application" >> $LOG
+cd ..
+
+echo "Finished building Front Side applications"
+echo "Finished building Front Side applications" >> $LOG
+cd ..
 
 echo "Ready to create deployment file"
-zip -r -q ../$EXT.zip .env composer.json app artisan bootstrap config database lang public resources routes storage vendor
-
+echo "Ready to create deployment file" >> $LOG
+zip -r -q ../$EXT.zip API.zip registration.zip
 cd ..
-echo -e "put $EXT.zip\r\nput provision\r\nquit" | sftp -b - $DEPLOY_SERVER
-sudo ssh $DEPLOY_SERVER -i $DEPLOY_KEY "/bin/bash \$HOME/provision $EXT $DEPLOY_DOMAIN"
+
+echo "Provisioning"
+echo "Provisioning" >> $LOG
+echo -e "put $EXT.zip\r\nput provision\r\nquit" | sudo sftp -i $DEPLOY_KEY -b - $DEPLOY_SERVER
+
+#sudo ssh $DEPLOY_SERVER -i $DEPLOY_KEY "/bin/bash \$HOME/provision $EXT $DEPLOY_DOMAIN"
 
