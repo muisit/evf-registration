@@ -137,17 +137,27 @@ fi
 echo "Creating application files"
 npm run build
 
-echo "Removing node, Vue and other build files from resources"
-rm -rf node_modules resources/js resources/css resources/images resources/vue
+cd dist
+zip -r -q registration.zip index.html assets
+mv registration.zip ../../..
+cd ..
 
-echo "Adjusting .env file"
-cat .env | sed "s/DEPLOY_EXT/$EXT/" > tmp.txt
-mv tmp.txt .env
+echo "Finished building Registration application"
+echo "Finished building Registration application" >> $LOG
+cd ..
+
+echo "Finished building Front Side applications"
+echo "Finished building Front Side applications" >> $LOG
+cd ..
 
 echo "Ready to create deployment file"
-zip -r -q ../$EXT.zip .env composer.json app artisan bootstrap config database lang public resources routes storage vendor
-
+echo "Ready to create deployment file" >> $LOG
+zip -r -q ../$EXT.zip API.zip registration.zip
 cd ..
-echo -e "put $EXT.zip\r\nput provision\r\nquit" | sftp -b - $DEPLOY_SERVER
-sudo ssh $DEPLOY_SERVER -i $DEPLOY_KEY "/bin/bash \$HOME/provision $EXT $DEPLOY_DOMAIN"
+
+echo "Provisioning"
+echo "Provisioning" >> $LOG
+echo -e "put $EXT.zip\r\nput provision\r\nquit" | sudo sftp -i $DEPLOY_KEY -b - $DEPLOY_SERVER
+
+#sudo ssh $DEPLOY_SERVER -i $DEPLOY_KEY "/bin/bash \$HOME/provision $EXT $DEPLOY_DOMAIN"
 
