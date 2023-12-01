@@ -20,7 +20,9 @@ import { Registration } from '../../../common/api/schemas/registration';
 import { useAuthStore } from '../../../common/stores/auth';
 import { payregistration } from '../../../common/api/registrations/payregistration';
 
+console.log("defining store");
 export const useDataStore = defineStore('data', () => {
+    console.log("setting default store state");
     const categories = ref([]);
     const categoriesById = ref({});
     const roles = ref([]);

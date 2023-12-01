@@ -151,7 +151,8 @@ then
 fi
 
 echo "Creating application files"
-npm run build >> $LOG 2>&1
+#NODE_ENV=development npm run build-only -- --mode development --minify false
+npm run build-only >> $LOG 2>&1
 
 cd dist
 zip -r -q registration.zip index.html assets
@@ -178,3 +179,10 @@ echo -e "put $EXT.zip\r\nput provision\r\nquit" | sftp -i $DEPLOY_KEY -b - $DEPL
 ssh $DEPLOY_SERVER -i $DEPLOY_KEY "/bin/bash \$HOME/provision $EXT"
 
 
+VERSION=`curl -s https://api.veteransfencing.eu`
+if [[ "x$VERSION" = "x$APIVERSION" ]]
+then
+    echo "Deployment and provisioning successful"
+else
+    echo "Error in deployment, returned version is $VERSION, expected $APIVERSION"
+fi
