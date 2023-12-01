@@ -3,6 +3,7 @@ import { watch } from 'vue';
 import { useAuthStore } from '../../common/stores/auth';
 import { useDataStore } from './stores/data';
 
+console.log("using stores");
 const authStore = useAuthStore();
 const dataStore = useDataStore();
 
