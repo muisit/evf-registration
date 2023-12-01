@@ -33,8 +33,17 @@ git clone $GIT_ROOT --branch $GIT_BRANCH $WD >>$LOG 2>&1
 echo "Copying production .env file for build process" >>$LOG
 cp env.production $WD/api/.env
 cp env.testing $WD/api/tests/Support/bootstrap/.env.testing
+cp env.register $WD/apps/reg/.env
 
-cd $WD/api
+cd $WD
+APIVERSION=`php -r '$version=json_decode(file_get_contents("builds.json")); echo $version->api->major . "." . $version->api->minor . "." . $version->api->micro . "." . $version->api->build;'`
+REGVERSION=`php -r '$version=json_decode(file_get_contents("builds.json")); echo $version->register->major . "." . $version->register->minor . "." . $version->register->micro . "." . $version->register->build;'`
+
+echo "Patching versions in env files" >> $LOG
+cat $WD/api/.env | sed "s/APP_VERSION=.*/APP_VERSION=$APIVERSION/" > tmp; mv tmp $WD/api/.env
+cat $WD/apps/reg/.env | sed "s/VITE_VERSION=.*/VITE_VERSION=$REGVERSION/" > tmp; mv tmp $WD/apps/reg/.env
+
+cd api
 
 echo "Building API"
 echo "Building API" >> $LOG
