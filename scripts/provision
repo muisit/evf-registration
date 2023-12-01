@@ -1,56 +1,94 @@
 #!/bin/bash
 
 WD=$1
-DMN=$2
+HOME=`pwd`
+ARCHIVE="$HOME/$WD.zip"
+VERSION=`php --version | grep '^PHP' | sed 's/PHP \([0-9]*\.[0-9]*\).*/\1/'`
 
-if [[ ! -e "$WD.zip" ]]
+if [[ ! "x$VERSION" = "x8.1" ]]
+then
+    echo "Expecting PHP version 8.1, received $VERSION"
+    exit 1
+fi
+
+if [[ ! -e $ARCHIVE ]]
 then
     echo "No upload detected, bailing"
     exit 1
 fi
 
-cd /opt/websites/$DMN
-
-echo "Making sure we can create a release directory"
-sudo chown michiel.www-data releases
+echo "Creating release directory"
+mkdir -p $HOME/releases/$WD
 echo "Unpacking release"
-mkdir -p releases/$WD
 cd releases/$WD
-unzip -q $HOME/$WD.zip
-sudo chmod u+x ./artisan
+unzip -q $ARCHIVE
 
-USER='michiel'
-GROUP='www-data'
+if [[ -e "registration.zip" ]]
+then
+    echo "Unzipping registration application"
+    mkdir registration
+    cd registration
+    unzip -q ../registration.zip
+    cd ..
+    rm registration.zip
+else
+    echo "ERROR: NO REGISTRATION APPLICATION"
+    exit 1
+fi
+
+if [[ -e "API.zip" ]]
+then
+    echo "Unzipping API application"
+    unzip -q API.zip
+    rm API.zip
+
+    if  [[ ! -e "api/.env" ]]
+    then
+        echo "ERROR: missing .env file"
+        exit 1
+    fi
+else
+    echo "ERROR: NO API APPLICATION"
+    exit 1
+fi
+
+cd api
+
 echo "Adjusting file permissions"
-sudo find ./ -type f -exec chmod 644 {} \;
+find ./ -type f -exec chmod 644 {} \;
 
 echo "Adjusting directory permissions"
-sudo find ./ -type d -exec chmod 755 {} \;
+find ./ -type d -exec chmod 755 {} \;
 
-echo "Setting sticky bit"
-sudo chmod 2777 bootstrap/cache
-sudo rm -rf storage
-sudo ln -sf ../../storage .
+#echo "Setting sticky bit"
+#chmod 2777 bootstrap/cache
 
-echo "Creating caches"
-php8.2 ./artisan config:clear
-php8.2 ./artisan route:clear
-php8.2 ./artisan view:clear
+echo "Handling storage"
+if [[ -e "storage" ]]
+then
+    rm -rf storage
+fi
+ln -sf $HOME/api_storage storage
 
-echo "Taking application down"
-php8.2 ./artisan down
-
-echo "Switching releases"
-cd /opt/websites/$DMN
-sudo rm -rf public
-sudo ln -sf releases/$WD/public ./public
+#echo "Creating caches"
+#php8.2 ./artisan config:clear
+#php8.2 ./artisan route:clear
+#php8.2 ./artisan view:clear
 
 echo "Migrating database"
-cd /opt/websites/$DMN/releases/$WD
-php8.2 ./artisan migrate --force
+cd $HOME/releases/$WD/api
+php ./artisan migrate --force
 
-echo "Application up"
-php8.2 ./artisan up
+echo "Switching releases"
+cd $HOME/register.veteransfencing.eu
+rm index.html assets
+ln -sf $HOME/releases/$WD/registration/index.html .
+ln -sf $HOME/releases/$WD/registration/assets .
+
+cd $HOME/api.veteransfencing.eu
+rm index.php
+ln -sf $HOME/releases/$WD/api/public/index.php .
+ln -sf $HOME/releases/$WD/api/public/.htaccess .
 
 echo "Cleanup"
-rm $HOME/$WD.zip $HOME/provision
+rm $ARCHIVE $HOME/provision
