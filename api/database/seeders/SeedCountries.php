@@ -18,6 +18,9 @@ class SeedCountries extends Seeder
      */
     public function run()
     {
+        $data = DB::table('TD_Country')->where('country_id', 1)->first();
+        if (!empty($data)) return;
+
         DB::table('TD_Country')->insert([
             [
                 'country_id' => 1,

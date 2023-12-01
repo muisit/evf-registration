@@ -18,7 +18,7 @@ class IndexTest extends TestCase
         $this->get('/');
 
         $this->assertEquals(
-            $this->app->version(),
+            env('APP_VERSION'),
             $this->response->getContent()
         );
     }

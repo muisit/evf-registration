@@ -18,6 +18,9 @@ class SeedCategories extends Seeder
      */
     public function run()
     {
+        $data = DB::table('TD_Category')->where('category_id', Category::CAT1)->first();
+        if (!empty($data)) return;
+
         DB::table('TD_Category')->insert([[
             'category_id' => Category::CAT1,
             'category_name' => 'Cat 1',

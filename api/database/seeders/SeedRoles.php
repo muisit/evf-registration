@@ -18,6 +18,9 @@ class SeedRoles extends Seeder
      */
     public function run()
     {
+        $data = DB::table('TD_Role')->where('role_id', Role::HOD)->first();
+        if (!empty($data)) return;
+
         DB::table('TD_Role')->insert([
             [
                 'role_id' => Role::HOD,
