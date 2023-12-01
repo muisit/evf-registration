@@ -20,7 +20,7 @@ require('accreditations.php');
 */
 
 $router->get('/', function () use ($router) {
-    return $router->app->version();
+    return env('APP_VERSION');
 });
 
 $router->get('/basic', 'Basic@index');
