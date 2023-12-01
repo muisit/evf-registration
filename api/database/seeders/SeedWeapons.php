@@ -18,6 +18,9 @@ class SeedWeapons extends Seeder
      */
     public function run()
     {
+        $data = DB::table('TD_Weapon')->where('weapon_id', Weapon::MF)->first();
+        if (!empty($data)) return;
+
         DB::table('TD_Weapon')->insert([
             [
                 'weapon_id' => Weapon::MF,

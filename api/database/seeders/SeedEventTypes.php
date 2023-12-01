@@ -18,6 +18,9 @@ class SeedEventTypes extends Seeder
      */
     public function run()
     {
+        $data = DB::table('TD_Event_Type')->where('event_type_id', EventType::INDIVIDUAL)->first();
+        if (!empty($data)) return;
+
         DB::table('TD_Event_Type')->insert([
             [
                 'event_type_id' => EventType::INDIVIDUAL,

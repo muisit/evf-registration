@@ -18,6 +18,9 @@ class SeedRoleTypes extends Seeder
      */
     public function run()
     {
+        $data = DB::table('TD_Role_Type')->where('role_type_id', RoleType::COUNTRY)->first();
+        if (!empty($data)) return;
+
         DB::table('TD_Role_Type')->insert([
             [
                 'role_type_id' => RoleType::COUNTRY,

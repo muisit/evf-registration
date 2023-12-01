@@ -2,8 +2,8 @@
     "api": {
         "major": 1,
         "minor": 0,
-        "micro": 1,
-        "build": 2
+        "micro": 2,
+        "build": 3
     },
     "register": {
         "major": 1,
