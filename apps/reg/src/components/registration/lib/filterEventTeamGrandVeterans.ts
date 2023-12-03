@@ -1,5 +1,5 @@
-import { Fencer } from "../../../../../common/api/schemas/fencer";
-import { SideEvent } from "../../../../../common/api/schemas/sideevent";
+import type { Fencer } from "../../../../../common/api/schemas/fencer";
+import type { SideEvent } from "../../../../../common/api/schemas/sideevent";
 
 export function filterEventTeamGrandVeterans (fencer:Fencer, sideevent:SideEvent):boolean
 {

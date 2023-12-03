@@ -15,8 +15,8 @@ import { ElSelect, ElOption } from 'element-plus';
 </script>
 <template>
     <div class="cashier-header">
-        <div v-if="countrySwitch">
-            <div  class="country-switch">
+        <div v-if="props.countrySwitch">
+            <div class="country-switch">
                 <label>Select a country:</label>
                 <ElSelect :model-value="'' + data.currentCountry.id" @update:model-value="(e) => updateCountry(e)" size="small">
                     <ElOption value="0" label="Organisation"/>

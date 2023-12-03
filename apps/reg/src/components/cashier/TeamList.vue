@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { Fencer } from '../../../../common/api/schemas/fencer';
-import { Registration } from '../../../../common/api/schemas/registration';
-import { Team } from './lib/payments';
+import type { Fencer } from '../../../../common/api/schemas/fencer';
+import type { Registration } from '../../../../common/api/schemas/registration';
+import type { StringKeyedTeam, Team } from './lib/payments';
 import { useDataStore } from '../../stores/data';
 import { useAuthStore } from '../../../../common/stores/auth';
 import { allowMoreTeams } from '../../../../common/lib/event';
@@ -11,7 +11,7 @@ const auth = useAuthStore();
 
 function getSortedTeams()
 {
-    let teams = {};
+    let teams:StringKeyedTeam = {};
     data.forEachRegistrationDo((fencer:Fencer, reg:Registration) => {
         if (reg.team) {
             let teamkey = 's' + reg.sideEventId + reg.team;
@@ -45,10 +45,13 @@ function getSortedTeams()
             return a.sideEvent.title > b.sideEvent.title ? 1 : -1;
         }
         // then by category
-        if (a.sideEvent && b.sideEvent && a.sideEvent.competition && b.sideEvent.competition
-            && a.sideEvent?.competition.category.name != b.sideEvent.competition.category.name
-        ) {
-            return a.sideEvent.competition.category.name > b.sideEvent.competition.category.name ? 1 : -1;
+        if (a.sideEvent && b.sideEvent && a.sideEvent.competition && b.sideEvent.competition) {
+            if (a.sideEvent.competition.category && b.sideEvent.competition.category
+               && a.sideEvent.competition.category.name && b.sideEvent.competition.category.name
+               && a.sideEvent.competition.category.name != b.sideEvent.competition.category.name
+            ) {
+                return a.sideEvent.competition.category.name > b.sideEvent.competition.category.name ? 1 : -1;
+            }
         }
 
         // then by team name
@@ -59,7 +62,7 @@ function getSortedTeams()
     });
 }
 
-function markPayment(team:Team, state)
+function markPayment(team:Team, state:any)
 {
     data.markPayments(
         team.registrations,

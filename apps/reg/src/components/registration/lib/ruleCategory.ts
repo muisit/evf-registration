@@ -1,5 +1,5 @@
-import { Fencer } from "../../../../../common/api/schemas/fencer";
-import { Registration } from "../../../../../common/api/schemas/registration";
+import type { Fencer } from "../../../../../common/api/schemas/fencer";
+import type { Registration } from "../../../../../common/api/schemas/registration";
 import { useDataStore } from "../../../stores/data";
 
 export const ruleCategory = (fencer:Fencer, registration:Registration, competitionRegistrations:Registration[]) => {

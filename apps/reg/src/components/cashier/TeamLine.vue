@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useDataStore } from '../../stores/data';
 import { useAuthStore } from '../../../../common/stores/auth';
-import { Team } from './lib/team';
+import type { Team } from './lib/payments';
 import { format_currency } from '../../../../common/functions';
 import { allowMoreTeams } from '../../../../common/lib/event';
 const props = defineProps<{
@@ -54,7 +54,7 @@ import { Select, CloseBold, Upload, ArrowRight, ArrowDown, CircleCheck } from '@
     <tr>
         <td>{{ props.team.sideEvent.title }}</td>
         <td v-if="allowMoreTeams(data.currentEvent)">{{ props.team.name }}</td>
-        <td>{{ data.currentEvent.bank?.symbol }} {{ format_currency(data.currentEvent.bank?.competitionFee) }}</td>
+        <td>{{ data.currentEvent.bank?.symbol }} {{ format_currency(data.currentEvent.bank?.competitionFee || 0.0) }}</td>
         <td><ElCheckbox :model-value="wasPaid()" @update:model-value="(e) => $emit('onUpdate', e)" :disabled="isDisabled()"/></td>
         <td>
             <ElIcon size="large" @click="expand">

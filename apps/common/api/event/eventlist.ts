@@ -1,5 +1,6 @@
-import { fetchJson, FetchResponse } from '../interface';
-import { Event } from '../schemas/event';
+import { fetchJson } from '../interface';
+import type { FetchResponse } from '../interface';
+import type { Event } from '../schemas/event';
 
 export const eventlist = function() {
     return new Promise<Array<Event>>((resolve, reject) => {       

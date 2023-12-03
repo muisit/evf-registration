@@ -1,4 +1,4 @@
-import { Event } from '../api/schemas/event';
+import type{ Event } from '../api/schemas/event';
 
 export function allowMoreTeams(event:Event|null)
 {

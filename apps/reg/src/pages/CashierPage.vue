@@ -1,10 +1,7 @@
 <script lang="ts" setup>
-import { Ref, ref, watch } from 'vue';
+import { watch } from 'vue';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
-import { Fencer, FencerList, defaultFencer } from '../../../common/api/schemas/fencer';
-import { fencerlist } from '../../../common/api/fencers/fencerlist';
-import { is_valid } from '../../../common/functions';
 const props = defineProps<{
     visible:boolean;
 }>();
@@ -15,11 +12,6 @@ function canSwitchCountry()
 {
     // system administrators, super-HoDs (general administrators), the event organiser and the event registrar can change countries
     return auth.isSysop() || auth.isOrganiser(data.currentEvent.id) || auth.isSuperHod() || auth.isRegistrar(data.currentEvent.id);
-}
-
-function onChangeCountry(newValue)
-{
-    data.setCountry(newValue.countryId);
 }
 
 watch(
@@ -40,7 +32,7 @@ import { ElButton } from 'element-plus';
 </script>
 <template>
     <div class="cashier-page" v-if="props.visible">
-        <CashierHeader :country-switch="canSwitchCountry()" @onChangeCountry="onChangeCountry"/>
+        <CashierHeader :country-switch="canSwitchCountry()"/>
         <ParticipantList />
         <CashierFooter/>
     </div>

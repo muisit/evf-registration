@@ -1,9 +1,9 @@
-import { FencerList } from "../../../../../common/api/schemas/fencer";
+import type { FencerList } from "../../../../../common/api/schemas/fencer";
 
 export function filterSuggestionsFromFencerList(name:string, fencers:FencerList): FencerList
 {
     var lowername = name.toLocaleLowerCase();
-    return fencers.map((fencer) => {
+    let retval = fencers.map((fencer) => {
             if (   fencer.lastName
                 && fencer.lastName.length >= lowername.length
                 && fencer.lastName.substring(0, lowername.length).toLowerCase() == lowername) {
@@ -13,4 +13,5 @@ export function filterSuggestionsFromFencerList(name:string, fencers:FencerList)
                 return null;
             }
         }).filter((fencer) => fencer != null);
+    return retval as FencerList; // we know we filtered out all null fencers
 }

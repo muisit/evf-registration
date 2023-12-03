@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { Fencer } from '../../../../../common/api/schemas/fencer';
-import { WeaponSchema } from '../../../../../common/api/schemas/weapon';
+import type { WeaponSchema } from '../../../../../common/api/schemas/weapon';
+import type { Registration } from '../../../../../common/api/schemas/registration';
 import { useDataStore } from '../../../stores/data';
 const emits = defineEmits(['onEdit', 'onSelect']);
 const props = defineProps<{
@@ -10,9 +11,14 @@ const props = defineProps<{
 
 const data = useDataStore();
 
+interface FencerByWeapon {
+    [key:string]: Registration[];
+}
+
 function separateFencersByWeapon()
 {
-    let byWeapon = {"other": []};
+    let byWeapon:FencerByWeapon = {};
+    byWeapon['other'] = [];
     props.dataList.map((fencer:Fencer) => {
         if (fencer.registrations) {
             fencer.registrations.map((reg) => {
@@ -22,11 +28,11 @@ function separateFencersByWeapon()
                 }
                 else {
                     let wpn = sideEvent.competition.weapon;
-                    if(props.filter.length == 0 || props.filter.includes(wpn.abbr)) {
-                        if (!byWeapon[wpn.abbr]) {
-                            byWeapon[wpn.abbr] = [];
+                    if(props.filter.length == 0 || props.filter.includes(wpn.abbr || '')) {
+                        if (!byWeapon[wpn.abbr || '']) {
+                            byWeapon[wpn.abbr || ''] = [];
                         }
-                        byWeapon[wpn.abbr].push(reg);
+                        byWeapon[wpn.abbr || ''].push(reg);
                     }
                 }
             });

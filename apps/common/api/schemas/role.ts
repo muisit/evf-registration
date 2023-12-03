@@ -3,3 +3,7 @@ export interface RoleSchema {
     name: string|null;
     type: string|null;
 };
+
+export interface RoleById {
+    [key:string]: RoleSchema;
+}

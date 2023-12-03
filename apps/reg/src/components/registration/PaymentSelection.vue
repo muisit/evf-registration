@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { useDataStore } from '../../stores/data';
 import { useAuthStore } from '../../../../common/stores/auth';
-import { CountrySchema } from '../../../../common/api/schemas/country';
 import { is_valid } from '../../../../common/functions';
 const props = defineProps<{
     payments: string;

@@ -2,8 +2,9 @@
 import { useDataStore } from '../../stores/data';
 import { useAuthStore } from '../../../../common/stores/auth';
 import { format_currency } from '../../../../common/functions';
-import { Registration } from '../../../../common/api/schemas/registration';
-import { Fencer } from '../../../../common/api/schemas/fencer';
+import type { Registration } from '../../../../common/api/schemas/registration';
+import type { Fencer } from '../../../../common/api/schemas/fencer';
+import type { StringKeyedBoolean } from '../../../../common/types';
 const data = useDataStore();
 const auth = useAuthStore();
 
@@ -53,8 +54,8 @@ function totals()
 
     let baseFee = data.currentEvent.bank?.baseFee || 0.0;
     let competitionFee = data.currentEvent.bank?.competitionFee || 0.0;
-    let teamsPaid = {};
-    let fencersPaid = {};
+    let teamsPaid:StringKeyedBoolean = {};
+    let fencersPaid:StringKeyedBoolean = {};
 
     data.forEachRegistrationDo((fencer:Fencer, reg:Registration) => {
         let fid = 'f' + fencer.id;
@@ -65,8 +66,8 @@ function totals()
             if (sideEvent.competition.category && sideEvent.competition.category.type == 'T') {
                 var teamname = 'p' + sideEvent.id + reg.team;
                 if (!teamsPaid[teamname]) {
-                    // there is no baseFee + competitionFee for team events
-                    totals = addToGroupCosts(reg, competitionFee, totals);
+                    // there is no baseFee + competitionFee for team events, either one is entered
+                    totals = addToGroupCosts(reg, baseFee + competitionFee, totals);
                     teamsPaid[teamname] = true;
                 }
             }

@@ -1,19 +1,15 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { RoleSchema } from "../../../../common/api/schemas/role";
-import { Registration } from '../../../../common/api/schemas/registration';
-import { useDataStore } from "../../stores/data";
+import type { Ref } from 'vue';
+import type { RoleSchema } from "../../../../common/api/schemas/role";
+import type { Registration } from '../../../../common/api/schemas/registration';
 import { random_token, is_valid } from  '../../../../common/functions';
 
 const props = defineProps<{
     role:RoleSchema;
     registration:Registration|null;
-    team:string|null;
-    teams:string[];
 }>();
 const emits = defineEmits(['onUpdate']);
-
-const data = useDataStore();
 
 function inputDisabled()
 {
@@ -26,7 +22,7 @@ function checkboxValue()
     return props.registration && is_valid(props.registration.id) ? true : false;
 }
 
-const checkbox = ref(random_token(32));
+const checkbox:Ref<string> = ref(random_token(32));
 
 import { Select, CloseBold, Upload } from '@element-plus/icons-vue';
 import { ElCheckbox, ElSelect, ElOption, ElIcon } from 'element-plus';

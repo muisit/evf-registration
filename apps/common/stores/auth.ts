@@ -1,8 +1,10 @@
-import { Ref, ref } from 'vue'
+import { ref } from 'vue'
+import type { Ref } from 'vue';
 import { defineStore } from 'pinia'
 import { me } from '../api/auth/me';
 import { login } from '../api/auth/login';
 import { logout } from '../api/auth/logout';
+import type { MeSchema } from '../api/schemas/me';
 
 export const useAuthStore = defineStore('auth', () => {
     const userName = ref('');
@@ -14,7 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
     const isLoading = ref(false);
 
     function sendMe() {
-        me().then((data) => {
+        me().then((data:MeSchema) => {
             token.value = data.token || '';
             if (data.status && data.username && data.username.length) {
                 isGuest.value = false;
@@ -33,7 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     function logOut() {
-        logout()
+        return logout()
             .then(() => {
                 isGuest.value = true;
                 userName.value = '';

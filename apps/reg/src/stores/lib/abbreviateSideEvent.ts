@@ -6,7 +6,7 @@ export function abbreviateSideEvent(se:SideEvent)
 {
     const dataStore = useDataStore();
     var abbr='??';
-    if(is_valid(se.competition)) {
+    if(is_valid(se.competition) && se.competition) {
         var wpn = se.competition.weapon ? se.competition.weapon : {abbr:'?'};
         var cat = se.competition.category ? se.competition.category : {abbr: '?'};
         abbr = '' + wpn.abbr + cat.abbr;

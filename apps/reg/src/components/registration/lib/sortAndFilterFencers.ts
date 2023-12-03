@@ -1,6 +1,6 @@
-import { Registration } from "../../../../../common/api/schemas/registration";
-import { SideEvent } from "../../../../../common/api/schemas/sideevent";
-import { Fencer } from "../../../../../common/api/schemas/fencer";
+import type { Registration } from "../../../../../common/api/schemas/registration";
+import type { SideEvent } from "../../../../../common/api/schemas/sideevent";
+import type { Fencer } from "../../../../../common/api/schemas/fencer";
 import { useDataStore } from "../../../stores/data";
 import { is_valid } from "../../../../../common/functions";
 import { ruleYoungerCategory } from "./ruleYoungerCategory";
@@ -82,9 +82,12 @@ function validateFencerState(fencer:Fencer, sepByEvent:any, youngerCategory:bool
     return fencer;
 }
 
+interface RegistrationsById {
+    [key:string]: Registration[];
+}
+
 export function sortAndFilterFencers(sorters:Array<string>, filters:Array<string>)
 {
-    console.log('sorting and filtering based on ', sorters, filters);
     const data = useDataStore();
     let allow_registration_lower_age = allowYoungerCategory(data.currentEvent);
 
@@ -108,23 +111,20 @@ export function sortAndFilterFencers(sorters:Array<string>, filters:Array<string
     keylist.forEach((id) => {
         retval.push(data.fencerData[id]);
     });
-    var sepByEvent = {};
+    var sepByEvent:RegistrationsById = {};
     retval.map((fencer:Fencer) => {
         if (fencer.registrations && fencer.registrations.length) {
             fencer.registrations.map((reg:Registration) => {
                 let sideEvent = data.sideEventsById['s' + reg.sideEventId];
                 if (sideEvent && sideEvent.competition) {
-                    if (!sepByEvent['s' + sideEvent.id]) {
-                        sepByEvent['s' + sideEvent.id] = [];
+                    let key = 's' + sideEvent.id;
+                    if (!sepByEvent[key]) {
+                        sepByEvent[key] = [];
                     }
-                    sepByEvent['s' + sideEvent.id].push(reg);
+                    sepByEvent[key].push(reg);
                 }
             });
         }
-        else {
-            console.log('fencer ', fencer.fullName, ' has no registrations');
-        }
     })
-    console.log('validating fencerlist');
     return retval.map((fencer:Fencer) => validateFencerState(fencer, sepByEvent, allow_registration_lower_age));
 }

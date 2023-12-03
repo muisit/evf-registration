@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { is_valid, random_hash, valid_date } from '../../../../common/functions';
-import { Fencer } from '../../../../common/api/schemas/fencer';
+import type { Fencer } from '../../../../common/api/schemas/fencer';
 import { useDataStore } from '../../stores/data';
 import { duplicateFencerCheck } from './lib/duplicateFencerCheck';
 import { savefencer } from '../../../../common/api/fencers/savefencer';
@@ -152,10 +152,10 @@ import PhotoId from './PhotoId.vue';
           </ElSelect>
         </ElFormItem>
         <ElFormItem label="Date of birth">
-          <ElDatePicker :model-value="props.fencer.dateOfBirth" format="YYYY-MM-DD" value-format="YYYY-MM-DD"  @update:model-value="(e) => update('dateOfBirth', e)"/>
+          <ElDatePicker :model-value="props.fencer.dateOfBirth || ''" format="YYYY-MM-DD" value-format="YYYY-MM-DD"  @update:model-value="(e) => update('dateOfBirth', e)"/>
         </ElFormItem>
         <ElFormItem label="Country">
-          <ElSelect :model-value="props.fencer.countryId" @update:model-value="(e) => update('countryId', e)"  v-if="props.changeCountry">
+          <ElSelect :model-value="props.fencer.countryId || 0" @update:model-value="(e) => update('countryId', e)"  v-if="props.changeCountry">
             <ElOption v-for="country in data.countries" :key="country.id" :value="country.id" :label="country.name"/>
           </ElSelect>
           <label v-else>

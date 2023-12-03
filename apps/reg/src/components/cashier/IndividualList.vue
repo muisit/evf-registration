@@ -1,16 +1,14 @@
 <script lang="ts" setup>
-import { Fencer } from '../../../../common/api/schemas/fencer';
-import { Registration } from '../../../../common/api/schemas/registration';
-import { FencerPayment } from './lib/payments';
+import type { Fencer } from '../../../../common/api/schemas/fencer';
+import type { Registration } from '../../../../common/api/schemas/registration';
+import type { FencerPayment, StringKeyedFenderPayment } from './lib/payments';
 import { useDataStore } from '../../stores/data';
-import { useAuthStore } from '../../../../common/stores/auth';
 
 const data = useDataStore();
-const auth = useAuthStore();
 
 function getSortedIndividuals()
 {
-    let fencers = {};
+    let fencers:StringKeyedFenderPayment = {};
 
     data.forEachRegistrationDo((fencer:Fencer, reg:Registration) => {       
         if (!reg.team && reg.sideEventId) {
@@ -33,7 +31,7 @@ function getSortedIndividuals()
                     fencers[fid].payment = 'M'; // mixed
                 }
                 else {
-                    fencers[fid].payment = reg.payment;
+                    fencers[fid].payment = reg.payment || '';
                 }
             }
         }
@@ -41,9 +39,9 @@ function getSortedIndividuals()
     let fencerArray:FencerPayment[] = [];
     Object.keys(fencers).map((key:string) => {
         let entry = fencers[key];
-        entry.registrations.sort((a, b) => {
-            let sa = data.sideEvents['s' + a.sideEventId];
-            let sb = data.sideEvents['s' + b.sideEventId];
+        entry.registrations.sort((a:Registration, b:Registration) => {
+            let sa = data.sideEventsById['s' + a.sideEventId];
+            let sb = data.sideEventsById['s' + b.sideEventId];
             if (!sa && !sb) return 0;
             if (!sa && sb) return 1;
             if (sa && !sb) return -1;
@@ -53,6 +51,8 @@ function getSortedIndividuals()
     });
     return fencerArray.sort((a, b) => {
         // sort by fencer name, which ought to be unique within this list
+        if (!a.fencer.fullName) return 1;
+        if (!b.fencer.fullName) return -1;
         return a.fencer.fullName > b.fencer.fullName ? 1 : -1;
     });
 }

@@ -1,6 +1,7 @@
-import { fetchJson, FetchResponse } from '../interface';
-import { Registration } from '../schemas/registration';
-import { ReturnStatusSchema } from '../schemas/returnstatus';
+import { fetchJson } from '../interface';
+import type { FetchResponse } from '../interface';
+import type { Registration } from '../schemas/registration';
+import type { ReturnStatusSchema } from '../schemas/returnstatus';
 
 export const payregistration = function(registrations:Registration[], paidHod:boolean|null, paidOrg:boolean|null) {
     return new Promise<ReturnStatusSchema|null>((resolve, reject) => {     

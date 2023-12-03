@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-import { Ref, ref, watch } from 'vue';
-import { defaultFencer, Fencer, FencerList } from '../../../../common/api/schemas/fencer';
+import { ref, watch } from 'vue';
+import type { Ref } from 'vue';
+import type { Fencer, FencerList } from '../../../../common/api/schemas/fencer';
+import { defaultFencer } from '../../../../common/api/schemas/fencer';
 import { useDataStore } from '../../stores/data';
 import { autocomplete } from '../../../../common/api/fencers/autocomplete';
 import { filterSuggestionsFromFencerList } from './lib/filterSuggestionsFromFencerList';
@@ -64,15 +66,12 @@ function onChange()
             };
 
             window.setTimeout(() => {
-                console.log('testing ', name.value, 'vs ', autocompleteData.name);
                 if (name.value == autocompleteData.name) {
-                    autocomplete(autocompleteData)
+                    autocomplete(name.value)
                         .then((results) => {
                             if (autocompleteData.name == name.value) {
                                 suggestions.value = results.map((fencer) => {
-                                    console.log('fencer country is ', fencer.countryId);
                                     decorateFencer(fencer);
-                                    console.log('fencer country is ', fencer.countryId);
                                     return fencer;
                                 });
                             }

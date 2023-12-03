@@ -1,3 +1,7 @@
+export interface CategoryById {
+    [key:string]: CategorySchema;
+}
+
 export interface CategorySchema {
     id: number|null;
     name: string|null;

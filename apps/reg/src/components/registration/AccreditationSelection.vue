@@ -1,16 +1,15 @@
 <script lang="ts" setup>
-import { ref, Ref, watch } from 'vue'
-import { Accreditation, AccreditationList } from '../../../../common/api/schemas/accreditation';
+import { ref, watch } from 'vue'
+import type { Ref } from 'vue';
+import type { Accreditation, AccreditationList } from '../../../../common/api/schemas/accreditation';
+import type { Fencer } from '../../../../common/api/schemas/fencer';
 import { fetchAttachment } from '../../../../common/api/interface';
-import { Fencer } from '../../../../common/api/schemas/fencer';
 import { accreditations } from '../../../../common/api/fencers/accreditations';
-import { useDataStore } from '../../stores/data';
 import { is_valid } from '../../../../common/functions';
 const props = defineProps<{
     fencer: Fencer;
 }>();
 
-const data = useDataStore();
 const accreditationList:Ref<AccreditationList> = ref([]);
 watch(
     () => props.fencer.id,

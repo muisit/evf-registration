@@ -1,10 +1,11 @@
 import { is_valid } from "../../../../common/functions";
-import type { OverviewLine } from "../../../../common/api/schemas/overviewline";
+import type { OverviewLine, OverviewObjects } from "../../../../common/api/schemas/overviewline";
 import { useDataStore } from "../data";
+
 
 export function overviewToCountry(overviewData: Array<OverviewLine>)
 {
-    var retval = {};
+    var retval:OverviewObjects = {};
     if (!overviewData) return {};
     const dataStore = useDataStore();
 

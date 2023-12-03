@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import type { RoleSchema } from '../../../../common/api/schemas/role';
 import { useDataStore } from '../../stores/data';
 const data = useDataStore();
 
-function getLines(part:string, role: object)
+function getLines(part:string, role: RoleSchema)
 {
-    var rkey = 'r' + role.id;
+    var rkey = 'r' + (role.id || 0);
     var total = 0;
     if (data.overviewData) {
         data.overviewData.forEach((line) => {
@@ -32,7 +32,7 @@ import RoleLine from './RoleLine.vue';
             </tr>
         </thead>
         <tbody>
-            <RoleLine v-for="role in data.organisationRoles" :key="role.id" :line="getLines('corg', role)" />
+            <RoleLine v-for="role in data.organisationRoles" :key="role.id || 0" :line="getLines('corg', role)" />
         </tbody>
       </table>
       <h5 class="block-title">Officials</h5>
@@ -44,7 +44,7 @@ import RoleLine from './RoleLine.vue';
             </tr>
         </thead>
         <tbody>
-            <RoleLine v-for="role in data.officialRoles" :key="role.id" :line="getLines('coff', role)" />
+            <RoleLine v-for="role in data.officialRoles" :key="role.id || 0" :line="getLines('coff', role)" />
         </tbody>
       </table>
     </div>

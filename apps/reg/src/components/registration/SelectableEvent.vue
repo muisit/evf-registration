@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { SideEvent } from "../../../../common/api/schemas/sideevent";
-import { Registration } from '../../../../common/api/schemas/registration';
+import type { SideEvent } from "../../../../common/api/schemas/sideevent";
+import type { Registration } from '../../../../common/api/schemas/registration';
 import { useDataStore } from "../../stores/data";
 import { format_date_fe_short, random_token, is_valid } from  '../../../../common/functions';
+import { allowMoreTeams } from '../../../../common/lib/event';
 
 const props = defineProps<{
     event:SideEvent;
@@ -13,14 +14,6 @@ const props = defineProps<{
 const emits = defineEmits(['onUpdate']);
 
 const data = useDataStore();
-
-function allowMoreTeams()
-{
-    if (data.currentEvent && data.currentEvent.config && data.currentEvent.config.allow_more_teams) {
-        return true;
-    }
-    return false;
-}
 
 function inputDisabled()
 {
@@ -35,10 +28,10 @@ function checkboxValue()
 
 const checkbox = ref(random_token(32));
 
-function update(selection)
+function update(selection:any)
 {
     if (props.event.competition?.category?.type == 'T') {
-        if (allowMoreTeams()) {
+        if (allowMoreTeams(data.currentEvent)) {
             if (selection == 'new') {
                 let found = true;
                 let index = 0;
@@ -53,7 +46,6 @@ function update(selection)
                     });
                 }
             }
-            console.log('team selection says ', selection, selection || '');
             emits('onUpdate', selection || '');
         }
         else {
@@ -71,8 +63,8 @@ import { ElCheckbox, ElSelect, ElOption, ElIcon } from 'element-plus';
     <tbody>
         <tr>
             <td>
-                <ElCheckbox v-if="!allowMoreTeams()" :model-value="checkboxValue()" @update:model-value="update" :disabled="inputDisabled()" :id="checkbox"/>
-                <ElSelect v-if="allowMoreTeams()" :model-value="props.registration?.team || ''" @update:model-value="update" :disabled="inputDisabled()">
+                <ElCheckbox v-if="!allowMoreTeams(data.currentEvent)" :model-value="checkboxValue()" @update:model-value="update" :disabled="inputDisabled()" :id="checkbox"/>
+                <ElSelect v-if="allowMoreTeams(data.currentEvent)" :model-value="props.registration?.team || ''" @update:model-value="update" :disabled="inputDisabled()">
                     <ElOption value="" label="Select a team"/>
                     <ElOption v-for="(team,i) in props.teams" :key="i" :value="team" :label="team"/>
                     <ElOption value="new" label="New team"/>

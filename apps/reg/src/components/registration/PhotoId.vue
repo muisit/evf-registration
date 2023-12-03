@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { random_hash } from '../../../../common/functions';
 import { useAuthStore } from '../../../../common/stores/auth';
 import { useDataStore } from '../../stores/data';
 const props = defineProps<{
@@ -51,7 +49,7 @@ function approveStates()
     return approvestates;
 }
 
-function onFileChange(event)
+function onFileChange(event:any)
 {
     if (event.target.files && event.target.files.length) {
         emits('onSave', event.target.files[0]);

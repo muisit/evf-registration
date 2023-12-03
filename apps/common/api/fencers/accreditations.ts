@@ -1,5 +1,6 @@
-import { fetchJson, FetchResponse } from '../interface';
-import { AccreditationList } from '../schemas/accreditation';
+import { fetchJson } from '../interface';
+import type { FetchResponse } from '../interface';
+import type { AccreditationList } from '../schemas/accreditation';
 
 export const accreditations = function(id:number) {
     return new Promise<AccreditationList>((resolve, reject) => {       

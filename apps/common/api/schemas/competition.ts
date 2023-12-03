@@ -1,5 +1,9 @@
-import { CategorySchema } from "./category";
-import { WeaponSchema } from "./weapon";
+import type { CategorySchema } from "./category";
+import type { WeaponSchema } from "./weapon";
+
+export interface CompetitionById {
+    [key:string]: Competition;
+}
 
 export interface Competition {
     id: number;

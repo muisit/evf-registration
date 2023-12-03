@@ -2,15 +2,13 @@
 import { ref } from 'vue';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
-import { useRouter } from 'vue-router';
 const auth = useAuthStore();
 const data = useDataStore();
 
 const activeTab = ref('overview');
 
-function onTabChange(name:string)
+function onTabChange(name:TabPaneName)
 {
-    console.log(name);
     if (name == 'logout') {
         console.log("calling logout");
         auth.logOut().then(() => {
@@ -39,7 +37,8 @@ function canOrganise()
     return auth.isSysop() || auth.isOrganiser(data.currentEvent.id);
 }
 
-import  { ElTabs, ElTabPane } from 'element-plus';
+import { ElTabs, ElTabPane } from 'element-plus';
+import type { TabPaneName } from 'element-plus';
 import OverviewPage from '../pages/OverviewPage.vue';
 import RegistrationPage from '../pages/RegistrationPage.vue';
 import CashierPage from '../pages/CashierPage.vue';

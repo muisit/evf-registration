@@ -1,4 +1,15 @@
-import { Ref, ref } from 'vue'
+import type { Ref } from 'vue'
+import type { Event } from '../../../common/api/schemas/event';
+import type { SideEvent, SideEventById } from '../../../common/api/schemas/sideevent';
+import type { CategorySchema, CategoryById } from '../../../common/api/schemas/category';
+import type { Fencer, FencerById } from '../../../common/api/schemas/fencer';
+import type { Competition, CompetitionById } from '../../../common/api/schemas/competition';
+import type { CountrySchema, CountryById } from '../../../common/api/schemas/country';
+import type { Registration } from '../../../common/api/schemas/registration';
+import type { RoleSchema, RoleById } from '../../../common/api/schemas/role';
+import type { WeaponSchema, WeaponById } from '../../../common/api/schemas/weapon';
+import type { OverviewLine, OverviewObjects } from '../../../common/api/schemas/overviewline';
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { is_valid } from '../../../common/functions';
 import { basicData } from '../../../common/api/basicdata';
@@ -11,44 +22,37 @@ import { abbreviateSideEvent } from './lib/abbreviateSideEvent';
 import { overviewToCountry } from './lib/overviewToCountry';
 import { registrationToFencers } from './lib/registrationToFencers';
 import { insertFencer } from './lib/insertFencer';
-import { Event, defaultEvent } from '../../../common/api/schemas/event';
-import { SideEvent } from '../../../common/api/schemas/sideevent';
-import { Fencer } from '../../../common/api/schemas/fencer';
-import { Competition } from '../../../common/api/schemas/competition';
-import { CountrySchema } from '../../../common/api/schemas/country';
-import { Registration } from '../../../common/api/schemas/registration';
+import { defaultEvent } from '../../../common/api/schemas/event';
 import { useAuthStore } from '../../../common/stores/auth';
 import { payregistration } from '../../../common/api/registrations/payregistration';
 
-console.log("defining store");
 export const useDataStore = defineStore('data', () => {
-    console.log("setting default store state");
-    const categories = ref([]);
-    const categoriesById = ref({});
-    const roles = ref([]);
-    const countryRoles = ref([]);
-    const organisationRoles = ref([]);
-    const officialRoles = ref([]);
-    const rolesById = ref({});
-    const weapons = ref([]);
-    const weaponsById = ref({});
-    const countries = ref([]);
-    const countriesById = ref({});
+    const categories:Ref<CategorySchema[]> = ref([]);
+    const categoriesById:Ref<CategoryById> = ref({});
+    const roles:Ref<RoleSchema[]> = ref([]);
+    const countryRoles:Ref<RoleSchema[]> = ref([]);
+    const organisationRoles:Ref<RoleSchema[]> = ref([]);
+    const officialRoles:Ref<RoleSchema[]> = ref([]);
+    const rolesById:Ref<RoleById> = ref({});
+    const weapons:Ref<WeaponSchema[]> = ref([]);
+    const weaponsById:Ref<WeaponById> = ref({});
+    const countries:Ref<CountrySchema[]> = ref([]);
+    const countriesById:Ref<CountryById> = ref({});
 
     const currentEvent:Ref<Event> = ref(defaultEvent());
-    const events = ref([]);
-    const competitions = ref([]);
-    const competitionsById = ref({});
-    const sideEvents = ref([]);
-    const competitionEvents = ref([]);
-    const nonCompetitionEvents = ref([]);
-    const sideEventsById = ref({});
+    const events:Ref<Event[]> = ref([]);
+    const competitions:Ref<Competition[]> = ref([]);
+    const competitionsById:Ref<CompetitionById> = ref({});
+    const sideEvents:Ref<SideEvent[]> = ref([]);
+    const competitionEvents:Ref<SideEvent[]> = ref([]);
+    const nonCompetitionEvents:Ref<SideEvent[]> = ref([]);
+    const sideEventsById:Ref<SideEventById> = ref({});
 
-    const overviewData = ref([]);
-    const overviewPerCountry = ref([]);
+    const overviewData:Ref<OverviewLine[]> = ref([]);
+    const overviewPerCountry:Ref<OverviewObjects> = ref({});
 
     const currentCountry:Ref<CountrySchema> = ref({id: 0, name: 'Organisation', abbr: 'Org', path: ''});
-    const fencerData = ref({});
+    const fencerData:Ref<FencerById> = ref({});
 
     function hasBasicData() {
         return categories.value.length > 0;
@@ -70,7 +74,7 @@ export const useDataStore = defineStore('data', () => {
         }
     }
 
-    function fillData(data:object) {
+    function fillData(data:any) {
         categories.value = [];
         categoriesById.value = {};
         roles.value = [];
@@ -120,80 +124,110 @@ export const useDataStore = defineStore('data', () => {
     }
 
     function getEvents() {
+        console.log('getting events');
         return eventlist()
             .then((data) => {
+                console.log('received events ', data);
                 events.value = data;
                 if (events.value && events.value.length > 0) {
-                    setEvent(events.value[0].id);
+                    console.log('setting event to first event in list ', events.value[0].id);
+                    setEvent(events.value[0].id || 0);
                 }
             });
     }
 
     function setEvent(eventId:number) {
-        if (!is_valid(eventId)) return;
+        if (!is_valid(eventId)) {
+            console.log("no valid event id for setEvent");
+            return;
+        }
 
-        var eventFound = { id: -1, title: 'Please wait while loading', competitions: [], sideEvents: []};
+        console.log("creating default event");
+        var eventFound:Event = defaultEvent();
         events.value.forEach((data) => {
             if (data.id == eventId) {
+                console.log("found an event", eventId, data.id);
                 eventFound = data;
             }
         });
 
+        console.log("setting currentEvent value");
         currentEvent.value = eventFound;
-        competitions.value = eventFound.competitions.map((comp:Competition) => {
-            if (is_valid(comp.categoryId)) {
-                comp.category = categoriesById.value['c' + comp.categoryId];
-            }
-            if (is_valid(comp.weaponId)) {
-                comp.weapon = weaponsById.value['w' + comp.weaponId];
-            }
-            return comp;
-        });
+        competitions.value = [];
         competitionsById.value = {};
+        competitionEvents.value = [];
+        nonCompetitionEvents.value = [];
+        sideEvents.value = [];
+        sideEventsById.value = {};
+
+        if (eventFound.competitions) {
+            console.log("event has competitions, setting competitions");
+            competitions.value = eventFound.competitions.map((comp:Competition) => {
+                if (is_valid(comp.categoryId)) {
+                    comp.category = categoriesById.value['c' + comp.categoryId];
+                }
+                if (is_valid(comp.weaponId)) {
+                    comp.weapon = weaponsById.value['w' + comp.weaponId];
+                }
+                return comp;
+            });
+        }
         competitions.value.forEach((data) => competitionsById.value['c' + data.id] = data);
 
         // sort side events in competition based events and side events
-        var comps = [];
-        var ses = [];
-        eventFound.sideEvents.map((se:SideEvent) => {
-            if (is_valid(se.competitionId)) {
-                se.competition = competitionsById.value['c' + se.competitionId];
-                //se.title = se.competition?.weapon?.name + " " + se.competition?.category.name;
-                comps.push(se);
-            }
-            else {
-                ses.push(se);
-            }
-            se.abbr = abbreviateSideEvent(se);
-        });
+        var comps:SideEvent[] = [];
+        var ses:SideEvent[] = [];
+        if (eventFound.sideEvents) {
+            eventFound.sideEvents.map((se:SideEvent) => {
+                if (is_valid(se.competitionId)) {
+                    se.competition = competitionsById.value['c' + se.competitionId];
+                    //se.title = se.competition?.weapon?.name + " " + se.competition?.category.name;
+                    comps.push(se);
+                }
+                else {
+                    ses.push(se);
+                }
+                se.abbr = abbreviateSideEvent(se);
+            });
+        }
         competitionEvents.value = comps;
         nonCompetitionEvents.value = ses;
         sideEvents.value = comps.concat(ses);
-        sideEventsById.value = {};
         sideEvents.value.forEach((data) => sideEventsById.value['s' + data.id] = data);
 
+        console.log("clearing overview and fencer data");
         overviewData.value = [];
         fencerData.value = {};
 
+        console.log("setting authStore eventId");
         const authStore = useAuthStore();
-        authStore.eventId = currentEvent.value.id;
+        authStore.eventId = currentEvent.value.id || 0;
     } 
 
-    function getOverview() {
-        if (!is_valid(currentEvent.value)) return [];
+    function getOverview():Promise<OverviewLine[]> {
+        if (!is_valid(currentEvent.value)) {
+            console.log("no valid event, returning empty promise");
+            return new Promise(() => []);
+        }
 
-        return overview(currentEvent.value.id)
-            .then((data) => {
+        console.log("calling overview");
+        return overview(currentEvent.value.id || 0)
+            .then((data:OverviewLine[]) => {
+                console.log("received overview data");
                 overviewData.value = data;
+                console.log("converting to country-overview");
                 overviewPerCountry.value = overviewToCountry(data);
+                console.log("returning original data further in the promise")
                 return data;
             }, (e) => {
                 console.log(e);
                 alert("There was an error retrieving the general overview. Please reload the page. If this problem persists, please contact the webmaster");
+                return [];
             })
             .catch((e) => {
                 console.log(e);
                 alert("There was an error retrieving the general overview. Please reload the page. If this problem persists, please contact the webmaster");
+                return [];
             });
     }
 
@@ -215,9 +249,7 @@ export const useDataStore = defineStore('data', () => {
     function getRegistrations() {
         return registrations()
             .then((data) => {
-                console.log('received registrations, creating data structure', data);
                 registrationToFencers(data);
-                console.log('fencerdata should have changed now', Object.keys(fencerData.value).length);
             }, (e) => {
                 console.log(e);
                 alert("There was an error retrieving the registration data. Please reload the page. If this problem persists, please contact the webmaster");
@@ -230,34 +262,17 @@ export const useDataStore = defineStore('data', () => {
 
     function addFencer(fencer:Fencer)
     {
-        console.log('inserting fencer', fencer.fullName);
-        let fid = 'f' + fencer.id;
-        if (fencerData.value[fid]) {
-            console.log('fencer in list ', fencer.fullName, ' has ', fencerData.value[fid].registrations?.length,'registrations');
-        }
-        else {
-            console.log('fencer not found in list before insert');
-        }
         insertFencer(fencer);
-        if (fencerData.value[fid]) {
-            console.log('fencer in list ', fencer.fullName, ' now has ', fencerData.value[fid].registrations?.length,'registrations');
-        }
-        else {
-            console.log('fencer not found in list after insert');
-        }
     }
 
     function saveRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:string|null, teamName:string|null, payment:string|null)
     {
-        console.log('saving registration for ', pFencer.id, sideEvent?.id, roleId);
         let registration = updateRegistration(pFencer, sideEvent, roleId, teamName, payment, 'saving');
         if (registration) {
             saveregistration(registration).then((data) => {
-                    console.log('saved registration for ', pFencer.id, sideEvent?.id, roleId);
                     if (data && is_valid(data.id)) {
                         updateRegistration(pFencer, sideEvent, roleId, data.team, data.payment, 'saved', data.id);
                         window.setTimeout(() => {
-                            console.log('clearing state of registration for ', pFencer.id, sideEvent?.id, roleId);
                             // do not overwrite teamName or payment 
                             updateRegistration(pFencer, sideEvent, roleId, null, null, '');
                         }, 3000);
@@ -278,23 +293,21 @@ export const useDataStore = defineStore('data', () => {
     function updateRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:string|null, teamName:string|null, payment:string|null, state:string|null, id:number|null = null)
     {
         let found:Registration|null = null;
-        let newData = {};
+        let newData:FencerById = {};
         Object.keys(fencerData.value).map((key:string) => {
             let fencer = fencerData.value[key];
             if (fencer.id == pFencer.id) {
-                fencer.registrations.map((registration) => {
+                fencer.registrations?.map((registration) => {
                     if (   (roleId != null|| sideEvent != null) // either one is set, both allowed
                         && (sideEvent === null || registration.sideEventId == sideEvent.id) // unset or it matches
-                        && (roleId === null || registration.roleId == roleId) // unset or it matches
+                        && (roleId === null || registration.roleId == parseInt(roleId)) // unset or it matches
                     ) {
                         if (teamName !== null) {
                             // we use '' as a replacement for 'null, yes, really null' instead of 'null, do not replace'
                             if (teamName == '') {
-                                console.log('setting team name to null explicitely');
                                 registration.team = null;
                             }
                             else {
-                                console.log('replacing teamname with ', teamName);
                                 registration.team = teamName;
                             }
                         }
@@ -315,7 +328,6 @@ export const useDataStore = defineStore('data', () => {
                 });
 
                 if (!found) {
-                    console.log('not found, creating new entry', state, sideEvent?.id, roleId);
                     found = {
                         id: id || 0,
                         fencerId: pFencer.id,
@@ -328,7 +340,7 @@ export const useDataStore = defineStore('data', () => {
                         team: teamName,
                         state: state
                     };
-                    fencer.registrations.push(found);
+                    fencer.registrations?.push(found);
                 }
             }
             newData['f' + fencer.id] = fencer;
@@ -337,13 +349,13 @@ export const useDataStore = defineStore('data', () => {
         return found;
     }
 
-    function deleteRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:string|null)
+    function findRegistrationForFencerEventAndRole(pFencer:Fencer, sideEvent:SideEvent|null, roleId:string|null):Registration|null
     {
         let found:Registration|null = null;
         Object.keys(fencerData.value).map((key:string) => {
             let fencer = fencerData.value[key];
             if (fencer.id == pFencer.id) {
-                fencer.registrations.map((registration) => {
+                fencer.registrations?.map((registration) => {
                     if (sideEvent && registration.sideEventId == sideEvent.id) {
                         found = registration;
                     }
@@ -353,10 +365,17 @@ export const useDataStore = defineStore('data', () => {
                 });
             }
         });
-        if (found) {
-            let regId = found?.id || 0;
+        return found;
+    }
+
+    function deleteRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:string|null)
+    {
+        let found = findRegistrationForFencerEventAndRole(pFencer, sideEvent, roleId);
+
+        if (found !== null) {
+            let regId = found.id;
             updateRegistration(pFencer, sideEvent, roleId, found.team ? '' : null, null, 'saving', 0); // set the id to 0
-            deleteregistration(regId)
+            deleteregistration(regId || 0)
                 .then((data) => {
                     if (data && data.status == 'ok') {
                         updateRegistration(pFencer, sideEvent, roleId, null, null, 'saved');
@@ -385,24 +404,26 @@ export const useDataStore = defineStore('data', () => {
         Object.keys(fencerData.value).map((key:string) => {
             let fencer = fencerData.value[key];
             if (fencer.id == pFencer.id) {
-                fencer.registrations = fencer.registrations.filter((registration) => {
-                    // if still marked for deleting (id == 0)
-                    if (registration.id == 0) {
-                        if (sideEvent && registration.sideEventId == sideEvent.id) {
-                            return false;
+                if (fencer.registrations) {
+                    fencer.registrations = fencer.registrations.filter((registration) => {
+                        // if still marked for deleting (id == 0)
+                        if (registration.id == 0) {
+                            if (sideEvent && registration.sideEventId == sideEvent.id) {
+                                return false;
+                            }
+                            else if (!sideEvent && !registration.sideEventId && registration.roleId == parseInt(roleId || '')) {
+                                return false;
+                            }
                         }
-                        else if (!sideEvent && !registration.sideEventId && registration.roleId == parseInt(roleId || '')) {
-                            return false;
-                        }
-                    }
-                    return true;
-                });
+                        return true;
+                    });
+                }
                 fencerData.value['f' + fencer.id] = fencer;
             }
         });
     }
 
-    function forEachRegistrationDo(callback)
+    function forEachRegistrationDo(callback:Function)
     {
         Object.keys(fencerData.value).map((key:string) => {
             let fencer = fencerData.value[key];
@@ -414,14 +435,14 @@ export const useDataStore = defineStore('data', () => {
 
     function updatePayment(registrationList:Registration[], paidHod:boolean|null, paidOrg:boolean|null, state:string)
     {
-        let fencerIds = registrationList.map((reg) => reg.fencerId);
-        let regIds = registrationList.map((reg) => reg.id);
-        var newData = {};
+        let fencerIds:number[] = registrationList.map((reg) => reg.fencerId || 0);
+        let regIds:number[] = registrationList.map((reg) => reg.id || 0);
+        var newData:FencerById = {};
         Object.keys(fencerData.value).map((key:string) => {
             let fencer = fencerData.value[key];
             if (fencerIds.includes(fencer.id) && fencer.registrations) {
                 fencer.registrations = fencer.registrations.map((reg:Registration) => {
-                    if (regIds.includes(reg.id)) {
+                    if (regIds.includes(reg.id || 0)) {
                         if (paidOrg !== null) {
                             reg.paid = paidOrg ? 'Y': 'N';
                         }

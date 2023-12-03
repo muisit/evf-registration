@@ -1,5 +1,6 @@
-import { fetchJson, FetchResponse } from '../interface';
-import { Fencer } from '../schemas/fencer';
+import { fetchJson } from '../interface';
+import type { FetchResponse } from '../interface';
+import type { Fencer } from '../schemas/fencer';
 
 export const duplicatefencer = function(fencer:Fencer) {
     return new Promise<Fencer|null>((resolve, reject) => {       

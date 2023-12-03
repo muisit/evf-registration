@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { Registration } from "../../../../common/api/schemas/registration";
-import { FencerPayment } from "./lib/payments";
+import type { Registration } from "../../../../common/api/schemas/registration";
+import type { FencerPayment } from "./lib/payments";
 import { format_currency } from "../../../../common/functions";
 import { useDataStore } from "../../stores/data";
 import { useAuthStore } from "../../../../common/stores/auth";
@@ -65,7 +65,7 @@ function isVisible()
     return ['I', 'G'].includes(props.fencer.payment);
 }
 
-function markSimplePayment(reg:Registration, state) {
+function markSimplePayment(reg:Registration, state:any) {
     if (!isDisabled(reg)) {
         data.markPayments(
             [reg],
@@ -81,7 +81,7 @@ import { CloseBold, Select, Upload, CircleCheck } from '@element-plus/icons-vue'
     <div class="individual-details">
         <table class="nostripes">
             <tbody>
-                <tr v-for="(reg,i) in props.fencer.registrations" :key="reg.id">
+                <tr v-for="(reg,i) in props.fencer.registrations" :key="reg.id || 0">
                     <td>{{ getSideEvent(reg) }}</td>
                     <td>{{ data.currentEvent.bank?.symbol }} {{ format_currency(getFee(reg, i)) }}</td>
                     <td>

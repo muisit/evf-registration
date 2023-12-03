@@ -1,23 +1,23 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import type { CountrySchema } from '../../../../common/api/schemas/country';
+import type { OverviewObject } from '../../../../common/api/schemas/overviewline';
 import { useDataStore } from '../../stores/data';
-import { is_valid } from '../../../../common/functions';
 const emits = defineEmits(['changeTab']);
 
 const data = useDataStore();
 
-function getLines(country)
+function getLines(country:CountrySchema)
 {
     var ckey = 'c' + country.id;
     if (data.overviewPerCountry && data.overviewPerCountry[ckey]) { 
         return data.overviewPerCountry[ckey];
     }
-    return {};
+    return {country:country, events:{}};
 }
 
 function getTotalLines()
 {
-    var retval = {country: { name: 'Total'}, events: []};
+    var retval:OverviewObject = {country: { id: 0, name: 'Total', abbr: '', path: ''}, events: {}};
     if (data.overviewPerCountry) {
         data.sideEvents.forEach((se) => {
             calculateTotalForEvent(retval, 's' + se.id);
@@ -27,7 +27,7 @@ function getTotalLines()
     return retval;
 }
 
-function calculateTotalForEvent(countObject: object, skey: string)
+function calculateTotalForEvent(countObject: OverviewObject, skey: string)
 {
     var totalParticipants = 0;
     var totalTeams = 0;
@@ -39,7 +39,7 @@ function calculateTotalForEvent(countObject: object, skey: string)
             totalTeams += data.overviewPerCountry[ckey].events[skey].teams;
         }
     });
-    countObject.events[skey] = { participants: totalParticipants, teams: totalTeams};
+    countObject.events[skey] = { sideEvent: null, participants: totalParticipants, teams: totalTeams};
 }
 
 import CountryHeader from './CountryHeader.vue';

@@ -1,5 +1,5 @@
-import { Fencer } from "../../../../../common/api/schemas/fencer";
-import { SideEvent } from "../../../../../common/api/schemas/sideevent";
+import type { Fencer } from "../../../../../common/api/schemas/fencer";
+import type { SideEvent } from "../../../../../common/api/schemas/sideevent";
 import { my_category_is_older } from "../../../../../common/functions";
 
 export function filterEventCategoryYounger (fencer:Fencer, sideevent:SideEvent):boolean
