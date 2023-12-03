@@ -1,8 +1,3 @@
-import { format_date, parse_date } from "../../functions";
-import { useAuthStore } from "../../stores/auth";
-import { CountrySchema } from "./country";
-import { Registration } from "./registration";
-
 export interface Accreditation {
     id: number;
     eventId: number;

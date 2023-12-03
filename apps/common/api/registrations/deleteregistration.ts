@@ -1,5 +1,6 @@
-import { fetchJson, FetchResponse } from '../interface';
-import { ReturnStatusSchema } from '../schemas/returnstatus';
+import { fetchJson } from '../interface';
+import type { FetchResponse } from '../interface';
+import type { ReturnStatusSchema } from '../schemas/returnstatus';
 
 export const deleteregistration = function(id:number) {
     return new Promise<ReturnStatusSchema|null>((resolve, reject) => {     

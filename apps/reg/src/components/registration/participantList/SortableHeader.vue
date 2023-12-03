@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { WeaponSchema } from '../../../../../common/api/schemas/weapon';
-import { hasTeam, allowMoreTeams } from '../../../../../common/lib/event';
+import type { WeaponSchema } from '../../../../../common/api/schemas/weapon';
+import { hasTeam } from '../../../../../common/lib/event';
 import { useDataStore } from '../../../stores/data';
 import { is_valid } from '../../../../../common/functions';
 const emits = defineEmits(['onSort']);

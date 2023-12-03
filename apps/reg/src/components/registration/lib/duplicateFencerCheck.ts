@@ -1,5 +1,5 @@
 import { duplicatefencer } from "../../../../../common/api/fencers/duplicatefencer";
-import { Fencer } from "../../../../../common/api/schemas/fencer";
+import type { Fencer } from "../../../../../common/api/schemas/fencer";
 
 export function duplicateFencerCheck(fencer:Fencer)
 {

@@ -2,10 +2,9 @@
 import { ref } from 'vue';
 import { useDataStore } from '../../stores/data';
 import { useAuthStore } from '../../../../common/stores/auth';
-import { FencerPayment } from './lib/payments';
-import { Registration } from '../../../../common/api/schemas/registration';
+import type { FencerPayment } from './lib/payments';
+import type { Registration } from '../../../../common/api/schemas/registration';
 import { format_currency } from '../../../../common/functions';
-import { allowMoreTeams } from '../../../../common/lib/event';
 const props = defineProps<{
     fencer:FencerPayment;
 }>();
@@ -59,11 +58,11 @@ function isVisible()
 
 function getCompetitions()
 {
-    let comps = [];
+    let comps:string[] = [];
     props.fencer.registrations.map((reg:Registration) => {
         let se = data.sideEventsById['s' + reg.sideEventId];
         if (se) {
-            comps.push(se.abbr);
+            comps.push(se.abbr || '');
         }
     });
     return comps.join(', ');
@@ -88,7 +87,7 @@ function getCosts()
     return total + baseFee;
 }
 
-function markPayment(state)
+function markPayment(state:any)
 {
     if (!isDisabled()) {
         let paymentTypes= ['I','G'];

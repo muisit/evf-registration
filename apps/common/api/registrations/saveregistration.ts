@@ -1,5 +1,6 @@
-import { fetchJson, FetchResponse } from '../interface';
-import { Registration } from '../schemas/registration';
+import { fetchJson } from '../interface';
+import type { FetchResponse } from '../interface';
+import type { Registration } from '../schemas/registration';
 
 export const saveregistration = function(registration:Registration) {
     return new Promise<Registration|null>((resolve, reject) => {     

@@ -1,5 +1,6 @@
-import { fetchJson, FetchResponse } from '../interface';
-import { Registrations } from '../schemas/registrations';
+import { fetchJson } from '../interface';
+import type { FetchResponse } from '../interface';
+import type { Registrations } from '../schemas/registrations';
 
 export const registrations = function() {
     return new Promise<Registrations>((resolve, reject) => {       

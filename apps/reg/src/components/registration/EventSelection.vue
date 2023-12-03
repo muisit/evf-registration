@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { Fencer } from '../../../../common/api/schemas/fencer';
-import { SideEvent } from '../../../../common/api/schemas/sideevent';
+import type { Fencer } from '../../../../common/api/schemas/fencer';
+import type { SideEvent } from '../../../../common/api/schemas/sideevent';
 import { useDataStore } from '../../stores/data';
-import { StringKeyedStringList } from '../../../common/types';
+import type { StringKeyedStringList } from '../../../../common/types';
 const props = defineProps<{
     fencer: Fencer;
     teams: StringKeyedStringList;

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import { Fencer } from '../../../../common/api/schemas/fencer';
-import { SideEvent } from '../../../../common/api/schemas/sideevent';
-import { Registration } from '../../../../common/api/schemas/registration';
+import type { Fencer } from '../../../../common/api/schemas/fencer';
+import type { SideEvent } from '../../../../common/api/schemas/sideevent';
+import type { Registration } from '../../../../common/api/schemas/registration';
 import { useDataStore } from '../../stores/data';
 import { useAuthStore } from '../../../../common/stores/auth';
 import { is_valid } from '../../../../common/functions';
@@ -65,9 +65,21 @@ function availableEvents()
     });
 }
 
+interface TeamNameObject {
+    [key:string]: boolean;
+}
+
+interface TeamNamesObject {
+    [key:string]: TeamNameObject;
+}
+
+interface TeamNames {
+    [key:string]:string[];
+}
+
 function findTeams()
 {
-    let teamNames = {};
+    let teamNamesObject:TeamNamesObject = {};
     let eventIds = availableEvents().map((event:SideEvent) => { return event.id });
     Object.keys(data.fencerData).map((fid:string) => {
         let fencer = data.fencerData[fid];
@@ -75,15 +87,17 @@ function findTeams()
             if (eventIds.includes(reg.sideEventId || 0) && reg.team !== null) {
                 let sideEvent = data.sideEventsById['s' + reg.sideEventId];
                 if (sideEvent.competition) {
-                    if (!teamNames[sideEvent.competition.weapon.name]) {
-                        teamNames[sideEvent.competition.weapon.name] = {};
+                    let key = sideEvent.competition.weapon?.name || '';
+                    if (!teamNamesObject[key]) {
+                        teamNamesObject[key] = {};
                     }
-                    teamNames[sideEvent.competition.weapon.name][reg.team] = true;
+                    teamNamesObject[key][reg.team] = true;
                 }
             }
         })
     });
-    Object.keys(teamNames).map((weaponId:string) => {
+    let teamNames:TeamNames = {};
+    Object.keys(teamNamesObject).map((weaponId:string) => {
         teamNames[weaponId] = Object.keys(teamNames[weaponId]);
     });
     return teamNames;

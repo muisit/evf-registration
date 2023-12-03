@@ -1,5 +1,5 @@
-import { Fencer } from "../../../../../common/api/schemas/fencer";
-import { RoleSchema } from "../../../../../common/api/schemas/role";
+import type { Fencer } from "../../../../../common/api/schemas/fencer";
+import type { RoleSchema } from "../../../../../common/api/schemas/role";
 import { useDataStore } from "../../../stores/data";
 import { useAuthStore } from "../../../../../common/stores/auth";
 
@@ -16,7 +16,7 @@ export function selectRolesForFencer(fencer:Fencer) {
     });
 
     roles.sort((a:RoleSchema, b:RoleSchema) => {
-        if (a.type == 'Country' && b.org != 'Country') return -1;
+        if (a.type == 'Country' && b.type != 'Country') return -1;
         if (b.type =='Country' && a.type != 'Country') return 1;
         if (a.type == 'Org' && b.type != 'Org') return -1;
         if (b.type == 'Org' && a.type != 'Org') return 1;

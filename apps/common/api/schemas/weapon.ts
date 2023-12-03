@@ -4,3 +4,7 @@ export interface WeaponSchema {
     abbr: string|null;
     gender: string|null;
 };
+
+export interface WeaponById {
+    [key:string]: WeaponSchema;
+}

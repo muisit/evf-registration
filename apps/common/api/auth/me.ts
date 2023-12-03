@@ -1,7 +1,8 @@
-import { fetchJson, FetchResponse } from '../interface';
-import { MeSchema } from '../schemas/me';
+import { fetchJson } from '../interface';
+import type { FetchResponse } from '../interface';
+import type { MeSchema } from '../schemas/me';
 
-export const me = function(retries:number = 0) {
+export const me = function(retries:number = 0): Promise<MeSchema> {
     return new Promise<MeSchema>((resolve, reject) => {       
         return fetchJson('GET', '/auth/me')
             .then( (data:FetchResponse) => {                
@@ -16,7 +17,7 @@ export const me = function(retries:number = 0) {
                     status: data.data.status,
                     credentials: data.data.credentials,
                     countryId: data.data.countryId
-                });
+                } as MeSchema);
         }, (err) => {
             reject(err);
         }).catch(() => {

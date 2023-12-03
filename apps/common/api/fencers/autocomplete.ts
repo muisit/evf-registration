@@ -1,9 +1,10 @@
-import { fetchJson, FetchResponse } from '../interface';
-import { FencerList } from '../schemas/fencer';
+import { fetchJson } from '../interface';
+import type { FetchResponse } from '../interface';
+import type { FencerList } from '../schemas/fencer';
 
-export const autocomplete = function(searchdata) {
+export const autocomplete = function(searchdata:string) {
     return new Promise<FencerList>((resolve, reject) => {       
-        return fetchJson('GET', '/fencers/autocomplete', searchdata)
+        return fetchJson('GET', '/fencers/autocomplete', { name: searchdata })
             .then( (data:FetchResponse) => {
                 if(!data || data.status != 200) {
                     return reject("No response data");

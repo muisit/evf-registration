@@ -1,7 +1,8 @@
-import { fetchJson, FetchResponse } from '../interface';
-import { OverviewLine } from '../schemas/overviewline';
+import { fetchJson } from '../interface';
+import type { FetchResponse } from '../interface';
+import type { OverviewLine } from '../schemas/overviewline';
 
-export const overview = function(eventId: number) {
+export const overview = function(eventId: number): Promise<OverviewLine[]> {
     return new Promise<Array<OverviewLine>>((resolve, reject) => {       
         return fetchJson('GET', '/events/' + eventId + '/overview')
             .then( (data:FetchResponse) => {
@@ -13,7 +14,7 @@ export const overview = function(eventId: number) {
         }, (err) => {
             reject(err);
         }).catch((err) => {
-                return reject(err);
+            return reject(err);
         });
     });
 }

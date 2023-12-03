@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { Fencer } from '../../../../common/api/schemas/fencer';
-import { RoleSchema } from '../../../../common/api/schemas/role';
+import type { Fencer } from '../../../../common/api/schemas/fencer';
+import type { RoleSchema } from '../../../../common/api/schemas/role';
 import { useDataStore } from '../../stores/data';
 import { selectRolesForFencer } from './lib/selectRolesForFencer';
 import { is_valid } from '../../../../common/functions';
@@ -52,7 +51,7 @@ import SelectableRole from './SelectableRole.vue';
             <tbody>
                 <SelectableRole
                     v-for="role in availableRoles()"
-                    :key="role.id"
+                    :key="role.id || 0"
                     :role="role"
                     :registration="isRegistered(role)"
                     @on-update="(e) => saveRegistration(role, e)"

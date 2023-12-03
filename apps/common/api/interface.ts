@@ -31,11 +31,11 @@ function simpleFetch(method: string, path:string, data:any, options:object|null 
     );
 
     const fetchOptions = Object.assign({}, {headers: contentHeaders}, options, {
-        credentials: "include",
-        redirect: "manual",
+        credentials: <RequestCredentials>"include",
+        redirect: <RequestRedirect>"manual",
         method: method,
         signal: controller.signal
-    });
+    }) as RequestInit;
 
     if (!data.event) data.event = auth.eventId;
     if (!data.country) data.country = auth.countryId;
@@ -54,7 +54,7 @@ function simpleFetch(method: string, path:string, data:any, options:object|null 
         path = path + glue + elements.join('&');
     }
 
-    return fetch(import.meta.env.VITE_API_URL + path, fetchOptions as RequestInit)
+    return fetch(import.meta.env.VITE_API_URL + path, fetchOptions)
         .then(postprocessor())
         .catch(err => {
             if(err.name != "AbortError") {
@@ -80,9 +80,9 @@ export function fetchJson(method:string, path:string, data={}, options = {}, hea
 }
 
 function attachmentResponse() {
-    return res => {
+    return (res:any) => {
         if (res.status == 200) {
-            return res.blob().then((blob)=> {
+            return res.blob().then((blob:any)=> {
                 var file = window.URL.createObjectURL(blob);
                 window.location.assign(file);
             });
@@ -97,11 +97,11 @@ export function fetchAttachment(path:string, data={}, options={}, headers={}) {
     return simpleFetch('GET', path, data, options, headers, attachmentResponse);
 }
 
-export function uploadFile(path, selectedFile, add_data, options={}, headers={}): Promise<FetchResponse> {
+export function uploadFile(path:string, selectedFile:any, add_data:any, options={}, headers={}): Promise<FetchResponse> {
     return (doUploadFile(path, selectedFile, add_data, options, headers) as unknown) as Promise<FetchResponse>;
 }
 
-function doUploadFile(path, selectedFile, add_data, options={}, headers={}) {
+function doUploadFile(path:string, selectedFile:any, add_data:any, options={}, headers={}) {
     if(!controller) {
         controller = new AbortController();
     }
@@ -126,8 +126,8 @@ function doUploadFile(path, selectedFile, add_data, options={}, headers={}) {
     });
 
     const fetchOptions = Object.assign({}, {headers: contentHeaders}, options, {
-        credentials: "include",
-        redirect: "manual",
+        credentials: <RequestCredentials>"include",
+        redirect: <RequestRedirect>"manual",
         method: 'POST',
         signal: controller.signal,
         body: data

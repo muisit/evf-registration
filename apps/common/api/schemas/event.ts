@@ -19,7 +19,7 @@ export interface Event {
     bank: Bank|null;
     payments: string|null;
     feed: string|null;
-    config: string|object|null;
+    config: any;
     sideEvents: Array<SideEvent>|null;
     competitions: Array<Competition>|null;
 }

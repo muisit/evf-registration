@@ -9,9 +9,22 @@ export function is_valid(id:any)
 }
 
 export function parse_date(dt:any = null) {
+    if (dt !== null && typeof dt == 'object') {
+        return dt;
+    }
     var retval=dayjs(dt);
-    if(!retval || !retval.isValid()) retval=dayjs();
+    if(!retval || !retval.isValid()) {
+        retval=dayjs();
+    }
     return retval;
+}
+
+export function parse_float(val:string|number)
+{
+    if (typeof val == 'string') {
+        return parseFloat(val);
+    }
+    return val;
 }
 
 export function valid_date(dt:any) {
@@ -32,24 +45,24 @@ export function format_datetime(date:any = null)
 }
 
 var months=["January","February","March","April","May","June","July","August","September","October","November","December"];
-export function format_date_fe(dt) {
-    var mmt = dayjs(dt);
+export function format_date_fe(dt:any) {
+    var mmt = parse_date(dt);
     return mmt.date() + " " + months[mmt.month()] + " " + mmt.year();
 }
 var short_months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-export function format_date_fe_short(dt) {
-    var mmt = dayjs(dt);
+export function format_date_fe_short(dt:any) {
+    var mmt = parse_date(dt);
     return mmt.date() + " " + short_months[mmt.month()];
 }
 
-export function format_currency(val) {
-    return parseFloat(val).toFixed(2);
+export function format_currency(val:string|number) {
+    return parse_float(val).toFixed(2);
 }
 
-export function random_token(length, charlist?:string) {
+export function random_token(length:number, charlist?:string):string {
     if (!charlist) charlist = "abcdefghijklmnopqrstuvwxyz0123456789";
     if (length > 100) length = 100;
-    if (length < 0) return null;
+    if (length < 0) return '';
     var retval = '';
     for (var i=0;i < length; i++) {
         retval += random_from_list(charlist);
@@ -57,13 +70,13 @@ export function random_token(length, charlist?:string) {
     return retval;
 }
 
-export function random_from_list(lst) {
+export function random_from_list(lst:string) {
     if (!lst || !lst.length) return null;
     var index = random_int(lst.length);
     return lst[index];
 }
 
-export function random_int(max) {
+export function random_int(max:number) {
     if (!max) max = 0x7fffffff;
     return Math.floor(Math.random() * max);
 }
@@ -72,9 +85,9 @@ export function random_hash() {
     return dayjs().format("YYYYMMDDHHmmss");
 }
 
-export function date_to_category_num(dt:string|object, wrt:any = null) {
-    var date=dayjs(dt);
-    var date2=dayjs(wrt);
+export function date_to_category_num(dt:any, wrt:any = null) {
+    var date=parse_date(dt);
+    var date2=parse_date(wrt);
     var yearold=date.year();
     var yearnew = date2.year();
     var diff=yearnew - yearold;

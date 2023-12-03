@@ -1,6 +1,7 @@
-import { fetchJson, FetchResponse } from '../interface';
-import { CountrySchema } from '../schemas/country';
-import { FencerList } from '../schemas/fencer';
+import { fetchJson } from '../interface';
+import type { FetchResponse } from '../interface';
+import type { CountrySchema } from '../schemas/country';
+import type { FencerList } from '../schemas/fencer';
 
 export const fencerlist = function(country:CountrySchema) {
     return new Promise<FencerList>((resolve, reject) => {       

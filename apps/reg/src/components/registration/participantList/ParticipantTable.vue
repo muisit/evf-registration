@@ -3,7 +3,7 @@ import { is_valid } from '../../../../../common/functions';
 import type { Fencer } from '../../../../../common/api/schemas/fencer';
 import type { Registration } from '../../../../../common/api/schemas/registration';
 import { allowMoreTeams } from '../../../../../common/lib/event';
-import { WeaponSchema } from '../../../../../common/api/schemas/weapon';
+import type { WeaponSchema } from '../../../../../common/api/schemas/weapon';
 import { useDataStore } from '../../../stores/data';
 const emits = defineEmits(['onEdit', 'onSelect']);
 const props = defineProps<{
@@ -34,13 +34,13 @@ function parseRolesForWeaponOnly(fencer:Fencer)
                 var se = data.sideEventsById['s' + reg.sideEventId];
                 if (se && se.competition && se.competition.weapon && props.weapon && props.weapon.id == se.competition.weapon.id) {
                     // only display the team if we allow more teams
-                    if (se.competition.category.type == 'T') {
+                    if (se.competition.category?.type == 'T') {
                         if(allowMoreTeams(data.currentEvent)) {
-                            athleteRoles.push(se.competition.category.name + ' ' + (reg.team || ''));
+                            athleteRoles.push('' + se.competition.category?.name + ' ' + (reg.team || ''));
                         }
                         else {
                             // indicate team grand-veterans or veterans
-                            athleteRoles.push(se.competition.category.name);
+                            athleteRoles.push(se.competition.category?.name || '');
                         }
                     }
                 }
@@ -51,7 +51,7 @@ function parseRolesForWeaponOnly(fencer:Fencer)
             else if(is_valid(reg.roleId || '') && !is_valid(props.weapon?.id)) {
                 var role = data.rolesById['r' + reg.roleId];
                 if (role) {
-                    otherRoles.push(role.name);
+                    otherRoles.push(role.name || '');
                 }
             }
         });
@@ -71,11 +71,11 @@ function parseAllRolesAndEvents(fencer:Fencer)
                 var se = data.sideEventsById['s' + reg.sideEventId];
                 if (se) {
                     if (se.competition) {
-                        if (se.competition.category.type == 'T' && allowMoreTeams(data.currentEvent)) {
+                        if (se.competition.category?.type == 'T' && allowMoreTeams(data.currentEvent)) {
                             athleteRoles.push(se.abbr + ' (' + reg.team + ')');
                         }
                         else {
-                            athleteRoles.push(se.abbr);
+                            athleteRoles.push(se.abbr || '');
                         }
                     }
                     else {
@@ -86,7 +86,7 @@ function parseAllRolesAndEvents(fencer:Fencer)
             else if(is_valid(reg.roleId || '')) {
                 var role = data.rolesById['r' + reg.roleId];
                 if (role) {
-                    otherRoles.push(role.name);
+                    otherRoles.push(role.name || '');
                 }
             }
         });

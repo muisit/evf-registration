@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { SideEvent } from '../../../../common/api/schemas/sideevent';
 const props = defineProps<{
     filter:Array<string>;
     name: string;

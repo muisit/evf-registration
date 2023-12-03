@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
+import { is_valid } from '../../../common/functions';
 
 const authStore = useAuthStore();
 const dataStore = useDataStore();
@@ -27,7 +28,7 @@ function onCloseLogin()
     loginVisible.value = waitAsGuest();
 }
 
-function onLogin(credentials:object)
+function onLogin(credentials:any)
 {
     authStore.logIn(credentials.username, credentials.password)
         .then((data) => {
@@ -85,7 +86,7 @@ import { Loading } from '@element-plus/icons-vue';
             </div>
             <div v-else class="full">
                 <div class="main-header">
-                    <div class="event-title" v-if="dataStore.currentEvent.id > 0">Registration for: {{ dataStore.currentEvent.name }}</div>
+                    <div class="event-title" v-if="is_valid(dataStore.currentEvent.id)">Registration for: {{ dataStore.currentEvent.name }}</div>
                     <div class="event-title" v-else>Please wait while loading</div>
                     <div class="event-selection">
                         <EventSelection />

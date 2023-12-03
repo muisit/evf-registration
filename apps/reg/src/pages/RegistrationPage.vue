@@ -1,8 +1,10 @@
 <script lang="ts" setup>
-import { Ref, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
+import type { Ref } from 'vue';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
-import { Fencer, FencerList, defaultFencer } from '../../../common/api/schemas/fencer';
+import type { Fencer, FencerList } from '../../../common/api/schemas/fencer';
+import { defaultFencer } from '../../../common/api/schemas/fencer';
 import { fencerlist } from '../../../common/api/fencers/fencerlist';
 import { is_valid } from '../../../common/functions';
 const props = defineProps<{
@@ -34,6 +36,7 @@ function openSearchDialog()
     selectedFencer.value = defaultFencer();
     isSearching.value = true;
 }
+
 function closeSearchDialog()
 {
     searchDialog.value = false;
@@ -72,14 +75,25 @@ function updateFencerDialog(fieldDef:any)
 {
     switch (fieldDef.field) {
         case 'id':
+            selectedFencer.value.id = fieldDef.value;
+            break;
         case 'lastName':
+            selectedFencer.value.lastName = fieldDef.value;
+            break;
         case 'firstName':
+            selectedFencer.value.firstName = fieldDef.value;
+            break;
         case 'gender':
+            selectedFencer.value.gender = fieldDef.value;
+            break;
         case 'countryId':
+            selectedFencer.value.countryId = fieldDef.value;
+            break;
         case 'dateOfBirth':
+            selectedFencer.value.dateOfBirth = fieldDef.value;
+            break;
         case 'photoStatus':
-            console.log('setting field ', fieldDef.field, fieldDef.value);
-            selectedFencer.value[fieldDef.field] = fieldDef.value;
+            selectedFencer.value.photoStatus = fieldDef.value;
             break;
     }
 }

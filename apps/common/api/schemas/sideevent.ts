@@ -1,4 +1,8 @@
-import { Competition } from "./competition";
+import type { Competition } from "./competition";
+
+export interface SideEventById {
+    [key:string]: SideEvent;
+}
 
 export interface SideEvent {
     id: number;

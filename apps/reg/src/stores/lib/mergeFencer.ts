@@ -1,4 +1,4 @@
-import { Fencer } from "../../../../common/api/schemas/fencer";
+import type { Fencer } from "../../../../common/api/schemas/fencer";
 
 export function mergeFencer(fencer1: Fencer, fencer2: Fencer)
 {

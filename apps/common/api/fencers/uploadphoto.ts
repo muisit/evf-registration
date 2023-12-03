@@ -1,6 +1,7 @@
-import { uploadFile, FetchResponse } from '../interface';
-import { Fencer } from '../schemas/fencer';
-import { ReturnStatusSchema } from '../schemas/returnstatus';
+import { uploadFile } from '../interface';
+import type { FetchResponse } from '../interface';
+import type { Fencer } from '../schemas/fencer';
+import type { ReturnStatusSchema } from '../schemas/returnstatus';
 
 export const uploadphoto = function(fencer:Fencer, fileObject:any) {
     return new Promise<ReturnStatusSchema|null>((resolve, reject) => {       

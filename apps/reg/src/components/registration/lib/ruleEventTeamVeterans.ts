@@ -1,5 +1,5 @@
-import { Fencer } from "../../../../../common/api/schemas/fencer";
-import { Registration } from "../../../../../common/api/schemas/registration";
+import type { Fencer } from "../../../../../common/api/schemas/fencer";
+import type { Registration } from "../../../../../common/api/schemas/registration";
 import { useDataStore } from "../../../stores/data";
 
 export const ruleEventTeamVeterans = (fencer:Fencer, registration:Registration, competitionRegistrations:Registration[]) => {
@@ -28,8 +28,9 @@ export const ruleEventTeamVeterans = (fencer:Fencer, registration:Registration, 
         team.map((reg:Registration) => {
             let f = data.fencerData['f' + reg.fencerId];
             if (f) {
-                if(f.categoryNum == 2) has_a_cat2_fencer=true;
-                if(f.categoryNum > 2 || f.categoryNum < 1) has_a_cat34_fencer=true;
+                let categoryValue = f.categoryNum || 0;
+                if(categoryValue == 2) has_a_cat2_fencer=true;
+                if(categoryValue > 2 || categoryValue < 1) has_a_cat34_fencer=true;
             }
         });
         if (!has_a_cat2_fencer) {

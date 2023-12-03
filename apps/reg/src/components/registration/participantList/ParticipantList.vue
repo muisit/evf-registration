@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { ref, Ref, watch } from 'vue';
-import { Fencer } from '../../../../../common/api/schemas/fencer';
+import { ref, watch } from 'vue';
+import type { Ref } from 'vue';
+import type { Fencer } from '../../../../../common/api/schemas/fencer';
 import { hasTeam } from '../../../../../common/lib/event';
 import { useDataStore } from '../../../stores/data';
 import { sortAndFilterFencers } from '../lib/sortAndFilterFencers';
@@ -12,7 +13,7 @@ const sorter:Ref<Array<string>> = ref(['n', 'f']);
 const dataList:Ref<Array<Fencer>> = ref([]);
 const byweapon = ref(false);
 
-function onFilter(filterState)
+function onFilter(filterState:any)
 {
     var newFilter:Array<string> = filter.value.filter((f) => f != filterState.name);
     if (filterState.state) {
@@ -52,8 +53,8 @@ import { ElSwitch } from 'element-plus';
     <div class="participant-list">
         <div class="participant-header">
             <div class="participant-filters">
-                <FilterButton v-for="item in data.weapons" :key="item.id" :name="item.abbr" :label="item.name" :filter="filter" @onFilter="onFilter"/>
-                <FilterButton v-for="item in data.nonCompetitionEvents" :key="item.id" :name="item.abbr" :label="item.title" :filter="filter" @onFilter="onFilter"/>
+                <FilterButton v-for="item in data.weapons" :key="item.id || 0" :name="item.abbr || ''" :label="item.name || ''" :filter="filter" @onFilter="onFilter"/>
+                <FilterButton v-for="item in data.nonCompetitionEvents" :key="item.id || 0" :name="item.abbr || ''" :label="item.title || ''" :filter="filter" @onFilter="onFilter"/>
                 <FilterButton name="Support" label="Support roles" :filter="filter" @onFilter="onFilter"/>
             </div>
             <div class="last">

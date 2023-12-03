@@ -1,3 +1,7 @@
+export interface CountryById {
+    [key:string]: CountrySchema;
+}
+
 export interface CountrySchema {
     id: number;
     name: string;

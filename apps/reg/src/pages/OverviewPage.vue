@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { watch } from 'vue';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
 const props = defineProps<{
@@ -11,10 +11,11 @@ const auth = useAuthStore();
 const data = useDataStore();
 
 watch (
-    () => [props.visible, data.currentEvent, data.currentCountry],
-    () => {
+    () => [props.visible, data.currentEvent.id, data.currentCountry.id],
+    (nw, old) => {
         if (props.visible) {
-            auth.isLoading = true;        
+            console.log('loading overview due to change', nw, old);
+            auth.isLoading = true;
             data.getOverview().then(() => { auth.isLoading = false; });
         }
     },

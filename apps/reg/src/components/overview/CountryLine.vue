@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { CountrySchema } from '../../../../common/api/schemas/country';
+import type { CountrySchema } from '../../../../common/api/schemas/country';
+import type { OverviewObject } from '../../../../common/api/schemas/overviewline';
 import { is_valid } from '../../../../common/functions';
 import { useAuthStore } from '../../../../common/stores/auth';
 const props = defineProps<{
-    line:any;
+    line:OverviewObject;
     isTotal: boolean;
-    country: CountrySchema;
+    country?: CountrySchema;
 }>();
 import { useDataStore } from '../../stores/data';
 const emits = defineEmits(['changeTab']);
@@ -51,7 +52,7 @@ function outputCount(sideEvent:any)
 function selectForRegistration()
 {
     if (auth.isOrganisation() && !props.isTotal) {
-        data.setCountry(props.country.id);
+        data.setCountry(props.country?.id || 0);
         emits('changeTab', 'registration');
     }
 }

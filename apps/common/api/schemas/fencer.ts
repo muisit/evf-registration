@@ -1,7 +1,7 @@
 import { format_date, parse_date } from "../../functions";
 import { useAuthStore } from "../../stores/auth";
-import { CountrySchema } from "./country";
-import { Registration } from "./registration";
+import type { CountrySchema } from "./country";
+import type { Registration } from "./registration";
 
 export interface Fencer {
     id: number;

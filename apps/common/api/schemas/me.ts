@@ -1,4 +1,4 @@
-import { CountrySchema } from "./country";
+import type { CountrySchema } from "./country";
 
 export interface MeSchema {
     status: boolean;

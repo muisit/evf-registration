@@ -1,7 +1,7 @@
 import { mergeFencer } from "./mergeFencer";
 import { decorateFencer } from "./decorateFencer";
 import { useDataStore } from "../data";
-import { Fencer } from "../../../../common/api/schemas/fencer";
+import type { Fencer } from "../../../../common/api/schemas/fencer";
 
 export function insertFencer(fencer:Fencer)
 {

@@ -1,4 +1,4 @@
-import { Fencer } from "../../../../common/api/schemas/fencer";
+import type { Fencer } from "../../../../common/api/schemas/fencer";
 import { is_valid, date_to_category, date_to_category_num, parse_date } from "../../../../common/functions";
 import { useDataStore } from "../data";
 
@@ -9,7 +9,7 @@ export function decorateFencer(fencer:Fencer)
         fencer.country = dataStore.countriesById['c' + fencer.countryId];
     }
     else {
-        fencer.country = null;
+        delete fencer.country;
         fencer.countryId = 0;
     }
 
@@ -29,8 +29,8 @@ export function decorateFencer(fencer:Fencer)
         fencer.categoryNum = 0;
     }
     else {
-        fencer.category = date_to_category(fencer.dateOfBirth, dataStore.currentEvent.opens);
-        fencer.categoryNum = date_to_category_num(fencer.dateOfBirth, dataStore.currentEvent.opens);
+        fencer.category = date_to_category(fencer.dateOfBirth || '', dataStore.currentEvent.opens);
+        fencer.categoryNum = date_to_category_num(fencer.dateOfBirth || '', dataStore.currentEvent.opens);
     }
     if (!fencer.registrations) {
         fencer.registrations = [];

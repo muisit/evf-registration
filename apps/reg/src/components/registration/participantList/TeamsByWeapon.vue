@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import { Registration } from '../../../../../common/api/schemas/registration';
-import { Fencer } from '../../../../../common/api/schemas/fencer';
+import type { Registration } from '../../../../../common/api/schemas/registration';
 import { useDataStore } from '../../../stores/data';
-import { WeaponSchema } from '../../../../../common/api/schemas/weapon';
+import type { WeaponSchema } from '../../../../../common/api/schemas/weapon';
 const props = defineProps<{
     registrations: Registration[];
     weapon: WeaponSchema;

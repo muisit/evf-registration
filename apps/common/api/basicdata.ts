@@ -1,5 +1,6 @@
-import { fetchJson, FetchResponse } from './interface';
-import { BasicDataSchema } from './schemas/basicdata';
+import { fetchJson } from './interface';
+import type { FetchResponse } from './interface';
+import type { BasicDataSchema } from './schemas/basicdata';
 
 export const basicData = function() {
     return new Promise<BasicDataSchema>((resolve, reject) => {       
