@@ -15,8 +15,8 @@ if (isset($versions->$app)) {
         $versions->$app->minor += 1;
         $versions->$app->micro = 0;
     }
-    else {
-        $versions->$app->micro +=1;
+    else if ($which == "micro") {
+        $versions->$app->micro += 1;
     }
     file_put_contents('builds.json', json_encode($versions, JSON_PRETTY_PRINT));
 }

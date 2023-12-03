@@ -66,7 +66,7 @@ function onChange()
             };
 
             window.setTimeout(() => {
-                if (name.value == autocompleteData.name) {
+                if (name.value == autocompleteData.name && data.currentCountry.id == autocompleteData.country) {
                     autocomplete(name.value)
                         .then((results) => {
                             if (autocompleteData.name == name.value) {
@@ -108,8 +108,9 @@ import { ElDialog, ElInput, ElButton } from 'element-plus';
                 <tr>
                     <th>Lastname</th>
                     <th>Firstname</th>
-                    <th>Gender</th>
-                    <th>Date of birth</th>
+                    <th v-if="is_valid(data.currentCountry.id)">Gender</th>
+                    <th v-if="is_valid(data.currentCountry.id)">Date of birth</th>
+                    <th v-if="!is_valid(data.currentCountry.id)">Country</th>
                 </tr>
             </thead>
             <tbody>
@@ -121,8 +122,9 @@ import { ElDialog, ElInput, ElButton } from 'element-plus';
                 <tr v-for="fencer in suggestions" :key="fencer.id">
                     <td>{{ fencer.lastName?.toUpperCase() }}</td>
                     <td>{{ fencer.firstName }}</td>
-                    <td>{{ fencer.fullGender }}</td>
-                    <td>{{ fencer.dateOfBirth }}</td>
+                    <td v-if="is_valid(data.currentCountry.id)">{{ fencer.fullGender }}</td>
+                    <td v-if="is_valid(data.currentCountry.id)">{{ fencer.dateOfBirth }}</td>
+                    <td v-if="!is_valid(data.currentCountry.id)">{{ fencer.country?.name || 'Unknown' }}</td>
                     <td>
                         <ElButton type="primary" @click="() => selectFencer(fencer)">select</ElButton>
                     </td>
