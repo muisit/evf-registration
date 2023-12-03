@@ -2,8 +2,10 @@
 import { watch } from 'vue';
 import { useAuthStore } from '../../common/stores/auth';
 import { useDataStore } from './stores/data';
+const props = defineProps<{
+    event:string;
+}>();
 
-console.log("using stores");
 const authStore = useAuthStore();
 const dataStore = useDataStore();
 
@@ -25,7 +27,9 @@ watch(
                     if (authStore.countryId && dataStore.countriesById['c' + authStore.countryId] && !authStore.canSwitchCountry()) {
                         dataStore.setCountry(authStore.countryId);
                     }
-                    dataStore.getEvents().then(() => { authStore.isLoading = false;});
+                    dataStore.getEvents(props.event).then(() => { 
+                        authStore.isLoading = false;
+                    });
                 });
         }
     },
