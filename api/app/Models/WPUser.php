@@ -46,7 +46,7 @@ class WPUser extends Model implements AuthenticatableContract, AuthorizableContr
         $capabilities = !emptyResult($capabilitiesValue) && is_string($capabilitiesValue->option_value) ? unserialize($capabilitiesValue->option_value) : [];
 
         $retval = ["user"];
-        $row = DB::table(env('WPDBPREFIX') . "usermeta")->where('user_id', $this->getKey())->where('meta_key', 'wp_capabilities')->first();
+        $row = DB::table(env('WPDBPREFIX') . "usermeta")->where('user_id', $this->getKey())->where('meta_key', env('WPDBPREFIX') . 'capabilities')->first();
         if (is_object($row) && is_string($row->meta_value)) {
             $obj = unserialize($row->meta_value, ['allowed_classes' => false]);
             foreach ($obj as $key => $val) {

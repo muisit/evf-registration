@@ -29,8 +29,8 @@ function getTotalLines()
 
 function calculateTotalForEvent(countObject: OverviewObject, skey: string)
 {
-    var totalParticipants = 0;
-    var totalTeams = 0;
+    let totalParticipants = 0;
+    let totalTeams = 0;
     data.countries.forEach((country) => {
         var ckey = 'c' + country.id;
         if (data.overviewPerCountry[ckey] && data.overviewPerCountry[ckey].events[skey]) {
@@ -40,6 +40,15 @@ function calculateTotalForEvent(countObject: OverviewObject, skey: string)
         }
     });
     countObject.events[skey] = { sideEvent: null, participants: totalParticipants, teams: totalTeams};
+}
+
+function getRegisteredCountries()
+{
+    return data.countries.filter((country:CountrySchema) => {
+        let ckey = 'c' + country.id;
+        if (data.overviewPerCountry[ckey]) return true;
+        return false;
+    });
 }
 
 import CountryHeader from './CountryHeader.vue';
@@ -52,7 +61,7 @@ import CountryLine from './CountryLine.vue';
         <CountryHeader />
         <tbody>
             <CountryLine :line="getTotalLines()" :is-total="true"/>
-            <CountryLine v-for="country in data.countries" :key="country.id" :line="getLines(country)" :country="country" :is-total="false" @change-tab="(e) => $emit('changeTab', e)"/>
+            <CountryLine v-for="country in getRegisteredCountries()" :key="country.id" :line="getLines(country)" :country="country" :is-total="false" @change-tab="(e) => $emit('changeTab', e)"/>
         </tbody>
       </table>
     </div>
