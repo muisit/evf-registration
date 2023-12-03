@@ -123,15 +123,17 @@ export const useDataStore = defineStore('data', () => {
         }
     }
 
-    function getEvents() {
-        console.log('getting events');
+    function getEvents(eventid?:string) {
         return eventlist()
             .then((data) => {
-                console.log('received events ', data);
                 events.value = data;
                 if (events.value && events.value.length > 0) {
-                    console.log('setting event to first event in list ', events.value[0].id);
-                    setEvent(events.value[0].id || 0);
+                    let eid = parseInt(eventid || '0');
+                    let validIds = events.value.map((e:Event) => e.id);
+                    if (!is_valid(eid) || !validIds.includes(eid)) {
+                        eid = events.value[0].id || 0;
+                    }
+                    setEvent(eid);
                 }
             });
     }
