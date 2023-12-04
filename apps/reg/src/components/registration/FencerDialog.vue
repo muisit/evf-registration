@@ -26,6 +26,7 @@ function submitForm()
     duplicateFencerCheck(props.fencer)
         .then((result) => {
             if (result && result.id) {
+                console.log('duplicates found');
                 var country = data.countriesById['c' + result.countryId];
                 var genderPronoun = result.gender == 'M' ? 'his' : 'her';
 
@@ -52,10 +53,14 @@ function submitForm()
                 }
             }
             else {
+                console.log('no duplicates found. Saving data');
                 saveFencerData()
                   .then(() => {
+                      console.log('emitting onSave');
                       emits('onSave');
+                      console.log('closing form');
                       closeForm();
+                      console.log('end of FencerDialog submitForm');
                   });
             }
         });
@@ -63,15 +68,20 @@ function submitForm()
 
 function saveFencerData()
 {
+    console.log('saving fencer data');
     return savefencer(props.fencer)
         .then((fencer:Fencer|null) => {
             if(fencer) {
+                console.log('fencer returned, setting return data');
                 // update fields to account for back-office field validation changes
                 update('lastName', fencer.lastName);
                 update('firstName', fencer.firstName);
                 update('gender', fencer.gender);
                 update('dateOfBirth', fencer.dateOfBirth);
                 update('id', fencer.id);
+            }
+            else {
+                console.log('no fencer returned on save');
             }
         });
 }

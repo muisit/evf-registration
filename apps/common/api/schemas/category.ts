@@ -9,3 +9,14 @@ export interface CategorySchema {
     type: string|null;
     value: number|null;
 };
+
+export function defaultCategory(): CategorySchema
+{
+    return {
+        id: 0,
+        name: 'Cat',
+        abbr: 'C',
+        type: 'I',
+        value: 1
+    };
+}

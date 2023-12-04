@@ -42,19 +42,19 @@ export function selectEventsForFencer(fencer:Fencer) {
         let allweaponevents:EventsById = {}; // stores all events based on weapon
 
         events = data.sideEvents.map((event:SideEvent) => {
+            event = Object.assign({}, event);
             event.isAthleteEvent = false; // is this a competition event selectable for this specific athlete
             event.isTeamEvent = false; // is this a competition event selectable for this specific athlete AND a team event
             event.defaultRole = null; // regular participant
             event.isNonCompetitionEvent = false; // is this a non-competition event
             event.isRegistered = fencerIsRegisteredForEvent(fencer, event);
-
             if (event.competition) {
                 event.defaultRole = '' + roles[0].id; // any non-athlete role
                 if (event.competition.category && event.competition.weapon) { // should always be true
                     let key = event.competition.weapon.abbr || '';
-                    event.isAthleteEvent = filterEventCategory(fencer,event)
-                            || filterEventTeamVeterans(fencer,event)
-                            || filterEventTeamGrandVeterans(fencer,event);
+                    event.isAthleteEvent = filterEventCategory(fencer, event)
+                            || filterEventTeamVeterans(fencer, event)
+                            || filterEventTeamGrandVeterans(fencer, event);
                     if(event.isAthleteEvent) {
                         event.defaultRole = null;
                         if(event.competition.category.type == 'T') {
@@ -108,12 +108,13 @@ export function selectEventsForFencer(fencer:Fencer) {
                     var hasOwnCat = openevents[key];
                     if(hasOwnCat && event.competition.weapon.gender == fencer.gender && event.competition.category.value == hasOwnCat) {
                         event.isAthleteEvent = true;
-                        event.defaultRole=null; // default role for athlete events is athlete
+                        event.defaultRole = null; // default role for athlete events is athlete
                     }
                 }
                 return event;
             });
         }
     }
+    console.log('initial selection returns ', events.length,' events');
     return events;
 }

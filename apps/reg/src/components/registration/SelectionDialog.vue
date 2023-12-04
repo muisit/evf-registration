@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import type { Fencer } from '../../../../common/api/schemas/fencer';
 import type { SideEvent } from '../../../../common/api/schemas/sideevent';
 import type { Registration } from '../../../../common/api/schemas/registration';
@@ -7,6 +7,7 @@ import { useDataStore } from '../../stores/data';
 import { useAuthStore } from '../../../../common/stores/auth';
 import { is_valid } from '../../../../common/functions';
 import { selectEventsForFencer } from './lib/selectEventsForFencer';
+import { determineUniqueTeamNames } from './lib/determineUniqueTeamNames';
 
 const props = defineProps<{
     visible:boolean;
@@ -49,8 +50,7 @@ function unregister()
     emits('onClose');
 }
 
-function availableEvents()
-{
+const availableEvents = computed(() => {
     return selectEventsForFencer(props.fencer).filter((event:SideEvent) => {
         if (!(event.isAthleteEvent || event.isNonCompetitionEvent || event.isRegistered)) {
             return false;
@@ -60,47 +60,19 @@ function availableEvents()
         if(!is_valid(data.currentCountry.id) && !event.isNonCompetitionEvent) {
             return false;
         }
-
         return true;        
     });
-}
+});
 
-interface TeamNameObject {
-    [key:string]: boolean;
-}
-
-interface TeamNamesObject {
-    [key:string]: TeamNameObject;
-}
-
-interface TeamNames {
-    [key:string]:string[];
-}
-
-function findTeams()
+function teamNames()
 {
-    let teamNamesObject:TeamNamesObject = {};
-    let eventIds = availableEvents().map((event:SideEvent) => { return event.id });
-    Object.keys(data.fencerData).map((fid:string) => {
-        let fencer = data.fencerData[fid];
-        fencer.registrations?.map((reg:Registration) =>{
-            if (eventIds.includes(reg.sideEventId || 0) && reg.team !== null) {
-                let sideEvent = data.sideEventsById['s' + reg.sideEventId];
-                if (sideEvent.competition) {
-                    let key = sideEvent.competition.weapon?.name || '';
-                    if (!teamNamesObject[key]) {
-                        teamNamesObject[key] = {};
-                    }
-                    teamNamesObject[key][reg.team] = true;
-                }
-            }
-        })
-    });
-    let teamNames:TeamNames = {};
-    Object.keys(teamNamesObject).map((weaponId:string) => {
-        teamNames[weaponId] = Object.keys(teamNames[weaponId]);
-    });
-    return teamNames;
+    return determineUniqueTeamNames(data.fencerData, availableEvents.value);
+}
+
+function updatePayment(e:string)
+{
+    console.log('updating payment', e);
+    payments.value = e;
 }
 
 import PaymentSelection from './PaymentSelection.vue';
@@ -116,8 +88,8 @@ import { ElDialog, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton, El
         <h3 v-if="is_valid(data.currentCountry.id)">Year of birth: {{ props.fencer.birthYear }} Gender: {{ props.fencer.gender == 'F' ? 'Woman' : 'Man'}} Category: {{ props.fencer.category }}</h3>
       </div>
       <ElForm>
-        <PaymentSelection :payments="payments" @on-update="(e) => payments = e" :isadmin="props.isadmin"/>
-        <EventSelection :fencer="props.fencer" :payments="payments" :teams="findTeams()" :available-events="availableEvents()"/>
+        <PaymentSelection :payments="payments" @on-update="updatePayment" :isadmin="props.isadmin"/>
+        <EventSelection :fencer="props.fencer" :teams="teamNames()" :payments="payments" :available-events="availableEvents"/>
         <RoleSelection :fencer="props.fencer" :payments="payments"/>
         <AccreditationSelection v-if="auth.isOrganisation()" :fencer="props.fencer"/>
       </ElForm>

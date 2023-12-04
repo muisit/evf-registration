@@ -151,8 +151,8 @@ then
 fi
 
 echo "Creating application files"
-#NODE_ENV=development npm run build-only -- --mode development --minify false
-npm run build-only >> $LOG 2>&1
+NODE_ENV=development npm run build-only -- --mode development --minify false >> $LOG 2>&1
+#npm run build-only >> $LOG 2>&1
 
 cd dist
 zip -r -q registration.zip index.html assets

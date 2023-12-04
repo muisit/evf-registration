@@ -21,3 +21,17 @@ export interface SideEvent {
     isRegistered?: boolean;
     defaultRole?: string|null;
 }
+
+export function defaultSideEvent(): SideEvent
+{
+    return {
+        id: 0,
+        title: 'SideEvent',
+        description: 'SideEvent',
+        starts: '',
+        costs: 0,
+        competitionId: 0,
+        abbr: 'SE',
+        competition: null
+    };
+}

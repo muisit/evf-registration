@@ -8,3 +8,13 @@ export interface WeaponSchema {
 export interface WeaponById {
     [key:string]: WeaponSchema;
 }
+
+export function defaultWeapon() : WeaponSchema
+{
+    return {
+        id: 0,
+        name: 'Weapon',
+        abbr: 'WP',
+        gender: 'M'
+    };
+}

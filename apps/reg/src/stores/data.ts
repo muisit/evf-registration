@@ -144,16 +144,13 @@ export const useDataStore = defineStore('data', () => {
             return;
         }
 
-        console.log("creating default event");
         var eventFound:Event = defaultEvent();
         events.value.forEach((data) => {
             if (data.id == eventId) {
-                console.log("found an event", eventId, data.id);
                 eventFound = data;
             }
         });
 
-        console.log("setting currentEvent value");
         currentEvent.value = eventFound;
         competitions.value = [];
         competitionsById.value = {};
@@ -163,7 +160,6 @@ export const useDataStore = defineStore('data', () => {
         sideEventsById.value = {};
 
         if (eventFound.competitions) {
-            console.log("event has competitions, setting competitions");
             competitions.value = eventFound.competitions.map((comp:Competition) => {
                 if (is_valid(comp.categoryId)) {
                     comp.category = categoriesById.value['c' + comp.categoryId];
@@ -197,11 +193,9 @@ export const useDataStore = defineStore('data', () => {
         sideEvents.value = comps.concat(ses);
         sideEvents.value.forEach((data) => sideEventsById.value['s' + data.id] = data);
 
-        console.log("clearing overview and fencer data");
         overviewData.value = [];
         fencerData.value = {};
 
-        console.log("setting authStore eventId");
         const authStore = useAuthStore();
         authStore.eventId = currentEvent.value.id || 0;
     } 
@@ -212,14 +206,10 @@ export const useDataStore = defineStore('data', () => {
             return new Promise(() => []);
         }
 
-        console.log("calling overview");
         return overview(currentEvent.value.id || 0)
             .then((data:OverviewLine[]) => {
-                console.log("received overview data");
                 overviewData.value = data;
-                console.log("converting to country-overview");
                 overviewPerCountry.value = overviewToCountry(data);
-                console.log("returning original data further in the promise")
                 return data;
             }, (e) => {
                 console.log(e);

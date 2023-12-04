@@ -16,3 +16,16 @@ export interface Competition {
     category: CategorySchema|null;
     weapon: WeaponSchema|null;
 }
+
+export function defaultCompetition(): Competition
+{
+    return {
+        id: 0,
+        categoryId: 0,
+        weaponId: 0,
+        starts: '',
+        weaponsCheck: '',
+        category: null,
+        weapon: null
+    };
+}

@@ -71,8 +71,7 @@ function onChange()
                         .then((results) => {
                             if (autocompleteData.name == name.value) {
                                 suggestions.value = results.map((fencer) => {
-                                    decorateFencer(fencer);
-                                    return fencer;
+                                    return decorateFencer(fencer);
                                 });
                             }
                             else {
@@ -83,6 +82,7 @@ function onChange()
                 }, 500);
         }
         else {
+            // these suggestions are already decorated
             suggestions.value = filterSuggestionsFromFencerList(name.value, props.fencers);
         }
     }
