@@ -274,7 +274,7 @@ export const useDataStore = defineStore('data', () => {
                     if (data && is_valid(data.id)) {
                         registration.state = 'saved';
                         // use a callback to update the back-end id
-                        fencerData.value = updateRegistration(fencerData.value, registration, (old, nw) => {
+                        fencerData.value = updateRegistration(fencerData.value, registration, (old:Registration, nw:Registration) => {
                             nw.id = data.id;
                             return nw;
                         });
