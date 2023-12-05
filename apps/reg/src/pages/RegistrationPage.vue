@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import type { Ref } from 'vue';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
@@ -129,6 +129,10 @@ watch(
     { immediate: true }
 )
 
+const showAddButton = computed(() => {
+    return auth.isOrganisation() || (auth.isHod() && isOpenForRegistration(data.currentEvent));
+});
+
 import RegistrationHeader from '../components/registration/RegistrationHeader.vue';
 import ParticipantList from '../components/registration/participantList/ParticipantList.vue';
 import FencerDialog from '../components/registration/FencerDialog.vue';
@@ -139,7 +143,7 @@ import { ElButton } from 'element-plus';
 <template>
     <div class="registration-page" v-if="props.visible">
         <RegistrationHeader :country-switch="auth.canSwitchCountry() || false"/>
-        <div class='registration-buttons' v-if="isOpenForRegistration(data.currentEvent)">
+        <div class='registration-buttons' v-if="showAddButton">
             <ElButton type="primary" @click="openSearchDialog">Add Registration</ElButton>
         </div>
         <ParticipantList @on-edit="editFencer" @on-select="selectFencer"/>
