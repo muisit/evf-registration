@@ -38,6 +38,6 @@ import LoadingService from './components/special/LoadingService.vue';
 <template>
     <div>
         <LoadingService/>
-        <DashboardView/>
+        <DashboardView :event="props.event"/>
     </div>
 </template>
