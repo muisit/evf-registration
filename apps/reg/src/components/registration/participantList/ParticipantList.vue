@@ -5,6 +5,7 @@ import type { Fencer } from '../../../../../common/api/schemas/fencer';
 import { hasTeam } from '../../../../../common/lib/event';
 import { useDataStore } from '../../../stores/data';
 import { sortAndFilterFencers } from '../lib/sortAndFilterFencers';
+import { is_valid } from '../../../../../common/functions';
 const emits = defineEmits(['onEdit', 'onSelect']);
 
 const data = useDataStore();
@@ -23,9 +24,9 @@ function onFilter(filterState:any)
 }
 
 watch(
-    () => data.currentEvent.id,
+    () => [data.currentEvent.id, data.currentCountry.id],
     () => {
-        byweapon.value = hasTeam(data.currentEvent);
+        byweapon.value = hasTeam(data.currentEvent) && is_valid(data.currentCountry);
     },
     { immediate: true }
 )
