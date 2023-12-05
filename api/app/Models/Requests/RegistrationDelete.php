@@ -32,6 +32,19 @@ class RegistrationDelete extends Base
         }
         \Log::debug("authorizing registration delete " . get_class($this->controller));
         $this->controller->authorize('delete', $this->model);
+
+        // check that the event is open for registration if the current user is not an organiser or
+        // sysop. 
+        if (!$user->hasRole("sysop") && !$user->can('register', RegistrationModel::class) && $user->can('hod', RegistrationModel::class)) {
+            $event = request()->get('eventObject');
+            if (empty($event) || !$event->exists) {
+                return false;
+            }
+            else if(!$event->isOpenForRegistration()) {
+                return false;
+            }
+        }
+
         return true;
     }
 

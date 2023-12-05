@@ -243,13 +243,81 @@ class RegistrationTest extends TestCase
         $this->assertEquals('not/ever', $this->authorizeCalls[2]);
 
         // accreditation
-        $user = WPUser::where('ID', UserData::TESTUSER3)->first();
+        $user = WPUser::where('ID', UserData::TESTUSER4)->first();
         $model = $this->baseTest($testData, $user);
         $this->assertEmpty($model);
         $this->assertCount(3, $this->authorizeCalls);
         $this->assertEquals('create', $this->authorizeCalls[0]);
         $this->assertEquals('create', $this->authorizeCalls[1]);
         $this->assertEquals('not/ever', $this->authorizeCalls[2]);
+    }
+
+    public function testNoAuthorizationBeforeRegistrationPeriod()
+    {
+        $regopens = Carbon::now()->addDays(20)->toDateString();
+        $regcloses = Carbon::now()->addDays(40)->toDateString();
+        $event = Event::where('event_id', EventData::EVENT1)->first();
+        $event->event_registration_open = $regopens;
+        $event->event_registration_close = $regcloses;
+        $event->save();
+
+        $testData = [
+            'id' => 0,
+            'fencerId' => FencerData::MCAT1,
+            'roleId' => null,
+            'sideEventId' => SideEventData::MFCAT2,
+            'team' => null,
+            'payment' => 'G'
+        ];
+
+        // no privileges
+        $user = WPUser::where('ID', UserData::TESTUSER5)->first();
+        $model = $this->baseTest($testData, $user);
+        $this->assertEmpty($model);
+
+        // HoD
+        $user = WPUser::where('ID', UserData::TESTUSERHOD)->first();
+        $model = $this->baseTest($testData, $user);
+        $this->assertEmpty($model); // HoD is not authorized
+
+        // registrar
+        $user = WPUser::where('ID', UserData::TESTUSERREGISTRAR)->first();
+        $model = $this->baseTest($testData, $user);
+        $this->assertNotEmpty($model); // registrar is authorized
+    }
+
+    public function testNoAuthorizationAfterRegistrationPeriod()
+    {
+        $regopens = Carbon::now()->subDays(40)->toDateString();
+        $regcloses = Carbon::now()->subDays(20)->toDateString();
+        $event = Event::where('event_id', EventData::EVENT1)->first();
+        $event->event_registration_open = $regopens;
+        $event->event_registration_close = $regcloses;
+        $event->save();
+
+        $testData = [
+            'id' => 0,
+            'fencerId' => FencerData::MCAT1,
+            'roleId' => null,
+            'sideEventId' => SideEventData::MFCAT2,
+            'team' => null,
+            'payment' => 'G'
+        ];
+
+        // no privileges
+        $user = WPUser::where('ID', UserData::TESTUSER5)->first();
+        $model = $this->baseTest($testData, $user);
+        $this->assertEmpty($model);
+
+        // HoD
+        $user = WPUser::where('ID', UserData::TESTUSERHOD)->first();
+        $model = $this->baseTest($testData, $user);
+        $this->assertEmpty($model);
+
+        // registrar
+        $user = WPUser::where('ID', UserData::TESTUSERREGISTRAR)->first();
+        $model = $this->baseTest($testData, $user);
+        $this->assertNotEmpty($model);
     }
 
     public function testValidateFencer()

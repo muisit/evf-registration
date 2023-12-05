@@ -8,6 +8,8 @@ import { defaultFencer } from '../../../common/api/schemas/fencer';
 import { fencerlist } from '../../../common/api/fencers/fencerlist';
 import { is_valid } from '../../../common/functions';
 import { decorateFencer } from '../stores/lib/decorateFencer';
+import { isOpenForRegistration } from '../../../common/lib/event';
+
 const props = defineProps<{
     visible:boolean;
 }>();
@@ -137,7 +139,7 @@ import { ElButton } from 'element-plus';
 <template>
     <div class="registration-page" v-if="props.visible">
         <RegistrationHeader :country-switch="auth.canSwitchCountry() || false"/>
-        <div class='registration-buttons'>
+        <div class='registration-buttons' v-if="isOpenForRegistration(data.currentEvent)">
             <ElButton type="primary" @click="openSearchDialog">Add Registration</ElButton>
         </div>
         <ParticipantList @on-edit="editFencer" @on-select="selectFencer"/>

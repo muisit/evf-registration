@@ -1,4 +1,5 @@
 import type{ Event } from '../api/schemas/event';
+import { parse_date } from '../functions';
 
 export function allowMoreTeams(event:Event|null)
 {
@@ -27,4 +28,23 @@ export function hasTeam(event:Event|null)
         });
     }
     return hasTeams;
+}
+
+export function isOpenForRegistration(event:Event)
+{
+    const now = parse_date();
+    const opens = parse_date(event.reg_open);
+    const closes = parse_date(event.reg_close);
+    return opens.isAfter(now) && closes.isBefore(now);
+}
+
+export function isOpenForRegistrationView(event:Event)
+{
+    console.log("testing is-open-for-registration-view", event.reg_open, event.opens, event.duration);
+    const now = parse_date();
+    const opens = parse_date(event.reg_open);
+    const starts = parse_date(event.opens);
+    const finishes = starts.add((event.duration || 0) + 2, 'day');
+    console.log('testing ', opens.format('Y-m-d'), finishes.format('Y-m-d'), now.format('Y-m-d'));
+    return opens.isBefore(now) && finishes.isAfter(now);
 }

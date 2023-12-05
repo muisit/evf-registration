@@ -3,6 +3,7 @@ import { useDataStore } from '../../stores/data';
 import { useAuthStore } from '../../../../common/stores/auth';
 import { is_valid } from '../../../../common/functions';
 import type { SelectOption } from '../../../../common/types';
+import { isOpenForRegistration } from '../../../../common/lib/event';
 const props = defineProps<{
     payments: string;
     isadmin: boolean;
@@ -30,11 +31,17 @@ function paymentOptions():SelectOption[]
     return options;
 }
 
+function allowPaymentSelection()
+{
+    if (auth.isHod() && !isOpenForRegistration(data.currentEvent)) return false;
+    return paymentOptions().length > 1 ? true : false;
+}
+
 import { ElFormItem, ElSelect, ElOption } from 'element-plus';
 </script>
 <template>
-    <div class="payment-selection">
-        <ElFormItem label="Payment" v-if="paymentOptions().length > 1">
+    <div class="payment-selection" v-if="allowPaymentSelection()">
+        <ElFormItem label="Payment">
             <ElSelect :model-value="props.payments" @update:model-value="(e) => $emit('onUpdate', e)">
                 <ElOption v-for="(po,i) in paymentOptions()" :key="i" :value="po.value" :label="po.label" />
             </ElSelect>

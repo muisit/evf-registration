@@ -123,7 +123,7 @@ import { Select, CloseBold, Upload, ArrowRight, ArrowDown, CircleCheck } from '@
             <ElCheckbox :model-value="wasPaid()" @update:model-value="(e) => markPayment(e)" :disabled="isDisabled()" v-if="isVisible()"/>
         </td>
         <td>
-            <ElIcon size="large" v-if="wasReceived() && auth.isHod()">
+            <ElIcon size="large" v-if="wasReceived()">
                 <CircleCheck/>
             </ElIcon>
         </td>

@@ -6,12 +6,16 @@ import type { Registration } from '../../../../common/api/schemas/registration';
 import { defaultRegistration } from '../../../../common/api/schemas/registration';
 import type { Fencer } from '../../../../common/api/schemas/fencer';
 import { random_token, is_valid } from  '../../../../common/functions';
-
+import { isOpenForRegistration } from '../../../../common/lib/event';
+import { useDataStore } from '../../stores/data';
+import { useAuthStore } from '../../../../common/stores/auth';
 const props = defineProps<{
     role:RoleSchema;
     fencer: Fencer;
 }>();
 const emits = defineEmits(['update']);
+const data = useDataStore();
+const auth = useAuthStore();
 
 const registration:Ref<Registration> = computed(() => {
     if (props.fencer.registrations) {
@@ -27,6 +31,7 @@ const registration:Ref<Registration> = computed(() => {
 
 function inputDisabled()
 {
+    if (auth.isHod() && !isOpenForRegistration(data.currentEvent)) return true;
     if (['error', 'saving', 'removing'].includes(registration.value.state || '')) return true;
     return false;
 }

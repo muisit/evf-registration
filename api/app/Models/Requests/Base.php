@@ -65,14 +65,11 @@ class Base
 
     protected function authorize(EVFUser $user, array $data): bool
     {
-        \Log::debug("base request authorization");
         if (!empty($this->model)) {
             if (!$this->model->exists) {
-                \Log::debug("testing create authorization for " . get_class($this->model));
                 $this->controller->authorize('create', get_class($this->model));
             }
             else {
-                \Log::debug("testing update authorization for " . get_class($this->model));
                 $this->controller->authorize('update', $this->model);
             }
         }
