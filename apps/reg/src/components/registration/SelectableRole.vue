@@ -1,28 +1,56 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import type { Ref } from 'vue';
 import type { RoleSchema } from "../../../../common/api/schemas/role";
 import type { Registration } from '../../../../common/api/schemas/registration';
+import { defaultRegistration } from '../../../../common/api/schemas/registration';
+import type { Fencer } from '../../../../common/api/schemas/fencer';
 import { random_token, is_valid } from  '../../../../common/functions';
 
 const props = defineProps<{
     role:RoleSchema;
-    registration:Registration|null;
+    fencer: Fencer;
 }>();
-const emits = defineEmits(['onUpdate']);
+const emits = defineEmits(['update']);
+
+const registration:Ref<Registration> = computed(() => {
+    if (props.fencer.registrations) {
+        for(let i in props.fencer.registrations) {
+            let reg = props.fencer.registrations[i];
+            if (reg.roleId == props.role.id) {
+                return reg;
+            }
+        }
+    }
+    return defaultRegistration();
+});
 
 function inputDisabled()
 {
-    if (props.registration?.state && props.registration?.state != 'saved') return true;
+    if (['error', 'saving', 'removing'].includes(registration.value.state || '')) return true;
     return false;
 }
 
 function checkboxValue()
 {
-    return props.registration && is_valid(props.registration.id) ? true : false;
+    if (  (is_valid(registration.value.id) && ['', 'saved','saving'].includes(registration.value.state || ''))
+       || (!is_valid(registration.value.id) && registration.value.state == 'saving')
+    ) {
+        return true;
+    }
+    return false;
+}
+
+function update(e:any)
+{
+    emits('update', e);
 }
 
 const checkbox:Ref<string> = ref(random_token(32));
+
+const hasError = computed(() => registration.value.state == 'error');
+const isSaving = computed(() => registration.value.state == 'saving' || registration.value.state == 'removing');
+const isSaved = computed(() => registration.value.state == 'saved' || registration.value.state == 'removed');
 
 import { Select, CloseBold, Upload } from '@element-plus/icons-vue';
 import { ElCheckbox, ElSelect, ElOption, ElIcon } from 'element-plus';
@@ -30,18 +58,18 @@ import { ElCheckbox, ElSelect, ElOption, ElIcon } from 'element-plus';
 <template>
     <tr>
         <td>
-            <ElCheckbox :model-value="checkboxValue()" @update:model-value="(e) => $emit('onUpdate', e)" :disabled="inputDisabled()" :id="checkbox"/>
+            <ElCheckbox :model-value="checkboxValue()" @update:model-value="update" :disabled="inputDisabled()" :id="checkbox"/>
         </td>
         <td>
             <label :for="checkbox">
                 {{ props.role.name }}
             </label>
         </td>
-        <td :class="{'state-icons':true, 'state-error': props.registration?.state == 'error', 'state-upload': props.registration?.state == 'saving', 'state-ok': props.registration?.state == 'saved'}">
+        <td :class="{'state-icons':true, 'state-error': hasError, 'state-upload': isSaving, 'state-ok': isSaved}">
             <ElIcon>
-                <CloseBold v-if="props.registration?.state == 'error'" />
-                <Select v-if="props.registration?.state == 'saved'"/>
-                <Upload v-if="props.registration?.state == 'saving'"/>
+                <CloseBold v-if="hasError" />
+                <Select v-if="isSaved"/>
+                <Upload v-if="isSaving"/>
             </ElIcon>
         </td>
         <td class="filler-cell"></td>

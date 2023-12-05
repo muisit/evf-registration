@@ -23,23 +23,11 @@ function availableRoles():RoleSchema[]
 function saveRegistration(role:RoleSchema, state:any)
 {
     if (state) {
-        data.saveRegistration(props.fencer, null, '' + role.id, null, props.payments);
+        data.saveRegistration(props.fencer, null, role.id, null, props.payments);
     }
     else {
-        data.deleteRegistration(props.fencer, null, '' + role.id);
+        data.removeRegistration(props.fencer, null, role.id);
     }
-}
-
-function isRegistered(role:RoleSchema)
-{
-    if (props.fencer.registrations) {
-        for(let i = 0;i < props.fencer.registrations.length; i++) {
-            if (props.fencer.registrations[i].roleId == role.id) {
-                return props.fencer.registrations[i];
-            }
-        }
-    }
-    return null;
 }
 
 import SelectableRole from './SelectableRole.vue';
@@ -53,8 +41,8 @@ import SelectableRole from './SelectableRole.vue';
                     v-for="role in availableRoles()"
                     :key="role.id || 0"
                     :role="role"
-                    :registration="isRegistered(role)"
-                    @on-update="(e) => saveRegistration(role, e)"
+                    :fencer="props.fencer"
+                    @update="(e) => saveRegistration(role, e)"
                 />
             </tbody>
         </table>

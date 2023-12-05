@@ -35,5 +35,6 @@ export function decorateFencer(fencer:Fencer)
     if (!fencer.registrations) {
         fencer.registrations = [];
     }
-    fencer.fullGender = fencer.gender == 'M' ? 'M' : 'W';
+    fencer.fullGender = fencer.gender == 'F' ? 'W' : 'M';
+    return fencer;
 }

@@ -1,5 +1,4 @@
 import { format_date, parse_date } from "../../functions";
-import { useAuthStore } from "../../stores/auth";
 import type { CountrySchema } from "./country";
 import type { Registration } from "./registration";
 
@@ -29,13 +28,11 @@ export interface FencerById {
 
 export function defaultFencer()
 {
-    const auth = useAuthStore();
-
     var fencer:Fencer = {
         id: 0,
         firstName: '',
         lastName: '',
-        countryId: auth.countryId || 0,
+        countryId: 0,
         gender: 'M',
         dateOfBirth: format_date(parse_date().subtract(40, 'years')),
         photoStatus: null,

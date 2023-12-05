@@ -1,0 +1,24 @@
+#!/usr/bin/php
+<?php
+
+$app = $_SERVER["argv"][1] ?? "";
+$which = $_SERVER["argv"][2] ?? "";
+$versions = json_decode(file_get_contents('versions.json'));
+if (isset($versions->$app)) {
+    if ($which == 'major') {
+        $versions->$app->major += 1;
+        $versions->$app->minor = 0;
+        $versions->$app->micro = 0;
+    }
+    else if ($which == "minor") {
+        $versions->$app->minor += 1;
+        $versions->$app->micro = 0;
+    }
+    else if ($which == "micro") {
+        $versions->$app->micro += 1;
+    }
+    file_put_contents('versions.json', json_encode($versions, JSON_PRETTY_PRINT));
+}
+else {
+    echo "No such app $app\r\n";
+}

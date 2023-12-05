@@ -1,0 +1,30 @@
+#!/bin/bash
+
+CMD=$1
+PHASE=$2
+
+case $CMD in
+
+co*)
+    if [[ "x$PHASE" = "xpre" ]]
+    then
+        if [[ -x "scripts/updateversion" ]]
+        then
+            HASAPI=`git status --porcelain | grep "^M *api"`
+            if [[ ! "x$HASAPI" = "x" ]]
+            then
+                echo "updating API build version before commit"
+                scripts/updateversion api
+            fi
+
+            HASREGISTER=`git status --porcelain | grep "^M *apps/reg"`
+            if [[ ! "x$HASREGISTER" = "x" ]]
+            then
+                echo "updating REGISTER build version before commit"
+                scripts/updateversion register
+            fi
+        fi
+    fi
+    ;;
+esac
+

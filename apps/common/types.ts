@@ -9,3 +9,8 @@ export interface StringKeyedNumber {
 export interface StringKeyedBoolean {
     [key:string]: boolean;
 }
+
+export interface SelectOption {
+    value: string;
+    label: string;
+}

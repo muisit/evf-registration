@@ -31,7 +31,7 @@ function simpleFetch(method: string, path:string, data:any, options:object|null 
     );
 
     const fetchOptions = Object.assign({}, {headers: contentHeaders}, options, {
-        credentials: <RequestCredentials>"include",
+        credentials: "include",
         redirect: <RequestRedirect>"manual",
         method: method,
         signal: controller.signal

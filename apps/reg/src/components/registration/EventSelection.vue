@@ -14,33 +14,22 @@ const data = useDataStore();
 
 function saveRegistration(event:SideEvent, state:any)
 {
+    console.log('saveRegistration: ', event.title, event.id, state);
     // state is null, the empty string, true/false or a team name
     if (state) {
         if (event.isAthleteEvent && event.isTeamEvent) {
             // state is the team-name
             // always mark this as a group-payment, if we have a choice
-            data.saveRegistration(props.fencer, event, event.defaultRole || null, state, data.currentEvent.payments == 'all' ? 'G' : props.payments);
+            data.saveRegistration(props.fencer, event, null, state, data.currentEvent.payments == 'all' ? 'G' : props.payments);
         }
         else {
             // individual tournament, no team name
-            data.saveRegistration(props.fencer, event, event.defaultRole || null, null, props.payments);
+            data.saveRegistration(props.fencer, event, null, null, props.payments);
         }
     }
     else {
-        data.deleteRegistration(props.fencer, event, null);
+        data.removeRegistration(props.fencer, event, null);
     }
-}
-
-function isRegistered(event:SideEvent)
-{
-    if (props.fencer.registrations) {
-        for(let i = 0;i < props.fencer.registrations.length; i++) {
-            if (props.fencer.registrations[i].sideEventId == event.id) {
-                return props.fencer.registrations[i];
-            }
-        }
-    }
-    return null;
 }
 
 function getTeamsForEvent(event:SideEvent):string[]
@@ -62,9 +51,9 @@ import SelectableEvent from './SelectableEvent.vue';
             <SelectableEvent
                 v-for="event in props.availableEvents" :key="event.id"
                 :event="event"
-                :registration="isRegistered(event)"
+                :fencer="props.fencer"
                 :teams="getTeamsForEvent(event)"
-                @on-update="(e) => saveRegistration(event, e)"
+                @update="(e) => saveRegistration(event, e)"
             />
         </table>
     </div>

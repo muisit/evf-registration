@@ -18,7 +18,6 @@ function fencerData()
         let sa = data.sideEventsById['s' + a.sideEventId] || null;
         let sb = data.sideEventsById['s' + b.sideEventId] || null;
         if (sa && sb && sa.title != sb.title) {
-            console.log('sorting on event title');
             return sa.title > sb.title ? 1 : -1;
         }
 

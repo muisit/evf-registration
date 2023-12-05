@@ -2,6 +2,7 @@
 import { useDataStore } from '../../stores/data';
 import { useAuthStore } from '../../../../common/stores/auth';
 import { is_valid } from '../../../../common/functions';
+import type { SelectOption } from '../../../../common/types';
 const props = defineProps<{
     payments: string;
     isadmin: boolean;
@@ -11,9 +12,9 @@ const emits = defineEmits(['onUpdate']);
 const auth = useAuthStore();
 const data = useDataStore();
 
-function paymentOptions()
+function paymentOptions():SelectOption[]
 {
-    let options:any[] = [];
+    let options:SelectOption[] = [];
 
     if (auth.isOrganisation() && !is_valid(data.currentCountry.id)) {
         options.push({label: 'By Organisation', value: 'O'});

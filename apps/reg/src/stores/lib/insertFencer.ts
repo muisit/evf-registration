@@ -11,7 +11,7 @@ export function insertFencer(fencer:Fencer)
     if (allFencers[fid]) {
         fencer = mergeFencer(allFencers[fid], fencer);
     }
-    decorateFencer(fencer);
-    allFencers[fid] = fencer;
+    
+    allFencers[fid] = decorateFencer(fencer);
     dataStore.fencerData = allFencers;
 }

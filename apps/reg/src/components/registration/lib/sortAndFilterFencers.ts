@@ -55,7 +55,6 @@ function filterFencers(aId:string, data:any, filterEvents:Array<number>, filterS
             retval = retval || filterEvents.includes(reg.sideEventId || 0);
 
             if (filterSupportRoles && is_valid(reg.roleId)) {
-                console.log('filtering in registration ', reg, ' because roleId is valid');
                 retval = true;
             }
         });
