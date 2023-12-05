@@ -10,13 +10,15 @@ co*)
     then
         if [[ -x "scripts/updatebuild" ]]
         then
-            HASAPI=`git status --porcelain | grep "^M *api"`
-            HASAPP=`git status --porcelain | grep "^M *apps"`
+            HASAPI=`git status --porcelain | grep "^ *M  *api"`
+            HASAPP=`git status --porcelain | grep "^ *M  *apps"`
             # only update if we changed the code
             if [[ ! "x$HASAPI$HASAPP" = "x" ]]
             then
                 echo "updating build version before commit"
                 scripts/updatebuild
+            else
+                echo "no code changes detected"
             fi
         fi
     else

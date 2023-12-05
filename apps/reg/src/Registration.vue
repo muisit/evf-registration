@@ -21,16 +21,12 @@ watch(
             authStore.sendMe();
         }
         else {
-            authStore.isLoading = true;
-            dataStore.getBasicData().then(
-                () => {
-                    if (authStore.countryId && dataStore.countriesById['c' + authStore.countryId] && !authStore.canSwitchCountry()) {
-                        dataStore.setCountry(authStore.countryId);
-                    }
-                    dataStore.getEvents(props.event).then(() => { 
-                        authStore.isLoading = false;
-                    });
-                });
+            dataStore.getBasicData(() => {
+                if (authStore.countryId && dataStore.countriesById['c' + authStore.countryId] && !authStore.canSwitchCountry()) {
+                    dataStore.setCountry(authStore.countryId);
+                }
+                dataStore.getEvents(props.event);
+            });
         }
     },
     { immediate: true }
@@ -40,6 +36,8 @@ import DashboardView from './pages/DashboardView.vue';
 import LoadingService from './components/special/LoadingService.vue';
 </script>
 <template>
-    <DashboardView/>
-    <LoadingService/>
+    <div>
+        <LoadingService/>
+        <DashboardView/>
+    </div>
 </template>

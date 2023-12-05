@@ -14,8 +14,7 @@ watch (
     () => [props.visible, data.currentEvent.id, data.currentCountry.id],
     (nw, old) => {
         if (props.visible) {
-            auth.isLoading = true;
-            data.getOverview().then(() => { auth.isLoading = false; });
+            data.getOverview();
         }
     },
     { immediate: true }
