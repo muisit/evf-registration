@@ -3,10 +3,12 @@ import { ref } from 'vue';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
 import { is_valid } from '../../../common/functions';
+const props = defineProps<{
+    event:string;
+}>();
 
 const authStore = useAuthStore();
 const dataStore = useDataStore();
-const loginVisible = ref(waitAsGuest());
 
 function waitAsGuest()
 {
@@ -30,7 +32,6 @@ function getVersion()
 
 function onCloseLogin()
 {
-    loginVisible.value = waitAsGuest();
 }
 
 function onLogin(credentials:any)
@@ -39,19 +40,17 @@ function onLogin(credentials:any)
         .then((data) => {
             if (data.status == 'error') {
                 alert('There was an error with the supplied credentials. Please try again.');
-                loginVisible.value = true;
             }
             else {
                 if (authStore.isHod() && authStore.countryId && dataStore.countries.length) {
                     dataStore.setCountry(authStore.countryId);
                 }
                 // retrieve the list of events
-                dataStore.getEvents();
+                dataStore.getEvents(props.event);
             }
         })
         .catch((e) => {
-            alert('There was a network error. Please try again.' + e);
-            loginVisible.value = true;
+            alert('There was a network error. Please try again.');
         });
 }
 
@@ -88,7 +87,7 @@ import { Loading } from '@element-plus/icons-vue';
             </div>
             <div v-else-if="waitAsGuest()">
                 <h3 class="textcenter">Login</h3>
-                <LoginDialog @on-close="onCloseLogin" @on-save="onLogin" v-if="loginVisible"/>
+                <LoginDialog @on-close="onCloseLogin" @on-save="onLogin" v-if="waitAsGuest()"/>
                 <div v-else>
                     <p>Please wait while loading</p>
                     <ElIcon class="is-loading">

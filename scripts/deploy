@@ -192,7 +192,7 @@ echo -e "put $EXT.zip\r\nput provision\r\nquit" | sftp -i $DEPLOY_KEY -b - $DEPL
 ssh $DEPLOY_SERVER -i $DEPLOY_KEY "/bin/bash \$HOME/provision $EXT"
 
 VERSION=`curl -s https://api.veteransfencing.eu`
-if [[ "x$VERSION" = "x$APIVERSION" ]]
+if [[ "x$VERSION" = "x${APIVERSION}.${BUILDNR}" ]]
 then
     echo "Deployment and provisioning successful"
     rm -rf $EXT $EXT.zip $LOG
