@@ -19,12 +19,12 @@ function onTabChange(name:TabPaneName)
 
 function canRegister()
 {
-    return canOrganise() || auth.isRegistrar(data.currentEvent.id) || auth.isHod();
+    return canOrganise() || auth.isRegistrar(data.currentEvent.id) || (auth.isHod() && isOpenForRegistrationView(data.currentEvent));
 }
 
 function canCashier()
 {
-    return canOrganise() || auth.isCashier(data.currentEvent.id) || auth.isHod();
+    return canOrganise() || auth.isCashier(data.currentEvent.id) || (auth.isHod() && isOpenForRegistrationView(data.currentEvent));
 }
 
 function canAccredit()
@@ -42,6 +42,7 @@ import type { TabPaneName } from 'element-plus';
 import OverviewPage from '../pages/OverviewPage.vue';
 import RegistrationPage from '../pages/RegistrationPage.vue';
 import CashierPage from '../pages/CashierPage.vue';
+import { isOpenForRegistration, isOpenForRegistrationView } from '../../../common/lib/event';
 </script>
 <template>
     <ElTabs type="card" @tab-change="onTabChange" v-model="activeTab">

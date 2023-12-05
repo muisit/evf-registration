@@ -6,8 +6,9 @@ import type { Registration } from '../../../../common/api/schemas/registration';
 import type { Fencer } from '../../../../common/api/schemas/fencer';
 import { defaultRegistration } from '../../../../common/api/schemas/registration';
 import { useDataStore } from "../../stores/data";
+import { useAuthStore } from '../../../../common/stores/auth';
 import { format_date_fe_short, random_token, is_valid } from  '../../../../common/functions';
-import { allowMoreTeams } from '../../../../common/lib/event';
+import { allowMoreTeams, isOpenForRegistration } from '../../../../common/lib/event';
 
 const props = defineProps<{
     event:SideEvent;
@@ -15,7 +16,7 @@ const props = defineProps<{
     teams:string[];
 }>();
 const emits = defineEmits(['update']);
-
+const auth = useAuthStore();
 const data = useDataStore();
 
 const registration:Ref<Registration> = computed(() => {
@@ -33,6 +34,7 @@ const registration:Ref<Registration> = computed(() => {
 
 function inputDisabled()
 {
+    if (auth.isHod() && !isOpenForRegistration(data.currentEvent)) return true;
     if (['error', 'saving', 'removing'].includes(registration.value.state || '')) return true;
     return false;
 }
