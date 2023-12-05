@@ -10,9 +10,21 @@ co*)
     then
         if [[ -x "scripts/updatebuild" ]]
         then
-            echo "updating build version before commit"
-            scripts/updatebuild
+            HASAPI=`git status --porcelain | grep "^M *api"`
+            HASAPP=`git status --porcelain | grep "^M *apps"`
+            # only update if we changed the code
+            if [[ ! "x$HASAPI$HASAPP" = "x" ]]
+            then
+                echo "updating build version before commit"
+                scripts/updatebuild
+            fi
         fi
+    else
+        # automatically tag the build number using a lightweight tag
+        BUILDNR=`php -r '$version=json_decode(file_get_contents("build.json")); echo $version->build;'`
+        DATE=`date +'%Y%m%d%H%M%S'`
+        echo "Adding build tag b$BUILDNR-$DATE"
+        git tag "b$BUILDNR-$DATE"
     fi
     ;;
 esac
