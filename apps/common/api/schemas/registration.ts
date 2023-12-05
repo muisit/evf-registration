@@ -13,3 +13,19 @@ export interface Registration {
     // front-end data
     errors?: string[];
 }
+
+export function defaultRegistration():Registration
+{
+    return {
+        id: 0,
+        fencerId: null,
+        roleId: null,
+        sideEventId: null,
+        dateTime: null,
+        payment: null,
+        paid: null,
+        paidHod: null,
+        state: null,
+        team: null
+    };
+}

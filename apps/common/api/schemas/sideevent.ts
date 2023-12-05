@@ -19,7 +19,7 @@ export interface SideEvent {
     isTeamEvent?: boolean;
     isNonCompetitionEvent?: boolean;
     isRegistered?: boolean;
-    defaultRole?: string|null;
+    defaultRole?: number|null;
 }
 
 export function defaultSideEvent(): SideEvent

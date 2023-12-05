@@ -71,7 +71,6 @@ function teamNames()
 
 function updatePayment(e:string)
 {
-    console.log('updating payment', e);
     payments.value = e;
 }
 
