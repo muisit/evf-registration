@@ -4,6 +4,7 @@
 $app = $_SERVER["argv"][1] ?? "";
 $which = $_SERVER["argv"][2] ?? "";
 $versions = json_decode(file_get_contents('versions.json'));
+
 if (isset($versions->$app)) {
     if ($which == 'major') {
         $versions->$app->major += 1;
