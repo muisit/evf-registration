@@ -67,16 +67,13 @@ function update(selection:any)
                     });
                 }
             }
-            console.log('updating with team selection', selection);
             emits('update', selection || '');
         }
         else {
-            console.log('updating for single team Team 1');
             emits('update', selection ? 'Team 1' : null);
         }
     }
     else {
-        console.log('updating individual event');
         emits('update', selection ? true : null);
     }
 }

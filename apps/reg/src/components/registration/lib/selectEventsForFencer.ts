@@ -111,6 +111,5 @@ export function selectEventsForFencer(fencer:Fencer) {
             });
         }
     }
-    console.log('initial selection returns ', events.length,' events');
     return events;
 }

@@ -14,7 +14,6 @@ const data = useDataStore();
 
 function saveRegistration(event:SideEvent, state:any)
 {
-    console.log('saveRegistration: ', event.title, event.id, state);
     // state is null, the empty string, true/false or a team name
     if (state) {
         if (event.isAthleteEvent && event.isTeamEvent) {

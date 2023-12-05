@@ -264,7 +264,6 @@ export const useDataStore = defineStore('data', () => {
 
     function saveRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:number|null, teamName:string|null, payment:string|null)
     {
-        let debugData = [pFencer.id, sideEvent ? sideEvent.id : 'role', roleId ? roleId : 'sideEvent', teamName, payment];
         let registration = createOrFindRegistration(pFencer, sideEvent, roleId, teamName, payment);
         registration.state = 'saving';
         fencerData.value = updateRegistration(fencerData.value, registration);
@@ -280,9 +279,13 @@ export const useDataStore = defineStore('data', () => {
                         });
 
                         window.setTimeout(() => {
-                            // do not overwrite teamName or payment
-                            registration.state = '';
-                            fencerData.value = updateRegistration(fencerData.value, registration);
+                            // only adjust the state if it is still 'saved', or else we may be clicking quickly
+                            fencerData.value = updateRegistration(fencerData.value, registration, (old:Registration, nw: Registration) => {
+                                if (old.state == 'saved') {
+                                    old.state = '';
+                                }
+                                return old;
+                            });
                         }, 3000);
                     }
                     else {
@@ -329,7 +332,6 @@ export const useDataStore = defineStore('data', () => {
 
     function removeRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:number|null)
     {
-        let debugData = [pFencer.id, sideEvent ? sideEvent.id : 'role', roleId ? roleId : 'sideEvent'];
         let registration = findRegistrationForFencerEventAndRole(pFencer, sideEvent, roleId);
 
         if (registration !== null) {
@@ -343,7 +345,12 @@ export const useDataStore = defineStore('data', () => {
                         fencerData.value = updateRegistration(fencerData.value, registration);
                         window.setTimeout(() => {
                             if (registration) {
-                                fencerData.value = deleteRegistration(fencerData.value, registration);
+                                // if someone clicks quickly and re-adds the removed registration,
+                                // the findOrCreate returns the 'removed' entry. Only delete the
+                                // registration if it is still removed
+                                if (registration.state == 'removed') {
+                                    fencerData.value = deleteRegistration(fencerData.value, registration);
+                                }
                             }
                         }, 3000);
                     }

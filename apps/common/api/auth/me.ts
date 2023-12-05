@@ -10,7 +10,6 @@ export const me = function(retries:number = 0): Promise<MeSchema> {
                     return reject("No response data");
                 }
 
-                console.log('resolving me using token ', data, data.data.token);
                 return resolve({
                     token: data.data.token,
                     username: data.data.username,

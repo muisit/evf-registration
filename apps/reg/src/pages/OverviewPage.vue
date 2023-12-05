@@ -14,7 +14,6 @@ watch (
     () => [props.visible, data.currentEvent.id, data.currentCountry.id],
     (nw, old) => {
         if (props.visible) {
-            console.log('loading overview due to change', nw, old);
             auth.isLoading = true;
             data.getOverview().then(() => { auth.isLoading = false; });
         }

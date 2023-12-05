@@ -33,7 +33,6 @@ const selectionDialog = ref(false);
 
 function openSearchDialog()
 {
-    console.log('opening search dialog');
     searchDialog.value = true;
     selectedFencer.value = defaultFencer();
     isSearching.value = true;
@@ -41,7 +40,6 @@ function openSearchDialog()
 
 function closeSearchDialog()
 {
-    console.log('closing search dialog', fencerDialog.value);
     searchDialog.value = false;
     // if we opened the fencerDialog, assume we are still searching
     isSearching.value = fencerDialog.value;
@@ -49,14 +47,12 @@ function closeSearchDialog()
 
 function saveSearchDialog(el:Fencer) 
 {
-    console.log('saving search dialog for fencer ', el.lastName);
     selectedFencer.value = el;
     fencerDialog.value = true;
 }
 
 function closeFencerDialog()
 {
-    console.log('closing fencer dialog, ', selectionDialog.value);
     fencerDialog.value = false;
     // if we opened the selection dialog, we are still searching
     isSearching.value = selectionDialog.value;
@@ -64,24 +60,20 @@ function closeFencerDialog()
 
 function saveFencerDialog()
 {
-    console.log('saving fencer dialog');
     data.addFencer(selectedFencer.value);
     if (isSearching.value) {
-        console.log('is searching, so opening selection dialog');
         selectionDialog.value = true;
     }
 }
 
 function closeSelectionDialog()
 {
-    console.log('closing selection dialog');
     selectionDialog.value = false;
     isSearching.value = false;
 }
 
 function updateFencerDialog(fieldDef:any)
 {
-    console.log('update fencer data', fieldDef);
     switch (fieldDef.field) {
         case 'id':
             selectedFencer.value.id = fieldDef.value;
@@ -109,14 +101,12 @@ function updateFencerDialog(fieldDef:any)
 
 function editFencer(fencer:Fencer)
 {
-    console.log('opening fencer dialog after edit click');
     fencerDialog.value = true;
     selectedFencer.value = fencer;
 }
 
 function selectFencer(fencer:Fencer)
 {
-    console.log('opening selection dialog after select click');
     selectionDialog.value = true;
     selectedFencer.value = fencer;
 }
