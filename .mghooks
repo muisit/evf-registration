@@ -1,0 +1,20 @@
+#!/bin/bash
+
+CMD=$1
+PHASE=$2
+
+case $CMD in
+
+co*)
+    if [[ "x$PHASE" = "xpre" ]]
+    then
+        if [[ -x "scripts/updatebuild" ]]
+        then
+            echo "updating build version before commit"
+            scripts/updatebuild
+        fi
+    fi
+    ;;
+esac
+
+
