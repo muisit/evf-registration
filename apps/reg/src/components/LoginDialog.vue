@@ -47,7 +47,7 @@ import { ElDialog, ElForm, ElFormItem, ElInput, ElButton } from 'element-plus';
       </ElForm>
       <template #footer>
         <span class="dialog-footer">
-          <ElButton type="primary" @click="submitForm" :disabled="auth.isLoading">Log in</ElButton>
+          <ElButton type="primary" @click="submitForm" :disabled="auth.isCurrentlyLoading()">Log in</ElButton>
         </span>
       </template>
     </ElDialog>

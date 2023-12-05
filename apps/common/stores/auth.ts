@@ -13,7 +13,7 @@ export const useAuthStore = defineStore('auth', () => {
     const credentials:Ref<Array<string>> = ref([]);
     const countryId = ref(0);
     const eventId = ref(0);
-    const isLoadingData:string[] = ref([]);
+    const isLoadingData:Ref<string[]> = ref([]);
 
     function isLoading(section:string)
     {
