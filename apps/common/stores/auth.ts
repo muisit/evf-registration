@@ -13,10 +13,29 @@ export const useAuthStore = defineStore('auth', () => {
     const credentials:Ref<Array<string>> = ref([]);
     const countryId = ref(0);
     const eventId = ref(0);
-    const isLoading = ref(false);
+    const isLoadingData:string[] = ref([]);
+
+    function isLoading(section:string)
+    {
+        if (!isLoadingData.value.includes(section)) {
+            isLoadingData.value.push(section);
+        }
+    }
+
+    function hasLoaded(section:string)
+    {
+        isLoadingData.value = isLoadingData.value.filter((s) => s != section);
+    }
+
+    function isCurrentlyLoading()
+    {
+        return isLoadingData.value.length > 0;
+    }
 
     function sendMe() {
+        isLoading('me');
         me().then((data:MeSchema) => {
+            hasLoaded('me');
             token.value = data.token || '';
             if (data.status && data.username && data.username.length) {
                 isGuest.value = false;
@@ -28,20 +47,25 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     function logIn(username:string, password: string) {
+        isLoading('login');
         return login(username, password)
             .finally(() => {
+                hasLoaded('login');
                 sendMe();
             });
     }
 
     function logOut() {
+        isLoading('logout');
         return logout()
             .then(() => {
+                hasLoaded('logout');
                 isGuest.value = true;
                 userName.value = '';
                 sendMe();
             })
             .catch(() => {
+                hasLoaded('logout');
                 sendMe();
             });
     }
@@ -102,7 +126,8 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     return {
-        userName, isGuest, token, credentials, countryId, eventId, isLoading,
+        userName, isGuest, token, credentials, countryId, eventId,
+        isLoading, hasLoaded, isCurrentlyLoading, isLoadingData,
         sendMe, logIn, logOut,
         isSysop, isHod, isSuperHod, isHodFor, isOrganisation, isOrganiser, isRegistrar, isCashier, isAccreditor,
         canRegister, canCashier, canSwitchCountry

@@ -63,15 +63,20 @@ export const useDataStore = defineStore('data', () => {
         return categories.value.length > 0;
     }
 
-    function getBasicData() {
+    function getBasicData(callback:Function) {
         if (!hasBasicData()) {
+            const authStore = useAuthStore();
+            authStore.isLoading('basic');
             return basicData()
                 .then((data) => {
+                    authStore.hasLoaded('basic');
                     fillData(data);
+                    callback();
                 })
                 .catch((e) => {
+                    authStore.hasLoaded('basic');
                     console.log(e);
-                    setTimeout(() => { getBasicData(); }, 500);
+                    setTimeout(() => { getBasicData(callback); }, 500);
                 });
         }
         else {
@@ -129,8 +134,11 @@ export const useDataStore = defineStore('data', () => {
     }
 
     function getEvents(eventid?:string) {
+        const authStore = useAuthStore();
+        authStore.isLoading('events');
         return eventlist()
             .then((data) => {
+                authStore.hasLoaded('events');
                 events.value = data;
                 if (events.value && events.value.length > 0) {
                     let eid = parseInt(eventid || '0');
@@ -140,7 +148,10 @@ export const useDataStore = defineStore('data', () => {
                     }
                     setEvent(eid);
                 }
-            });
+            })
+            .catch((e) => {
+                authStore.hasLoaded('events');
+            })
     }
 
     function setEvent(eventId:number) {
@@ -211,17 +222,22 @@ export const useDataStore = defineStore('data', () => {
             return new Promise(() => []);
         }
 
+        const authStore = useAuthStore();
+        authStore.isLoading('overview');
         return overview(currentEvent.value.id || 0)
             .then((data:OverviewLine[]) => {
+                authStore.hasLoaded('overview');
                 overviewData.value = data;
                 overviewPerCountry.value = overviewToCountry(data);
                 return data;
             }, (e) => {
+                authStore.hasLoaded('overview');
                 console.log(e);
                 alert("There was an error retrieving the general overview. Please reload the page. If this problem persists, please contact the webmaster");
                 return [];
             })
             .catch((e) => {
+                authStore.hasLoaded('overview');
                 console.log(e);
                 alert("There was an error retrieving the general overview. Please reload the page. If this problem persists, please contact the webmaster");
                 return [];
@@ -244,14 +260,19 @@ export const useDataStore = defineStore('data', () => {
     }
 
     function getRegistrations() {
+        const authStore = useAuthStore();
+        authStore.isLoading('registrations');
         return registrations()
             .then((data) => {
+                authStore.hasLoaded('registrations');
                 registrationToFencers(data);
             }, (e) => {
+                authStore.hasLoaded('registrations');
                 console.log(e);
                 alert("There was an error retrieving the registration data. Please reload the page. If this problem persists, please contact the webmaster");
             })
             .catch((e) => {
+                authStore.hasLoaded('registrations');
                 console.log(e);
                 alert("There was an error retrieving the registration data. Please reload the page. If this problem persists, please contact the webmaster");
             });
@@ -264,7 +285,6 @@ export const useDataStore = defineStore('data', () => {
 
     function saveRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:number|null, teamName:string|null, payment:string|null)
     {
-        let debugData = [pFencer.id, sideEvent ? sideEvent.id : 'role', roleId ? roleId : 'sideEvent', teamName, payment];
         let registration = createOrFindRegistration(pFencer, sideEvent, roleId, teamName, payment);
         registration.state = 'saving';
         fencerData.value = updateRegistration(fencerData.value, registration);
@@ -274,15 +294,19 @@ export const useDataStore = defineStore('data', () => {
                     if (data && is_valid(data.id)) {
                         registration.state = 'saved';
                         // use a callback to update the back-end id
-                        fencerData.value = updateRegistration(fencerData.value, registration, (old, nw) => {
+                        fencerData.value = updateRegistration(fencerData.value, registration, (old:Registration, nw:Registration) => {
                             nw.id = data.id;
                             return nw;
                         });
 
                         window.setTimeout(() => {
-                            // do not overwrite teamName or payment
-                            registration.state = '';
-                            fencerData.value = updateRegistration(fencerData.value, registration);
+                            // only adjust the state if it is still 'saved', or else we may be clicking quickly
+                            fencerData.value = updateRegistration(fencerData.value, registration, (old:Registration, nw: Registration) => {
+                                if (old.state == 'saved') {
+                                    old.state = '';
+                                }
+                                return old;
+                            });
                         }, 3000);
                     }
                     else {
@@ -329,7 +353,6 @@ export const useDataStore = defineStore('data', () => {
 
     function removeRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:number|null)
     {
-        let debugData = [pFencer.id, sideEvent ? sideEvent.id : 'role', roleId ? roleId : 'sideEvent'];
         let registration = findRegistrationForFencerEventAndRole(pFencer, sideEvent, roleId);
 
         if (registration !== null) {
@@ -343,7 +366,12 @@ export const useDataStore = defineStore('data', () => {
                         fencerData.value = updateRegistration(fencerData.value, registration);
                         window.setTimeout(() => {
                             if (registration) {
-                                fencerData.value = deleteRegistration(fencerData.value, registration);
+                                // if someone clicks quickly and re-adds the removed registration,
+                                // the findOrCreate returns the 'removed' entry. Only delete the
+                                // registration if it is still removed
+                                if (registration.state == 'removed') {
+                                    fencerData.value = deleteRegistration(fencerData.value, registration);
+                                }
                             }
                         }, 3000);
                     }

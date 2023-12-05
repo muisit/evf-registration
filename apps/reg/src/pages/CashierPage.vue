@@ -18,8 +18,7 @@ watch(
     () => [props.visible, data.currentEvent, data.currentCountry],
     () => {
         if (props.visible) {
-            auth.isLoading = true;
-            data.getRegistrations().then(() => { auth.isLoading = false });
+            data.getRegistrations();
         }
     },
     { immediate: true }

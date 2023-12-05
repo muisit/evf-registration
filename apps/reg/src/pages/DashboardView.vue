@@ -10,12 +10,17 @@ const loginVisible = ref(waitAsGuest());
 
 function waitAsGuest()
 {
-    return !authStore || authStore.isGuest;
+    return authStore && authStore.isGuest && !authStore.isCurrentlyLoading();
+}
+
+function nothingAvailable()
+{
+    return !authStore || (authStore.isGuest && authStore.isCurrentlyLoading());
 }
 
 function noEventsAvailable()
 {
-    return authStore && !authStore.isGuest && dataStore && dataStore.events.length < 1;
+    return authStore && !authStore.isGuest && dataStore && dataStore.events.length < 1 && !authStore.isCurrentlyLoading();
 }
 
 function getVersion()
@@ -64,18 +69,15 @@ import { Loading } from '@element-plus/icons-vue';
             <HeaderBar />
         </ElHeader>
         <ElMain>
-            <div v-if="waitAsGuest()">
-                <h3 class="textcenter">Login</h3>
-                <LoginDialog @on-close="onCloseLogin" @on-save="onLogin" v-if="loginVisible"/>
-                <div v-if="!loginVisible">
-                    <p>Please wait while loading</p>
-                    <ElIcon class="is-loading">
-                        <Loading />
-                    </ElIcon>
+            <div class="main-header">
+                <div class="event-title" v-if="is_valid(dataStore.currentEvent.id)">Registration for: {{ dataStore.currentEvent.name }}</div>
+                <div class="event-selection">
+                    <EventSelection />
                 </div>
+                <div class="version">{{ getVersion() }}</div>
             </div>
-            <div v-else-if="noEventsAvailable() && authStore.isLoading">
-                <p>Please wait while loading data</p>
+
+            <div v-if="nothingAvailable()" class="full">
             </div>
             <div v-else-if="noEventsAvailable()">
                 <h3 class="textcenter">No events found</h3>
@@ -84,15 +86,17 @@ import { Loading } from '@element-plus/icons-vue';
                     to be an error.
                 </p>
             </div>
-            <div v-else class="full">
-                <div class="main-header">
-                    <div class="event-title" v-if="is_valid(dataStore.currentEvent.id)">Registration for: {{ dataStore.currentEvent.name }}</div>
-                    <div class="event-title" v-else>Please wait while loading</div>
-                    <div class="event-selection">
-                        <EventSelection />
-                    </div>
-                    <div class="version">{{ getVersion() }}</div>
+            <div v-else-if="waitAsGuest()">
+                <h3 class="textcenter">Login</h3>
+                <LoginDialog @on-close="onCloseLogin" @on-save="onLogin" v-if="loginVisible"/>
+                <div v-else>
+                    <p>Please wait while loading</p>
+                    <ElIcon class="is-loading">
+                        <Loading />
+                    </ElIcon>
                 </div>
+            </div>
+            <div v-else class="full">
                 <TabInterface />
             </div>
         </ElMain>

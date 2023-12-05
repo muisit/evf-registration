@@ -59,5 +59,4 @@ import CashierPage from '../pages/CashierPage.vue';
         <ElTabPane v-if="auth.isSysop()" label="Templates" name="templates">Pane 6</ElTabPane>
         <ElTabPane label="Logout" name="logout"></ElTabPane>
     </ElTabs>
-    
 </template>
