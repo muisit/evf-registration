@@ -8,23 +8,29 @@ class PhotoAssessService
         $type = strtolower($type);
         \Log::debug("converting file $filename of type $type");
         $image = null;
-        switch ($type) {
-            case 'image/jpg':
-            case 'image/jpeg':
-                $image = self::rotateImage(imagecreatefromjpeg($filename), $filename);
-                break;
-            case 'image/png':
-                $image = imagecreatefrompng($filename);
-                break;
-            case 'image/gif':
-                $image = imagecreatefromgif($filename);
-                break;
-            default:
-                \Log::error("Unable to transform uploaded image $filename/$type");
-                return null;
-        }
+        try {
+            switch ($type) {
+                case 'image/jpg':
+                case 'image/jpeg':
+                    $image = self::rotateImage(imagecreatefromjpeg($filename), $filename);
+                    break;
+                case 'image/png':
+                    $image = imagecreatefrompng($filename);
+                    break;
+                case 'image/gif':
+                    $image = imagecreatefromgif($filename);
+                    break;
+                default:
+                    \Log::error("Unable to transform uploaded image $filename/$type");
+                    return null;
+            }
 
-        return self::doConvert($image, $filename);
+            return self::doConvert($image, $filename);
+        }
+        catch (\Exception $e) {
+            \Log::error("caught exception while converting image: " . $e->getMessage());
+        }
+        return null;
     }
 
     private static function doConvert($image, $filename)
