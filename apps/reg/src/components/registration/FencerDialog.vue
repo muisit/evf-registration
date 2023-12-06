@@ -68,11 +68,9 @@ function submitForm()
 
 function saveFencerData()
 {
-    console.log('saving fencer data');
     return savefencer(props.fencer)
         .then((fencer:Fencer|null) => {
             if(fencer) {
-                console.log('fencer returned, setting return data');
                 // update fields to account for back-office field validation changes
                 update('lastName', fencer.lastName);
                 update('firstName', fencer.firstName);

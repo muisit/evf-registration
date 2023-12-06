@@ -52,3 +52,5 @@ RUN echo 'memory_limit = 512M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.
 RUN echo 'upload_max_filesize = 128M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini;
 RUN echo 'post_max_size = 128M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini;
 
+RUN docker-php-ext-install exif
+

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Fencer;
 use App\Models\Schemas\ReturnStatus;
+use App\Support\Services\PhotoAssessService;
 
 class PhotoSave extends Controller
 {
@@ -46,12 +47,21 @@ class PhotoSave extends Controller
 
         if ($request->hasFile('picture')) {
             $imageLocation = $fencer->image();
+            $mimeType = $request->file('picture')->getMimeType();
             $request->file('picture')->move(dirname($imageLocation), basename($imageLocation));
 
-            $fencer->fencer_picture = 'Y';
-            $fencer->save();
-
-            return response()->json(new ReturnStatus('ok'));
+            $filename = PhotoAssessService::convert($imageLocation, $mimeType);
+            if (!empty($filename)) {
+                $fencer->fencer_picture = 'Y';
+                $fencer->save();
+                return response()->json(new ReturnStatus('ok'));
+            }
+            else {
+                if (file_exists($imageLocation)) {
+                    @unlink($imageLocation);
+                }
+                return response()->json(new ReturnStatus('error', 'corrupt image detected'));
+            }
         }
         return response()->json(new ReturnStatus('error', 'missing image data'));
     }

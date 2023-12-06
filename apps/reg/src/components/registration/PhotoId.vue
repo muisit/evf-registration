@@ -24,7 +24,7 @@ function canApprove()
 
 function getPhotoUrl()
 {
-    return import.meta.env.VITE_API_URL + '/fencers/' + props.fencer.id + '/photo?hash=' + props.reloadHash;
+    return import.meta.env.VITE_API_URL + '/fencers/' + props.fencer.id + '/photo?event=' + data.currentEvent.id + '&hash=' + props.reloadHash;
 }
 
 function approveStates()
