@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 
@@ -22,7 +21,7 @@ class Accreditation extends Model
             $dt = new Accreditation();
             $dt->fencer_id = $fencer->getKey();
             $dt->event_id = $event->getKey();
-            $dt->data = json_encode(array());
+            $dt->data = json_encode([]);
 
             $tmpl = AccreditationTemplate::where('event_id', $event->getKey())->first();
             if (!empty($tmpl)) {

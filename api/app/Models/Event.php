@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Carbon\Carbon;
 use App\Support\Services\OverviewService;
+use App\Support\Services\AccreditationOverviewService;
 
 class Event extends Model
 {
@@ -43,6 +44,11 @@ class Event extends Model
     public function overview(): array
     {
         return (new OverviewService($this))->create();
+    }
+
+    public function accreditationOverview(): array
+    {
+        return (new AccreditationOverviewService($this))->create();
     }
 
     public function registrationHasStarted()

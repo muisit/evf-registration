@@ -78,7 +78,7 @@ class RegistrationTest extends TestCase
         $organiser = WPUser::where("ID", UserData::TESTUSERORGANISER)->first();
         $registrar = WPUser::where("ID", UserData::TESTUSERREGISTRAR)->first();
 
-        // a superhod or hod cam see all registrations (only for a specific country)
+        // a superhod or hod can see all registrations (only for a specific country)
         $this->assertTrue($policy->viewAny($superhod));
         $this->assertTrue($policy->viewAny($gerhod));
 

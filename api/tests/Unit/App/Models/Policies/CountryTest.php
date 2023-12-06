@@ -123,4 +123,40 @@ class CountryTest extends TestCase
         $this->assertTrue($policy->view($gerhod, $countryGER));
         $this->assertFalse($policy->view($gerhod, $countryITA));
     }
+
+    public function testHod()
+    {
+        request()->merge([
+            'eventObject' => null,
+            'countryObject' => Country::where('country_id', Country::GER)->first()
+        ]);
+
+        $countryGER = Country::where("country_id", Country::GER)->first();
+        $countryITA = Country::where("country_id", Country::ITA)->first();
+
+        $policy = new Policy();
+        $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
+        $gerhod = WPUser::where("ID", UserData::TESTUSERHOD)->first();
+        $unpriv = WPUser::where("ID", UserData::TESTUSER5)->first();
+        $cashier = WPUser::where("ID", UserData::TESTUSER3)->first();
+        $accred = WPUser::where("ID", UserData::TESTUSER4)->first();
+        $organiser = WPUser::where("ID", UserData::TESTUSERORGANISER)->first();
+        $registrar = WPUser::where("ID", UserData::TESTUSERREGISTRAR)->first();
+
+        // organiser and registrar are no longer recognised as organisers
+        $this->assertFalse($policy->hod($cashier, $countryGER));
+        $this->assertFalse($policy->hod($accred, $countryITA));
+        $this->assertFalse($policy->hod($organiser, $countryGER));
+        $this->assertFalse($policy->hod($registrar, $countryITA));
+
+        $this->assertTrue($policy->hod($gerhod, $countryGER));
+        $this->assertFalse($policy->hod($gerhod, $countryITA));
+
+        // super hod is hod for everyone
+        $this->assertTrue($policy->hod($superhod, $countryGER));
+        $this->assertTrue($policy->hod($superhod, $countryITA));
+
+        $this->assertFalse($policy->hod($unpriv, $countryITA));
+    }
+
 }

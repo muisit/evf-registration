@@ -34,8 +34,7 @@ class Overview extends Controller
 
         $retval = [];
         if ($request->user()->can("view", $event)) {
-            $isOrganiser = $request->user()->hasRole(['sysop','organisation:' . $event->getKey(), 'superhod']);
-            $lines = $event->overview($isOrganiser);
+            $lines = $event->overview();
             foreach ($lines as $key => $line) {
                 $retval[] = new OverviewSchema($key, $line);
             }

@@ -41,4 +41,17 @@ class Country
         // all other people cannot see country related data
         return false;
     }
+
+    public function hod(EVFUser $user, Model $model)
+    {
+        // super-heads-of-delegation are always HoD
+        if ($user->hasRole('superhod')) {
+            return true;
+        }
+
+        if ($user->hasRole(['hod:' . $model->getKey()])) {
+            return true;
+        }
+        return false;
+    }
 }

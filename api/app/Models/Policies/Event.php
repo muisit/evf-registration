@@ -60,4 +60,34 @@ class Event
         // all other people cannot view it
         return false;
     }
+
+    // can perform accreditation functions for this event
+    public function accredit(EVFUser $user, Model $model): bool | null
+    {
+        // see if we have a global request object for the event
+        if ($user->hasRole(['organiser:' . $model->getKey(), 'accreditation:' . $model->getKey()])) {
+            return true;
+        }
+        return false;
+    }
+
+    // can perform cashier functions for this event
+    public function cashier(EVFUser $user, Model $model): bool | null
+    {
+        // see if we have a global request object for the event
+        if ($user->hasRole(['organiser:' . $model->getKey(), 'cashier:' . $model->getKey()])) {
+            return true;
+        }
+        return false;
+    }
+
+    // can perform register functions for this event
+    public function register(EVFUser $user, Model $model): bool | null
+    {
+        // see if we have a global request object for the event
+        if ($user->hasRole(['organiser:' . $model->getKey(), 'registrar:' . $model->getKey()])) {
+            return true;
+        }
+        return false;
+    }
 }
