@@ -23,7 +23,7 @@ class OverviewTest extends TestCase
         $output = $this->response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
-        $this->assertCount(7, $output);
+        $this->assertCount(6, $output);
 
         // test user 2 is sysop
         $this->session(['wpuser' => UserData::TESTUSER2])

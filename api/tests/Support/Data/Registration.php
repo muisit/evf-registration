@@ -64,7 +64,7 @@ class Registration extends Fixture
             'registration_payment' => 'I',
             'registration_state' => 'A',
             'registration_team' => null,
-            'registration_country' => Country::GER
+            'registration_country' => Country::ITA
         ])->save();
 
         Model::create([
@@ -94,7 +94,7 @@ class Registration extends Fixture
             'registration_payment' => 'I',
             'registration_state' => 'A',
             'registration_team' => 'team1',
-            'registration_country' => Country::ITA
+            'registration_country' => Country::GER
         ])->save();
 
         Model::create([
@@ -109,7 +109,7 @@ class Registration extends Fixture
             'registration_payment' => 'I',
             'registration_state' => 'A',
             'registration_team' => 'team1',
-            'registration_country' => Country::ITA
+            'registration_country' => Country::GER
         ])->save();
 
         Model::create([
@@ -124,7 +124,7 @@ class Registration extends Fixture
             'registration_payment' => 'I',
             'registration_state' => 'A',
             'registration_team' => 'team1',
-            'registration_country' => Country::ITA
+            'registration_country' => Country::GER
         ])->save();
 
         Model::create([
@@ -154,7 +154,7 @@ class Registration extends Fixture
             'registration_payment' => 'I',
             'registration_state' => 'A',
             'registration_team' => null,
-            'registration_country' => Country::FRA
+            'registration_country' => Country::GER
         ])->save();
 
         Model::create([
@@ -169,7 +169,7 @@ class Registration extends Fixture
             'registration_payment' => 'I',
             'registration_state' => 'A',
             'registration_team' => null,
-            'registration_country' => Country::FRA
+            'registration_country' => null
         ])->save();
     
         Model::create([
@@ -184,7 +184,7 @@ class Registration extends Fixture
             'registration_payment' => 'I',
             'registration_state' => 'A',
             'registration_team' => null,
-            'registration_country' => Country::FRA
+            'registration_country' => Country::NED
         ])->save();
 
         Model::create([
@@ -199,7 +199,7 @@ class Registration extends Fixture
             'registration_payment' => 'I',
             'registration_state' => 'A',
             'registration_team' => null,
-            'registration_country' => Country::NED
+            'registration_country' => Country::FRA
         ])->save();
 
         Model::create([
@@ -214,7 +214,7 @@ class Registration extends Fixture
             'registration_payment' => 'I',
             'registration_state' => 'A',
             'registration_team' => null,
-            'registration_country' => Country::NED
+            'registration_country' => null
         ])->save();
 
         Model::create([
@@ -229,7 +229,7 @@ class Registration extends Fixture
             'registration_payment' => 'I',
             'registration_state' => 'A',
             'registration_team' => null,
-            'registration_country' => Country::OTH
+            'registration_country' => Country::GER
         ])->save();
 
         Model::create([
@@ -244,7 +244,7 @@ class Registration extends Fixture
             'registration_payment' => 'I',
             'registration_state' => 'A',
             'registration_team' => null,
-            'registration_country' => Country::OTH
+            'registration_country' => Country::GER
         ])->save();
 
         Model::create([

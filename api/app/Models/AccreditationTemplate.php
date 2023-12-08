@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class AccreditationTemplate extends Model
 {
@@ -26,4 +27,10 @@ class AccreditationTemplate extends Model
         }
         return [];
     }
+
+    /*
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'TD_Role_Template', 'template_id', 'role_id');
+    }*/
 }

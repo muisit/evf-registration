@@ -1,0 +1,64 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use App\Models\AccreditationTemplate;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        // Create table for associating templates and roles
+        Schema::create('TD_Role_Template', function (Blueprint $table) {
+            $table->integer('role_id')->nullable();
+            $table->foreign('role_id')->references('role_id')->on('TD_Role');
+
+            $table->integer('template_id');
+            $table->foreign('template_id')->references('id')->on('TD_Accreditation_Template');
+
+            $table->primary(['role_id', 'template_id']);
+        });
+
+        $templates = AccreditationTemplate::get();
+        foreach ($templates as $template) {
+            \Log::debug("config is $template->content");
+            $config = json_decode($template->content);
+            if (!empty($config)) {
+                $roles = collect($config->roles)->filter(fn ($id) => $id > 0);
+                $template->roles()->sync($roles);
+                if (in_array(0, $config->roles)) {
+                    $template->roles()->attach(null);
+                }
+            }
+        }
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        /*
+        $templates = AccreditationTemplate::get();
+        foreach ($templates as $template) {
+            $config = json_decode($template->content);
+            if ($config === false) {
+                $config = [];
+            }
+            $roles = $template->roles()->get()->pluck('id');
+            $config->roles = $roles;
+            $template->content = json_encode($config);
+            $template->save();
+        }*/
+
+        Schema::table('TD_Role_Template', function (Blueprint $table) {
+            $table->dropForeign(['role_id']);
+            $table->dropForeign(['template_id']);
+        });
+        Schema::dropIfExists('TD_Role_Template');
+    }
+};

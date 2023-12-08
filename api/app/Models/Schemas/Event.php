@@ -111,7 +111,6 @@ class Event
     /**
      * Bank and financial information on this event
      *
-     * @var string
      * @OA\Property()
      */
     public ?Bank $bank = null;

@@ -14,5 +14,14 @@ $router->group(
                 'uses' => 'Accreditations\Badge@index'
             ]
         );
+
+        $router->get(
+            '/overview',
+            [
+                'as' => 'acrreditations.overview',
+                'uses' => 'Accreditations\Overview@index'
+            ]
+        );
+   
     }
 );

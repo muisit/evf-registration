@@ -31,9 +31,8 @@ class AccreditationsTest extends TestCase
         $output = $this->response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
-        $this->assertCount(2, $output);
+        $this->assertCount(1, $output);
         $this->assertEquals(AccreditationData::MFCAT1, $output[0]['id']);
-        $this->assertEquals(AccreditationData::HOD, $output[1]['id']);
 
         // test user 4 is organisation
         $this->session(['wpuser' => UserData::TESTUSER4])

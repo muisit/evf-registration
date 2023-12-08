@@ -29,7 +29,7 @@ class Overview extends Controller
     {
         $event = Event::where('event_id', $event)->first();
         if (empty($event) || !$event->exists || get_class($event) != Event::class) {
-            $this->authorize("not/ever");
+            abort(404);
         }
 
         $retval = [];
