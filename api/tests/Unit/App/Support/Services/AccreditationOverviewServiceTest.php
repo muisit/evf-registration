@@ -2,10 +2,12 @@
 
 namespace Tests\Unit\App\Support;
 
+use App\Models\Accreditation;
 use App\Models\AccreditationTemplate;
 use App\Models\Event;
 use App\Models\EventRole;
 use App\Models\Country;
+use App\Models\Registration;
 use App\Models\Role;
 use App\Models\RoleType;
 use App\Support\Services\AccreditationOverviewService;
@@ -188,6 +190,32 @@ class AccreditationOverviewServiceTest extends TestCase
         // template 3 also includes the template 2 registration of MCAT5
         $this->assertEquals(
             '[["T",2,[5,2,0,2],[]],["T",3,[3,1,0,1],[]]]',
+            json_encode($service->createOverviewForTemplates())
+        );
+    }
+
+    public function testCreateForEmpty()
+    {
+        // This is a test to see if there are issues when a new event is created,
+        // where no registrations and accreditations (or templates) are available
+        // This makes sure expected roles like Athlete have a relevant default
+        // and do not throw an error
+        Registration::where('registration_id', '>', 0)->delete();
+        Accreditation::where('id', '>', 0)->delete();
+        $event = Event::find(EventData::EVENT1);
+        $this->assertNotEmpty($event);
+        $service = new AccreditationOverviewService($event);
+        $output = $service->create();
+        $this->assertEquals(
+            '[["T",2,[0,0,0,0],[]],["T",3,[0,0,0,0],[]]]',
+            json_encode($service->createOverviewForTemplates())
+        );
+
+        AccreditationTemplate::where('id', '>', 0)->delete();
+        $service = new AccreditationOverviewService($event);
+        $output = $service->create();
+        $this->assertEquals(
+            '[]',
             json_encode($service->createOverviewForTemplates())
         );
     }
