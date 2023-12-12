@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 import type { Ref } from 'vue';
-import { AccreditationOverviewLine } from '../../../../common/api/schemas/accreditation';
+import type { CountPerCountry, CountPerEvent, CountPerRole, CountPerTemplate } from '../../stores/lib/accreditationtypes';
 import { useAccreditationsStore } from '../../stores/accreditations';
-import { CountPerCountry, CountPerEvent, CountPerRole, CountPerTemplate } from '../../stores/lib/accreditationtypes';
 
 const accreditations = useAccreditationsStore();
 
@@ -140,13 +139,13 @@ import OverviewLine from './OverviewLine.vue';
                 <tbody>
                     <OverviewLine
                         v-for="line in sortedRoles"
-                        :name="line.role.name"
+                        :name="line.role.name || ''"
                         :a="line.accreditations || 0"
                         :r="line.registrations || 0"
                         :d="line.dirty || 0"
                         :g="line.generated || 0"
                         :docs="line.documents"
-                        :key="line.role.id"/>
+                        :key="line.role.id || 0"/>
                 </tbody>
             </table>
         </div>
