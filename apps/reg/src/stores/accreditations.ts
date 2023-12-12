@@ -5,6 +5,7 @@ import { defineStore } from 'pinia'
 import { overview } from '../../../common/api/accreditations/overview';
 import type { BadgeOverview } from './lib/accreditationtypes';
 import { parseAccreditationOverview } from './lib/parseAccreditationOverview';
+import { regenerate as regenerateAPI } from '../../../common/api/accreditations/regenerate';
 
 export const useAccreditationsStore = defineStore('accreditations', () => {
     const accreditationData:Ref<BadgeOverview> = ref({countries:[], events:[], roles:[], templates:[]});
@@ -23,8 +24,14 @@ export const useAccreditationsStore = defineStore('accreditations', () => {
         });
     }
 
+    function regenerate()
+    {
+        return regenerateAPI();
+    }
+
     return {
         accreditationData,
-        getAccreditationData
+        getAccreditationData,
+        regenerate
     }
 });

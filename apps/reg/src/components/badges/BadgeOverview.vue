@@ -54,8 +54,20 @@ const sortedTemplates:Ref<Array<CountPerTemplate>> = computed(() => {
     });
 });
 
+function regenerate()
+{
+    accreditations.regenerate().then(() => {
+        alert('All accreditation badges are being regenerated, please wait for the process to finish');
+        accreditations.getAccreditationData();
+    })
+    .catch((e) => {
+        console.log(e);
+        alert('There was an error pushing the job to the queue. Please try again or reload the page.');
+    });
+}
 
 import OverviewLine from './OverviewLine.vue';
+import { ElButton } from 'element-plus';
 </script>
 <template>
     <div class="badge-list">
@@ -178,5 +190,8 @@ import OverviewLine from './OverviewLine.vue';
             </table>
         </div>
 
+        <div class="badge-footer">
+            <ElButton @click="regenerate">Regenerate</ElButton>
+        </div>
     </div>
 </template>

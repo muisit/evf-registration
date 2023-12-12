@@ -23,5 +23,12 @@ $router->group(
             ]
         );
    
+        $router->get(
+            '/regenerate',
+            [
+                'as' => 'acrreditations.regenerate',
+                'uses' => 'Accreditations\Regenerate@index'
+            ]
+        );
     }
 );
