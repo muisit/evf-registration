@@ -161,6 +161,17 @@ class Event
      */
     public ?array $competitions = null;
 
+    /**
+     * Related templates
+     * 
+     * @var AccreditationTemplate[]
+     * @OA\Property(
+     *   type="array",
+     *   @OA\Items(type="AccreditationTemplate")
+     * )
+     */
+    public ?array $templates = null;
+
     public function __construct(?BaseModel $event = null)
     {
         if (!empty($event)) {
@@ -194,6 +205,11 @@ class Event
             $this->competitions = [];
             foreach ($event->competitions as $competition) {
                 $this->competitions[] = new Competition($competition);
+            }
+
+            $this->templates = [];
+            foreach ($event->templates as $template) {
+                $this->templates[] = new AccreditationTemplate($template);
             }
         }
     }

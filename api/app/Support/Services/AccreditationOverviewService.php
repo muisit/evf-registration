@@ -116,7 +116,7 @@ class AccreditationOverviewService
         return Document::findByName($name)->get();
     }
 
-    private function decorateResults($type, $namePart, $results)
+    private function decorateResults($type, $namePart, $results, $removeEmptyLines = true)
     {
         // parse the results into a list of AccreditationOverview lines
         $retval = [];
@@ -131,7 +131,7 @@ class AccreditationOverviewService
             });
 
             // filter out empty lines
-            if (count($documents) > 0 || $total > 0) {
+            if (!$removeEmptyLines || count($documents) > 0 || $total > 0) {
                 $retval[] = array(
                     $type,
                     $obj->id,
@@ -148,7 +148,10 @@ class AccreditationOverviewService
         // for side-events, we only display the athletes and participants
         // we do that by selecting on the accreditation templates
         $k1 = "r0"; // athlete role
-        $acceptableTemplates = $this->templatesByRole[$k1];
+        $acceptableTemplates = [-1];
+        if (isset($this->templatesByRole[$k1])) {
+            $acceptableTemplates = $this->templatesByRole[$k1];
+        }
         $acceptableRoles = [0];
 
         $st = SideEvent::tableName();
@@ -221,7 +224,7 @@ class AccreditationOverviewService
         // we do that by selecting on the accreditation templates
         $k1 = "r0"; // athlete role
         $k2 = "r" . RoleType::COUNTRY; // federative role
-        $acceptableTemplates = array_merge($this->templatesByRole[$k1], $this->templatesByRole[$k2]);
+        $acceptableTemplates = array_merge($this->templatesByRole[$k1] ?? [], $this->templatesByRole[$k2] ?? []);
         if (empty($acceptableTemplates)) {
             $acceptableTemplates = [-1];
         }
@@ -380,6 +383,9 @@ class AccreditationOverviewService
             ->leftJoinSub($cleanClause, 'g', function (JoinClause $join) use ($rt) {
                 $join->on($rt . '.registration_role', '=', 'g.registration_role');
             })
+            ->where($rt . '.registration_mainevent', $this->event->getKey()) // only look at registrations from this event
+            ->where($rt . '.registration_role', '>', 0) // no athlete roles
+            ->groupBy($rt . '.registration_role') // squash all to a distinct list of roles
             ->get();
 
         return $this->decorateResults('R', 'Role', $results);
@@ -451,6 +457,7 @@ class AccreditationOverviewService
             ->where($tt . '.event_id', $this->event->getKey())
             ->whereIn($tt . '.id', $acceptableTemplates)
             ->get();
-        return $this->decorateResults('T', 'Template', $results);
+        \Log::debug("template results are " . json_encode($results->toArray()));
+        return $this->decorateResults('T', 'Template', $results, false);
     }
 }

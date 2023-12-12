@@ -7,6 +7,15 @@
     height: 100vh;
     padding: 0px;
 
+    h2 {
+        font-size: x-large;
+        color: var(--el-color-primary);
+    }
+    h3 {
+        font-size: large;
+        color: var(--el-color-primary);
+    }
+
     .el-container {
         .el-header {
             width: 100%;
@@ -192,6 +201,7 @@
 @import 'pages/overview.scss';
 @import 'pages/registration.scss';
 @import 'pages/cashier.scss';
+@import 'pages/badges.scss';
 
 
 #app {
