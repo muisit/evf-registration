@@ -12,7 +12,6 @@ export const useAccreditationsStore = defineStore('accreditations', () => {
 
     function getAccreditationData()
     {
-        accreditationData.value = {countries:[], events:[], roles:[], templates:[]};
         return overview().then((data) => {
             if (data && data.length) {
                 accreditationData.value = parseAccreditationOverview(data);

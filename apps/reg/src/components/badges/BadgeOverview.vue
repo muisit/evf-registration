@@ -54,6 +54,11 @@ const sortedTemplates:Ref<Array<CountPerTemplate>> = computed(() => {
     });
 });
 
+function reload()
+{
+    accreditations.getAccreditationData();
+}
+
 function regenerate()
 {
     accreditations.regenerate().then(() => {
@@ -191,7 +196,8 @@ import { ElButton } from 'element-plus';
         </div>
 
         <div class="badge-footer">
-            <ElButton @click="regenerate">Regenerate</ElButton>
+            <ElButton @click="regenerate" type="primary">Regenerate</ElButton>
+            <ElButton @click="reload" type="primary">Reload</ElButton>
         </div>
     </div>
 </template>
