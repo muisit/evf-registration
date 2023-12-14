@@ -83,4 +83,17 @@ class Event extends Model
         $dateEnd = (new Carbon($this->event_open))->addDays($this->event_duration);
         return $now->greaterThan($dateEnd);
     }
+
+    public function allowGenerationOfAccreditations()
+    {
+        if (!empty($this->config)) {
+            $config = json_decode($this->config);
+            if ($config !== false && isset($config->no_accreditations)) {
+                // inverse check, because the configuration indicates we are NOT using accreditations
+                return !($config->no_accreditations == true);
+            }
+        }
+        // by default, allow generation of accreditations
+        return true;
+    }
 }

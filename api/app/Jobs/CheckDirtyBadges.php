@@ -12,23 +12,22 @@ use Illuminate\Database\Query\Builder as QBuilder;
 use Illuminate\Database\Eloquent\Builder as EBuilder;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 
-class RegenerateBadges extends Job implements ShouldBeUniqueUntilProcessing
+// We check for dirty accreditations in a queue job, so it is naturally placed directly after
+// any regeneration attempts
+class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
 {
-    public $event = null;
-
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Event $event)
+    public function __construct()
     {
-        $this->event = $event->withoutRelations();
     }
 
     public function uniqueId(): string
     {
-        return strval($this->event->getKey());
+        return "globally_unique";
     }
 
     /**
@@ -38,17 +37,36 @@ class RegenerateBadges extends Job implements ShouldBeUniqueUntilProcessing
      */
     public function handle()
     {
-        \Log::debug("RegenerateBadges job");
-        if ($this->event->exists) {
-            \Log::debug("event exists, making all existing accreditations dirty");
-            // make all existing accreditations for this event dirty
-            // This is a catch all to make sure we get all accreditations
-            Accreditation::where('event_id', $this->event->getKey())->update(['is_dirty' => date('Y-m-d H:i:s')]);
+        \Log::debug("handling CheckDirtyBadges");
+        // only look at accreditations that were made dirty over 10 minutes ago, to avoid creating accreditations
+        // when the fencer and registration data is still being updated
+        $notafter = date('Y-m-d H:i:s', time() - 10 * 60);
+        $accreditations = DB::table(Accreditation::tableName())
+            ->select('fencer_id', 'event_id')
+            ->where('is_dirty', '<>', null)
+            ->where('is_dirty', '<', $notafter)
+            ->groupBy('fencer_id', 'event_id')
+            ->orderBy('fencer_id', 'asc')->orderBy('event_id', 'asc')
+            ->get();
 
-            $this->makeAllRegistrationsDirty();
-        }
-        else {
-            \Log::debug("event does not exist");
+        $eventsById = [];
+
+        foreach ($accreditations as $row) {
+            $eventId = $row->event_id;
+            if (!isset($eventsById['e' . $eventId])) {
+                $event = Event::find($eventId);
+                if (!empty($event)) {
+                    $eventsById['e' . $event->getKey()] = $event;
+                }
+            }
+
+            $event = $eventsById['e' . $eventId];
+            \Log::debug("checking " . ($event->allowGenerationOfAccreditations() ? 'allowed' : 'not allowed'));
+            if (!empty($event) && $event->allowGenerationOfAccreditations()) {
+                \Log::debug("dispatching checkbadge job");
+                $job = new CheckBadge($row->fencer_id, $row->event_id);
+                dispatch($job);
+            }
         }
     }
 

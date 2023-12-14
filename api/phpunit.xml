@@ -13,5 +13,10 @@
         <env name="APP_ENV" value="testing"/>
         <env name="CACHE_DRIVER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="APP_ENV" value="testing"/>
+        <env name="DB_DATABASE" value="testing"/>
+        <env name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_USERNAME" value="evfregistration"/>
+        <env name="DB_PASSWORD" value="6LVWwSqPlKYCJ0oMg49gXRqjChD1V9JV"/>
     </php>
 </phpunit>

@@ -10,7 +10,8 @@ use App\Models\Country;
 use App\Models\Registration;
 use App\Models\Role;
 use App\Models\RoleType;
-use App\Jobs\RegenerateBadges;
+use App\Jobs\CheckDirtyBadges;
+use App\Jobs\CheckBadge;
 use Tests\Support\Data\Fencer as FencerData;
 use Tests\Support\Data\Registration as RegistrationData;
 use Tests\Support\Data\Event as EventData;
@@ -21,7 +22,7 @@ use Tests\Support\Data\AccreditationTemplate as TemplateData;
 use Tests\Unit\TestCase;
 use Illuminate\Support\Facades\Queue;
 
-class RegenerateBadgesTest extends TestCase
+class CheckDirtyBadgesTest extends TestCase
 {
     public function fixtures()
     {
@@ -36,30 +37,36 @@ class RegenerateBadgesTest extends TestCase
 
     public function testBasicJob()
     {
-        $event = Event::find(EventData::EVENT1);
-        $count = Accreditation::where('is_dirty', null)->count();
-        $this->assertEquals(8, $count);
-        $job = new RegenerateBadges($event);
+        Queue::fake();
+        $job = new CheckDirtyBadges();
         $job->handle();
-        $count = Accreditation::where('is_dirty', null)->count();
-        $this->assertEquals(0, $count);
+        // nothing was dirty, so nothing is pushed
+        Queue::assertNothingPushed();
+
+        // set the dirty date to way in the past
+        Accreditation::where('is_dirty', null)->update(['is_dirty' => '2000-01-01']);
+
+        // now all accreditations are dirty, so we'll push jobs
+        $job->handle();
+        // there are 11 unique fencers registered for this event
+        // However, for 4 cases accreditations are missing in the dataset
+        // and we only have 7 active combinations
+        Queue::assertPushed(CheckBadge::class, 7);
     }
 
     public function testUnique()
     {
         Queue::fake();
-
-        $event = Event::find(EventData::EVENT1);
-        $job = new RegenerateBadges($event);
+        $job = new CheckDirtyBadges();
         dispatch($job);
 
-        $job = new RegenerateBadges($event);
+        $job = new CheckDirtyBadges();
         dispatch($job);
 
-        $job = new RegenerateBadges($event);
+        $job = new CheckDirtyBadges();
         dispatch($job);
 
         // only one job actually pushed
-        Queue::assertPushed(RegenerateBadges::class, 1);
+        Queue::assertPushed(CheckDirtyBadges::class, 1);
     }
 }

@@ -2,8 +2,11 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
+$env = $_ENV['APP_ENV'] ?? 'production';
+
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
-    dirname(__DIR__)
+    dirname(__DIR__),
+    ['.env.' . $env, '.env']
 ))->bootstrap();
 
 date_default_timezone_set(env('APP_TIMEZONE', 'Europe/Paris'));
@@ -82,6 +85,7 @@ $app->configure('session');
 $app->configure('swagger-lume');
 $app->configure('secure-headers');
 $app->configure('mail');    // for sending notifications
+$app->configure('cache');
 
 // mail configuration
 $app->alias('mail.manager', Illuminate\Mail\MailManager::class);
