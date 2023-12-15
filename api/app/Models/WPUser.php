@@ -83,7 +83,7 @@ class WPUser extends Model implements AuthenticatableContract, AuthorizableContr
             }
         }
 
-        return array_unique($retval);
+        return array_values(array_unique($retval));
     }
 
     private function matchCapabilities($role, $capability, $options)
