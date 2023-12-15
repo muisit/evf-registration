@@ -57,9 +57,10 @@ function simpleFetch(method: string, path:string, data:any, options:object|null 
     return fetch(import.meta.env.VITE_API_URL + path, fetchOptions)
         .then(postprocessor())
         .catch(err => {
+            console.log(err);
             if(err.name != "AbortError") {
                 console.log("error in fetch: ",err);
-                throw err;
+                //throw err;
             }
         });
 
@@ -71,6 +72,7 @@ function validateResponse() {
             data: await res.json(),
             status: res.status
         };
+        console.log('returning ', dt);
         return dt;
     };
 }
