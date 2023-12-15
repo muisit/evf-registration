@@ -10,6 +10,7 @@ class AccreditationTemplate extends Fixture
 {
     public const ATHLETE = 1;
     public const ORG = 2;
+    public const COUNTRY = 3;
 
     protected static function boot()
     {
@@ -19,14 +20,21 @@ class AccreditationTemplate extends Fixture
         Model::create([
             'id' => self::ATHLETE,
             'name' => 'Athlete',
-            'content' => '{}',
+            'content' => '{"roles":["0"]}',
             'event_id' => Event::EVENT1,
         ])->save();
 
         Model::create([
             'id' => self::ORG,
-            'name' => 'Athlete',
-            'content' => '{}',
+            'name' => 'Organisation',
+            'content' => '{"roles":["21","18","16","13","9","10","7","17","12","11","8","20","14","22"]}',
+            'event_id' => Event::EVENT1,
+        ])->save();
+
+        Model::create([
+            'id' => self::COUNTRY,
+            'name' => 'Fed',
+            'content' => '{"roles":["4","2","5","19","6"]}',
             'event_id' => Event::EVENT1,
         ])->save();
     }

@@ -53,10 +53,10 @@ class Registration
         }
 
         $countryObject = request()->get('countryObject');
-        $countryId = !empty($countryObject) ? $countryObject->getKey() : null;
-        if (!empty($countryId)) {
-            if ($user->hasRole(['hod:' . $countryId, 'superhod'])) {
-                return $testForId == null || $countryId == $testForId;
+        if (!empty($countryObject)) {
+            \Log::debug("testing " . ($testForId === null ? 'true':'false') . " and " . $countryObject->getKey());
+            if ($testForId === null || ($countryObject->getKey() == $testForId)) {
+                return $user->can('hod', $countryObject);
             }
         }
         return false;
@@ -72,9 +72,8 @@ class Registration
     {
         // see if we have a global request object for the event
         $event = request()->get('eventObject');
-        $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
-        if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId, 'registrar:' . $eventId])) {
-            return true;
+        if (!empty($event)) {
+            return $user->can('register', $event);
         }
         return false;
     }
@@ -84,9 +83,8 @@ class Registration
     {
         // see if we have a global request object for the event
         $event = request()->get('eventObject');
-        $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
-        if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId, 'cashier:' . $eventId])) {
-            return true;
+        if (!empty($event)) {
+            return $user->can('cashier', $event);
         }
         return false;
     }
@@ -96,9 +94,8 @@ class Registration
     {
         // see if we have a global request object for the event
         $event = request()->get('eventObject');
-        $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
-        if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId, 'accreditation:' . $eventId])) {
-            return true;
+        if (!empty($event)) {
+            return $user->can('accredit', $event);
         }
         return false;
     }

@@ -2,28 +2,52 @@
 
 namespace Tests\Support\Data;
 
-use DB;
 use App\Models\Accreditation as Model;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class Accreditation extends Fixture
 {
     public const MFCAT1 = 1;
-    public const WFCAT1 = 2;
-    public const HOD = 3;
-    public const REFEREE = 4;
-    public const DIRECTOR = 5;
+    public const MFCAT2 = 2;
+    public const WFCAT1 = 3;
+    public const TEAM2 = 6;
+    public const TEAM3 = 7;
+    public const COACH = 11;
+    public const HOD = 11;
+    public const REFEREE = 20;
+    public const DIRECTOR = 30;
 
     protected static function boot()
     {
         Fencer::create();
         Event::create();
         AccreditationTemplate::create();
+        Registration::create();
         self::booted();
 
+        // remove empty accreditations as result of entering registrations
+        DB::table(Model::tableName())->delete();
+
+        // has a registration for both MFCAT1 and MFTEAM
         Model::create([
             'id' => self::MFCAT1,
             'fencer_id' => Fencer::MCAT1,
+            'event_id' => Event::EVENT1,
+            'template_id' => AccreditationTemplate::ATHLETE,
+            'data' => '{}',
+            'hash' => null,
+            'file_hash' => null,
+            'file_id' => null,
+            'generated' => null,
+            'is_dirty' => null,
+            'fe_id' => null
+        ])->save();
+
+        // has a registration for MFCAT2 and MFTEAM
+        Model::create([
+            'id' => self::MFCAT2,
+            'fencer_id' => Fencer::MCAT2,
             'event_id' => Event::EVENT1,
             'template_id' => AccreditationTemplate::ATHLETE,
             'data' => '{}',
@@ -50,10 +74,38 @@ class Accreditation extends Fixture
         ])->save();
 
         Model::create([
-            'id' => self::HOD,
-            'fencer_id' => Fencer::MCAT1,
+            'id' => self::TEAM2,
+            'fencer_id' => Fencer::MCAT1B,
             'event_id' => Event::EVENT1,
-            'template_id' => AccreditationTemplate::ORG,
+            'template_id' => AccreditationTemplate::ATHLETE,
+            'data' => '{}',
+            'hash' => null,
+            'file_hash' => null,
+            'file_id' => null,
+            'generated' => null,
+            'is_dirty' => null,
+            'fe_id' => null
+        ])->save();
+
+        Model::create([
+            'id' => self::TEAM3,
+            'fencer_id' => Fencer::MCAT1C,
+            'event_id' => Event::EVENT1,
+            'template_id' => AccreditationTemplate::ATHLETE,
+            'data' => '{}',
+            'hash' => null,
+            'file_hash' => null,
+            'file_id' => null,
+            'generated' => null,
+            'is_dirty' => null,
+            'fe_id' => null
+        ])->save();
+
+        Model::create([
+            'id' => self::COACH,
+            'fencer_id' => Fencer::MCAT5,
+            'event_id' => Event::EVENT1,
+            'template_id' => AccreditationTemplate::COUNTRY,
             'data' => '{}',
             'hash' => null,
             'file_hash' => null,
@@ -65,7 +117,7 @@ class Accreditation extends Fixture
 
         Model::create([
             'id' => self::REFEREE,
-            'fencer_id' => Fencer::WCAT1,
+            'fencer_id' => Fencer::MCAT5,
             'event_id' => Event::EVENT1,
             'template_id' => AccreditationTemplate::ORG,
             'data' => '{}',
@@ -79,7 +131,7 @@ class Accreditation extends Fixture
 
         Model::create([
             'id' => self::DIRECTOR,
-            'fencer_id' => Fencer::WCAT1,
+            'fencer_id' => Fencer::MCAT4,
             'event_id' => Event::EVENT1,
             'template_id' => AccreditationTemplate::ORG,
             'data' => '{}',

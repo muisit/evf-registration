@@ -144,7 +144,8 @@ class EventTest extends TestCase
         // unprivileged cannot
         $this->assertFalse($policy->view($unpriv, $event));
     }
-        public function testViewStarted()
+
+    public function testViewStarted()
     {
         $policy = new Policy();
         $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
@@ -192,5 +193,86 @@ class EventTest extends TestCase
 
         // unprivileged cannot
         $this->assertFalse($policy->view($unpriv, $event));
+    }
+
+    public function testRegister()
+    {
+        $policy = new Policy();
+        $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
+        $gerhod = WPUser::where("ID", UserData::TESTUSERHOD)->first();
+        $unpriv = WPUser::where("ID", UserData::TESTUSER5)->first();
+        $cashier = WPUser::where("ID", UserData::TESTUSER3)->first();
+        $accred = WPUser::where("ID", UserData::TESTUSER4)->first();
+        $organiser = WPUser::where("ID", UserData::TESTUSERORGANISER)->first();
+        $registrar = WPUser::where("ID", UserData::TESTUSERREGISTRAR)->first();
+
+        $event = Event::where('event_id', EventData::EVENT1)->first();
+
+        // hod, superhod do not have event-register powers
+        $this->assertFalse($policy->register($superhod, $event));
+        $this->assertFalse($policy->register($gerhod, $event));
+
+        // organiser and registrar have powers, cashier and accred not
+        $this->assertFalse($policy->register($cashier, $event));
+        $this->assertFalse($policy->register($accred, $event));
+        $this->assertTrue($policy->register($organiser, $event));
+        $this->assertTrue($policy->register($registrar, $event));
+
+        // unprivileged has no event-register powers
+        $this->assertFalse($policy->register($unpriv, $event));
+    }
+
+    public function testAccredit()
+    {
+        $policy = new Policy();
+        $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
+        $gerhod = WPUser::where("ID", UserData::TESTUSERHOD)->first();
+        $unpriv = WPUser::where("ID", UserData::TESTUSER5)->first();
+        $cashier = WPUser::where("ID", UserData::TESTUSER3)->first();
+        $accred = WPUser::where("ID", UserData::TESTUSER4)->first();
+        $organiser = WPUser::where("ID", UserData::TESTUSERORGANISER)->first();
+        $registrar = WPUser::where("ID", UserData::TESTUSERREGISTRAR)->first();
+
+        $event = Event::where('event_id', EventData::EVENT1)->first();
+
+        // hod, superhod do not have event-accreditation powers
+        $this->assertFalse($policy->accredit($superhod, $event));
+        $this->assertFalse($policy->accredit($gerhod, $event));
+
+        // organiser and accredit have powers, cashier and registrar not
+        $this->assertFalse($policy->accredit($cashier, $event));
+        $this->assertTrue($policy->accredit($accred, $event));
+        $this->assertTrue($policy->accredit($organiser, $event));
+        $this->assertFalse($policy->accredit($registrar, $event));
+
+        // unprivileged has no event-accreditation powers
+        $this->assertFalse($policy->accredit($unpriv, $event));
+    }
+
+    public function testCashier()
+    {
+        $policy = new Policy();
+        $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
+        $gerhod = WPUser::where("ID", UserData::TESTUSERHOD)->first();
+        $unpriv = WPUser::where("ID", UserData::TESTUSER5)->first();
+        $cashier = WPUser::where("ID", UserData::TESTUSER3)->first();
+        $accred = WPUser::where("ID", UserData::TESTUSER4)->first();
+        $organiser = WPUser::where("ID", UserData::TESTUSERORGANISER)->first();
+        $registrar = WPUser::where("ID", UserData::TESTUSERREGISTRAR)->first();
+
+        $event = Event::where('event_id', EventData::EVENT1)->first();
+
+        // hod, superhod do not have event-cashier powers
+        $this->assertFalse($policy->cashier($superhod, $event));
+        $this->assertFalse($policy->cashier($gerhod, $event));
+
+        // organiser and cashier have powers, accred and registrar not
+        $this->assertTrue($policy->cashier($cashier, $event));
+        $this->assertFalse($policy->cashier($accred, $event));
+        $this->assertTrue($policy->cashier($organiser, $event));
+        $this->assertFalse($policy->cashier($registrar, $event));
+
+        // unprivileged has no event-cashier powers
+        $this->assertFalse($policy->cashier($unpriv, $event));
     }
 }

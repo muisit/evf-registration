@@ -78,7 +78,7 @@ class RegistrationTest extends TestCase
         $organiser = WPUser::where("ID", UserData::TESTUSERORGANISER)->first();
         $registrar = WPUser::where("ID", UserData::TESTUSERREGISTRAR)->first();
 
-        // a superhod or hod cam see all registrations (only for a specific country)
+        // a superhod or hod can see all registrations (only for a specific country)
         $this->assertTrue($policy->viewAny($superhod));
         $this->assertTrue($policy->viewAny($gerhod));
 
@@ -115,7 +115,7 @@ class RegistrationTest extends TestCase
         ]);
 
         $regGER = Registration::where("registration_id", RegistrationData::REG1)->first();
-        $regITA = Registration::where("registration_id", RegistrationData::TEAM1)->first();
+        $regITA = Registration::where("registration_id", RegistrationData::REG2)->first();
 
         $policy = new Policy();
         $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
@@ -210,7 +210,7 @@ class RegistrationTest extends TestCase
         ]);
 
         $regGER = Registration::where("registration_id", RegistrationData::REG1)->first();
-        $regITA = Registration::where("registration_id", RegistrationData::TEAM1)->first();
+        $regITA = Registration::where("registration_id", RegistrationData::REG2)->first();
 
         $policy = new Policy();
         $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
@@ -259,7 +259,7 @@ class RegistrationTest extends TestCase
         ]);
 
         $regGER = Registration::where("registration_id", RegistrationData::REG1)->first();
-        $regITA = Registration::where("registration_id", RegistrationData::TEAM1)->first();
+        $regITA = Registration::where("registration_id", RegistrationData::REG2)->first();
 
         $policy = new Policy();
         $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();

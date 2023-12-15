@@ -47,7 +47,7 @@ class OverviewService
                 }
                 $skey = empty($sideEventId) ? "sorg" : "s" . $sideEventId;
 
-                if (intval($roleId) == 0 && isset($this->sidesById[$skey])) {
+                if (intval($roleId) == 0 && isset($this->sidesById[$skey]) && !empty($countryId)) {
                     $this->addEventRole($ckey, $skey, $count, $row->registration_team);
                 }
                 else {
@@ -106,8 +106,11 @@ class OverviewService
             // else keep the ckey set to the country and the skey as ssup
             // to mark this as a support role
         }
-        // else: no role and no side event... this would be an error, but treat it as
-        // a generic country support role (skey = ssup)
+        else {
+            // else: no role, possibly an invitation for a gala side-event
+            // treat this as a 'corg' support role
+            $ckey = 'corg';
+        }
 
         // finally add the count to the determined key
         $prevcount = isset($this->overview[$ckey][$skey]) ? $this->overview[$ckey][$skey] : [0, 0];

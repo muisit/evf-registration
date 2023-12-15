@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -84,7 +83,7 @@ class WPUser extends Model implements AuthenticatableContract, AuthorizableContr
             }
         }
 
-        return array_unique($retval);
+        return array_values(array_unique($retval));
     }
 
     private function matchCapabilities($role, $capability, $options)

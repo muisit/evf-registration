@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Kirschbaum\PowerJoins\PowerJoins;
 
 class Role extends Model
@@ -25,6 +25,12 @@ class Role extends Model
     {
         return $this->belongsTo(RoleType::class, 'role_type', 'role_type_id');
     }
+
+    /*
+    public function templates(): BelongsToMany
+    {
+        return $this->belongsToMany(AccreditationTemplate::class, 'TD_Role_Template', 'role_id', 'template_id');
+    }*/
 
     public function newInstance($attributes = [], $exists = false)
     {

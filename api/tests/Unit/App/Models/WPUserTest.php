@@ -91,4 +91,34 @@ class WPUserTest extends TestCase
         $this->assertCount(3, $roles);
         $this->assertNotContains("registrar:" . (EventData::EVENT1 + 1), $roles);
     }
+
+    function testEffectOfUnique()
+    {
+        $user = WPUser::where('id', Data::TESTUSER)->first();
+        $er = new EventRole();
+        $er->event_id = EventData::EVENT1;
+        $er->user_id = $user->getKey();
+        $er->role_type = 'organiser';
+        $er->save();
+        $er = new EventRole();
+        $er->event_id = EventData::EVENT1;
+        $er->user_id = $user->getKey();
+        $er->role_type = 'registrar';
+        $er->save();
+        $er = new EventRole();
+        $er->event_id = EventData::EVENT1;
+        $er->user_id = $user->getKey();
+        $er->role_type = 'cashier';
+        $er->save();
+
+        $roles = $user->getAuthRoles();
+        $this->assertCount(6, $roles);
+        $this->assertContains("sysop", $roles);
+        $this->assertContains("user", $roles);
+        $this->assertContains("organisation:" . EventData::EVENT1, $roles);
+        $this->assertContains("organiser:" . EventData::EVENT1, $roles);
+        $this->assertContains("cashier:" . EventData::EVENT1, $roles);
+        $this->assertContains("registrar:" . EventData::EVENT1, $roles);
+        $this->assertTrue(array_is_list($roles));
+    }
 }

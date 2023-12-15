@@ -48,7 +48,7 @@ class Event extends Fixture
             'event_competition_fee' => 10,
             'event_payments' => 'group',
             'event_feed' => null,
-            'event_config' => '{}'
+            'event_config' => '{"use_registration":true}'
         ])->save();
     }
 }

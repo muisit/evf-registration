@@ -1,0 +1,38 @@
+#app {
+    .badges-page {
+        .badge-list {
+            .section {
+                h3 { 
+                    margin-bottom: 5px;
+                }
+
+                .subtext {
+                    font-size: x-small;
+                    display: block;
+                    margin-bottom: 10px;
+                }
+
+                table {
+                    width: 70%;
+
+                    .document-available {
+                        color: green;
+                    }
+
+                    .document-pending {
+                        color: red;
+                    }
+                }
+            }
+
+            .badge-footer {
+                margin-top: 30px;
+                text-align: center;
+
+                button {
+                    margin: 5px 20px;
+                }
+            }
+        }
+    }
+}

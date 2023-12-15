@@ -186,4 +186,49 @@ class EventTest extends TestCase
         $this->assertTrue(is_array($overview));
         $this->assertCount(0, $overview);
     }
+
+    public function testAllowGenerationOfAccreditations()
+    {
+        $event = Event::find(Data::EVENT1);
+        $event->event_config = json_encode([
+            "no_accreditations" => true
+        ]);
+        $this->assertFalse($event->allowGenerationOfAccreditations());
+
+        $event->event_config = json_encode([
+            "no_accreditations" => false
+        ]);
+        $this->assertTrue($event->allowGenerationOfAccreditations());
+
+        $event->event_config = json_encode([
+            "something_else" => false
+        ]);
+        $this->assertTrue($event->allowGenerationOfAccreditations());
+
+        $event->event_config = '';
+        $this->assertTrue($event->allowGenerationOfAccreditations());
+    }
+
+
+    public function testUseRegistrationApplication()
+    {
+        $event = Event::find(Data::EVENT1);
+        $event->event_config = json_encode([
+            "use_registration" => true
+        ]);
+        $this->assertTrue($event->useRegistrationApplication());
+
+        $event->event_config = json_encode([
+            "use_registration" => false
+        ]);
+        $this->assertFalse($event->useRegistrationApplication());
+
+        $event->event_config = json_encode([
+            "something_else" => false
+        ]);
+        $this->assertFalse($event->useRegistrationApplication());
+
+        $event->event_config = '';
+        $this->assertFalse($event->useRegistrationApplication());
+    }
 }

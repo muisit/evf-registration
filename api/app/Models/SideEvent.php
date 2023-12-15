@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Kirschbaum\PowerJoins\PowerJoins;
 use Carbon\Carbon;
 
 class SideEvent extends Model
 {
+    use PowerJoins;
+
     protected $table = 'TD_Event_Side';
     //protected $primaryKey = 'id';
     protected $guarded = [];

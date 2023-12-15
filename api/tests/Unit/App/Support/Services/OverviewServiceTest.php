@@ -127,28 +127,29 @@ class OverviewServiceTest extends TestCase
         $service = new OverviewService(Event::where('event_id', EventData::EVENT1)->first());
         $result = $service->create();
 
-        $this->assertCount(7, $result);
+        $this->assertCount(6, $result);
 
-        $this->assertCount(1, $result['c2']);
-        $this->assertEquals([4, 1], $result['c2']['s3']);
+        $this->assertCount(2, $result['c2']);
+        $this->assertEquals([1, 0], $result['c2']['s2']);
+        $this->assertEquals([1, 1], $result['c2']['s3']);
 
         $this->assertCount(1, $result['c11']);
-        $this->assertEquals([3, 0], $result['c11']['s5']);
+        $this->assertEquals([1, 0], $result['c11']['s6']);
 
-        $this->assertCount(3, $result['c12']);
+        $this->assertCount(5, $result['c12']);
         $this->assertEquals([1, 0], $result['c12']['s1']);
-        $this->assertEquals([1, 0], $result['c12']['s2']);
+        $this->assertEquals([3, 1], $result['c12']['s3']);
         $this->assertEquals([1, 0], $result['c12']['s4']);
+        $this->assertEquals([1, 0], $result['c12']['s5']);
+        $this->assertEquals([2, 0], $result['c12']['ssup']); // Coach and Hod
 
         $this->assertCount(1, $result['c21']);
-        $this->assertEquals([2, 0], $result['c21']['s6']);
+        $this->assertEquals([1, 0], $result['c21']['s5']);
 
-        $this->assertCount(1, $result['c49']);
-        $this->assertEquals([2, 0], $result['c49']['ssup']);
-
-        $this->assertCount(2, $result['corg']);
+        $this->assertCount(3, $result['corg']);
         $this->assertEquals([1, 0], $result['corg']['r7']);
         $this->assertEquals([1, 0], $result['corg']['r11']);
+        $this->assertEquals([2, 0], $result['corg']['ssup']); // invitations to Gala and Cocktail
 
         $this->assertCount(1, $result['coff']);
         $this->assertEquals([1, 0], $result['coff']['r14']);

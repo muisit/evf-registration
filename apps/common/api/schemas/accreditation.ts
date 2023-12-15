@@ -8,3 +8,16 @@ export interface Accreditation {
 }
 
 export interface AccreditationList extends Array<Accreditation>{};
+
+export interface AccreditationDocument {
+    id: number;
+    size: string;
+    available: string;   
+}
+
+export interface AccreditationOverviewLine {
+    type: string;
+    id: number;
+    counts: number[];
+    documents: AccreditationDocument[];
+}

@@ -14,5 +14,21 @@ $router->group(
                 'uses' => 'Accreditations\Badge@index'
             ]
         );
+
+        $router->get(
+            '/overview',
+            [
+                'as' => 'acrreditations.overview',
+                'uses' => 'Accreditations\Overview@index'
+            ]
+        );
+   
+        $router->get(
+            '/regenerate',
+            [
+                'as' => 'acrreditations.regenerate',
+                'uses' => 'Accreditations\Regenerate@index'
+            ]
+        );
     }
 );

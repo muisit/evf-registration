@@ -29,13 +29,12 @@ class Overview extends Controller
     {
         $event = Event::where('event_id', $event)->first();
         if (empty($event) || !$event->exists || get_class($event) != Event::class) {
-            $this->authorize("not/ever");
+            abort(404);
         }
 
         $retval = [];
         if ($request->user()->can("view", $event)) {
-            $isOrganiser = $request->user()->hasRole(['sysop','organisation:' . $event->getKey(), 'superhod']);
-            $lines = $event->overview($isOrganiser);
+            $lines = $event->overview();
             foreach ($lines as $key => $line) {
                 $retval[] = new OverviewSchema($key, $line);
             }

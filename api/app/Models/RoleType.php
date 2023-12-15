@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
 class RoleType extends Model
 {
     protected $table = 'TD_Role_Type';

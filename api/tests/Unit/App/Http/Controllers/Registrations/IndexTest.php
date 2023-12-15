@@ -25,8 +25,8 @@ class IndexTest extends TestCase
 
         $output = $this->response->json();
         $this->assertTrue($output !== false);
-        $this->assertCount(3, $output['registrations']);
-        $this->assertCount(2, $output['fencers']);
+        $this->assertCount(5, $output['registrations']); // 5 organisation roles
+        $this->assertCount(3, $output['fencers']); // MCAT4, MCAT5 and MCAT3 (invited to Gala)
     }
 
     public function testRouteWithCountry()
@@ -36,8 +36,8 @@ class IndexTest extends TestCase
 
         $output = $this->response->json();
         $this->assertTrue($output !== false);
-        $this->assertCount(4, $output['registrations']);
-        $this->assertCount(4, $output['fencers']);
+        $this->assertCount(2, $output['registrations']); // 2 registrations for ITA
+        $this->assertCount(1, $output['fencers']); // only MCAT2
     }
 
     public function testRouteWithHod()
@@ -47,8 +47,8 @@ class IndexTest extends TestCase
 
         $output = $this->response->json();
         $this->assertTrue($output !== false);
-        $this->assertCount(3, $output['registrations']);
-        $this->assertCount(3, $output['fencers']);
+        $this->assertCount(8, $output['registrations']); // 8 registrations for GER
+        $this->assertCount(5, $output['fencers']); // MCAT1, MCAT1B, MCAT1C, MCAT5, WCAT1
 
         // country parameter has no effect
         $this->session(['wpuser' => UserData::TESTUSERHOD])
@@ -56,8 +56,8 @@ class IndexTest extends TestCase
 
         $output = $this->response->json();
         $this->assertTrue($output !== false);
-        $this->assertCount(3, $output['registrations']);
-        $this->assertCount(3, $output['fencers']);
+        $this->assertCount(8, $output['registrations']);
+        $this->assertCount(5, $output['fencers']);
     }
 
     public function testUnAuthorised()
