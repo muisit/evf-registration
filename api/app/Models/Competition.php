@@ -39,4 +39,23 @@ class Competition extends Model
         $dateStart = new Carbon($this->competition_opens);
         return $now->greaterThanOrEqualTo($dateStart);
     }
+
+    public function abbreviation()
+    {
+        $cat = $this->category;
+        $wpn = $this->weapon;
+
+        if ($cat->category_type != 'T') {
+            return $wpn->weapon_abbr . $cat->category_abbr;
+        }
+        else if ($cat->category_name == 'Team') {
+            // no need to indicate this is Team, as we will not mix individual and team events (yet)
+            return $wpn->weapon_abbr;
+        }
+        else {
+            // for Grand Veterans, indicate the subclass
+            return $wpn->weapon_abbr . "-GV";
+        }
+
+    }
 }
