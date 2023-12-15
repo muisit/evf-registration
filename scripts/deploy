@@ -32,8 +32,9 @@ git clone $GIT_ROOT --branch $GIT_BRANCH $WD >>$LOG 2>&1
 
 echo "Copying production .env file for build process" >>$LOG
 cp env.production $WD/api/.env
-cp env.testing $WD/api/tests/Support/bootstrap/.env.testing
+cp env.testing $WD/api/.env.testing
 cp env.register $WD/apps/reg/.env
+echo "APP_ENV=testing" >> $WD/api/tests/.env
 
 cd $WD
 BUILDNR=`php -r '$version=json_decode(file_get_contents("build.json")); echo $version->build;'`
