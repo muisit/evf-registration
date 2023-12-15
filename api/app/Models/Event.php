@@ -86,8 +86,8 @@ class Event extends Model
 
     public function allowGenerationOfAccreditations()
     {
-        if (!empty($this->config)) {
-            $config = json_decode($this->config);
+        if (!empty($this->event_config)) {
+            $config = json_decode($this->event_config);
             if ($config !== false && isset($config->no_accreditations)) {
                 // inverse check, because the configuration indicates we are NOT using accreditations
                 return !($config->no_accreditations == true);
@@ -95,5 +95,21 @@ class Event extends Model
         }
         // by default, allow generation of accreditations
         return true;
+    }
+
+    public function useRegistrationApplication()
+    {
+        if (!empty($this->event_config)) {
+            \Log::debug("config is not empty " . json_encode($this->event_config));
+            $config = json_decode($this->event_config);
+            \Log::debug("result is " . json_encode($config));
+            if ($config !== false && isset($config->use_registration)) {
+                \Log::debug("value set, testing for truthness " . ($config->use_registration == true ? 'truth' : 'false'));
+                return $config->use_registration == true;
+            }
+        }
+        \Log::debug("config is empty for " . $this->getKey() . ':' . json_encode($this->config));
+        // by default, do not use the registration application for events
+        return false;
     }
 }

@@ -32,8 +32,11 @@ class Index extends Controller
         $events = Event::where('event_open', '>', $now->toDateTimeString())->get();
         $retval = [];
         foreach ($events as $event) {
-            if ($request->user()->can('view', $event)) {
+            if ($request->user()->can('view', $event) && $event->useRegistrationApplication()) {
                 $retval[] = new EventSchema($event);
+            }
+            else {
+                \Log::debug("event " . $event->getKey() . ': ' . ($event->useRegistrationApplication() ? 'true' : 'false'));
             }
         }
         return response()->json($retval);
