@@ -123,6 +123,7 @@ function filterErrors(fencer:Fencer)
             }
         }
     });
+    errors = errors.sort().filter((e,i,a) => i === a.indexOf(e));
     return errors;
 }
 
