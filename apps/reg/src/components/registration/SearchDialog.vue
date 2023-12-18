@@ -101,6 +101,7 @@ import { ElDialog, ElInput, ElButton } from 'element-plus';
 </script>
 <template>
     <ElDialog :model-value="props.visible" title="Search Fencer Surname" :close-on-click-modal="false" :before-close="(done) => { closeForm(); done(false); }">
+        <p>Enter the surname of a person to search the database and click on the 'Select' button to select that person. If the person is not found, click on the 'Create new entry' button to create a new registration.</p>
         <ElInput :model-value="name" @update:model-value="(e) => name = e.toUpperCase()" ref="searchbox"/>
 
         <table v-if="name.length>1" class="suggestion-list">
