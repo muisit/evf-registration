@@ -100,13 +100,13 @@ watch (
 import { ElDialog, ElInput, ElButton } from 'element-plus';
 </script>
 <template>
-    <ElDialog :model-value="props.visible" title="Search Fencer" :close-on-click-modal="false" :before-close="(done) => { closeForm(); done(false); }">
-        <ElInput v-model="name" ref="searchbox"/>
+    <ElDialog :model-value="props.visible" title="Search Fencer Surname" :close-on-click-modal="false" :before-close="(done) => { closeForm(); done(false); }">
+        <ElInput :model-value="name" @update:model-value="(e) => name = e.toUpperCase()" ref="searchbox"/>
 
         <table v-if="name.length>1" class="suggestion-list">
             <thead>
                 <tr>
-                    <th>Lastname</th>
+                    <th>Surname</th>
                     <th>Firstname</th>
                     <th v-if="is_valid(data.currentCountry.id)">Gender</th>
                     <th v-if="is_valid(data.currentCountry.id)">Date of birth</th>

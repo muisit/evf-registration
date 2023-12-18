@@ -147,16 +147,16 @@ import PhotoId from './PhotoId.vue';
 <template>
     <ElDialog :model-value="props.visible" title="Edit Fencer Information" :close-on-click-modal="false"  :before-close="(done) => { closeForm(); done(false); }">
       <ElForm>
-        <ElFormItem label="Last name">
-          <ElInput :model-value="props.fencer.lastName" @update:model-value="(e) => update('lastName', e)"/>
+        <ElFormItem label="Surname">
+          <ElInput :model-value="props.fencer.lastName" @update:model-value="(e) => update('lastName', e.toUpperCase())"/>
         </ElFormItem>
         <ElFormItem label="First name">
           <ElInput :model-value="props.fencer.firstName" @update:model-value="(e) => update('firstName', e)"/>
         </ElFormItem>
         <ElFormItem label="Gender">
           <ElSelect :model-value="props.fencer.gender" @update:model-value="(e) => update('gender', e)">
-            <ElOption value="M" label="Man" />
-            <ElOption value="F" label="Woman" />
+            <ElOption value="M" label="Male" />
+            <ElOption value="F" label="Female" />
           </ElSelect>
         </ElFormItem>
         <ElFormItem label="Date of birth">
