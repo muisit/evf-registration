@@ -23,12 +23,30 @@ function doReplace()
     return props.fencer.photoStatus == 'R';
 }
 
-import { ElIcon } from 'element-plus';
+function displayMessage()
+{
+    if (isAbsent()) {
+        return "No photo found, please upload a photo";
+    }
+    else if(isPending()) {
+        return "Photo uploaded, waiting for approval";
+    }
+    else if(doReplace()) {
+        return "Photo was not approved. Please upload a new photo";
+    }
+    else if(isAccepted()) {
+        return "Photo uploaded and approved";
+    }
+}
+
+import { ElIcon, ElTooltip } from 'element-plus';
 import { Camera, CloseBold } from '@element-plus/icons-vue';
 </script>
 <template>
     <ElIcon :class="{photoAbsent: isAbsent(), photoPending: isPending(), photoAccepted: isAccepted(), photoReplace: doReplace()}">
-        <Camera v-if="!isAbsent()"/>
-        <CloseBold v-if="isAbsent()"/>
+        <ElTooltip :content="displayMessage()">
+            <Camera v-if="!isAbsent()"/>
+            <CloseBold v-if="isAbsent()"/>
+        </ElTooltip>
     </ElIcon>
 </template>
