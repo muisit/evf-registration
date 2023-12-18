@@ -25,7 +25,6 @@ use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 class CreateBadge extends Job implements ShouldBeUniqueUntilProcessing
 {
     public Accreditation $accreditation;
-    public int $eventId;
 
     /**
      * Create a new job instance.
@@ -49,5 +48,6 @@ class CreateBadge extends Job implements ShouldBeUniqueUntilProcessing
      */
     public function handle()
     {
+
     }
 }
