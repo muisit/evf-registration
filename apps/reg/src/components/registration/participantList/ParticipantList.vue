@@ -16,7 +16,8 @@ const byweapon = ref(false);
 
 function onFilter(filterState:any)
 {
-    var newFilter:Array<string> = filter.value.filter((f) => f != filterState.name);
+    // make the buttons exclusive by only allowing one of them to be checked
+    var newFilter:Array<string> = []; // filter.value.filter((f) => f != filterState.name);
     if (filterState.state) {
         newFilter.push(filterState.name);
     }
