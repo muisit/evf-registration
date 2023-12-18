@@ -1,7 +1,9 @@
 <script lang="ts" setup>
+import { computed } from 'vue';
 import type { CountrySchema } from '../../../../common/api/schemas/country';
 import type { OverviewObject } from '../../../../common/api/schemas/overviewline';
 import { is_valid } from '../../../../common/functions';
+import { allowMoreTeams } from '../../../../common/lib/event';
 import { useAuthStore } from '../../../../common/stores/auth';
 const props = defineProps<{
     line:OverviewObject;
@@ -13,6 +15,9 @@ const emits = defineEmits(['changeTab']);
 
 const data = useDataStore();
 const auth = useAuthStore();
+const showTeamCount = computed(() => {
+    return allowMoreTeams(data.currentEvent);
+});
 
 function calculateTotal()
 {
@@ -40,7 +45,7 @@ function outputCount(sideEvent:any)
             return '';
         }
         if (props.line.events[key].teams > 0) {
-            return props.line.events[key].participants + ' (' + props.line.events[key].teams + ')';
+            return props.line.events[key].teams;
         }
         return props.line.events[key].participants;
     }
