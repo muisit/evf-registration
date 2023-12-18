@@ -85,7 +85,7 @@ do
     sleep 1
     STATE=`docker inspect unittests | jq -r '.[0].State.Health.Status'`
 done
-php8.1 vendor/bin/codecept -q -c tests/codeception.yml run Unit >> $LOG 2>&1
+php8.1 vendor/bin/codecept -c tests/codeception.yml run Unit >> $LOG 2>&1
 EC="$?"
 
 echo "Cleaning up docker container" >> $LOG

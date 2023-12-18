@@ -26,7 +26,7 @@ import SortingIcon from './SortingIcon.vue';
             </th>
         </tr>
         <tr>
-            <th class="text-left">Name <SortingIcon v-if="props.sortable" :sorter="props.sorter" name="n" @onSort="(e) => $emit('onSort', e)"/></th>
+            <th class="text-left">Surname <SortingIcon v-if="props.sortable" :sorter="props.sorter" name="n" @onSort="(e) => $emit('onSort', e)"/></th>
             <th class="text-left">First name <SortingIcon v-if="props.sortable" :sorter="props.sorter" name="f" @onSort="(e) => $emit('onSort', e)"/></th>
             <th class="text-center">Gender <SortingIcon v-if="props.sortable" :sorter="props.sorter" name="g" @onSort="(e) => $emit('onSort', e)"/></th>
             <th class="text-center">YOB <SortingIcon v-if="props.sortable" :sorter="props.sorter" name="y" @onSort="(e) => $emit('onSort', e)"/></th>

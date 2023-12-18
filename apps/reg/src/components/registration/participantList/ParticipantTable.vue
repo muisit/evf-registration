@@ -123,6 +123,7 @@ function filterErrors(fencer:Fencer)
             }
         }
     });
+    errors = errors.sort().filter((e,i,a) => i === a.indexOf(e));
     return errors;
 }
 
@@ -144,12 +145,16 @@ import { Edit, Trophy, Bell, Camera, Close } from '@element-plus/icons-vue';
             </td>
             <td class='text-center'>
                 <ElIcon>
-                    <Edit @click="() => fencerSelect(item)"/>
+                    <ElTooltip content="Adjust fencer information and photo">
+                        <Edit @click="() => fencerSelect(item)"/>
+                    </ElTooltip>
                 </ElIcon>
             </td>
             <td class='text-center'>
                 <ElIcon>
-                    <Trophy @click="() => eventSelect(item)"/>
+                    <ElTooltip content="Select competitions and roles">
+                        <Trophy @click="() => eventSelect(item)"/>
+                    </ElTooltip>
                 </ElIcon>
             </td>
             <td class="text-center">
