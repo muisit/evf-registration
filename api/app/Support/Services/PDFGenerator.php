@@ -19,6 +19,7 @@ use App\Support\Services\PDF\PhotoId;
 use App\Support\Services\PDF\QRCode;
 use App\Support\Services\PDF\RolesElement;
 use App\Support\Services\PDF\TextElement;
+use App\Support\Services\PDF\TCPDF;
 
 class PDFGenerator
 {
@@ -29,27 +30,21 @@ class PDFGenerator
 
     //const PDF_PXTOPT=1.76; // for A4 reports
     const PDF_PXTOPT = 1.01;
-
     const FONTPATH = "vendor/tecnickcom/tcpdf/fonts";
 
-    private string $path;
     public $pdf;
     private string $pageoption;
     public $accreditationId = null;
     public Accreditation $accreditation;
 
-    public function __construct(string $path, Accreditation $accreditation)
+    public function __construct(Accreditation $accreditation)
     {
-        $this->path = $path;
         $this->accreditation = $accreditation;
     }
 
     public function generate($data)
     {
-        $this->pageoption = "a4portrait";
-        if (isset($data["print"])) {
-            $this->pageoption = $data["print"];
-        }
+        $this->pageoption = $data->print ?? 'a4portrait';
         $this->pdf = $this->createBasePDF();
         $this->pdf->AddPage();
         $template_id = $this->pdf->startTemplate(self::PDF_WIDTH, self::PDF_HEIGHT, true);
@@ -57,7 +52,6 @@ class PDFGenerator
         $this->pdf->endTemplate();
 
         $this->copyTemplateOverPage($template_id);
-        $this->saveFile();
     }
 
     protected function instantiatePDF()
@@ -87,7 +81,7 @@ class PDFGenerator
                 break;
         }
         /* last parameter: pdfa mode 3 */
-        return new (\TCPDF($orientation, "mm", $page, true, 'UTF-8', false, 3));
+        return new TCPDF($orientation, "mm", $page, true, 'UTF-8', false, 3);
     }
 
     protected function createBasePDF()
@@ -110,7 +104,7 @@ class PDFGenerator
         return $pdf;
     }
 
-    private function saveFile($path)
+    public function saveFile($path)
     {
         $dirname = dirname($path);
         @mkdir($dirname, 0755, true);
@@ -129,7 +123,7 @@ class PDFGenerator
             default:
             case 'a4portrait':
                 // paste the template twice at the top
-                $this->pdf->printTemplate($template_id, $x = 0, $y = 0, $w = slef::PDF_WIDTH, $h = self::PDF_HEIGHT, $align = '', $palign = '', $fitonpage = false);
+                $this->pdf->printTemplate($template_id, $x = 0, $y = 0, $w = self::PDF_WIDTH, $h = self::PDF_HEIGHT, $align = '', $palign = '', $fitonpage = false);
                 $this->pdf->printTemplate($template_id, $x = self::PDF_WIDTH, $y = 0, $w = self::PDF_WIDTH, $h = self::PDF_HEIGHT, $align = '', $palign = '', $fitonpage = false);
                 break;
             case 'a4landscape':
@@ -230,8 +224,8 @@ class PDFGenerator
         }
 
         $pictures = [];
-        if (isset($content->pictures)) {
-            foreach ($content->pictures as $pic) {
+        if (isset($templateSpecification->pictures)) {
+            foreach ($templateSpecification->pictures as $pic) {
                 if (isset($pic->file_id)) {
                     $pictures[$pic->file_id] = $pic;
                 }

@@ -79,6 +79,9 @@ class PhotoId extends BasicImage
             imagedestroy($img);
             $img = $img2;
         }
+        // re-establish proper width and height
+        $w = imagesx($img);
+        $h = imagesy($img);
 
         $fname = tempnam(null, "phid");
         if (file_exists($fname)) {
@@ -90,17 +93,16 @@ class PhotoId extends BasicImage
             $hdiff = $h + 1;
             while ($wdiff > $w || $hdiff > $h) {
                 $fsize -= 1;
-                \Log::debug("font file is $ffile");
                 $box = imagettfbbox($fsize, $rotation, $ffile, $this->generator->accreditation->event->event_name);
                 $maxx = max(array($box[0], $box[2], $box[4], $box[6]));
                 $minx = min(array($box[0], $box[2], $box[4], $box[6]));
                 $maxy = max(array($box[1], $box[3], $box[5], $box[7]));
                 $miny = min(array($box[1], $box[3], $box[5], $box[7]));
-                $wdiff = $maxx - $minx;
-                $hdiff = $maxy - $miny;
+                $wdiff = abs($maxx - $minx);
+                $hdiff = abs($maxy - $miny);
             }
-            $x = ($w - ($maxx - $minx)) / 2.0;
-            $y = $h - ($maxy - $miny) - 2;
+            $x = ($w - abs($maxx - $minx)) / 2.0;
+            $y = $h - abs($maxy - $miny) - 2;
             imagettftext($img, $fsize, $rotation, $x, $y, $text_color, $ffile, $this->generator->accreditation->event->event_name);
             imagejpeg($img, $fname, 90);
             imagedestroy($img);

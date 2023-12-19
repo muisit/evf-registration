@@ -67,8 +67,8 @@ class ImageTest extends TestCase
             'side' => 'left',
         ];
         $data = [
-            'afile' => ['path' => base_path('tests/Support/Files/Portrait_exorientation_0.jpg'), 'file_ext' => 'jpg'],
-            'bfile' => ['path' => base_path('tests/Support/Files/Portrait_exorientation_1.jpg'), 'file_ext' => 'jpg'],
+            'afile' => (object)['path' => base_path('tests/Support/Files/Portrait_exorientation_0.jpg'), 'file_ext' => 'jpg'],
+            'bfile' => (object)['path' => base_path('tests/Support/Files/Portrait_exorientation_1.jpg'), 'file_ext' => 'jpg'],
         ];
         $obj->withData($data)->generate($element);
     }
@@ -90,8 +90,8 @@ class ImageTest extends TestCase
             'side' => 'left',
         ];
         $data = [
-            'cfile' => ['path' => base_path('tests/Support/Files/Portrait_exorientation_0.jpg'), 'file_ext' => 'jpg'],
-            'bfile' => ['path' => base_path('tests/Support/Files/Portrait_exorientation_1.jpg'), 'file_ext' => 'jpg'],
+            'cfile' => (object)['path' => base_path('tests/Support/Files/Portrait_exorientation_0.jpg'), 'file_ext' => 'jpg'],
+            'bfile' => (object)['path' => base_path('tests/Support/Files/Portrait_exorientation_1.jpg'), 'file_ext' => 'jpg'],
         ];
         $obj->withData($data)->generate($element);
     }

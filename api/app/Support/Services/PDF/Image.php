@@ -8,18 +8,14 @@ class Image extends BasicImage
 {
     public function generate($el)
     {
-        \Log::debug("image generate ");
         $this->parse($el);
         $imageid = $el->file_id ?? '';
-        \Log::debug("image id is $imageid");
 
         if (isset($this->data[$imageid])) {
-            \Log::debug("image file set");
             $pic = $this->data[$imageid];
-            $ext = $pic["file_ext"];
-            if (isset($pic["path"])) {
-                \Log::debug("taking path from picture directly");
-                $path = $pic["path"];
+            $ext = $pic->file_ext;
+            if (isset($pic->path)) {
+                $path = $pic->path;
             }
             else {
                 $path = $this->generator->accreditation->template->image($imageid, $ext);
