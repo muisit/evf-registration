@@ -6,15 +6,19 @@ use App\Support\Services\PDFGenerator;
 
 class Image extends BasicImage
 {
-    public function generate($el, $pictures)
+    public function generate($el)
     {
+        \Log::debug("image generate ");
         $this->parse($el);
-        $imageid = $element->file_id ?? '';
+        $imageid = $el->file_id ?? '';
+        \Log::debug("image id is $imageid");
 
-        if (isset($pictures[$imageid])) {
-            $pic = $pictures[$imageid];
+        if (isset($this->data[$imageid])) {
+            \Log::debug("image file set");
+            $pic = $this->data[$imageid];
             $ext = $pic["file_ext"];
             if (isset($pic["path"])) {
+                \Log::debug("taking path from picture directly");
                 $path = $pic["path"];
             }
             else {

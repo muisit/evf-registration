@@ -45,6 +45,11 @@ class Accreditation extends Model
         return $this->belongsTo(Fencer::class, 'fencer_id', 'fencer_id');
     }
 
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(Event::class, 'event_id', 'event_id');
+    }
+
     public function template(): BelongsTo
     {
         return $this->belongsTo(AccreditationTemplate::class, 'template_id', 'id');

@@ -4,24 +4,17 @@ namespace App\Support\Services\PDF;
 
 use App\Support\Services\PDFGenerator;
 
-class DatesElement
+class DatesElement extends TextElement
 {
-    private $generator;
-
-    public function __construct(PDFGenerator $generator)
-    {
-        $this->generator = $generator;
-    }
-
-    public function generate($el, $data)
+    public function generate($el)
     {
         $this->parse($el);
-        $txt = $data->dates ?? [];
+        $txt = $this->data?->dates ?? [];
         if (isset($el->onedateonly) && $el->onedateonly === true) {
             $txt = [$txt[0]];
         }
         $txt = implode("\n", $txt);
-        $txt = implode("\n", str_replace(" ", "~", $txt));
+        $txt = str_replace(" ", "~", $txt);
         $this->replaceTilde = true;
         if (strlen(trim($txt))) {
             $this->insertText($txt);

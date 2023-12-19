@@ -6,25 +6,32 @@ use App\Support\Services\PDFGenerator;
 
 class AccreditationID extends TextElement
 {
-    private $generator;
-    public $options;
     public $side;
     public $label;
 
-    public function __construct(PDFGenerator $generator)
+    public function withLabel($label)
     {
-        $this->generator = $generator;
-    }
-
-    public function prepare($el, $label)
-    {
-        $this->parse($el);
         $this->label = $label;
-        $this->side = $element->side ?? 'both';
         return $this;
     }
 
-    public function generate($options)
+    public function generate($el)
+    {
+        $this->parse($el);
+        $this->side = $el->side ?? 'both';
+        $this->generator->accreditationId = $this;
+        return $this;
+    }
+
+    public function options()
+    {
+        $obj = parent::options();
+        $obj->side = $this->side ?? 'both';
+        $obj->label = $this->label ?? '';
+        return $obj;
+    }
+
+    public function finalise()
     {
         // the accreditation ID consists of a QR code and the AccID underneath it
         $style = [
@@ -37,7 +44,7 @@ class AccreditationID extends TextElement
             'module_height' => 1 // height of a single module in points
         ];
 
-        $link = get_site_url(null, "/accreditation/" . $this->label, "https");
+        $link = $this->label;
         // QRCODE,H : QR-CODE Best error correction
         $this->generator->pdf->write2DBarcode(
             $link,

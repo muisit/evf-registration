@@ -6,20 +6,15 @@ use App\Support\Services\PDFGenerator;
 
 class CountryFlag extends BasicImage
 {
-    private $generator;
-
-    public function __construct(PDFGenerator $generator)
-    {
-        $this->generator = $generator;
-    }
-
-    public function generate($el, $data)
+    public function generate($el)
     {
         $this->parse($el);
-        $fpath = $data->country_flag ?? null;
-        if (empty($fpath)) return;
+        $fpath = $this->data?->country_flag ?? null;
+        if (empty($fpath)) {
+            return;
+        }
 
-        $fpath = basepath($fpath);
+        $fpath = base_path($fpath);
         if (!file_exists($fpath)) return;
 
         if (!isset($this->size)) {
@@ -39,6 +34,6 @@ class CountryFlag extends BasicImage
                 $this->size[1] = $rheight;
             }
         }
-        $this->insertImage($path);
+        $this->insertImage($fpath);
     }
 }

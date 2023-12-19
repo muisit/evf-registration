@@ -4,19 +4,12 @@ namespace App\Support\Services\PDF;
 
 use App\Support\Services\PDFGenerator;
 
-class RolesElement
+class RolesElement extends TextElement
 {
-    private $generator;
-
-    public function __construct(PDFGenerator $generator)
-    {
-        $this->generator = $generator;
-    }
-
-    public function generate($el, $data)
+    public function generate($el)
     {
         $this->parse($el);
-        $txt = $data->roles ?? [];
+        $txt = $this->data?->roles ?? [];
         $txt = implode(", ", $txt);
         if (strlen(trim($txt))) {
             $this->insertText($txt);

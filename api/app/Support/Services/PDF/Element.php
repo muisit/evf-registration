@@ -6,16 +6,32 @@ use App\Support\Services\PDFGenerator;
 
 class Element
 {
-    private $generator;
-
+    protected $generator;
     protected $colour;
     protected $size;
     protected $offset;
     protected $ratio;
 
+    protected $data;
+
     public function __construct(PDFGenerator $generator)
     {
         $this->generator = $generator;
+    }
+
+    public function options() {
+        return (object)[
+            "colour" => $this->colour ?? '#000000',
+            "size" => $this->size ?? [0,0],
+            "offset" => $this->offset ?? [0,0],
+            "ratio" => $this->ratio ?? 1.0
+        ];
+    }
+
+    public function withData($data)
+    {
+        $this->data = $data;
+        return $this;
     }
 
     public function parse($element)
@@ -59,6 +75,7 @@ class Element
         if (isset($element->ratio)) {
             $this->ratio = floatval($element->ratio);
 
+            \Log::debug("adjusting $x and $y based on $this->ratio");
             if ($x < 1 && $y > 1) {
                 $x = $y * $this->ratio;
             }
@@ -93,7 +110,7 @@ class Element
         }
         else {
             $r = (16 * $r) + $r;
-            $g = (18 * $g) + $g;
+            $g = (16 * $g) + $g;
             $b = (16 * $b) + $b;
         }
         return array($r, $g, $b);
@@ -101,9 +118,12 @@ class Element
 
     protected function getFontFile($family)
     {
-        $ffile = basepath(PDFGenerator::FONTPATH . "/$family.ttf");
+        $ffile = base_path(PDFGenerator::FONTPATH . "/$family.ttf");
         if (!file_exists($ffile)) {
-            $ffile = basepath(PDFGenerator::FONTPATH . "/helvetica.ttf");
+            $ffile = resource_path("fonts/$family.ttf");
+        }
+        if (!file_exists($ffile)) {
+            return $this->getFontFile("arial");
         }
         return $ffile;
     }

@@ -6,17 +6,11 @@ use App\Support\Services\PDFGenerator;
 
 class TextElement extends Element
 {
-    private $generator;
     protected $fontSize;
     protected $fontFamily;
     protected $alignment;
     protected $wrap;
     protected $replaceTilde;
-
-    public function __construct(PDFGenerator $generator)
-    {
-        $this->generator = $generator;
-    }
 
     public function parse($element)
     {
@@ -26,6 +20,17 @@ class TextElement extends Element
             $this->fontFamily = $this->parseFontFamily($element);
             $this->alignment = $this->parseAlignment($element);
         }
+    }
+
+    public function options()
+    {
+        $obj = parent::options();
+        $obj->fontSize = $this->fontSize ?? 20;
+        $obj->fontFamily = $this->fontFamily ?? 'Helvetica';
+        $obj->alignment = $this->alignment ?? '';
+        $obj->wrap = $this->wrap ?? true;
+        $obj->replaceTilde = $this->replaceTilde ?? false;
+        return $obj;
     }
 
     private function parseFontSize($element)
@@ -41,7 +46,7 @@ class TextElement extends Element
         $family = "Helvetica";
         if (isset($element->style->fontFamily)) {
             $family = $element->style->fontFamily;
-            if (!in_array($family, array_keys(PDFGenerator::PDF_FONTS))) {
+            if (!in_array($family, array_keys(FontManager::PDF_FONTS))) {
                 $family = "Helvetica";
             }
         }
@@ -82,7 +87,7 @@ class TextElement extends Element
 
     private function addFont($fontfamily)
     {
-        (new FontManager($this->generator))->add($font);
+        (new FontManager($this->generator))->add($fontfamily);
     }
 
     protected function insertText($text)
@@ -117,7 +122,7 @@ class TextElement extends Element
             $this->addFont($font);
         }
 
-        $fontsize = $this->determineFontSize($text, $originalFontSize, $font);
+        $fontsize = $this->determineFontSize($text, $this->fontSize, $font);
         $this->addFont($font);
         $this->generator->pdf->SetFontSize($fontsize * PDFGenerator::PDF_PXTOPT);
 
@@ -325,5 +330,10 @@ class TextElement extends Element
             $retval[] = $current;
         }
         return $retval;
+    }
+
+    public function replaceTildeForSpaces($value = true)
+    {
+        $this->replaceTilde = $value;
     }
 }

@@ -6,7 +6,7 @@ use App\Support\Services\PDFGenerator;
 
 class BasicImage extends Element
 {
-    private function insertImage($path)
+    protected function insertImage($path)
     {
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
         if (!in_array($ext, ["png", "jpg", "jpeg", "gif"])) {

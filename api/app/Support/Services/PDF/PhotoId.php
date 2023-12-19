@@ -26,7 +26,7 @@ class PhotoId extends BasicImage
         $goldenratio = 413.0 / 531.0;
         $rwidth = $this->size[1] * $goldenratio;
         $rheight = $this->size[0] / $goldenratio;
-        if ($rwidth < $size[0]) {
+        if ($rwidth < $this->size[0]) {
             $this->size[0] = $rwidth;
         }
         else {
@@ -90,7 +90,8 @@ class PhotoId extends BasicImage
             $hdiff = $h + 1;
             while ($wdiff > $w || $hdiff > $h) {
                 $fsize -= 1;
-                $box = imagettfbbox($fsize, $rotation, $ffile, $this->event->event_name);
+                \Log::debug("font file is $ffile");
+                $box = imagettfbbox($fsize, $rotation, $ffile, $this->generator->accreditation->event->event_name);
                 $maxx = max(array($box[0], $box[2], $box[4], $box[6]));
                 $minx = min(array($box[0], $box[2], $box[4], $box[6]));
                 $maxy = max(array($box[1], $box[3], $box[5], $box[7]));

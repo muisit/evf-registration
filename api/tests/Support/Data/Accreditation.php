@@ -41,7 +41,7 @@ class Accreditation extends Fixture
             'file_id' => null,
             'generated' => null,
             'is_dirty' => null,
-            'fe_id' => null
+            'fe_id' => '1002011'
         ])->save();
 
         // has a registration for MFCAT2 and MFTEAM

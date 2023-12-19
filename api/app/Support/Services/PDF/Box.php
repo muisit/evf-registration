@@ -4,15 +4,8 @@ namespace App\Support\Services\PDF;
 
 use App\Support\Services\PDFGenerator;
 
-class Box
+class Box extends Element
 {
-    private $generator;
-
-    public function __construct(PDFGenerator $generator)
-    {
-        $this->generator = $generator;
-    }
-
     public function generate($el)
     {
         $this->parse($el);

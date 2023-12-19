@@ -2,6 +2,7 @@
 
 namespace App\Support\Services;
 
+use App\Models\Accreditation;
 use App\Models\AccreditationTemplate;
 use App\Models\Event;
 use App\Models\Fencer;
@@ -34,7 +35,7 @@ class PDFGenerator
     private string $path;
     public $pdf;
     private string $pageoption;
-    private $accreditationId = null;
+    public $accreditationId = null;
     public Accreditation $accreditation;
 
     public function __construct(string $path, Accreditation $accreditation)
@@ -197,11 +198,11 @@ class PDFGenerator
 
             if ($this->accreditationId->side == "both" || $this->accreditationId->side == "left") {
                 $options["offset"] = $offset1;
-                $this->accreditationId->generate($options);
+                $this->accreditationId->generate();
             }
             if (!empty($offset2) && ($this->accreditationId->side == "both" || $this->accreditationId->side == "right")) {
                 $options["offset"] = $offset2;
-                $this->accreditationId->generate($options);
+                $this->accreditationId->generate();
             }
         }
     }
@@ -250,37 +251,37 @@ class PDFGenerator
                         (new TextElement($this))->generate($el);
                         break;
                     case "name":
-                        (new NameElement($this))->generate($el, $data);
+                        (new NameElement($this))->withData($data)->generate($el);
                         break;
                     case "accid":
-                        $this->accreditationId = (new AccreditationId($this))->prepare($el, $this->accreditation->fe_id);
+                        (new AccreditationId($this))->withLabel($this->accreditation->fe_id)->generate($el);
                         break;
                     case "category":
-                        (new CategoryElement($this))->generate($el, $data);
+                        (new CategoryElement($this))->withData($data)->generate($el);
                         break;
                     case "country":
-                        (new CountryElement($this))->generate($el, $data);
+                        (new CountryElement($this))->withData($data)->generate($el);
                         break;
                     case "cntflag":
-                        (new CountryFlag($this))->generate($el, $data);
+                        (new CountryFlag($this))->withData($data)->generate($el);
                         break;
                     case "org":
-                        (new OrgElement($this))->generate($el, $data);
+                        (new OrgElement($this))->withData($data)->generate($el);
                         break;
                     case "roles":
-                        (new RolesElement($this))->generate($el, $data);
+                        (new RolesElement($this))->withData($data)->generate($el);
                         break;
                     case "dates":
-                        (new DatesElement($this))->generate($el, $data);
+                        (new DatesElement($this))->withData($data)->generate($el);
                         break;
                     case "box":
                         (new Box($this))->generate($el);
                         break;
                     case "img":
-                        (new Image($this))->generate($el, $pictures);
+                        (new Image($this))->withData($pictures)->generate($el);
                         break;
                     case 'qr':
-                        (new QRCode($this))->generate($el, $data);
+                        (new QRCode($this))->withData($data)->generate($el);
                         break;
                     default:
                         \Log::error("PDF: unknown element for rendering " . $el->type);

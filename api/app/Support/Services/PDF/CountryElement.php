@@ -4,19 +4,12 @@ namespace App\Support\Services\PDF;
 
 use App\Support\Services\PDFGenerator;
 
-class CountryElement
+class CountryElement extends TextElement
 {
-    private $generator;
-
-    public function __construct(PDFGenerator $generator)
-    {
-        $this->generator = $generator;
-    }
-
-    public function generate($el, $data)
+    public function generate($el)
     {
         $this->parse($el);
-        $txt = $data->country ?? '';
+        $txt = $this->data?->country ?? '';
         if (strlen(trim($txt))) {
             $this->insertText($txt);
         }

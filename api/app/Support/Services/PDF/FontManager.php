@@ -65,22 +65,22 @@ class FontManager
             switch ($fontkey) {
                 // our fonts
                 case 'eurofurence':
-                    $this->generator->pdf->AddFont("Eurofurence", "", __DIR__ . "/fonts/eurof55.php", true);
+                    $this->generator->pdf->AddFont("Eurofurence", "", resource_path('fonts/eurof55.php'), true);
                     break;
                 case 'eurofurenceI':
-                    $this->generator->pdf->AddFont("Eurofurence", "I", __DIR__ . "/fonts/eurof56.php", true);
+                    $this->generator->pdf->AddFont("Eurofurence", "I", resource_path('fonts/eurof56.php'), true);
                     break;
                 case 'eurofurenceB':
-                    $this->generator->pdf->AddFont("Eurofurence", "B", __DIR__ . "/fonts/eurof75.php", true);
+                    $this->generator->pdf->AddFont("Eurofurence", "B", resource_path('fonts/eurof75.php'), true);
                     break;
                 case 'eurofurenceBI':
-                    $this->generator->pdf->AddFont("Eurofurence", "BI", __DIR__ . "/fonts/eurof76.php", true);
+                    $this->generator->pdf->AddFont("Eurofurence", "BI", resource_path('fonts/eurof76.php'), true);
                     break;
                 case 'eurofurencelight':
-                    $this->generator->pdf->AddFont("Eurofurencelight", "", __DIR__ . "/fonts/eurof35.php", true);
+                    $this->generator->pdf->AddFont("Eurofurencelight", "", resource_path('fonts/eurof35.php'), true);
                     break;
                 case 'eurofurencelightI':
-                    $this->generator->pdf->AddFont("Eurofurencelight", "I", __DIR__ . "/fonts/eurof36.php", true);
+                    $this->generator->pdf->AddFont("Eurofurencelight", "I", resource_path('fonts/eurof36.php'), true);
                     break;
 
                 // core fonts
