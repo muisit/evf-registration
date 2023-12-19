@@ -13,7 +13,12 @@ class CountryElement
         $this->generator = $generator;
     }
 
-    public function generate($el, $content, $data)
+    public function generate($el, $data)
     {
+        $this->parse($el);
+        $txt = $data->country ?? '';
+        if (strlen(trim($txt))) {
+            $this->insertText($txt);
+        }
     }
 }

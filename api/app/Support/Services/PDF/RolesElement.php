@@ -13,7 +13,13 @@ class RolesElement
         $this->generator = $generator;
     }
 
-    public function generate($el, $content, $data)
+    public function generate($el, $data)
     {
+        $this->parse($el);
+        $txt = $data->roles ?? [];
+        $txt = implode(", ", $txt);
+        if (strlen(trim($txt))) {
+            $this->insertText($txt);
+        }
     }
 }

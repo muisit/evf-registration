@@ -13,7 +13,18 @@ class DatesElement
         $this->generator = $generator;
     }
 
-    public function generate($el, $content, $data)
+    public function generate($el, $data)
     {
+        $this->parse($el);
+        $txt = $data->dates ?? [];
+        if (isset($el->onedateonly) && $el->onedateonly === true) {
+            $txt = [$txt[0]];
+        }
+        $txt = implode("\n", $txt);
+        $txt = implode("\n", str_replace(" ", "~", $txt));
+        $this->replaceTilde = true;
+        if (strlen(trim($txt))) {
+            $this->insertText($txt);
+        }
     }
 }

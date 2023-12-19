@@ -13,7 +13,12 @@ class CategoryElement
         $this->generator = $generator;
     }
 
-    public function generate($el, $content, $data)
+    public function generate($el, $data)
     {
+        $this->parse($el);
+        $txt = $data->category ?? '';
+        if (strlen(trim($txt))) {
+            $this->insertText($txt);
+        }
     }
 }

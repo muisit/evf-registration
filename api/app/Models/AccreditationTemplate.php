@@ -34,6 +34,17 @@ class AccreditationTemplate extends Model
         return $this->belongsTo(Event::class, 'event_id', 'event_id');
     }
 
+    public function image($name, $ext)
+    {
+        $fname = "none.dat";
+        if ($ext === null) $ext = "jpg";
+        $fname = "img_" . $this->getKey() . "_" . $id . "." . $ext;
+
+        $filename = storage_path('app/templates/' . $fname);
+        return $filename;
+    }
+
+
     /*
     public function roles(): BelongsToMany
     {

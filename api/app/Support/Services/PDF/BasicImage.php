@@ -4,16 +4,9 @@ namespace App\Support\Services\PDF;
 
 use App\Support\Services\PDFGenerator;
 
-class BasicImage
+class BasicImage extends Element
 {
-    private $generator;
-
-    public function __construct(PDFGenerator $generator)
-    {
-        $this->generator = $generator;
-    }
-
-    private function insertImage($path, $options)
+    private function insertImage($path)
     {
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
         if (!in_array($ext, ["png", "jpg", "jpeg", "gif"])) {
@@ -23,13 +16,13 @@ class BasicImage
         list($width, $height) = getimagesize($path);
         $x = 0;
         $y = 0;
-        if (isset($options->offset)) {
-            $x = $options->offset[0];
-            $y = $options->offset[1];
+        if (isset($this->offset)) {
+            $x = $this->offset[0];
+            $y = $this->offset[1];
         }
-        if (isset($options->size)) {
-            $swidth = $options->size[0];
-            $sheight = $options->size[1];
+        if (isset($this->size)) {
+            $swidth = $this->size[0];
+            $sheight = $this->size[1];
             if ($swidth < $width) {
                 // adjusting image width $width to smaller width $swidth based on size
                 $width = $swidth;

@@ -13,7 +13,12 @@ class OrgElement
         $this->generator = $generator;
     }
 
-    public function generate($el, $content, $data)
+    public function generate($el, $data)
     {
+        $this->parse($el);
+        $txt = $data->organisation ?? '';
+        if (strlen(trim($txt))) {
+            $this->insertText($txt);
+        }
     }
 }
