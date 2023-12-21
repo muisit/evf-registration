@@ -56,7 +56,6 @@ class CreateBadge extends Job implements ShouldBeUniqueUntilProcessing
                 $this->fail("Error creating accreditation, could not save file for " . $this->accreditation->getKey());
             }
             else {
-                \Log::debug("badge saved at " . $this->accreditation->path());
                 // theoretically it can be that the accreditation is set to is_dirty again while we were processing
                 // in that case, it will automatically pop up after a while for reprocessing
                 $this->accreditation->generated = date("Y-m-d H:i:s");

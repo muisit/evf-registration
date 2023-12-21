@@ -237,10 +237,10 @@ class PDFGeneratorElementTest extends TestCase
         $generator->pdf->setFileId(md5("testFonts"));
 
         $path = tempnam(null, "pdftest");
-        $path = base_path('testfonts.pdf');
+        //$path = base_path('testfonts.pdf');
         $generator->save($path);
         $hash = hash_file("md5", $path);
-        //@unlink($path);
+        @unlink($path);
         $this->assertEquals("961a4d56e18418e05b82b60ed74c83a0", $hash);
     }
 

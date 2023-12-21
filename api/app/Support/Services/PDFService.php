@@ -10,4 +10,10 @@ class PDFService
     {
         return "summary_" . $eventId . "_" . $type . "_" . $modelId . '$';
     }
+
+    public static function pdfPath(Event $event, $subpath = null)
+    {
+        $path = "pdfs/event" . $event->getKey() . ($subpath ? '/' . $subpath : '');
+        return storage_path($path);
+    }
 }

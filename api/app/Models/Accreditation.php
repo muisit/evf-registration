@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Support\Services\PDFService;
 use Carbon\Carbon;
 
 class Accreditation extends Model
@@ -57,7 +58,7 @@ class Accreditation extends Model
 
     public function path()
     {
-        return storage_path(sprintf("accreditations/event_%d/badge_%d.pdf", $this->event_id, $this->id));
+        return PDFService::pdfPath($this->event, sprintf("badge_%d.pdf", $this->id));
     }
 
     public function delete()

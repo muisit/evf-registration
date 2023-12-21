@@ -19,7 +19,8 @@ abstract class TestCase extends BaseTestCase
             $this->fixtures();
         }
         $request = request();
-        app()->instance('request', $request);
+        $this->app->instance('request', $request);
+        $this->app->useStoragePath(realpath(__DIR__ . '/../_output'));
     }
 
     /**
