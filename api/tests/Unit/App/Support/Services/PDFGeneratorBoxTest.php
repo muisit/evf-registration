@@ -94,7 +94,7 @@ class PDFGeneratorBoxTest extends TestCase
         $event->event_name = "EC2020 Bruxelles";
         $event->save();
         $template = $accreditation->template;
-        $generator = new PDFGenerator($accreditation);
+        $generator = new PDFGenerator();
         $accreditationData = (object) [
             'print' => 'a4portrait',
             'created' => '2000-01-01', // set explicit values to allow hash comparisons
@@ -145,12 +145,13 @@ class PDFGeneratorBoxTest extends TestCase
             ]
         ];
         $template->content = json_encode($content);
-        $generator->generate($accreditationData);
+        $accreditation->data = json_encode($accreditationData);
+        $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testBox"));
 
         $path = tempnam(null, "pdftest");
         //$path = base_path('testbox.pdf');
-        $generator->saveFile($path);
+        $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
         $this->assertEquals("4990f3ab6a52368a2537527e75eac012", $hash);
@@ -163,7 +164,7 @@ class PDFGeneratorBoxTest extends TestCase
         $event->event_name = "EC2020 Bruxelles";
         $event->save();
         $template = $accreditation->template;
-        $generator = new PDFGenerator($accreditation);
+        $generator = new PDFGenerator();
         $accreditationData = (object) [
             'print' => 'a4portrait',
             'created' => '2000-01-01', // set explicit values to allow hash comparisons
@@ -174,7 +175,7 @@ class PDFGeneratorBoxTest extends TestCase
 
         for ($w = 5; $w < 420; $w += 10) {
             for ($h = 5; $h < 594; $h += 10) {
-                $content["elements"][]=[
+                $content["elements"][] = [
                         "type" => "box",
                         "style" => [
                             "left" => $w,
@@ -187,12 +188,13 @@ class PDFGeneratorBoxTest extends TestCase
             }
         }
         $template->content = json_encode($content);
-        $generator->generate($accreditationData);
+        $accreditation->data = json_encode($accreditationData);
+        $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testBox"));
 
         $path = tempnam(null, "pdftest");
         //$path = base_path('testbox2.pdf');
-        $generator->saveFile($path);
+        $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
         $this->assertEquals("a34bf3df5fdcc9e4d5091a9bc21e182d", $hash);

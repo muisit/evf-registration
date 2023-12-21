@@ -94,7 +94,7 @@ class PDFGeneratorCaseTest extends TestCase
         $event->event_name = "EC2020 Bruxelles";
         $event->save();
         $template = $accreditation->template;
-        $generator = new PDFGenerator($accreditation);
+        $generator = new PDFGenerator();
         $accreditationData = (object) [
             'print' => 'a4portrait',
             'created' => '2000-01-01', // set explicit values to allow hash comparisons
@@ -310,15 +310,15 @@ class PDFGeneratorCaseTest extends TestCase
             ]
         ];
         $template->content = json_encode($content);
-        $generator->generate($accreditationData);
+        $accreditation->data = json_encode($accreditationData);
+        $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testCase20220216"));
 
         $path = tempnam(null, "pdftest");
         //$path = base_path('testcase20220216.pdf');
-        $generator->saveFile($path);
+        $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
         $this->assertEquals("608e4dca6e5c67f24859baf0fce7cbb3", $hash);
     }
-
 }

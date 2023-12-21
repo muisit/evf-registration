@@ -37,13 +37,15 @@ class PDFGenerator
     public $accreditationId = null;
     public Accreditation $accreditation;
 
-    public function __construct(Accreditation $accreditation)
+    public function generate(Accreditation $accreditation)
     {
         $this->accreditation = $accreditation;
-    }
+        $data = json_decode($this->accreditation->data);
+        if ($data === false) {
+            \Log::error("invalid data object in accreditation " . $this->accreditation->getKey() . '/' . $this->accreditation->fencer_id . '/' . $this->accreditation->event_id);
+            $data = (object)[];
+        }
 
-    public function generate($data)
-    {
         $this->pageoption = $data->print ?? 'a4portrait';
         $this->pdf = $this->createBasePDF();
         $this->pdf->AddPage();
@@ -104,7 +106,7 @@ class PDFGenerator
         return $pdf;
     }
 
-    public function saveFile($path)
+    public function save($path)
     {
         $dirname = dirname($path);
         @mkdir($dirname, 0755, true);

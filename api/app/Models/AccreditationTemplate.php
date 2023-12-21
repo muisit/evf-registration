@@ -38,7 +38,7 @@ class AccreditationTemplate extends Model
     {
         $fname = "none.dat";
         if ($ext === null) $ext = "jpg";
-        $fname = "img_" . $this->getKey() . "_" . $id . "." . $ext;
+        $fname = "img_" . $this->getKey() . "_" . $name . "." . $ext;
 
         $filename = storage_path('app/templates/' . $fname);
         return $filename;

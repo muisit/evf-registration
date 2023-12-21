@@ -10,9 +10,4 @@ class PDFService
     {
         return "summary_" . $eventId . "_" . $type . "_" . $modelId . '$';
     }
-
-    public static function generate($path, $specification)
-    {
-        (new PDFGenerator($path))->generate($specification);
-    }
 }

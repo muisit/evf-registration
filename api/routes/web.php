@@ -24,3 +24,4 @@ $router->get('/', function () use ($router) {
 });
 
 $router->get('/basic', 'Basic@index');
+$router->get('/cron', 'Cron@index');

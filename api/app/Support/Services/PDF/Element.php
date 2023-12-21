@@ -75,7 +75,6 @@ class Element
         if (isset($element->ratio)) {
             $this->ratio = floatval($element->ratio);
 
-            \Log::debug("adjusting $x and $y based on $this->ratio");
             if ($x < 1 && $y > 1) {
                 $x = $y * $this->ratio;
             }

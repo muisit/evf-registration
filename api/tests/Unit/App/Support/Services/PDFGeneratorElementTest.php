@@ -94,7 +94,7 @@ class PDFGeneratorElementTest extends TestCase
         $event->event_name = "EC2020 Bruxelles";
         $event->save();
         $template = $accreditation->template;
-        $generator = new PDFGenerator($accreditation);
+        $generator = new PDFGenerator();
         $accreditationData = (object) [
             'print' => 'a4portrait',
             'created' => '2000-01-01', // set explicit values to allow hash comparisons
@@ -103,7 +103,7 @@ class PDFGeneratorElementTest extends TestCase
         ];
         $content = $this->createBasicTemplate();
 
-        $vals=[
+        $vals = [
             [10, 10, 200, 40, 20],
             [250, 10, 150, 40, 30],
             [20, 120, 40, 200, 15],
@@ -115,7 +115,7 @@ class PDFGeneratorElementTest extends TestCase
         for ($i = 0; $i < sizeof($vals); $i++) {
             list($x, $y, $w, $h, $fs) = $vals[$i];
 
-            $content["elements"][]=[
+            $content["elements"][] = [
                 "type" => "text",
                 "text" => "This is a test with a lot of lines to see if this breaks up correctly. Add some lorem ipsum! And dolor, sit, amet, with - punctuations (sometimes) and an@email.address. Yes!",
                 "style" => [
@@ -129,12 +129,13 @@ class PDFGeneratorElementTest extends TestCase
             ];
         }
         $template->content = json_encode($content);
-        $generator->generate($accreditationData);
+        $accreditation->data = json_encode($accreditationData);
+        $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testText"));
 
         $path = tempnam(null, "pdftest");
         //$path = base_path('testtext.pdf');
-        $generator->saveFile($path);
+        $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
         $this->assertEquals("0742afc96bf5bd3c2e94fe2ccbe09411", $hash);
@@ -147,7 +148,7 @@ class PDFGeneratorElementTest extends TestCase
         $event->event_name = "EC2020 Bruxelles";
         $event->save();
         $template = $accreditation->template;
-        $generator = new PDFGenerator($accreditation);
+        $generator = new PDFGenerator();
         $accreditationData = (object) [
             'print' => 'a4portrait',
             'created' => '2000-01-01', // set explicit values to allow hash comparisons
@@ -176,16 +177,17 @@ class PDFGeneratorElementTest extends TestCase
         }
 
         $template->content = json_encode($content);
-        $generator->generate($accreditationData);
+        $accreditation->data = json_encode($accreditationData);
+        $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testText2"));
 
         $path = tempnam(null, "pdftest");
         //$path = base_path('testtext2.pdf');
-        $generator->saveFile($path);
+        $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
         $this->assertEquals("a83f3b454178fd5cf893c598a684f8fe", $hash);
-    }    
+    }
 
     public function testFonts()
     {
@@ -204,12 +206,14 @@ class PDFGeneratorElementTest extends TestCase
         $content = $this->createBasicTemplate();
 
         $offset = 20;
-        foreach([
+        foreach (
+            [
             "Courier", "Courier Bold", "Courier Italic","Courier Bold Italic",
             "Helvetica","Helvetica Bold","Helvetica Italic","Helvetica Bold Italic",
             "Times","Times Bold","Times Italic","Times Bold Italic",
             "DejaVuSans","DejaVuSans Bold","DejaVuSans Italic","DejaVuSans Bold Italic",
-        ] as $fontname) {
+            ] as $fontname
+        ) {
             $element = [
                 "type" => "text",
                 "text" => "This is a test in $fontname",
@@ -219,25 +223,26 @@ class PDFGeneratorElementTest extends TestCase
                     "width" => 400,
                     "height" => 100,
                     "color" => "#1234ab",
-                    "fontSize"=>"10",
+                    "fontSize" => "10",
                     "fontFamily" => $fontname
                 ]
             ];
-            $content["elements"][]=$element;
-            $offset += 32;    
+            $content["elements"][] = $element;
+            $offset += 32;
         }
 
         $template->content = json_encode($content);
-        $generator->generate($accreditationData);
+        $accreditation->data = json_encode($accreditationData);
+        $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testFonts"));
 
         $path = tempnam(null, "pdftest");
         $path = base_path('testfonts.pdf');
-        $generator->saveFile($path);
+        $generator->save($path);
         $hash = hash_file("md5", $path);
         //@unlink($path);
         $this->assertEquals("961a4d56e18418e05b82b60ed74c83a0", $hash);
-    }    
+    }
 
     public function testFonts2()
     {
@@ -246,7 +251,7 @@ class PDFGeneratorElementTest extends TestCase
         $event->event_name = "EC2020 Bruxelles";
         $event->save();
         $template = $accreditation->template;
-        $generator = new PDFGenerator($accreditation);
+        $generator = new PDFGenerator();
         $accreditationData = (object) [
             'print' => 'a4portrait',
             'created' => '2000-01-01', // set explicit values to allow hash comparisons
@@ -256,12 +261,14 @@ class PDFGeneratorElementTest extends TestCase
         $content = $this->createBasicTemplate();
 
         $offset = 20;
-        foreach([
+        foreach (
+            [
             "DejaVuSans Condensed","DejaVuSans Condensed Bold","DejaVuSans Condensed Italic","DejaVuSans Condensed Bold Italic",
             "DejaVuSans Mono","DejaVuSans Mono Bold","DejaVuSans Mono Italic","DejaVuSans Mono Bold Italic",
             "FreeSans","FreeSans Bold","FreeSans Italic","FreeSans Bold Italic",
             "FreeMono","FreeMono Bold","FreeMono Italic","FreeMono Bold Italic",
-        ] as $fontname) {
+            ] as $fontname
+        ) {
             $element = [
                 "type" => "text",
                 "text" => "This is a test in $fontname",
@@ -271,25 +278,26 @@ class PDFGeneratorElementTest extends TestCase
                     "width" => 400,
                     "height" => 100,
                     "color" => "#1234ab",
-                    "fontSize"=>"10",
+                    "fontSize" => "10",
                     "fontFamily" => $fontname
                 ]
             ];
-            $content["elements"][]=$element;
-            $offset += 32;    
+            $content["elements"][] = $element;
+            $offset += 32;
         }
 
         $template->content = json_encode($content);
-        $generator->generate($accreditationData);
+        $accreditation->data = json_encode($accreditationData);
+        $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testFonts2"));
 
         $path = tempnam(null, "pdftest");
         //$path = base_path('testfonts2.pdf');
-        $generator->saveFile($path);
+        $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
         $this->assertEquals("ffb261dec19f58ecb409a716dd4b42cb", $hash);
-    }    
+    }
 
     public function testFonts3()
     {
@@ -298,7 +306,7 @@ class PDFGeneratorElementTest extends TestCase
         $event->event_name = "EC2020 Bruxelles";
         $event->save();
         $template = $accreditation->template;
-        $generator = new PDFGenerator($accreditation);
+        $generator = new PDFGenerator();
         $accreditationData = (object) [
             'print' => 'a4portrait',
             'created' => '2000-01-01', // set explicit values to allow hash comparisons
@@ -308,11 +316,13 @@ class PDFGeneratorElementTest extends TestCase
         $content = $this->createBasicTemplate();
 
         $offset = 20;
-        foreach([
+        foreach(
+            [
             "FreeSerif","FreeSerif Bold","FreeSerif Italic","FreeSerif Bold Italic",
             "Eurofurence","Eurofurence Bold","Eurofurence Italic","Eurofurence Bold Italic",
             "Eurofurence Light","Eurofurence Light Italic",
-        ] as $fontname) {
+            ] as $fontname
+        ) {
             $element = [
                 "type" => "text",
                 "text" => "This is a test in $fontname",
@@ -326,19 +336,20 @@ class PDFGeneratorElementTest extends TestCase
                     "fontFamily" => $fontname
                 ]
             ];
-            $content["elements"][]=$element;
-            $offset += 32;    
+            $content["elements"][] = $element;
+            $offset += 32;
         }
 
         $template->content = json_encode($content);
-        $generator->generate($accreditationData);
+        $accreditation->data = json_encode($accreditationData);
+        $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testFonts3"));
 
         $path = tempnam(null, "pdftest");
         //$path = base_path('testfonts3.pdf');
-        $generator->saveFile($path);
+        $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
         $this->assertEquals("01bdf424862466ad7d6b1ed880b7f893", $hash);
-    }    
+    }
 }

@@ -57,7 +57,7 @@ class Accreditation extends Model
 
     public function path()
     {
-        return sprintf("accreditations/event_%d/badge_%d.pdf", $this->event_id, $this->id);
+        return storage_path(sprintf("accreditations/event_%d/badge_%d.pdf", $this->event_id, $this->id));
     }
 
     public function delete()

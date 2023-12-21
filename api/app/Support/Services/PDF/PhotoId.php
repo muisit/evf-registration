@@ -15,7 +15,7 @@ class PhotoId extends BasicImage
         }
         else {
             if ($this->generator->accreditation->fencer->fencer_picture != 'N') {
-                $path = $this->generator->accreditation->fencer->path();
+                $path = $this->generator->accreditation->fencer->image();
             }
             else {
                 $path = "doesnotexist"; // no photo to print

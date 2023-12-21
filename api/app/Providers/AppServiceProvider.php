@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Support\Services\PDFGenerator;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Lumen\Application;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,6 +15,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(PDFGenerator::class, function (Application $app) {
+            return new PDFGenerator();
+        });
     }
 }
