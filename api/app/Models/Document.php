@@ -12,7 +12,7 @@ class Document extends Model
     public $timestamps = false;
 
     protected $casts = [
-        "config" => AsArrayObject::class,
+        "config" => "array",
     ];
 
     public function event(): BelongsTo
@@ -50,5 +50,10 @@ class Document extends Model
     public function getPath()
     {
         return storage_path('app/documents/' . $this->path);
+    }
+
+    public function setConfig($vals)
+    {
+        $this->config = array_merge($this->config ?? [], $vals);
     }
 }

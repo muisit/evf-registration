@@ -62,4 +62,10 @@ class PDFService
         $service = new SummaryCreateService($document, $type, $model);
         return $service->handle();
     }
+
+    public function makeFpdi()
+    {
+        \Log::debug("creating Fpdi");
+        return new \setasign\Fpdi\Tcpdf\Fpdi();
+    }
 }

@@ -16,7 +16,7 @@ class SummaryCreateService
     private Document $document;
     private Event $event;
     private string $type;
-    private array $accreditations;
+    private $accreditations;
 
     private $overallhash = null;
     private array $files = [];
@@ -26,7 +26,9 @@ class SummaryCreateService
     {
         $this->document = $document;
 
-        $this->accreditations = $document->config["accreditations"] ?? [];
+        $this->accreditations = Accreditation::whereIn('id', $document->config["accreditations"] ?? [])
+            ->with(['fencer', 'event', 'template'])
+            ->get();
         $this->type = $document->config['type'] ?? '';
         $typeId = $document->config['typeId'] ?? 0;
         $this->model = PDFService::modelFactory($this->type, $typeId);
@@ -59,15 +61,15 @@ class SummaryCreateService
         $this->files = [];
         // check that all files exist
         foreach ($this->accreditations as $a) {
-            if ($a->isDirty()) {
+            if (!empty($a->is_dirty)) {
                 \Log::error("Dirty accreditation prevents creating summary file " . $this->document->getKey());
                 return;
             }
 
-            $path = $a->getPath();
+            $path = $a->path();
             if (!file_exists($path)) {
                 \Log::error("missing PDF $path prevents creation of summary file " . $this->document->getKey());
-                $a->setDirty();
+                $a->is_dirty = date('Y-m-d H:i:s');
                 $a->save();
                 return;
             }
@@ -76,7 +78,7 @@ class SummaryCreateService
         foreach ($this->accreditations as $a) {
             $hash = $a->file_hash;
             $key = $a->fencer->getFullName() . "~" . $a->getKey();
-            $this->files[$key] = ["file" => $a->getPath(), "hash" => $hash, "accreditation" => $a];
+            $this->files[$key] = ["file" => $a->path(), "hash" => $hash, "accreditation" => $a];
         }
 
         // sort the files by fencer name
@@ -95,7 +97,7 @@ class SummaryCreateService
 
     private function createPDF()
     {
-        $this->pdf = new \setasign\Fpdi\Tcpdf\Fpdi();
+        $this->pdf = app(PDFService::class)->makeFpdi();
         
         $currentposition = null;
         foreach ($this->files as $k => $v) {
@@ -134,7 +136,7 @@ class SummaryCreateService
         return $followingposition;
     }
 
-    private function positionPage(string $pageoption, ?PagePositions $currentposition): array
+    public function positionPage(string $pageoption, ?PagePositions $currentposition): array
     {
         $thisposition = null;
         $followingposition = null;
@@ -142,16 +144,16 @@ class SummaryCreateService
             default:
             case 'a4portrait':
                 if ($currentposition === null) {
-                    $thisposition = PagePosition::A4_1;
-                    $followingposition = PagePosition::A4_3;
+                    $thisposition = PagePositions::A4_1;
+                    $followingposition = PagePositions::A4_3;
                 }
-                else if ($currentposition === PagePosition::A4_3) {
-                    $thisposition = PagePosition::A4_3;
+                else if ($currentposition === PagePositions::A4_3) {
+                    $thisposition = PagePositions::A4_3;
                     $followingposition = null; // new page
                 }
                 break;
             case 'a4landscape':
-                $thisposition = PagePosition::A4L_1;
+                $thisposition = PagePositions::A4L_1;
                 $followingposition = null;
                 break;
             case 'a4portrait2':
@@ -176,24 +178,24 @@ class SummaryCreateService
             case 'a4landscape2':
                 if ($currentposition === null) {
                     $thisposition = PagePositions::A4L_1;
-                    $followingposition = PagePosition::A4L_2;
+                    $followingposition = PagePositions::A4L_2;
                 }
                 else if ($currentposition === PagePositions::A4L_2) {
-                    $thisposition = PagePosition::A4L_2;
+                    $thisposition = PagePositions::A4L_2;
                     $followingposition = null;
                 }
                 break;
             case 'a5landscape':
-                $thisposition = PagePosition::A5L_1;
+                $thisposition = PagePositions::A5L_1;
                 $followingposition = null;
                 break;
             case 'a5landscape2':
                 if ($currentposition === null) {
-                    $thisposition = PagePosition::A5L_1;
-                    $followingposition = PagePosition::A5L_2;
+                    $thisposition = PagePositions::A5L_1;
+                    $followingposition = PagePositions::A5L_2;
                 }
-                else if ($currentposition === PagePosition::A5L_2) {
-                    $thisposition = PagePosition::A5L_2;
+                else if ($currentposition === PagePositions::A5L_2) {
+                    $thisposition = PagePositions::A5L_2;
                     $followingposition = null;
                 }
                 break;
@@ -205,13 +207,13 @@ class SummaryCreateService
         return [$thisposition, $followingposition];
     }
 
-    private function plagePage(?PagePositions $position): array
+    public function placePage(?PagePositions $position): array
     {
         $x = 0;
         $y = 0;
         $w = 210;
         $h = 297;
-        switch ($thisposition) {
+        switch ($position) {
             case PagePositions::A4_1:
                 break; // no adjustments
             case PagePositions::A4_2:

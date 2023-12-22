@@ -89,7 +89,7 @@ class SummarySplitService
             }
             else {
                 $doc = $this->createSummaryDocument();
-                $doc->config["accreditations"] = array_map(fn ($accr) => $accr->getKey(), array_values($batch));
+                $doc->setConfig(["accreditations" => array_map(fn ($accr) => $accr->getKey(), array_values($batch))]);
                 $newDocs[] = $doc;
             }
         }
@@ -103,9 +103,8 @@ class SummarySplitService
     private function createSummaryDocument()
     {
         $doc->name = $this->createName();
-        $doc->config["event"] = $this->event->getKey();
-        $doc->config["type"] = $this->type;
-        $doc->config["typeId"] = $this->model->getKey(); // works because it is shared between all App\Models\Model
+        $doc->setConfig(["type" => $this->type]);
+        $doc->setConfig(["typeId" => $this->model->getKey()]); // works because it is shared between all App\Models\Model
         $doc->save();
         $doc->path = $doc->name . "_" . $doc->getKey() . ".pdf";
         $doc->save();
