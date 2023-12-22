@@ -34,13 +34,13 @@ use Carbon\Carbon;
 // 2 registrations for the gala (id 6, WCAT3, MCAT3)
 // 5 registrations for support roles (3x MCAT5, 2x MCAT4)
 //
-// there are 8 accreditations
+// there are 9 accreditations
 // 1 for MCAT1, with 2 registrations (MFCAT1, MFTEAM1)
 // 1 for MCAT1B, with 1 registration (MFTEAM2)
 // 1 for MCAT1C, with 1 registration (MFTEAM3)
 // 1 for MCAT2, with 2 registrations (MFCAT2, MFTEAM1)
 // 1 for WCAT1, with 1 registration (WSCAT1)
-// 2 for MCAT5, with 2 country support roles and 1 organisation support role
+// 2 for MCAT5, with 2 country support roles and 2 organisation support roles for 2 different templates
 // 1 for MCAT4, with 2 support roles (organisation)
 
 class AccreditationCreateServiceTest extends TestCase
@@ -88,8 +88,8 @@ class AccreditationCreateServiceTest extends TestCase
         $event = Event::find(EventData::EVENT1);
         $service = new AccreditationCreateService($fencer, $event);
         $output = $service->handle();
-        // MCAT5 has 3 official roles, 2 federative and one organisational
-        $this->assertCount(2, $output); // one federative, one official badge
+        // MCAT5 has 4 official roles, 2 federative, one referee and one organisational
+        $this->assertCount(3, $output); // one federative, one organisational, one referee badge
 
         $this->assertEquals(TemplateData::COUNTRY, $output[1]['template']->getKey());
         $this->assertEquals(4, $output[1]['content']['category']); // 4 is the max
@@ -100,10 +100,17 @@ class AccreditationCreateServiceTest extends TestCase
 
         $this->assertEquals(TemplateData::ORG, $output[0]['template']->getKey());
         $this->assertEquals(4, $output[0]['content']['category']);
-        $this->assertEquals(['Referee'], $output[0]['content']['roles']);
+        $this->assertEquals(['Volunteer'], $output[0]['content']['roles']);
         $this->assertEquals(['ALL'], $output[0]['content']['dates']);
         $this->assertEquals('ORG', $output[0]['content']['organisation']);
         $this->assertEquals('GER', $output[0]['content']['country']);
+
+        $this->assertEquals(TemplateData::REFEREE, $output[2]['template']->getKey());
+        $this->assertEquals(4, $output[2]['content']['category']);
+        $this->assertEquals(['Referee'], $output[2]['content']['roles']);
+        $this->assertEquals(['ALL'], $output[2]['content']['dates']);
+        $this->assertEquals('ORG', $output[2]['content']['organisation']);
+        $this->assertEquals('GER', $output[2]['content']['country']);
     }
 
     public function testOnAllDates()

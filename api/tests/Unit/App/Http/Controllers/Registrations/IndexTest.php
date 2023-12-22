@@ -25,7 +25,7 @@ class IndexTest extends TestCase
 
         $output = $this->response->json();
         $this->assertTrue($output !== false);
-        $this->assertCount(5, $output['registrations']); // 5 organisation roles
+        $this->assertCount(6, $output['registrations']); // 6 organisation roles
         $this->assertCount(3, $output['fencers']); // MCAT4, MCAT5 and MCAT3 (invited to Gala)
     }
 

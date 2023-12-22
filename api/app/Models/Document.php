@@ -2,11 +2,23 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+
 class Document extends Model
 {
     protected $table = 'TD_Document';
     //protected $primaryKey = 'id';
     public $timestamps = false;
+
+    protected $casts = [
+        "config" => AsArrayObject::class,
+    ];
+
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(Event::class, 'event_id', 'event_id');
+    }
 
     public function deleteByName()
     {

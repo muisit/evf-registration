@@ -10,7 +10,7 @@ use Tests\Support\Data\Event as EventData;
 use Tests\Unit\TestCase;
 use Illuminate\Support\Facades\Queue;
 
-class CheckCleanupTest extends TestCase
+class CleanAccreditationsTest extends TestCase
 {
     public function fixtures()
     {

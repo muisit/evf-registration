@@ -16,6 +16,7 @@ class Accreditation extends Fixture
     public const COACH = 11;
     public const HOD = 11;
     public const REFEREE = 20;
+    public const VOLUNTEER = 21;
     public const DIRECTOR = 30;
 
     protected static function boot()
@@ -116,10 +117,24 @@ class Accreditation extends Fixture
         ])->save();
 
         Model::create([
-            'id' => self::REFEREE,
+            'id' => self::VOLUNTEER,
             'fencer_id' => Fencer::MCAT5,
             'event_id' => Event::EVENT1,
             'template_id' => AccreditationTemplate::ORG,
+            'data' => '{}',
+            'hash' => null,
+            'file_hash' => null,
+            'file_id' => null,
+            'generated' => null,
+            'is_dirty' => null,
+            'fe_id' => null
+        ])->save();
+
+        Model::create([
+            'id' => self::REFEREE,
+            'fencer_id' => Fencer::MCAT5,
+            'event_id' => Event::EVENT1,
+            'template_id' => AccreditationTemplate::REFEREE,
             'data' => '{}',
             'hash' => null,
             'file_hash' => null,

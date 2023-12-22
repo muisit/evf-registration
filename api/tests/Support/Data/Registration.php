@@ -27,6 +27,7 @@ class Registration extends Fixture
     public const SUP3 = 42;
     public const SUP4 = 43;
     public const SUP5 = 44;
+    public const SUP6 = 45;
 
     protected static function boot()
     {
@@ -281,6 +282,21 @@ class Registration extends Fixture
             'registration_id' => self::SUP5,
             'registration_role' => Role::VOLUNTEER,
             'registration_fencer' => Fencer::MCAT4,
+            'registration_event' => null,
+            'registration_date' => '2022-01-01',
+            'registration_paid' => 'Y',
+            'registration_paid_hod' => 'Y',
+            'registration_mainevent' => Event::EVENT1,
+            'registration_payment' => 'I',
+            'registration_state' => 'A',
+            'registration_team' => null,
+            'registration_country' => null
+        ])->save();
+
+        Model::create([
+            'registration_id' => self::SUP6,
+            'registration_role' => Role::VOLUNTEER,
+            'registration_fencer' => Fencer::MCAT5,
             'registration_event' => null,
             'registration_date' => '2022-01-01',
             'registration_paid' => 'Y',

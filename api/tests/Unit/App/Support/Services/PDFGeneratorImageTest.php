@@ -122,12 +122,14 @@ class PDFGeneratorImageTest extends TestCase
             ];
         }
         $template->content = json_encode($content);
-        $generator->generate($accreditationData);
+        $template->save();
+        $accreditation->data = json_encode($accreditationData);
+        $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testbasicelements"));
 
         $path = tempnam(null, "pdftest");
         //$path = base_path('testpdfphoto.pdf');
-        $generator->saveFile($path);
+        $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
         $this->assertEquals("4c34414c0bf3b9d1526ad4cf8938027d", $hash);
@@ -157,12 +159,14 @@ class PDFGeneratorImageTest extends TestCase
         ];
 
         $template->content = json_encode($content);
-        $generator->generate($accreditationData);
+        $template->save();
+        $accreditation->data = json_encode($accreditationData);
+        $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testimages"));
 
         $path = tempnam(null, "pdftest");
         //$path = base_path('testimages.pdf');
-        $generator->saveFile($path);
+        $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
         $this->assertEquals("9fa5f2a4faa7bfb7ddc113b30368f6cb", $hash);
@@ -206,12 +210,14 @@ class PDFGeneratorImageTest extends TestCase
         }
 
         $template->content = json_encode($content);
-        $generator->generate($accreditationData);
+        $template->save();
+        $accreditation->data = json_encode($accreditationData);
+        $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testimages2"));
 
         $path = tempnam(null, "pdftest");
         //$path = base_path('testimages2.pdf');
-        $generator->saveFile($path);
+        $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
         $this->assertEquals("30ee00eb7ff6070f7578eff1b8b78ff0", $hash);
@@ -255,12 +261,14 @@ class PDFGeneratorImageTest extends TestCase
         }
 
         $template->content = json_encode($content);
-        $generator->generate($accreditationData);
+        $template->save();
+        $accreditation->data = json_encode($accreditationData);
+        $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testimages3"));
 
         $path = tempnam(null, "pdftest");
         //$path = base_path('testimages3.pdf');
-        $generator->saveFile($path);
+        $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
         $this->assertEquals("53ad05f0f4b1db30332d84f14cd22490", $hash);

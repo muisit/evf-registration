@@ -30,6 +30,7 @@ class CheckCleanupTest extends TestCase
         $event->save();
         $job->handle();
         // storage location does not exist
+        @rmdir(PDFService::pdfPath($event));
         Queue::assertPushed(CleanAccreditations::class, 0);
 
         $event->event_open = "3000-01-01";
