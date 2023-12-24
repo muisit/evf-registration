@@ -2,6 +2,7 @@
 
 namespace App\Support\Services;
 
+use App\Models\Document;
 use App\Models\Event;
 use App\Models\AccreditationTemplate;
 use App\Models\Role;
@@ -13,15 +14,11 @@ use App\Support\Services\PDF\SummaryCreateService;
 
 class PDFService
 {
-    public static function summaryName(int $eventId, string $type, int $modelId)
+    public static function pdfPath(?Event $event, $subpath = null, $makeAbsolute = true)
     {
-        return "summary_" . $eventId . "_" . $type . "_" . $modelId . '$';
-    }
-
-    public static function pdfPath(Event $event, $subpath = null)
-    {
-        $path = "app/pdfs/event" . $event->getKey() . ($subpath ? '/' . $subpath : '');
-        return storage_path($path);
+        if (empty($event)) return '';
+        $path = "pdfs/event" . $event->getKey() . ($subpath ? '/' . $subpath : '');
+        return $makeAbsolute ? storage_path('app/' . $path) : $path;
     }
 
     public static function modelFactory($type, $typeId)
@@ -57,9 +54,9 @@ class PDFService
         return $service->handle();
     }
 
-    public static function createSummary(Document $document, string $type, AccreditationRelation $model)
+    public static function createSummary(Document $document)
     {
-        $service = new SummaryCreateService($document, $type, $model);
+        $service = new SummaryCreateService($document);
         return $service->handle();
     }
 

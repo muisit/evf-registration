@@ -99,6 +99,9 @@ import { ElButton } from 'element-plus';
                         :r="line.registrations || 0"
                         :d="line.dirty || 0"
                         :g="line.generated || 0"
+                        type="Event"
+                        :typeId="line.sideEvent.id"
+                        @onRefresh="reload"
                         :docs="line.documents"
                         :key="line.sideEvent.id"/>
                 </tbody>
@@ -130,6 +133,9 @@ import { ElButton } from 'element-plus';
                         :r="line.registrations || 0"
                         :d="line.dirty || 0"
                         :g="line.generated || 0"
+                        type="Country"
+                        :typeId="line.country.id"
+                        @onRefresh="reload"
                         :docs="line.documents"
                         :key="line.country.id"/>
                 </tbody>
@@ -161,6 +167,9 @@ import { ElButton } from 'element-plus';
                         :r="line.registrations || 0"
                         :d="line.dirty || 0"
                         :g="line.generated || 0"
+                        type="Role"
+                        :typeId="line.role.id || 0"
+                        @onRefresh="reload"
                         :docs="line.documents"
                         :key="line.role.id || 0"/>
                 </tbody>
@@ -189,6 +198,9 @@ import { ElButton } from 'element-plus';
                         :r="line.registrations || 0"
                         :d="line.dirty || 0"
                         :g="line.generated"
+                        type="Template"
+                        :typeId="line.template.id"
+                        @onRefresh="reload"
                         :docs="line.documents || 0"
                         :key="line.template.id"/>
                 </tbody>

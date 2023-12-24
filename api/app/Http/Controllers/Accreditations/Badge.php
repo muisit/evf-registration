@@ -34,21 +34,17 @@ class Badge extends Controller
      */
     public function index(Request $request, int $accreditationId)
     {
-        \Log::debug("getting badge for $accreditationId");
         $event = $request->get('eventObject');
         if (empty($event) || !$event->exists || get_class($event) != Event::class) {
-            \Log::debug("no event given" . json_encode($event));
             $this->authorize("not/ever");
         }
         $accreditationObject = Accreditation::find($accreditationId);
         if (empty($accreditationObject) || $accreditationObject->event_id != $event->getKey()) {
-            \Log::debug("no valid accreditation");
             $this->authorize('not/ever');
         }
         $this->authorize('view', $accreditationObject);
 
         $filename = $accreditationObject->path();
-        \Log::debug("filename to check is $filename");
         if (Storage::disk('local')->exists($filename)) {
             return Storage::download($filename, $accreditationObject->template->name . '.pdf', ['Content-type' => 'application/pdf']);
         }

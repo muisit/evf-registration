@@ -2,30 +2,30 @@
  
 namespace App\Console\Commands;
  
-use App\Jobs\CheckDirtyBadges;
+use App\Jobs\CheckSummaries;
 use Illuminate\Console\Command;
  
-class QueueCheckDirtyBadges extends Command
+class QueueCheckDirtyDocuments extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'evf:dirty';
+    protected $signature = 'evf:documents';
  
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Schedule the CheckDirtyBadges job';
+    protected $description = 'Schedule the CheckSummaries job';
  
     /**
      * Execute the console command.
      */
     public function handle(): void
     {
-        dispatch(new CheckDirtyBadges(true));
+        dispatch(new CheckSummaries(true));
     }
 }

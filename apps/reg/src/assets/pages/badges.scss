@@ -15,6 +15,10 @@
                 table {
                     width: 70%;
 
+                    .document-icon {
+                        display: inline-block;
+                    }
+
                     .document-available {
                         color: green;
                     }

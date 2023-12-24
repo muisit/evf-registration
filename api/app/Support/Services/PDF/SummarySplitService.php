@@ -2,6 +2,8 @@
 
 namespace App\Support\Services\PDF;
 
+use App\Models\Accreditation;
+use App\Models\Document;
 use App\Models\Event;
 use App\Models\Fencer;
 use App\Support\Services\PDFService;
@@ -23,9 +25,12 @@ class SummarySplitService
 
     public function handle()
     {
+        \Log::debug("handling SummarySplit");
         $documents = $this->findExistingDocuments();
+        \Log::debug("found " . count($documents) . ' existing documents');
         $accreditations = $this->findAccreditations();
         if (count($accreditations) == 0) {
+            \Log::debug("no accreditations found, removing all documents");
             foreach ($documents as $doc) {
                 $doc->delete();
             }
@@ -37,13 +42,16 @@ class SummarySplitService
         return $documents;
     }
 
-    private function splitAccreditations(array $accreditations)
+    private function splitAccreditations($accreditations)
     {
+        \Log::debug("splitAccreditations for " . json_encode($accreditations->pluck('id')));
+        $accreditations = $accreditations->all();
         if (count($accreditations) < self::ACCREDITATIONS_PER_DOC) {
-            return [0 => $accreditations];
+            return [$accreditations];
         }
 
-        usort($accreditations, fn(Fencer $a1, Fencer $a2) => $a1->fencer->getFullName() <=> $a2->fencer->getFullName());
+        \Log::debug("accreditations is " . count($accreditations));
+        usort($accreditations, fn(Accreditation $a1, Accreditation $a2) => $a1->fencer->getFullName() <=> $a2->fencer->getFullName());
         $accreditations = array_values($accreditations); // is this necessary?
 
         $pages = ceil(count($accreditations) / self::ACCREDITATIONS_PER_DOC);
@@ -67,14 +75,15 @@ class SummarySplitService
 
     private function createSummaryDocuments($batches, $documents)
     {
+        \Log::debug("creating summary documents using " . count($batches));
         $newDocs = [];
-        foreach ($batches as $batch) {
+        foreach ($batches as $index => $batch) {
+            $batchIds = array_map(fn ($a) => $a->getKey(), array_values($batch));
             // see if we can find an oldDocument with the same selection of docs
             $found = null;
             foreach ($documents as $oldDoc) {
                 $accreditations = $oldDoc->config["accreditations"] ?? [];
                 if (count($accreditations) == count($batch)) {
-                    $batchIds = array_map(fn ($a) => $a->getKey(), array_values($batch));
                     $diff = array_diff(array_values($accreditations), $batchIds);
                     if (empty($diff)) {
                         $found = $oldDoc;
@@ -85,11 +94,13 @@ class SummarySplitService
 
             if ($found) {
                 $newDocs[] = $found;
-                $documents = array_filter($documents, fn($doc) => $doc->getKey() !== $found->getKey());
+                $documents = $documents->filter(fn($doc) => $doc->getKey() !== $found->getKey());
             }
             else {
                 $doc = $this->createSummaryDocument();
-                $doc->setConfig(["accreditations" => array_map(fn ($accr) => $accr->getKey(), array_values($batch))]);
+                \Log::debug("creating list of accreditations in batch of size " . json_encode($batchIds));
+                $doc->setConfig(["accreditations" => $batchIds]);
+                $doc->save();
                 $newDocs[] = $doc;
             }
         }
@@ -102,21 +113,19 @@ class SummarySplitService
 
     private function createSummaryDocument()
     {
-        $doc->name = $this->createName();
-        $doc->setConfig(["type" => $this->type]);
-        $doc->setConfig(["typeId" => $this->model->getKey()]); // works because it is shared between all App\Models\Model
+        $doc = new Document();
+        $doc->event_id = $this->event->getKey();
+        $doc->type = $this->type;
+        $doc->type_id = $this->model->getKey(); // works because it is shared between all App\Support\Contracts\AccreditationRelation
+        $doc->config = [];
         $doc->save();
-        $doc->path = $doc->name . "_" . $doc->getKey() . ".pdf";
+        $doc->path = $doc->type . "_" . $doc->type_id . '_' . $doc->getKey() . ".pdf";
         $doc->save();
-    }
-
-    private function createName()
-    {
-        return PDFService::summaryName($this->event->getKey(), $this->type, $this->model->getKey());
+        return $doc;
     }
 
     private function findExistingDocuments()
     {
-        return $this->event->documents;
+        return $this->event->documents()->where('type', $this->type)->where('type_id', $this->model->getKey())->get();
     }
 }

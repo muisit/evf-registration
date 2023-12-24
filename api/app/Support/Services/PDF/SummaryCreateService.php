@@ -4,7 +4,6 @@ namespace App\Support\Services\PDF;
 
 use App\Models\Accreditation;
 use App\Models\Document;
-use App\Models\Event;
 use App\Models\Fencer;
 use App\Support\Enums\PagePositions;
 use App\Support\Services\PDFService;
@@ -14,25 +13,20 @@ class SummaryCreateService
 {
     private AccreditationRelation $model;
     private Document $document;
-    private Event $event;
-    private string $type;
     private $accreditations;
 
-    private $overallhash = null;
-    private array $files = [];
+    private ?array $files = [];
     private $pdf = null;
 
     public function __construct(Document $document)
     {
         $this->document = $document;
 
+        \Log::debug("constructing CreateSummary for " . json_encode($document->config));
         $this->accreditations = Accreditation::whereIn('id', $document->config["accreditations"] ?? [])
-            ->with(['fencer', 'event', 'template'])
+            ->with(['fencer', 'template'])
             ->get();
-        $this->type = $document->config['type'] ?? '';
-        $typeId = $document->config['typeId'] ?? 0;
-        $this->model = PDFService::modelFactory($this->type, $typeId);
-        $this->event = $this->document->event;
+        $this->model = PDFService::modelFactory($document->type, $document->type_id);
     }
 
     public function handle()
@@ -42,68 +36,37 @@ class SummaryCreateService
             return;
         }
 
-        $this->createHash();
-        if (count($this->files) == 0) {
+        $this->files = $this->document->sortFiles();
+        if (empty($this->files) || count($this->files) == 0) {
             \Log::error("Could not create summary document: no files with hashes found " . $this->document->getKey());
             return;
         }
 
+        \Log::debug("creating PDF file");
         $this->createPDF();
 
         if (file_exists($this->document->getPath())) {
-            $this->document->hash = $this->overallhash;
+            \Log::debug("saving document hash");
+            $this->document->hash = $this->document->createHash();
             $this->document->save();
         }
-    }
-
-    private function createHash()
-    {
-        $this->files = [];
-        // check that all files exist
-        foreach ($this->accreditations as $a) {
-            if (!empty($a->is_dirty)) {
-                \Log::error("Dirty accreditation prevents creating summary file " . $this->document->getKey());
-                return;
-            }
-
-            $path = $a->path();
-            if (!file_exists($path)) {
-                \Log::error("missing PDF $path prevents creation of summary file " . $this->document->getKey());
-                $a->is_dirty = date('Y-m-d H:i:s');
-                $a->save();
-                return;
-            }
-        }
-
-        foreach ($this->accreditations as $a) {
-            $hash = $a->file_hash;
-            $key = $a->fencer->getFullName() . "~" . $a->getKey();
-            $this->files[$key] = ["file" => $a->path(), "hash" => $hash, "accreditation" => $a];
-        }
-
-        // sort the files by fencer name
-        // Sorting makes it easier for the end user to find missing accreditations
-        // Also, sorting is vital to make sure the overall hash is created in the
-        // same way
-        ksort($this->files, SORT_NATURAL);
-
-        // accumulate all hashes to get at an overall hash
-        $acchash = "";
-        foreach ($this->files as $k => $v) {
-            $acchash .= $v["hash"];
-        }
-        $this->overallhash = hash('sha256', $acchash);
     }
 
     private function createPDF()
     {
         $this->pdf = app(PDFService::class)->makeFpdi();
+        \Log::debug("created PDF");
         
         $currentposition = null;
         foreach ($this->files as $k => $v) {
+            \Log::debug("placing accreditation " . json_encode($currentposition));
             $currentposition = $this->placeAccreditation($v, $currentposition);
         }
 
+        $dirname = dirname($this->document->getPath());
+        \Log::debug("creating directory $dirname");
+        @mkdir($dirname, 0755, true);
+        \Log::debug("saving file at " . $this->document->getPath());
         $this->pdf->Output($this->document->getPath(), 'F');
     }
 
@@ -121,13 +84,14 @@ class SummaryCreateService
                 $pageoption = $content["print"];
             }
         }
+        \Log::debug("template page option is " . json_encode($pageoption));
 
         $this->pdf->SetSourceFile($file);
         $templateId = $this->pdf->importPage(1);
 
         list($thisposition, $followingposition) = $this->positionPage($pageoption, $currentposition);
         if ($currentposition === null) {
-            $size = $this->getPageSize($this->pdf, $pageoption, $templateId);
+            $size = $this->getPageSize($pageoption, $templateId);
             $this->pdf->AddPage($size['orientation'], $size);
         }
 
@@ -274,6 +238,7 @@ class SummaryCreateService
                 $size = $this->pdf->getTemplateSize($templateId, 105);
                 break;
         }
+        \Log::debug("getPageSize for " . json_encode([$pageoption, $templateId]) . ' returns ' . json_encode($size));
         return $size;
     }
 }

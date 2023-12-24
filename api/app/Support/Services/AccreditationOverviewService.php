@@ -88,8 +88,7 @@ class AccreditationOverviewService
 
     private function findDocuments(string $type, int $modelId)
     {
-        $name = PDFService::summaryName($this->event->getKey(), $type, $modelId);
-        return Document::findByName($name)->get();
+        return $this->event->documents()->where('type', $type)->where('type_id', $modelId)->get();
     }
 
     private function decorateResults($type, $namePart, $results, $removeEmptyLines = true)

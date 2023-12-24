@@ -32,11 +32,6 @@ class SetupSummary extends Job implements ShouldBeUniqueUntilProcessing
 
     public function uniqueId(): string
     {
-        return $this->summaryName();
-    }
-
-    private function summaryName(): string
-    {
         return $this->event->getKey() . '_' . $this->type . "_" . $this->typeId;
     }
 
@@ -58,8 +53,7 @@ class SetupSummary extends Job implements ShouldBeUniqueUntilProcessing
 
         $documents = PDFService::split($this->event, $this->type, $model);
         foreach ($documents as $doc) {
-            dispatch(CreateSummary($doc));
+            dispatch(new CreateSummary($doc));
         }
     }
-
 }

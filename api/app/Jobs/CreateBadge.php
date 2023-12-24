@@ -50,6 +50,8 @@ class CreateBadge extends Job implements ShouldBeUniqueUntilProcessing
         if (!file_exists($path)) {
             $generator = app(PDFGenerator::class);
             $generator->generate($this->accreditation);
+            $dirname = dirname($path);
+            @mkdir($dirname, 0755, true);
             $generator->save($path);
 
             if (!file_exists($path)) {

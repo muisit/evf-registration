@@ -30,5 +30,21 @@ $router->group(
                 'uses' => 'Accreditations\Regenerate@index'
             ]
         );
+
+        $router->get(
+            '/summary/{summaryId}',
+            [
+                'as' => 'acrreditations.download',
+                'uses' => 'Accreditations\Download@index'
+            ]
+        );
+
+        $router->post(
+            '/summary',
+            [
+                'as' => 'acrreditations.summary',
+                'uses' => 'Accreditations\Summary@index'
+            ]
+        );
     }
 );

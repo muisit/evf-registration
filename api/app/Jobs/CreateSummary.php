@@ -47,7 +47,10 @@ class CreateSummary extends SetupSummary
         else {
             PDFService::createSummary($this->document);
             if (!file_exists($this->document->getPath())) {
-                $this->fail("Could not create PDF at " . $document->getPath());
+                // remove the document as well to prevent the job from hanging
+                // Because the whole summary is now botched, we have to remove all documents of this type and id
+                $this->document->deleteSiblings();
+                $this->fail("Could not create PDF at " . $this->document->getPath());
             }
         }
     }

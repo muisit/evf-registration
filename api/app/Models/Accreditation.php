@@ -58,7 +58,7 @@ class Accreditation extends Model
 
     public function path()
     {
-        return PDFService::pdfPath($this->event, sprintf("badge_%d.pdf", $this->id));
+        return PDFService::pdfPath($this->event, sprintf("badges/badge_%d.pdf", $this->id));
     }
 
     public function delete()
