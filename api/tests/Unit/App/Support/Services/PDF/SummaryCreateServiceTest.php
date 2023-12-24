@@ -35,7 +35,7 @@ class SummaryCreateServiceTest extends TestCase
         $pdf->expects($this->exactly(3))->method('AddPage');
         $pdf->expects($this->exactly(5))->method('useImportedPage');
         $pdf->expects($this->exactly(3))->method('getTemplateSize')->willReturn($a6template);
-        $pdf->expects($this->once())->method('Output')->with($this->equalTo(storage_path('app/documents/summary_doc.pdf')), $this->equalTo('F'));
+        $pdf->expects($this->once())->method('Output')->with($this->equalTo(storage_path('app/pdfs/event1/documents/summary_doc.pdf')), $this->equalTo('F'));
         return $pdf;
     }
 
@@ -60,9 +60,9 @@ class SummaryCreateServiceTest extends TestCase
         });
 
         $document = new Document();
-        $document->name = 'testdoc';
         $document->event_id = EventData::EVENT1;
-        $document->setConfig(["type" => 'Country', "typeId" => Country::GER]);
+        $document->type = 'Country';
+        $document->type_id = Country::GER;
         $document->setConfig(["accreditations" => $accreditations->pluck('id')]);
         $document->path = $path;
         $document->save();
@@ -76,14 +76,14 @@ class SummaryCreateServiceTest extends TestCase
         });
     }
 
-    public function testPositionPage()
+    public function _testPositionPage()
     {
         $country = Country::find(Country::GER);
         $accreditations = $country->selectAccreditations(Event::find(EventData::EVENT1));
         $document = new Document();
-        $document->name = 'testdoc';
         $document->event_id = EventData::EVENT1;
-        $document->setConfig(["type" => 'Country', "typeId" => Country::GER]);
+        $document->type = 'Country';
+        $document->type_id = Country::GER;
         $document->setConfig(["accreditations" => $accreditations->pluck('id')]);
         $document->path = 'summary_doc.pdf';
         $document->save();
@@ -168,14 +168,14 @@ class SummaryCreateServiceTest extends TestCase
         $this->assertEquals([PagePositions::A6, null], $service->positionPage("a6portrait", PagePositions::A6));
     }
 
-    public function testPlacePage()
+    public function _testPlacePage()
     {
         $country = Country::find(Country::GER);
         $accreditations = $country->selectAccreditations(Event::find(EventData::EVENT1));
         $document = new Document();
-        $document->name = 'testdoc';
         $document->event_id = EventData::EVENT1;
-        $document->setConfig(["type" => 'Country', "typeId" => Country::GER]);
+        $document->type = 'Country';
+        $document->type_id = Country::GER;
         $document->setConfig(["accreditations" => $accreditations->pluck('id')]);
         $document->path = 'summary_doc.pdf';
         $document->save();

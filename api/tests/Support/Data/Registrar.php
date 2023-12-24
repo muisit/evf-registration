@@ -12,6 +12,12 @@ class Registrar extends Fixture
     public const REGGEN = 1;
     public const REGGER = 2;
 
+    protected static function wasBooted($cls)
+    {
+        $count = Model::where('id', '>', 0)->count();
+        return $count > 0;
+    }
+
     protected static function boot()
     {
         self::booted();

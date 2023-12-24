@@ -28,9 +28,14 @@ class CheckCleanupTest extends TestCase
         $event = Event::find(EventData::EVENT1);
         $event->event_open = "2000-01-01";
         $event->save();
-        $job->handle();
+
         // storage location does not exist
+        $cleanJob = new CleanAccreditations($event);
+        $cleanJob->handle();
         @rmdir(PDFService::pdfPath($event));
+        $this->assertFalse(file_exists(PDFService::pdfPath($event)));
+
+        $job->handle();
         Queue::assertPushed(CleanAccreditations::class, 0);
 
         $event->event_open = "3000-01-01";

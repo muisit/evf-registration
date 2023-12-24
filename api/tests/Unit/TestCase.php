@@ -13,11 +13,11 @@ abstract class TestCase extends BaseTestCase
 
     public function setUp(): void
     {
-        Fixture::clear();
+        //Fixture::clear();
         parent::setUp();
-        if (method_exists($this, 'fixtures')) {
-            $this->fixtures();
-        }
+        //if (method_exists($this, 'fixtures')) {
+        //    $this->fixtures();
+        //}
         $request = request();
         $this->app->instance('request', $request);
         $this->app->useStoragePath(realpath(__DIR__ . '/../_output'));
@@ -43,6 +43,7 @@ abstract class TestCase extends BaseTestCase
 
         return $this;
     }
+
     protected function startSession()
     {
         if (! $this->app['session']->isStarted()) {
@@ -51,6 +52,7 @@ abstract class TestCase extends BaseTestCase
 
         return $this;
     }
+
     public function flushSession()
     {
         $this->startSession();

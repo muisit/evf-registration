@@ -13,6 +13,12 @@ class AccreditationTemplate extends Fixture
     public const COUNTRY = 3;
     public const REFEREE = 4;
 
+    protected static function wasBooted($cls)
+    {
+        $count = Model::where('id', '>', 0)->count();
+        return $count > 0;
+    }
+
     protected static function boot()
     {
         Event::create();

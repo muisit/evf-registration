@@ -29,6 +29,12 @@ class Registration extends Fixture
     public const SUP5 = 44;
     public const SUP6 = 45;
 
+    protected static function wasBooted($cls)
+    {
+        $count = Model::where('registration_id', '>', 0)->count();
+        return $count > 0;
+    }
+
     protected static function boot()
     {
         Event::create();

@@ -13,6 +13,12 @@ class Event extends Fixture
     public const EVENT1 = 1;
     public const NOSUCHEVENT = 992;
 
+    protected static function wasBooted($cls)
+    {
+        $count = Model::where('event_id', '>', 0)->count();
+        return $count > 0;
+    }
+
     protected static function boot()
     {
         self::booted();

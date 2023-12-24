@@ -15,6 +15,12 @@ class Competition extends Fixture
     public const MFTEAM = 3;
     public const WSCAT1 = 4;
 
+    protected static function wasBooted($cls)
+    {
+        $count = Model::where('competition_id', '>', 0)->count();
+        return $count > 0;
+    }
+
     protected static function boot()
     {
         Event::create();

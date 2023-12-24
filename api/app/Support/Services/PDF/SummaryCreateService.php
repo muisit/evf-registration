@@ -11,7 +11,7 @@ use App\Support\Contracts\AccreditationRelation;
 
 class SummaryCreateService
 {
-    private AccreditationRelation $model;
+    private ?AccreditationRelation $model;
     private Document $document;
     private $accreditations;
 

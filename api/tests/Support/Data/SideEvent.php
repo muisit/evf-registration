@@ -16,6 +16,12 @@ class SideEvent extends Fixture
     public const GALA = 6;
     public const NOSUCHEVENT = 2883;
 
+    protected static function wasBooted($cls)
+    {
+        $count = Model::where('id', '>', 0)->count();
+        return $count > 0;
+    }
+
     protected static function boot()
     {
         Event::create();

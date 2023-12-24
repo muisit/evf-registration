@@ -19,6 +19,12 @@ class Accreditation extends Fixture
     public const VOLUNTEER = 21;
     public const DIRECTOR = 30;
 
+    protected static function wasBooted($cls)
+    {
+        $count = Model::where('id', '>', 0)->count();
+        return $count == 9;
+    }
+
     protected static function boot()
     {
         Fencer::create();

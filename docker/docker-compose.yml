@@ -46,6 +46,7 @@ services:
 
     mysql:
         image: 'mysql/mysql-server:8.0'
+        command: mysqld --general-log=1 --general-log-file=/var/lib/mysql/general-log.log
         ports:
             - '${FORWARD_DB_PORT:-3306}:3306'
         environment:

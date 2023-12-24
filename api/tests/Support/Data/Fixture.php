@@ -7,13 +7,13 @@ class Fixture
     private static $booted = [];
     protected static function wasBooted($cls)
     {
-        return in_array($cls, self::$booted);
+        return false;
     }
 
     protected static function booted()
     {
         $cls = get_called_class();
-        if (!self::wasBooted($cls)) {
+        if (!static::wasBooted($cls)) {
             self::$booted[] = $cls;
         }
     }
@@ -22,7 +22,7 @@ class Fixture
     {
         // get_called_class and static:: use 'late-static-binding'
         // so we bind to the original child class implementation
-        if (!self::wasBooted(get_called_class())) {
+        if (!static::wasBooted(get_called_class())) {
             static::boot();
         }
     }
@@ -35,5 +35,21 @@ class Fixture
     public static function clear()
     {
         self::$booted = [];
+    }
+
+    public static function loadAll()
+    {
+        Fencer::create();
+        WPUser::create();
+        Registrar::create();
+
+        Event::create();
+        Competition::create();
+        SideEvent::create();
+        EventRole::create();
+        AccreditationTemplate::create();
+
+        Registration::create();
+        Accreditation::create();
     }
 }
