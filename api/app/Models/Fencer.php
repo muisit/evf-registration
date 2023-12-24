@@ -41,4 +41,11 @@ class Fencer extends Model
     {
         return strtoupper($this->fencer_surname) . ", " . $this->fencer_firstname;
     }
+
+    public function save(array $options = [])
+    {
+        if (parent::save($options)) {
+            Accreditation::makeDirty($this, null);
+        }
+    }
 }

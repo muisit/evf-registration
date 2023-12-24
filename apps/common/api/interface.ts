@@ -14,6 +14,18 @@ export function abortAllCalls() {
     }
 }
 
+function glueParameters(path:string, data:any)
+{
+    var glue='?';
+    if (path.indexOf('?') > 0) {
+        glue = '&';
+    }
+    var elements = Object.keys(data).map((key) => {
+        return key + '=' + data[key];
+    });
+    return path + glue + elements.join('&');
+}
+
 function simpleFetch(method: string, path:string, data:any, options:object|null = {}, headers={}, postprocessor:any = null) {
     if(!controller) {
         controller = new AbortController();
@@ -44,14 +56,7 @@ function simpleFetch(method: string, path:string, data:any, options:object|null 
         fetchOptions.body = JSON.stringify(data);
     }
     if (data && method == 'GET') {
-        var glue='?';
-        if (path.indexOf('?') > 0) {
-            glue = '&';
-        }
-        var elements = Object.keys(data).map((key) => {
-            return key + '=' + data[key];
-        });
-        path = path + glue + elements.join('&');
+        path = glueParameters(path, data);
     }
 
     return fetch(import.meta.env.VITE_API_URL + path, fetchOptions)
@@ -87,6 +92,7 @@ function attachmentResponse() {
             return res.blob().then((blob:any)=> {
                 var file = window.URL.createObjectURL(blob);
                 window.location.assign(file);
+                window.URL.revokeObjectURL(file); // immediately release again
             });
         }
         else {
@@ -95,8 +101,13 @@ function attachmentResponse() {
     };
 }
 
-export function fetchAttachment(path:string, data={}, options={}, headers={}) {
-    return simpleFetch('GET', path, data, options, headers, attachmentResponse);
+export function fetchAttachment(path:string, data:any = {}) {
+    const auth = useAuthStore();
+    if (!data.event) data.event = auth.eventId;
+    if (!data.country) data.country = auth.countryId;
+    path = glueParameters(path, data);
+    window.location = import.meta.env.VITE_API_URL + path;
+    //return simpleFetch('GET', path, data, options, headers, attachmentResponse);
 }
 
 export function uploadFile(path:string, selectedFile:any, add_data:any, options={}, headers={}): Promise<FetchResponse> {

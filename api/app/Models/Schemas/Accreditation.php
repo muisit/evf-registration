@@ -41,6 +41,11 @@ class Accreditation
     public ?string $template;
 
     /**
+     * Template id
+     */
+    public int $templateId;
+
+    /**
      * Has File indicator
      */
     public string $hasFile;
@@ -52,6 +57,7 @@ class Accreditation
             $this->fencerId = $accreditation->fencer_id;
             $this->eventId = $accreditation->event_id;
             $this->template = $accreditation->template?->name;
+            $this->templateId = $accreditation->template_id;
             $this->hasFile = !empty($accreditation->generated) && !empty($accreditation->file_hash) ? 'Y' : 'N';
         }
     }

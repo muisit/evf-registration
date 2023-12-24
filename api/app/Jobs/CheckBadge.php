@@ -27,6 +27,8 @@ class CheckBadge extends Job implements ShouldBeUniqueUntilProcessing
     public int $fencerId;
     public int $eventId;
 
+    private $executeSynchronously = false;
+
     /**
      * Create a new job instance.
      *
@@ -48,7 +50,17 @@ class CheckBadge extends Job implements ShouldBeUniqueUntilProcessing
      *
      * @return void
      */
-    public function handle()
+    public function handle() {
+        return $this->doHandle();
+    }
+
+    public function handleSynchronous()
+    {
+        $this->executeSynchronously = true;
+        return $this->doHandle();
+    }
+
+    private function doHandle()
     {
         $fencer = Fencer::find($this->fencerId);
         $event = Event::find($this->eventId);
@@ -76,7 +88,18 @@ class CheckBadge extends Job implements ShouldBeUniqueUntilProcessing
             if (!empty($a->is_dirty)) {
                 $a->is_dirty = null; // make it clean to avoid additional jobs for this accreditation
                 $a->save();
-                dispatch(new CreateBadge($a));
+                $job = new CreateBadge($a);
+                if ($this->executeSynchronously) {
+                    try {
+                        $job->handle();
+                    }
+                    catch(\Exception $e) {
+                        \Log::error("caught exception trying to create a badge " . $e->getMessage());
+                    }
+                }
+                else {
+                    dispatch($job);
+                }
             }
         }
     }

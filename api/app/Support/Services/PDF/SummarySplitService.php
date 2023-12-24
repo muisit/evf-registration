@@ -119,9 +119,21 @@ class SummarySplitService
         $doc->type_id = $this->model->getKey(); // works because it is shared between all App\Support\Contracts\AccreditationRelation
         $doc->config = [];
         $doc->save();
-        $doc->path = $doc->type . "_" . $doc->type_id . '_' . $doc->getKey() . ".pdf";
+        $doc->path = $this->createName($doc);
         $doc->save();
         return $doc;
+    }
+
+    private function createName(Document $doc)
+    {
+        $name = '';
+        switch ($doc->type) {
+            case 'Country': $name = $this->model->country_abbr; break;
+            case 'Role': $name = $this->model->role_name; break;
+            case 'Event': $name = $this->model->title; break;
+            case 'Template': $name = $this->model->name;
+        }
+        return $doc->type . "_" . $name . '_' . $doc->getKey() . ".pdf";
     }
 
     private function findExistingDocuments()

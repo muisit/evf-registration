@@ -8,7 +8,7 @@ $router->group(
     ],
     function () use ($router) {
         $router->get(
-            '/{accreditationId}/badge',
+            '/{fencerId}/badge/{templateId}',
             [
                 'as' => 'accreditations.badge',
                 'uses' => 'Accreditations\Badge@index'
