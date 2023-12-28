@@ -13,6 +13,8 @@
         "bepsvpt/secure-headers": "^7.4",
         "darkaonline/swagger-lume": "10.*",
         "illuminate/cookie": "^10.18",
+        "illuminate/mail": "^10.38",
+        "illuminate/notifications": "^10.38",
         "kirschbaum-development/eloquent-power-joins": "^3.3",
         "laravel/lumen-framework": "^10.0",
         "league/flysystem": "^3.21",

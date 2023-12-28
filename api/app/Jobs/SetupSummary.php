@@ -44,11 +44,13 @@ class SetupSummary extends Job implements ShouldBeUniqueUntilProcessing
     {
         if (!in_array($this->type, ["Country", "Role", "Template", "Event"])) {
             $this->fail("Invalid summary type set: $this->type");
+            return;
         }
 
         $model = PDFService::modelFactory($this->type, $this->typeId);
         if (!$model->exists && ($this->type != 'Role' || $this->typeId != 0)) {
             $this->fail("Invalid type model, cannot create PDF summary for $this->type/$this->typeid");
+            return;
         }
 
         $documents = PDFService::split($this->event, $this->type, $model);

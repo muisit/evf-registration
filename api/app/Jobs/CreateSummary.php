@@ -43,6 +43,7 @@ class CreateSummary extends SetupSummary
         }
         if (file_exists($this->document->getPath())) {
             $this->fail("Could not remove old summary document from " . $this->document->getPath());
+            return;
         }
         else {
             PDFService::createSummary($this->document);

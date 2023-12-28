@@ -9,6 +9,7 @@ use App\Jobs\CheckCleanup;
 use App\Jobs\CheckSummaries;
 use App\Console\Commands\QueueCheckDirtyBadges;
 use App\Console\Commands\QueueCheckDirtyDocuments;
+use App\Console\Commands\SendGeneralNotification;
 
 class Kernel extends ConsoleKernel
 {
@@ -19,7 +20,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         QueueCheckDirtyBadges::class,
-        QueueCheckDirtyDocuments::class
+        QueueCheckDirtyDocuments::class,
+        SendGeneralNotification::class
     ];
 
     /**
