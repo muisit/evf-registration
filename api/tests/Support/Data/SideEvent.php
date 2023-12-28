@@ -22,6 +22,11 @@ class SideEvent extends Fixture
         return $count > 0;
     }
 
+    protected static function clear()
+    {
+        DB::table(Model::tableName())->delete();
+    }
+
     protected static function boot()
     {
         Event::create();

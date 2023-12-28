@@ -18,6 +18,11 @@ class Fixture
         }
     }
 
+    protected static function clear()
+    {
+
+    }
+
     public static function create()
     {
         // get_called_class and static:: use 'late-static-binding'
@@ -32,24 +37,36 @@ class Fixture
 
     }
 
-    public static function clear()
+    public static function clearBootCache()
     {
         self::$booted = [];
     }
 
     public static function loadAll()
     {
+        Fencer::clear();
         Fencer::create();
+
+        WPUser::clear();
         WPUser::create();
+
+        Registrar::clear();
         Registrar::create();
 
+        Event::clear();
         Event::create();
+        Competition::clear();
         Competition::create();
+        SideEvent::clear();
         SideEvent::create();
+        EventRole::clear();
         EventRole::create();
+        AccreditationTemplate::clear();
         AccreditationTemplate::create();
 
+        Registration::clear();
         Registration::create();
+        Accreditation::clear();
         Accreditation::create();
     }
 }
