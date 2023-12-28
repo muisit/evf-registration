@@ -7,6 +7,12 @@ use App\Models\EventRole as Model;
 
 class EventRole extends Fixture
 {
+    protected static function wasBooted($cls)
+    {
+        $count = Model::where('event_id', '>', 0)->count();
+        return $count > 0;
+    }
+
     protected static function boot()
     {
         Event::create();

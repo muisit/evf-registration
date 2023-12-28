@@ -2,11 +2,11 @@
     "api": {
         "major": 1,
         "minor": 0,
-        "micro": 6
+        "micro": 7
     },
     "register": {
         "major": 1,
         "minor": 0,
-        "micro": 14
+        "micro": 15
     }
 }

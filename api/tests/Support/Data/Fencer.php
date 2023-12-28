@@ -23,6 +23,12 @@ class Fencer extends Fixture
     public const MCAT1C = 12;
     public const NOSUCHFENCER = 2882;
 
+    protected static function wasBooted($cls)
+    {
+        $count = Model::where('fencer_id', '>', 0)->count();
+        return $count > 0;
+    }
+
     protected static function boot()
     {
         self::booted();

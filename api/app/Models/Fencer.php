@@ -36,4 +36,16 @@ class Fencer extends Model
     {
         return $this->hasMany(Accreditation::class, 'fencer_id', 'fencer_id');
     }
+
+    public function getFullName()
+    {
+        return strtoupper($this->fencer_surname) . ", " . $this->fencer_firstname;
+    }
+
+    public function save(array $options = [])
+    {
+        if (parent::save($options)) {
+            Accreditation::makeDirty($this, null);
+        }
+    }
 }

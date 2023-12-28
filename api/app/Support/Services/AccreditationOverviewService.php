@@ -52,31 +52,7 @@ class AccreditationOverviewService
     {
         $this->listOfSideEventsWithCompetition();
         $this->createRoleStructures();
-        $this->listTemplatesByRole();
-    }
-
-    private function listTemplatesByRole()
-    {
-        $templates = AccreditationTemplate::where('event_id', $this->event->getKey())->get();
-        foreach ($templates as $template) {
-            $roles = $template->forRoles();
-            foreach ($roles as $roleId) {
-                if (isset($this->roleById['r' . $roleId])) {
-                    $role = $this->roleById['r' . $roleId];
-                    $roleTypeKey = 'r' . $role->role_type;
-                    if (!isset($this->templatesByRole[$roleTypeKey])) {
-                        $this->templatesByRole[$roleTypeKey] = [];
-                    }
-                    if (!in_array($template->getKey(), $this->templatesByRole[$roleTypeKey])) {
-                        $this->templatesByRole[$roleTypeKey][] = $template->getKey();
-                    }
-                }
-                else if (intval($roleId) == 0) {
-                    // the athlete role, for which there should/could only ever be one template
-                    $this->templatesByRole['r0'] = [$template->getKey()];
-                }
-            }
-        }
+        $this->templatesByRole = AccreditationTemplate::byRoleId($this->event);
     }
 
     private function listOfSideEventsWithCompetition()
@@ -112,8 +88,7 @@ class AccreditationOverviewService
 
     private function findDocuments(string $type, int $modelId)
     {
-        $name = PDFService::summaryName($this->event->getKey(), $type, $modelId);
-        return Document::findByName($name)->get();
+        return $this->event->documents()->where('type', $type)->where('type_id', $modelId)->get();
     }
 
     private function decorateResults($type, $namePart, $results, $removeEmptyLines = true)

@@ -59,7 +59,7 @@ class CheckBadgeTest extends TestCase
 
         $job = new CheckBadge(FencerData::MCAT5, EventData::EVENT1);
         $job->handle();
-        Queue::assertPushed(CreateBadge::class, 4);
+        Queue::assertPushed(CreateBadge::class, 5);
     }
 
     public function testUnique()

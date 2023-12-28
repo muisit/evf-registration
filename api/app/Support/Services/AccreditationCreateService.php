@@ -84,9 +84,8 @@ class AccreditationCreateService
         // if the side event has a competition, accredit the person. Do not
         // accredit for other side events (gala diner, cocktails, etc)
         if ($sideevent->competition?->exists) {
-            \Log::debug("adding role for an athlete in a competition");
             // in this case, the fencer has no specific role, so is an athlete
-            $date = DateTimeImmutable::createFromFormat('Y-m-d', $sideevent->competition->competition_weapon_check)->format('Y-m-d');
+            $date = $this->safeDate($sideevent->competition->competition_weapon_check, 'Y-m-d');
 
             // requirement 6.1.1: For team events, display the team name as well
             // adding the team name causes too much flutter in the Role box. We can add it again
@@ -97,7 +96,7 @@ class AccreditationCreateService
             $role = new Role();
             $role->role_id = 0;
             $role->role_name = $sideevent->competition->abbreviation();
-            \Log::debug("role " . $role->role_name . ' at ' . $date);
+
             $this->insertRoleAtDate($date, $role, $registration);
         }
     }
@@ -155,7 +154,7 @@ class AccreditationCreateService
         // attach sideevents to their starting date
         foreach ($this->sidesById as $k => $s) {
             // we do this seemingly unnecessary stuff to avoid issues with bad date representation
-            $date = DateTimeImmutable::createFromFormat('Y-m-d', $s->starts)->format('Y-m-d');
+            $date = $this->safeDate($s->starts, 'Y-m-d');
             if (!isset($dates[$date])) {
                 $this->dateRoles[$date] = ["sideevents" => [], "roles" => [], "registrations" => []];
             }
@@ -175,7 +174,7 @@ class AccreditationCreateService
                 else {
                     // this is something we do not support in the front-end anymore: roles for specific
                     // events (coach at WS1 for example)
-                    $date = DateTimeImmutable::createFromFormat('Y-m-d', $sideevent->starts)->format('Y-m-d');
+                    $date = $this->safeDate($sideevent->starts, 'Y-m-d');
                     $this->insertRoleAtDate($date, $role, $r);
                 }
             }
@@ -186,7 +185,6 @@ class AccreditationCreateService
         }
         // unnecessary check commented out
         //$this->checkForGlobalRoles();
-        \Log::debug(json_encode($this->dateRoles, JSON_PRETTY_PRINT));
         return $this->dateRoles; // return for testing purposes
     }
 
@@ -259,7 +257,7 @@ class AccreditationCreateService
 
     private function createTemplate(AccreditationTemplate $template, array $assignedRoles, array $dates)
     {
-        $yob = DateTimeImmutable::createFromFormat('Y-m-d', $this->fencer->fencer_dob)->format('Y');
+        $yob = $this->safeDate($this->fencer->fencer_dob, 'Y');
         $catnum = Category::categoryFromYear($yob, $this->event->event_open);
         $accr = array(
             "category" => $catnum,
@@ -353,7 +351,7 @@ class AccreditationCreateService
         // convert dates to a 'SAT 1' kind of display
         foreach ($dates as $k) {
             if ($k != "ALL") {
-                $format = DateTimeImmutable::createFromFormat('Y-m-d', $k)->format('j D');
+                $format = $this->safeDate($k, 'j D');
                 $entry = str_replace('  ', ' ', strtoupper($format));
                 $accr["dates"][] = $entry;
             }
@@ -368,10 +366,10 @@ class AccreditationCreateService
 
             // depending on the role types, set the organisation
             $rtid = $role->role_type;
-            \Log::debug("looking for template $rtid");
+
             if (isset($this->roleTypeById["t" . $rtid])) {
                 $orgdecl = $this->roleTypeById["t" . $rtid]->org_declaration;
-                \Log::debug("orgdecl is $orgdecl");
+
                 // ideally templates should be different for federative and non-federative roles
                 // but in case they are not, make sure the organisation is not downgraded
                 if ($orgdecl == "Country" && strlen($accr["organisation"]) == 0) {
@@ -390,5 +388,14 @@ class AccreditationCreateService
         sort($accr["roles"]);
 
         return ["template" => $template, "content" => $accr];
+    }
+
+    private function safeDate($date, $outFormat, $inFormat = 'Y-m-d')
+    {
+        $date = DateTimeImmutable::createFromFormat($inFormat, $date);
+        if ($date === false) {
+            return '';
+        }
+        return $date->format($outFormat);
     }
 }

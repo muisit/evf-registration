@@ -26,7 +26,7 @@ watch(
 
 function download(accreditation:Accreditation)
 {
-    fetchAttachment('/accreditations/' + accreditation.id + '/badge');
+    fetchAttachment('/accreditations/' + props.fencer.id + '/badge/' + accreditation.templateId);
 }
 
 import { Download } from '@element-plus/icons-vue';

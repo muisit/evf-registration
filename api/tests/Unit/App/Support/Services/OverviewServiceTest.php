@@ -148,7 +148,7 @@ class OverviewServiceTest extends TestCase
 
         $this->assertCount(3, $result['corg']);
         $this->assertEquals([1, 0], $result['corg']['r7']);
-        $this->assertEquals([1, 0], $result['corg']['r11']);
+        $this->assertEquals([2, 0], $result['corg']['r11']); // volunteer
         $this->assertEquals([2, 0], $result['corg']['ssup']); // invitations to Gala and Cocktail
 
         $this->assertCount(1, $result['coff']);

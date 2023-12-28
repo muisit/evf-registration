@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Accreditation;
 use App\Models\Event;
 use Illuminate\Support\Facades\Storage;
+use App\Jobs\CheckBadge;
 
 class Badge extends Controller
 {
@@ -32,29 +33,53 @@ class Badge extends Controller
      *     )
      * )
      */
-    public function index(Request $request, int $accreditationId)
+    public function index(Request $request, int $fencerId, int $templateId)
     {
-        \Log::debug("getting badge for $accreditationId");
         $event = $request->get('eventObject');
         if (empty($event) || !$event->exists || get_class($event) != Event::class) {
-            \Log::debug("no event given" . json_encode($event));
             $this->authorize("not/ever");
         }
-        $accreditationObject = Accreditation::find($accreditationId);
-        if (empty($accreditationObject) || $accreditationObject->event_id != $event->getKey()) {
-            \Log::debug("no valid accreditation");
+        $accreditation = $this->findAccreditation($event, $fencerId, $templateId);
+        if (empty($accreditation) || $accreditation->event_id != $event->getKey()) {
             $this->authorize('not/ever');
         }
-        $this->authorize('view', $accreditationObject);
+        $this->authorize('view', $accreditation);
 
-        $filename = $accreditationObject->path();
-        \Log::debug("filename to check is $filename");
+        if (!empty($accreditation->is_dirty)) {
+            $accreditation = $this->regenerate($accreditation);
+            if (empty($accreditation)) {
+                // this causes an ugly break in the front-end, where the
+                // 404 is displayed instead of the SPA, forcing the user to
+                // move back using the browser buttons and losing any
+                // existing selections...
+                abort(404);
+            }
+        }
+
+        $filename = $accreditation->path(false);
         if (Storage::disk('local')->exists($filename)) {
-            return Storage::download($filename, $accreditationObject->template->name . '.pdf', ['Content-type' => 'application/pdf']);
+            return Storage::download($filename, $accreditation->template->name . '.pdf', ['Content-type' => 'application/pdf']);
         }
         else {
-            \Log::debug("file does not appear to exist");
+            \Log::debug("file " . $filename . " does not appear to exist");
         }
         abort(404);
+    }
+
+    private function findAccreditation(Event $event, int $fencerId, int $templateId)
+    {
+        return Accreditation::where('event_id', $event->getKey())
+            ->where('fencer_id', $fencerId)
+            ->where('template_id', $templateId)
+            ->first();
+    }
+
+    private function regenerate(Accreditation $accreditation)
+    {
+        \Log::debug("regenerating accreditation because it is dirty");
+        $job = new CheckBadge($accreditation->fencer_id, $accreditation->event_id);
+        $job->handleSynchronous();
+
+        return $this->findAccreditation($accreditation->event, $accreditation->fencer_id, $accreditation->template_id);
     }
 }

@@ -35,9 +35,7 @@ class Accreditations extends Controller
         if (empty($fencer)) {
             $this->authorize('not/ever');
         }
-        \Log::debug("authorizing view fencer");
         $this->authorize('view', $fencer);
-        \Log::debug("authorizing view-any accreditation");
         $this->authorize('viewAny', Accreditation::class);
 
         $retval = [];

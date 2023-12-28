@@ -40,6 +40,11 @@ class Event extends Model
         return $this->hasMany(Competition::class, 'competition_event', 'event_id');
     }
 
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Document::class, 'event_id', 'event_id');
+    }
+
     public function templates(): HasMany
     {
         return $this->hasMany(AccreditationTemplate::class, 'event_id', 'event_id');
@@ -100,15 +105,11 @@ class Event extends Model
     public function useRegistrationApplication()
     {
         if (!empty($this->event_config)) {
-            \Log::debug("config is not empty " . json_encode($this->event_config));
             $config = json_decode($this->event_config);
-            \Log::debug("result is " . json_encode($config));
             if ($config !== false && isset($config->use_registration)) {
-                \Log::debug("value set, testing for truthness " . ($config->use_registration == true ? 'truth' : 'false'));
                 return $config->use_registration == true;
             }
         }
-        \Log::debug("config is empty for " . $this->getKey() . ':' . json_encode($this->config));
         // by default, do not use the registration application for events
         return false;
     }

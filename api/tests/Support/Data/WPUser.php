@@ -2,6 +2,7 @@
 
 namespace Tests\Support\Data;
 
+use App\Models\WPUser as Model;
 use DB;
 
 class WPUser extends Fixture
@@ -16,6 +17,12 @@ class WPUser extends Fixture
     public const TESTUSERHOD = 3883;
     public const TESTUSERGENHOD = 3886;
     public const NOSUCHID = 894772;
+
+    protected static function wasBooted($cls)
+    {
+        $count = Model::where('ID', '>', 0)->count();
+        return $count > 0;
+    }
 
     protected static function boot()
     {

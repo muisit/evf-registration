@@ -2,17 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Models\Event;
-use App\Models\Fencer;
 use App\Models\Accreditation;
-use App\Models\AccreditationTemplate;
-use App\Models\Registration;
-use App\Support\Services\AccreditationCreateService;
-use App\Support\Services\AccreditationMatchService;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Query\JoinClause;
-use Illuminate\Database\Query\Builder as QBuilder;
-use Illuminate\Database\Eloquent\Builder as EBuilder;
+use App\Support\Services\PDFGenerator;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 
 // This job checks to see if all available accreditations for a fencer are still
@@ -25,7 +16,6 @@ use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 class CreateBadge extends Job implements ShouldBeUniqueUntilProcessing
 {
     public Accreditation $accreditation;
-    public int $eventId;
 
     /**
      * Create a new job instance.
@@ -49,5 +39,34 @@ class CreateBadge extends Job implements ShouldBeUniqueUntilProcessing
      */
     public function handle()
     {
+        // prevent any dirty-checks while we are processing
+        $this->accreditation->is_dirty = null;
+        $this->accreditation->save();
+
+        $path = $this->accreditation->path();
+        if (file_exists($path)) {
+            @unlink($path);
+        }
+        if (!file_exists($path)) {
+            $generator = app(PDFGenerator::class);
+            $generator->generate($this->accreditation);
+            $dirname = dirname($path);
+            @mkdir($dirname, 0755, true);
+            $generator->save($path);
+
+            if (!file_exists($path)) {
+                $this->fail("Error creating accreditation, could not save file for " . $this->accreditation->getKey());
+            }
+            else {
+                // theoretically it can be that the accreditation is set to is_dirty again while we were processing
+                // in that case, it will automatically pop up after a while for reprocessing
+                $this->accreditation->generated = date("Y-m-d H:i:s");
+                $this->accreditation->file_hash = hash_file('sha256', $path, false);
+                $this->accreditation->save();
+            }
+        }
+        else {
+            $this->fail('Could not remove existing accreditation for " . $this->accreditation->getKey()');
+        }
     }
 }

@@ -8,7 +8,7 @@ $router->group(
     ],
     function () use ($router) {
         $router->get(
-            '/{accreditationId}/badge',
+            '/{fencerId}/badge/{templateId}',
             [
                 'as' => 'accreditations.badge',
                 'uses' => 'Accreditations\Badge@index'
@@ -28,6 +28,22 @@ $router->group(
             [
                 'as' => 'acrreditations.regenerate',
                 'uses' => 'Accreditations\Regenerate@index'
+            ]
+        );
+
+        $router->get(
+            '/summary/{summaryId}',
+            [
+                'as' => 'acrreditations.download',
+                'uses' => 'Accreditations\Download@index'
+            ]
+        );
+
+        $router->post(
+            '/summary',
+            [
+                'as' => 'acrreditations.summary',
+                'uses' => 'Accreditations\Summary@index'
             ]
         );
     }

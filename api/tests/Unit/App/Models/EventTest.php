@@ -184,7 +184,7 @@ class EventTest extends TestCase
         $event = Event::where('event_id', Data::EVENT1)->first();
         $overview = $event->overview();
         $this->assertTrue(is_array($overview));
-        $this->assertCount(0, $overview);
+        $this->assertCount(6, $overview);
     }
 
     public function testAllowGenerationOfAccreditations()

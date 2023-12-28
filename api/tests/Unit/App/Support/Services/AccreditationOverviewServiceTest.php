@@ -80,7 +80,7 @@ class AccreditationOverviewServiceTest extends TestCase
         $this->assertEquals($service->templatesByRole['r' . RoleType::COUNTRY][0], TemplateData::COUNTRY);
 
         $this->assertNotEmpty($service->templatesByRole['r' . RoleType::ORG]);
-        $this->assertCount(1, $service->templatesByRole['r' . RoleType::ORG]);
+        $this->assertCount(2, $service->templatesByRole['r' . RoleType::ORG]); // one ORG, one Referee
         $this->assertEquals($service->templatesByRole['r' . RoleType::ORG][0], TemplateData::ORG);
 
         // EVF template is the same
@@ -167,7 +167,7 @@ class AccreditationOverviewServiceTest extends TestCase
         // Role 14 Director is for MCAT4
         // Role 11 Volunteer also for MCAT4
         $this->assertEquals(
-            '[["R",2,[1,1,0,1],[]],["R",4,[1,1,0,1],[]],["R",7,[1,1,0,1],[]],["R",14,[1,1,0,1],[]],["R",11,[1,1,0,1],[]]]',
+            '[["R",2,[1,1,0,1],[]],["R",4,[1,1,0,1],[]],["R",7,[1,1,0,1],[]],["R",14,[1,1,0,1],[]],["R",11,[2,2,0,2],[]]]',
             json_encode($service->createOverviewForRoles())
         );
     }
@@ -178,18 +178,19 @@ class AccreditationOverviewServiceTest extends TestCase
         $this->assertNotEmpty($event);
         $service = new AccreditationOverviewService($event);
         $service->initialise();
-        // there are 17 registrations
+        // there are 18 registrations
         // 7 are for athlete, competition events (template 1), with 5 different accreditations, filtered out
         // 5 for non-accreditation events (not visible)
         // 2 for country support roles (template 3), with 1 accreditation (MCAT5)
         // 3 for organisation support roles (template 2), with 2 accreditations (MCAT5, MCAT4)
+        // 1 for organisation referee role (template 4), with 1 accreditation (MCAT5)
         //
         // Because we cannot just link the registrations to accreditations at the moment,
         // we get double registrations for the support roles, which make the numbers meaningless
         // template 2 also includes the 2 template 3 registrations of MCAT5
         // template 3 also includes the template 2 registration of MCAT5
         $this->assertEquals(
-            '[["T",2,[5,2,0,2],[]],["T",3,[3,1,0,1],[]]]',
+            '[["T",2,[6,2,0,2],[]],["T",3,[4,1,0,1],[]],["T",4,[4,1,0,1],[]]]',
             json_encode($service->createOverviewForTemplates())
         );
     }
@@ -207,7 +208,7 @@ class AccreditationOverviewServiceTest extends TestCase
         $service = new AccreditationOverviewService($event);
         $output = $service->create();
         $this->assertEquals(
-            '[["T",2,[0,0,0,0],[]],["T",3,[0,0,0,0],[]]]',
+            '[["T",2,[0,0,0,0],[]],["T",3,[0,0,0,0],[]],["T",4,[0,0,0,0],[]]]',
             json_encode($service->createOverviewForTemplates())
         );
 

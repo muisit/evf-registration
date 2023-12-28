@@ -16,13 +16,16 @@ use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 // any regeneration attempts
 class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
 {
+    private $immediate = false;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($immediate = false)
     {
+        $this->immediate = $immediate;
     }
 
     public function uniqueId(): string
@@ -37,10 +40,9 @@ class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
      */
     public function handle()
     {
-        \Log::debug("handling CheckDirtyBadges");
         // only look at accreditations that were made dirty over 10 minutes ago, to avoid creating accreditations
         // when the fencer and registration data is still being updated
-        $notafter = date('Y-m-d H:i:s', time() - 10 * 60);
+        $notafter = date('Y-m-d H:i:s', $this->immediate ? time() : time() - 10 * 60);
         $accreditations = DB::table(Accreditation::tableName())
             ->select('fencer_id', 'event_id')
             ->where('is_dirty', '<>', null)
@@ -61,9 +63,9 @@ class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
             }
 
             $event = $eventsById['e' . $eventId];
-            \Log::debug("checking " . ($event->allowGenerationOfAccreditations() ? 'allowed' : 'not allowed'));
+            \Log::debug("checking event " . ($event?->getKey()) . ' and allows: ' . ($event?->allowGenerationOfAccreditations() ? 'true' : 'false'));
             if (!empty($event) && $event->allowGenerationOfAccreditations()) {
-                \Log::debug("dispatching checkbadge job");
+                \Log::debug("dispatching CheckBadge job");
                 $job = new CheckBadge($row->fencer_id, $row->event_id);
                 dispatch($job);
             }
@@ -82,7 +84,6 @@ class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
             })
             ->get()->pluck('registration_fencer');
 
-        \Log::debug("making new accreditations for " . $fids->count() . ' fencers');
         $template = AccreditationTemplate::where('event_id', $this->event->getKey())->first();
         if (!empty($template)) {
             foreach ($fids as $fid) {
@@ -95,7 +96,6 @@ class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
     {
         $cnt = Accreditation::where('fencer_id', $fid)->where('event_id', $this->event->getKey())->count();
         if ($cnt == 0) {
-            \Log::debug("creating new accreditation based on a template");
             // we create an empty accreditation to signal the queue that this set needs to be reevaluated
             $dt = new Accreditation();
             $dt->fencer_id = $fid;
@@ -108,7 +108,6 @@ class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
             $dt->save();
         }
         else {
-            \Log::debug("accreditation exists anyway, so making it dirty instead");
             Accreditation::where('fencer_id', $fid)->where("event_id", $this->event->getKey())->update(['is_dirty' => date('Y-m-d H:i:s')]);
         }
     }

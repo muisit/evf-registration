@@ -26,7 +26,6 @@ class AccreditationMatchService
         })->toArray();
 
         $existingAccreditations = Accreditation::where('fencer_id', $this->fencer->getKey())->where('event_id', $this->event->getKey())->get();
-        \Log::debug("found " . count($existingAccreditations) . " existing accreditations");
         $this->foundAccreditations = [];
         $foundIds = [];
         $newAccreditations = [];
@@ -34,22 +33,27 @@ class AccreditationMatchService
         foreach ($newData as $a1) {
             $foundThis = false;
             foreach ($existingAccreditations as $a2) {
-                if ($a1['hash'] == $a2->hash) {
-                    \Log::debug("hash matches, found this exact accreditation");
+                if ($a2->template_id == $a1['template']->getKey()) {
+                    if ($a1['hash'] !== $a2->hash) {
+                        $a2->data = json_encode($a1['content']);
+                        $a2->is_dirty = date('Y-m-d H:i:s');
+                    }
+                    else {
+                        $a2->is_dirty = null;
+                    }
                     $foundIds[] = $a2->getKey();
                     $foundThis = true;
                     break; // only match the first accreditation if we happen to have duplicates
                 }
             }
+
             if (!$foundThis) {
-                \Log::debug("no match, new accreditation");
                 $newAccreditations[] = $a1;
             }
         }
 
         foreach ($existingAccreditations as $a1) {
             if (!in_array($a1->getKey(), $foundIds)) {
-                \Log::debug("existing accreditation not matched " . $a1->getKey());
                 $this->missingAccreditations[] = $a1;
             }
             else {
@@ -62,20 +66,13 @@ class AccreditationMatchService
             // check that the file actually exists and that we have an accreditation ID set
             $path = $a->path();
             if (!file_exists($path) || empty($a->fe_id)) {
-                \Log::debug("creating new front end id");
                 $a->createId();
-            }
-            else {
-                // accreditation was found, the data still matches, so we do not need to regenerate
-                \Log::debug("resetting is dirty value for existing accreditation " . $a->getKey());
-                $a->is_dirty = null;
             }
             return $a;
         });
 
         // all new data needs to be converted to new accreditations
         foreach ($newAccreditations as $data) {
-            \Log::debug("creating a new accreditation");
             $accreditation = new Accreditation();
             $accreditation->event_id = $this->event->getKey();
             $accreditation->fencer_id = $this->fencer->getKey();

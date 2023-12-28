@@ -26,7 +26,12 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
-$app->withFacades();
+$app->withFacades(
+    true,
+    [
+        'Illuminate\Support\Facades\Notification' => 'Notification'
+    ]
+);
 $app->withEloquent();
 
 /*
@@ -130,10 +135,12 @@ $app->routeMiddleware([
 
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
+$app->register(App\Providers\EventServiceProvider::class);
 $app->register(\SwaggerLume\ServiceProvider::class);
 $app->register(Illuminate\Session\SessionServiceProvider::class);
 $app->register(Kirschbaum\PowerJoins\PowerJoinsServiceProvider::class);
+$app->register(Illuminate\Mail\MailServiceProvider::class);
+$app->register(Illuminate\Notifications\NotificationServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -149,7 +156,7 @@ $app->register(Kirschbaum\PowerJoins\PowerJoinsServiceProvider::class);
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
-    require __DIR__.'/../routes/web.php';
+    require __DIR__ . '/../routes/web.php';
 });
 
 return $app;

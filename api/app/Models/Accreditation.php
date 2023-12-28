@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Support\Services\PDFService;
 use Carbon\Carbon;
 
 class Accreditation extends Model
@@ -12,11 +13,15 @@ class Accreditation extends Model
     public $timestamps = false;
     protected $guarded = [];
 
-    public static function makeDirty(Fencer $fencer, Event $event)
+    public static function makeDirty(Fencer $fencer, ?Event $event)
     {
-        $cnt = Accreditation::where("fencer_id", $fencer->getKey())->where("event_id", $event->getKey())->count();
+        $sql = Accreditation::where("fencer_id", $fencer->getKey());
+        if (!empty($event)) {
+            $sql = $sql->where("event_id", $event->getKey());
+        }
+        $cnt = $sql->count();
 
-        if ($cnt == 0) {
+        if ($cnt == 0 && !empty($event)) {
             // we create an empty accreditation to signal the queue that this set needs to be reevaluated
             $dt = new Accreditation();
             $dt->fencer_id = $fencer->getKey();
@@ -34,7 +39,11 @@ class Accreditation extends Model
             // else if there are no templates, there are no accreditations (yet)
         }
         else {
-            Accreditation::where('fencer_id', $fencer->getKey())->where('event_id', $event->getKey())->update([
+            $sql = Accreditation::where('fencer_id', $fencer->getKey());
+            if (!empty($event)) {
+                $sql = $sql->where("event_id", $event->getKey());
+            }
+            $sql->update([
                 'is_dirty' => Carbon::now()->toDateTimeString()
             ]);
         }
@@ -45,14 +54,19 @@ class Accreditation extends Model
         return $this->belongsTo(Fencer::class, 'fencer_id', 'fencer_id');
     }
 
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(Event::class, 'event_id', 'event_id');
+    }
+
     public function template(): BelongsTo
     {
         return $this->belongsTo(AccreditationTemplate::class, 'template_id', 'id');
     }
 
-    public function path()
+    public function path($makeAbsolute = true)
     {
-        return sprintf("accreditations/event_%d/badge_%d.pdf", $this->event_id, $this->id);
+        return PDFService::pdfPath($this->event, sprintf("badges/badge_%d.pdf", $this->id), $makeAbsolute);
     }
 
     public function delete()

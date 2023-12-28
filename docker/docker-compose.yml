@@ -46,6 +46,7 @@ services:
 
     mysql:
         image: 'mysql/mysql-server:8.0'
+        command: mysqld --general-log=1 --general-log-file=/var/lib/mysql/general-log.log
         ports:
             - '${FORWARD_DB_PORT:-3306}:3306'
         environment:
@@ -68,6 +69,14 @@ services:
                 - '-p${DB_PASSWORD}'
             retries: 3
             timeout: 5s
+
+    mailpit:
+        image: 'axllent/mailpit:latest'
+        ports:
+            - '${FORWARD_MAILPIT_PORT:-1025}:1025'
+            - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+        networks:
+            - evf
 
 networks:
     evf:
