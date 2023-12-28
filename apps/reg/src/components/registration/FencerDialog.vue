@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { is_valid, random_hash, valid_date } from '../../../../common/functions';
 import type { Fencer } from '../../../../common/api/schemas/fencer';
 import { useDataStore } from '../../stores/data';
+import { useAuthStore } from '../../../../common/stores/auth';
 import { duplicateFencerCheck } from './lib/duplicateFencerCheck';
 import { savefencer } from '../../../../common/api/fencers/savefencer';
 import { uploadphoto } from '../../../../common/api/fencers/uploadphoto';
@@ -14,6 +15,7 @@ const props = defineProps<{
 }>();
 const emits = defineEmits(['onClose', 'onUpdate', 'onSave']);
 const data = useDataStore();
+const auth = useAuthStore();
 const reloadHash = ref(random_hash());
 
 function closeForm()
@@ -23,8 +25,10 @@ function closeForm()
 
 function submitForm()
 {
+    auth.isLoading("duplicatecheck");
     duplicateFencerCheck(props.fencer)
         .then((result) => {
+            auth.hasLoaded("duplicatecheck");
             if (result && result.id) {
                 console.log('duplicates found');
                 var country = data.countriesById['c' + result.countryId];
@@ -54,15 +58,27 @@ function submitForm()
             }
             else {
                 console.log('no duplicates found. Saving data');
+                auth.isLoading("savefencer");
                 saveFencerData()
-                  .then(() => {
-                      console.log('emitting onSave');
-                      emits('onSave');
-                      console.log('closing form');
-                      closeForm();
-                      console.log('end of FencerDialog submitForm');
-                  });
+                    .then(() => {
+                        auth.hasLoaded("savefencer");
+                        console.log('emitting onSave');
+                        emits('onSave');
+                        console.log('closing form');
+                        closeForm();
+                        console.log('end of FencerDialog submitForm');
+                    })
+                    .catch((e) => {
+                        console.log(e);
+                        auth.hasLoaded("savefencer");
+                        alert("There was an error with saving the fencer data. Please reload the page and try again.");
+                    });
             }
+        })
+        .catch((e) => {
+            auth.hasLoaded("duplicatecheck");
+            console.log(e);
+            alert("There was an error with the duplication check. Please reload the page and try again.")
         });
 }
 
@@ -107,6 +123,7 @@ function onSavePhoto(fileObject:any)
     }
     else {
         if (!is_valid(props.fencer.id)) {
+
             saveFencerData()
               .then(() => saveFencerPhoto(fileObject))
               .then(() => {
@@ -147,16 +164,16 @@ import PhotoId from './PhotoId.vue';
 <template>
     <ElDialog :model-value="props.visible" title="Edit Fencer Information" :close-on-click-modal="false"  :before-close="(done) => { closeForm(); done(false); }">
       <ElForm>
-        <ElFormItem label="Last name">
-          <ElInput :model-value="props.fencer.lastName" @update:model-value="(e) => update('lastName', e)"/>
+        <ElFormItem label="Surname">
+          <ElInput :model-value="props.fencer.lastName" @update:model-value="(e) => update('lastName', e.toUpperCase())"/>
         </ElFormItem>
         <ElFormItem label="First name">
           <ElInput :model-value="props.fencer.firstName" @update:model-value="(e) => update('firstName', e)"/>
         </ElFormItem>
         <ElFormItem label="Gender">
           <ElSelect :model-value="props.fencer.gender" @update:model-value="(e) => update('gender', e)">
-            <ElOption value="M" label="Man" />
-            <ElOption value="F" label="Woman" />
+            <ElOption value="M" label="Male" />
+            <ElOption value="F" label="Female" />
           </ElSelect>
         </ElFormItem>
         <ElFormItem label="Date of birth">

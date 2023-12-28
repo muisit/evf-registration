@@ -84,7 +84,7 @@ import { ElDialog, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton, El
     <ElDialog class='selection-dialog' :model-value="props.visible" title="Registration Selection" :close-on-click-modal="false"  :before-close="(done) => { closeForm(); done(false); }">
       <div class='selection-header'>
         <h3>{{ props.fencer.lastName }}, {{ props.fencer.firstName }}</h3>
-        <h3 v-if="is_valid(data.currentCountry.id)">Year of birth: {{ props.fencer.birthYear }} Gender: {{ props.fencer.gender == 'F' ? 'Woman' : 'Man'}} Category: {{ props.fencer.category }}</h3>
+        <h3 v-if="is_valid(data.currentCountry.id)">Year of birth: {{ props.fencer.birthYear }} Gender: {{ props.fencer.gender == 'F' ? 'Female' : 'Male'}} Category: {{ props.fencer.category }}</h3>
       </div>
       <ElForm>
         <PaymentSelection :payments="payments" @on-update="updatePayment" :isadmin="props.isadmin"/>
