@@ -341,10 +341,10 @@ class AccreditationOverviewService
             
         $results = Registration::select(
             $rt . '.registration_role AS id',
-            "r.total as registrations",
-            "a.total as accreditations",
-            "d.total as dirty",
-            "g.total as generated"
+            DB::Raw("max(r.total) as registrations"),
+            DB::Raw("max(a.total) as accreditations"),
+            DB::Raw("max(d.total) as dirty"),
+            DB::Raw("max(g.total) as `generated`")
         )
             ->leftJoinSub($registrationClause, 'r', function (JoinClause $join) use ($rt) {
                 $join->on($rt . '.registration_role', '=', 'r.registration_role');

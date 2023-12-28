@@ -100,9 +100,8 @@ echo "Switching link to latest release"
 mkdir -p $HOME/releases/last
 cd $HOME/releases/last
 rm -f api registration
-ln -sf HOME/releases/$WD/registration registration
+ln -sf $HOME/releases/$WD/registration registration
 ln -sf $HOME/releases/$WD/api api
-
 
 echo "Cleanup"
 rm $ARCHIVE $HOME/provision
