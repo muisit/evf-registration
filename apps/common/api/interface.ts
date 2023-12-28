@@ -106,7 +106,7 @@ export function fetchAttachment(path:string, data:any = {}) {
     if (!data.event) data.event = auth.eventId;
     if (!data.country) data.country = auth.countryId;
     path = glueParameters(path, data);
-    window.location = import.meta.env.VITE_API_URL + path;
+    window.location.href = import.meta.env.VITE_API_URL + path;
     //return simpleFetch('GET', path, data, options, headers, attachmentResponse);
 }
 
