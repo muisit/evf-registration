@@ -25,6 +25,11 @@ class Accreditation extends Fixture
         return $count == 9;
     }
 
+    protected static function clear()
+    {
+        DB::table(Model::tableName())->delete();
+    }
+
     protected static function boot()
     {
         Fencer::create();
@@ -34,7 +39,7 @@ class Accreditation extends Fixture
         self::booted();
 
         // remove empty accreditations as result of entering registrations
-        DB::table(Model::tableName())->delete();
+        self::clear();
 
         // has a registration for both MFCAT1 and MFTEAM
         Model::create([

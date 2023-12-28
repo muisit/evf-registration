@@ -201,6 +201,8 @@ class AccreditationCreateServiceTest extends TestCase
 
         $service = new AccreditationCreateService($fencer, $event);
         $output = $service->checkRolesAndDates(collect([$reg1]));
+        //$this->assertEquals("", json_encode($output));
+        $this->assertTrue(isset($output[$check]));
         $this->assertCount(1, $output[$check]["registrations"]);
         $this->assertCount(1, $output[$check]["roles"]);
         $this->assertCount(0, $output[$check]["sideevents"]); // the side event has not started yet on this date

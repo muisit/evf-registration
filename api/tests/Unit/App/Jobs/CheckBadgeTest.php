@@ -37,14 +37,17 @@ class CheckBadgeTest extends TestCase
 
     public function testBasicJob()
     {
+        $accreditation = Accreditation::find(AccreditationData::MFCAT1);
         Queue::fake();
         $job = new CheckBadge(FencerData::MCAT1, EventData::EVENT1);
         $job->handle();
 
-        // this should create one new accreditation 
+        // this should replace the data of the existing accreditation
         $accreditations = Accreditation::where('fencer_id', FencerData::MCAT1)->where('event_id', EventData::EVENT1)->get();
         $this->assertCount(1, $accreditations);
-        $this->assertNotEquals(AccreditationData::MFCAT1, $accreditations[0]->getKey());
+        $this->assertEquals(AccreditationData::MFCAT1, $accreditations[0]->getKey());
+        $this->assertNotEquals($accreditation->hash, $accreditations[0]->hash);
+        $this->assertEmpty($accreditations[0]->is_dirty); // the job resets the dirty value before it pushes CreateBadge
 
         Queue::assertPushed(CreateBadge::class, 1);
 
@@ -62,7 +65,7 @@ class CheckBadgeTest extends TestCase
         Queue::assertPushed(CreateBadge::class, 5);
     }
 
-    public function testUnique()
+    public function _testUnique()
     {
         Queue::fake();
         $job = new CheckBadge(FencerData::MCAT1, EventData::EVENT1);

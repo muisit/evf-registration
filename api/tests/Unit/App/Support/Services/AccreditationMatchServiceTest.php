@@ -66,12 +66,13 @@ class AccreditationMatchServiceTest extends TestCase
         $service->handle([$tmpl1]);
         $accreditations = Accreditation::where('fencer_id', $fencer->getKey())->where('event_id', $event->getKey())->get();
         $this->assertCount(1, $accreditations);
-        $this->assertCount(1, $service->missingAccreditations);
+        $this->assertCount(0, $service->missingAccreditations);
         $this->assertCount(1, $service->foundAccreditations);
         $service->actualise();
+        // make sure the found accreditation does not get a new ID
         $accreditations = Accreditation::where('fencer_id', $fencer->getKey())->where('event_id', $event->getKey())->get();
         $this->assertCount(1, $accreditations);
-        $this->assertNotEquals(AccreditationData::MFCAT1, $accreditations[0]->getKey());
+        $this->assertEquals(AccreditationData::MFCAT1, $accreditations[0]->getKey());
 
         $service = new AccreditationMatchService($fencer, $event);
         $service->handle([$tmpl1]);

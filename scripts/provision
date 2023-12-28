@@ -70,14 +70,20 @@ then
 fi
 ln -sf $HOME/api_storage storage
 
-#echo "Creating caches"
-#php8.2 ./artisan config:clear
-#php8.2 ./artisan route:clear
-#php8.2 ./artisan view:clear
-
 echo "Migrating database"
 cd $HOME/releases/$WD/api
 php ./artisan migrate --force
+
+# clear cache first, then restart the queue
+# the queue-restart signal is stored on the cache
+echo "Clearing caches"
+php ./artisan cache:clear
+
+echo "Restarting queue"
+php artisan queue:restart
+
+echo "Testing mail setup"
+php artisan evf:report
 
 echo "Switching releases"
 cd $HOME/register.veteransfencing.eu
