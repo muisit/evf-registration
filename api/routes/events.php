@@ -22,5 +22,21 @@ $router->group(
                 'uses' => 'Events\Overview@index'
             ]
         );
+
+        $router->get(
+            '/xml/{sideEventId}',
+            [
+                'as' => 'events.downloadxml',
+                'uses' => 'Events\Download@asXML'
+            ]
+        );
+
+        $router->get(
+            '/csv/{sideEventId}',
+            [
+                'as' => 'events.downloadcsv',
+                'uses' => 'Events\Download@asCSV'
+            ]
+        );
     }
 );
