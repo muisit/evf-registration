@@ -13,13 +13,9 @@ class RegistrationCSVService
     private $headers;
     private $config;
 
-    public function __construct($registrations)
+    public function generate($registrations, $headers, $config = null)
     {
         $this->registrations = $registrations;
-    }
-
-    public function generate($headers, $config = null)
-    {
         $this->headers = $headers;
         $this->config = $config;
         $csv = array_map([$this, 'makeMap'], $this->registrations);
@@ -59,6 +55,9 @@ class RegistrationCSVService
                 return $date->format('Y');
                 break;
             case 'date':
+                if (empty($registration->sideEvent)) {
+                    return '';
+                }
                 $date = DateTimeImmutable::createFromFormat('Y-m-d', $registration->sideEvent->starts);
                 if ($date === false) {
                     return '';
@@ -70,38 +69,38 @@ class RegistrationCSVService
                 break;
             case 'role':
                 if (!empty($registration->role)) {
-                    return $registration->role?->name;
+                    return $registration->role?->role_name;
                 }
-                return $this->config?->isCompetition ? 'Athlete' : 'Participant';
+                return ($this->config?->isCompetition ?? null) ? 'Athlete' : 'Participant';
                 break;
             case 'organisation':
                 if (empty($registration->role)) {
-                    return $registration->country->country_name;
+                    return $registration->country?->country_name;
                 }
                 else {
-                    if ($registration->role->roleType->org_declaration == 'Country') {
-                        return $registration->country->country_name;
+                    if ($registration->role?->type?->org_declaration == 'Country') {
+                        return $registration->country?->country_name;
                     }
-                    else if ($registration->role->roleType->org_declaration == 'Org') {
-                        return "Organisation " . $this->event->event->event_name;
+                    else if ($registration->role?->type?->org_declaration == 'Org') {
+                        return "Organisation " . $registration->event->event_name;
                     }
-                    else if ($registration->role->roleType->org_declaration == 'EVF') {
+                    else if ($registration->role?->type?->org_declaration == 'EVF') {
                         return "European Veterans Fencing";
                     }
                 }
                 break;
             case 'organisation_abbr':
                 if (empty($registration->role)) {
-                    return $registration->country->country_abbr;
+                    return $registration->country?->country_abbr;
                 }
                 else {
-                    if ($registration->role->roleType->org_declaration == 'Country') {
-                        return $registration->country->country_abbr;
+                    if ($registration->role?->type?->org_declaration == 'Country') {
+                        return $registration->country?->country_abbr;
                     }
-                    else if ($registration->role->roleType->org_declaration == 'Org') {
+                    else if ($registration->role?->type?->org_declaration == 'Org') {
                         return "Org";
                     }
-                    else if ($registration->role->roleType->org_declaration == 'EVF') {
+                    else if ($registration->role?->type?->org_declaration == 'EVF') {
                         return "EVF";
                     }
                 }
@@ -110,15 +109,15 @@ class RegistrationCSVService
                 if (!empty($registration->role)) {
                     return 'Official';
                 }
-                return $this->config?->isCompetition ? 'Athlete' : 'Participant';
+                return ($this->config?->isCompetition ?? null) ? 'Athlete' : 'Participant';
                 break;
             case 'cat':
-                $cat = Category::categoryFromYear($registration->fencer->fencer_dob, $this->event->event_starts);
+                $cat = Category::categoryFromYear($registration->fencer->fencer_dob, $registration->event->event_open);
                 if ($cat < 1) {
                     return '(no category)';
                 }
                 else {
-                    if ($this->config?->category && $cat != intval($this->config?->category)) {
+                    if (isset($this->config?->category) && $cat != intval($this->config?->category)) {
                         return "$cat (wrong category)";
                     }
                     else {
@@ -127,7 +126,7 @@ class RegistrationCSVService
                 }
                 break;
             case 'gender':
-                if ($this->config?->gender && $this->config?->gender != $registration->fencer->fencer_gender) {
+                if (isset($this->config?->gender) && $this->config?->gender != $registration->fencer->fencer_gender) {
                     return ($registration->fencer->fencer_gender == 'F' ? 'Female' : 'Male') . " (wrong gender)";
                 }
                 else {

@@ -23,7 +23,7 @@ class RankingService
         $ages = $this->calculateCategoryAges();
         $rows = DB::table('VW_Ranking')
             ->select(["fencer_id", "fencer_surname", "fencer_firstname", "fencer_country_abbr", DB::Raw("sum(result_total_points) as total_points")])
-            ->where(DB::Raw("(year(fencer_dob) > '".$ages[0]."' and year(fencer_dob) <= '".$ages[1]."')"))
+            ->whereRaw("(year(fencer_dob) > '" . $ages[0] . "' and year(fencer_dob) <= '" . $ages[1] . "')")
             ->where("weapon_id", $this->weapon->getKey())
             ->where('result_in_ranking', 'Y')
             ->where('fencer_country_registered', 'Y')

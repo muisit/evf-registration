@@ -68,5 +68,7 @@ class Fixture
         Registration::create();
         Accreditation::clear();
         Accreditation::create();
+
+        Result::create();
     }
 }

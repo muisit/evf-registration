@@ -21,18 +21,21 @@ class Category extends Model
     public static function categoryFromYear($year, $wrt)
     {
         $year = intval($year);
-        $wrtM = intval(DateTimeImmutable::createFromFormat('Y-m-d', $wrt)->format('m'));
-        $wrtY = intval(DateTimeImmutable::createFromFormat('Y-m-d', $wrt)->format('Y'));
+        $wrt = DateTimeImmutable::createFromFormat('Y-m-d', $wrt);
+        if ($wrt !== false) {
+            $wrtM = intval($wrt->format('m'));
+            $wrtY = intval($wrt->format('Y'));
     
-        $diff = $wrtY - $year;
-        if($wrtM > 6) {
-            $diff += 1; // people start fencing in the older category as of July
+            $diff = $wrtY - $year;
+            if($wrtM > 6) {
+                $diff += 1; // people start fencing in the older category as of July
+            }
+            //if ($diff >= 80) return 5;
+            if ($diff >= 70) return 4;
+            if ($diff >= 60) return 3;
+            if ($diff >= 50) return 2;
+            if ($diff >= 40) return 1;
         }
-        //if ($diff >= 80) return 5;
-        if ($diff >= 70) return 4;
-        if ($diff >= 60) return 3;
-        if ($diff >= 50) return 2;
-        if ($diff >= 40) return 1;
         return -1;
     }
 }

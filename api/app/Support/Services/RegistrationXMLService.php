@@ -20,7 +20,7 @@ class RegistrationXMLService
     private $doc;
     private $dom;
 
-    public function __construct(SideEvent $event, $registrations)
+    public function generate(SideEvent $event, $registrations)
     {
         $this->sideEvent = $event;
         $this->registrations = $registrations;
@@ -29,10 +29,7 @@ class RegistrationXMLService
         $this->competition = $this->sideEvent->competition;
         $this->category = $this->sideEvent->competition?->category;
         $this->weapon = $this->sideEvent->competition?->weapon;
-    }
 
-    public function generate()
-    {
         $this->dom = new \DOMDocument();
         $this->dom->encoding = 'UTF-8';
         $this->dom->xmlVersion = '1.0';

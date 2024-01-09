@@ -17,15 +17,15 @@ class ParticipantListService
     public function asCSV($filename)
     {
         $registrations = $this->sortRegistrations($this->createListOfParticipants());
-        $headers = array("name", "firstname", "country", "year-of-birth", "role", "organisation", "organisation_abbr", "type", "date", "team");
+        $headers = ["name", "firstname", "country", "year-of-birth", "role", "organisation", "organisation_abbr", "type", "date", "team"];
         if (empty($this->event->competition)) {
             $headers = array("name", "firstname", "country", "organisation");
         }
-        $csvservice = new RegistrationCSVService($registrations);
-        $lines = $csvservice->generate($headers, (object)[
+        $csvservice = app()->make(RegistrationCSVService::class);
+        $lines = $csvservice->generate($registrations, $headers, (object)[
             'isCompetition' => !empty($this->event->competition)
         ]);
-
+        \Log::debug("lines is " . json_encode($lines));
         header('Content-Disposition: attachment; filename="' . $filename . '";');
         header('Content-Type: application/csv; charset=UTF-8');
 
@@ -35,20 +35,18 @@ class ParticipantListService
         }
         fpassthru($f);
         fclose($f);
-        exit();
     }
 
     public function asXML($filename)
     {
         $registrations = $this->sortRegistrations($this->createListOfParticipants());
-        $xmlservice = new RegistrationXMLService($this->event, $registrations);
-        $doc = $xmlservice->generate();
+        $xmlservice = app()->make(RegistrationXMLService::class);
+        $doc = $xmlservice->generate($this->event, $registrations);
 
         header('Content-Disposition: attachment; filename="' . $filename . '";');
         header('Content-Type: text/xml; charset=UTF-8');
         echo "\xEF\xBB\xBF"; // echo a BOM for Windows purposes
         echo $doc;
-        exit();
     }
 
     private function sortRegistrations($registrations)
@@ -78,7 +76,6 @@ class ParticipantListService
         $registrations = Registration::where('registration_event', $this->event->getKey())
             ->with(['fencer', 'fencer.country', 'country', 'sideEvent', 'role'])
             ->get()->all();
-
         return $registrations;
     }
 }
