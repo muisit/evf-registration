@@ -28,12 +28,12 @@ class IndexTest extends TestCase
 
         // test user 2 is sysop
         $this->session(['wpuser' => UserData::TESTUSER2])
-            ->get('/events/' . EventData::EVENT1 . '/overview')
+            ->get('/events')
             ->assertStatus(200);
 
         // test user 4 is organisation
         $this->session(['wpuser' => UserData::TESTUSER4])
-            ->get('/events/' . EventData::EVENT1 . '/overview')
+            ->get('/events')
             ->assertStatus(200);
     }
 

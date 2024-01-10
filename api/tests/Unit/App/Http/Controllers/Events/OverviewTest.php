@@ -18,7 +18,7 @@ class OverviewTest extends TestCase
     public function testRoute()
     {
         $this->session(['wpuser' => UserData::TESTUSER])
-            ->get('/events/' . EventData::EVENT1 . '/overview');
+            ->get('/events/overview?event=' . EventData::EVENT1);
 
         $output = $this->response->json();
         $this->assertTrue($output !== false);
@@ -27,34 +27,34 @@ class OverviewTest extends TestCase
 
         // test user 2 is sysop
         $this->session(['wpuser' => UserData::TESTUSER2])
-            ->get('/events/' . EventData::EVENT1 . '/overview')
+            ->get('/events/overview?event=' . EventData::EVENT1)
             ->assertStatus(200);
 
         // test user 4 is organisation
         $this->session(['wpuser' => UserData::TESTUSER4])
-            ->get('/events/' . EventData::EVENT1 . '/overview')
+            ->get('/events/overview?event=' . EventData::EVENT1)
             ->assertStatus(200);
     }
 
     public function testUnAuthorised()
     {
-        $this->get('/events/' . EventData::EVENT1 . '/overview')
+        $this->get('/events/overview?event=' . EventData::EVENT1)
             ->assertStatus(401);
 
         // test user 5 has no privileges
         $this->session(['wpuser' => UserData::TESTUSER5])
-            ->get('/events/' . EventData::EVENT1 . '/overview')
+            ->get('/events/overview?event=' . EventData::EVENT1)
             ->assertStatus(403);
 
         // user id does not exist
         $this->session(['wpuser' => UserData::NOSUCHID])
-            ->get('/events/' . EventData::EVENT1 . '/overview')
+            ->get('/events/overview?event=' . EventData::EVENT1)
             ->assertStatus(403);
     }
 
     public function testNotExisting()
     {
-        $this->get('/events/' . EventData::NOSUCHEVENT . '/overview')
+        $this->get('/events/overview', ['event' => EventData::NOSUCHEVENT])
             ->assertStatus(401);
     }
 }

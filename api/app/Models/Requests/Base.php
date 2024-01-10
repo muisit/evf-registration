@@ -72,8 +72,9 @@ class Base
             else {
                 $this->controller->authorize('update', $this->model);
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     public function rules(): array

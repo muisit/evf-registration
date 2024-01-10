@@ -18,7 +18,7 @@ class FencerPhoto extends Base
     {
         return [
             'fencer.id' => ['required', 'int', 'min:0'],
-            'fencer.photoStatus' => ['nullable', Rule::in(['N','Y','A','R'])]
+            'fencer.photoStatus' => ['required', Rule::in(['N','Y','A','R'])]
         ];
     }
 
@@ -27,9 +27,7 @@ class FencerPhoto extends Base
         if (!parent::authorize($user, $data)) {
             return false;
         }
-
-        $this->canChangePictureState = $user->can('pictureState', Fencer::class);
-        return true;
+        return $user->can('pictureState', FencerModel::class);
     }
 
     protected function createModel(Request $request): ?Model
@@ -40,9 +38,7 @@ class FencerPhoto extends Base
         $id = intval($id);
 
         $model = FencerModel::where('fencer_id', $id)->first();
-        if (empty($model)) {
-            $model = new FencerModel();
-        }
+        // do not create a new model
         return $model;
     }
 

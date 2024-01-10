@@ -37,6 +37,6 @@ class PhotoState extends Controller
         if (!empty($model) && $model !== false) {
             return response()->json(new ReturnStatus('ok'));
         }
-        return response()->json(new ReturnStatus('error', 'Not authorized'));
+        return response()->json(new ReturnStatus('error', 'Not authorized'), 403);
     }
 }
