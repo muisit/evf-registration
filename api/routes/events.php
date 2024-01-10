@@ -16,10 +16,18 @@ $router->group(
         );
 
         $router->get(
-            '/{event}/overview',
+            '/overview',
             [
                 'as' => 'events.overview',
                 'uses' => 'Events\Overview@index'
+            ]
+        );
+
+        $router->get(
+            '/statistics',
+            [
+                'as' => 'events.statistics',
+                'uses' => 'Events\Statistics@index'
             ]
         );
 

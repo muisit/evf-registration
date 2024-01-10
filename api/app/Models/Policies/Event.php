@@ -61,6 +61,16 @@ class Event
         return false;
     }
 
+    // can perform organiser functions for this event
+    public function organise(EVFUser $user, Model $model): bool | null
+    {
+        // see if we have a global request object for the event
+        if ($user->hasRole(['organiser:' . $model->getKey()])) {
+            return true;
+        }
+        return false;
+    }
+
     // can perform accreditation functions for this event
     public function accredit(EVFUser $user, Model $model): bool | null
     {

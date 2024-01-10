@@ -63,11 +63,16 @@ class Index extends Controller
                 $this->authorize("not/ever");
             }
             else {
+                $getAll = $request->get('all');
+                if ($getAll) {
+                    $this->authorize('organise', $event);
+                }
                 $retval = new RegistrationsSchema();
-                $rows = Registration::where('registration_mainevent', $event->getKey())
-                    ->where('registration_country', (empty($country) ? null : $country->getKey()))
-                    ->with('fencer')
-                    ->get();
+                $query = Registration::where('registration_mainevent', $event->getKey());
+                if (!$getAll) {
+                    $query = $query->where('registration_country', (empty($country) ? null : $country->getKey()));
+                }
+                $rows = $query->with('fencer')->get();
                 
                 if (!emptyResult($rows)) {
                     foreach ($rows as $row) {

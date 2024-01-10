@@ -1,0 +1,28 @@
+#app .actions-page {
+    h3 { 
+        text-align: center;
+    }
+
+    table.statistics {
+        tr {
+            td {
+                padding: 4px 10px;
+            }
+            td.label {
+                font-weight: bold;
+            }
+        }
+    }
+
+    form {
+        margin: auto 27%;
+
+        .photoid-element {
+            .photo-id {
+                img {
+                    width: 100%;
+                }
+            }
+        }
+    }
+}

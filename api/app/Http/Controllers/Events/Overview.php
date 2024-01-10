@@ -14,7 +14,7 @@ class Overview extends Controller
      * Event registration overview
      *
      * @OA\Get(
-     *     path = "/events/{eventId}/overview",
+     *     path = "/events/overview",
      *     @OA\Response(
      *         response = "200",
      *         description = "List of accessible events",
@@ -25,9 +25,9 @@ class Overview extends Controller
      *     )
      * )
      */
-    public function index(Request $request, string $event)
+    public function index(Request $request)
     {
-        $event = Event::where('event_id', $event)->first();
+        $event = $request->get('eventObject');
         if (empty($event) || !$event->exists || get_class($event) != Event::class) {
             abort(404);
         }

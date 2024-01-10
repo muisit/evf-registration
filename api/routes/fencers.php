@@ -39,6 +39,14 @@ $router->group(
             ]
         );
 
+        $router->post(
+            '/{fencerId}/photostate',
+            [
+                'as' => 'fencers.photostate',
+                'uses' => 'Fencers\PhotoState@index'
+            ]
+        );
+
         $router->get(
             '/autocomplete',
             [

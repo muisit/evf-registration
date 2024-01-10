@@ -64,7 +64,10 @@ import { ElSelect, ElOption } from 'element-plus';
             <img class='photo-id-image' :src="getPhotoUrl()"/>
         </div>
         <div class='text-center'>
-            <input type="file" @change="onFileChange" v-if="props.dataComplete"/>
+            <label for="photoidupload" class="photoid-upload el-button el-button--primary">
+                Upload Image
+            </label>
+            <input id='photoidupload' type="file" @change="onFileChange" v-if="props.dataComplete"/>
         </div>
         <div v-if="canApprove()" class="approval-dropdown">
             <ElSelect :model-value="props.fencer.photoStatus" @update:model-value="(e) => $emit('onStateChange', e)">

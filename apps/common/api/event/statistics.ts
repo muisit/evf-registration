@@ -1,10 +1,10 @@
 import { fetchJson } from '../interface';
 import type { FetchResponse } from '../interface';
-import type { OverviewLine } from '../schemas/overviewline';
+import type { EventStatistics } from '../schemas/eventstatistics';
 
-export const overview = function(): Promise<OverviewLine[]> {
-    return new Promise<Array<OverviewLine>>((resolve, reject) => {       
-        return fetchJson('GET', '/events/overview')
+export const statistics = function(): Promise<EventStatistics> {
+    return new Promise<EventStatistics>((resolve, reject) => {       
+        return fetchJson('GET', '/events/statistics')
             .then( (data:FetchResponse) => {
                 if(!data || data.status != 200) {
                     return reject("No response data");
