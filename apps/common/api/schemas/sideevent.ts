@@ -22,9 +22,9 @@ export interface SideEvent {
     defaultRole?: number|null;
 }
 
-export function defaultSideEvent(): SideEvent
+export function defaultSideEvent(elements = {}): SideEvent
 {
-    return {
+    return Object.assign({
         id: 0,
         title: 'SideEvent',
         description: 'SideEvent',
@@ -33,5 +33,5 @@ export function defaultSideEvent(): SideEvent
         competitionId: 0,
         abbr: 'SE',
         competition: null
-    };
+    }, elements);
 }

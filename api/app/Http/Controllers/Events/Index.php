@@ -35,9 +35,6 @@ class Index extends Controller
             if ($request->user()->can('view', $event) && $event->useRegistrationApplication()) {
                 $retval[] = new EventSchema($event);
             }
-            else {
-                \Log::debug("event " . $event->getKey() . ': ' . ($event->useRegistrationApplication() ? 'true' : 'false'));
-            }
         }
         return response()->json($retval);
     }

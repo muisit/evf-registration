@@ -54,12 +54,12 @@ import { ElSwitch } from 'element-plus';
 <template>
     <div class="participant-list">
         <div class="participant-header">
-            <div class="participant-filters">
+            <div class="participant-filters" v-if="!hasTeam(data.currentEvent) && is_valid(data.currentCountry)">
                 <FilterButton v-for="item in data.weapons" :key="item.id || 0" :name="item.abbr || ''" :label="item.name || ''" :filter="filter" @onFilter="onFilter"/>
                 <FilterButton v-for="item in data.nonCompetitionEvents" :key="item.id || 0" :name="item.abbr || ''" :label="item.title || ''" :filter="filter" @onFilter="onFilter"/>
                 <FilterButton name="Support" label="Support roles" :filter="filter" @onFilter="onFilter"/>
             </div>
-            <div class="last">
+            <div class="last" v-if="!hasTeam(data.currentEvent) && is_valid(data.currentCountry)">
                 <ElSwitch v-model="byweapon" active-text="By Weapon" inactive-text="Individual" />
             </div>
         </div>

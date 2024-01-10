@@ -224,7 +224,7 @@ export const useDataStore = defineStore('data', () => {
 
         const authStore = useAuthStore();
         authStore.isLoading('overview');
-        return overview(currentEvent.value.id || 0)
+        return overview()
             .then((data:OverviewLine[]) => {
                 authStore.hasLoaded('overview');
                 overviewData.value = data;

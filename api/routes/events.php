@@ -16,10 +16,34 @@ $router->group(
         );
 
         $router->get(
-            '/{event}/overview',
+            '/overview',
             [
                 'as' => 'events.overview',
                 'uses' => 'Events\Overview@index'
+            ]
+        );
+
+        $router->get(
+            '/statistics',
+            [
+                'as' => 'events.statistics',
+                'uses' => 'Events\Statistics@index'
+            ]
+        );
+
+        $router->get(
+            '/xml/{sideEventId}',
+            [
+                'as' => 'events.downloadxml',
+                'uses' => 'Events\Download@asXML'
+            ]
+        );
+
+        $router->get(
+            '/csv/{sideEventId}',
+            [
+                'as' => 'events.downloadcsv',
+                'uses' => 'Events\Download@asCSV'
             ]
         );
     }

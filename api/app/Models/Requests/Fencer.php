@@ -52,7 +52,7 @@ class Fencer extends Base
             return false;
         }
 
-        $this->canChangePictureState = $user->can('pictureState', Fencer::class);
+        $this->canChangePictureState = $user->can('pictureState', FencerModel::class);
         return true;
     }
 

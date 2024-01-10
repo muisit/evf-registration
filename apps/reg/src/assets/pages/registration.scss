@@ -92,9 +92,33 @@
         }
 
         .photoid-element {
+            min-width: 300px;
+
             .photo-id {
+                margin-left: 22%;
+
                 img {
-                    width: 60%;
+                    width: 80%;
+                }
+            }
+            input#photoidupload {
+                display: none;
+            }
+
+            .photoid-upload {
+                border: 1px solid #ccc;
+                display: inline-block;
+                padding: 6px 12px;
+                cursor: pointer;
+                width: 40%;
+            }
+
+            .approval-dropdown {
+                margin: auto 30%;
+                padding-top: 15px;
+
+                .el-input {
+                    width: 100%; 
                 }
             }
         }

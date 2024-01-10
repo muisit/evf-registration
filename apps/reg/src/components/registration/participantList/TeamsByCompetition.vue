@@ -1,13 +1,12 @@
 <script lang="ts" setup>
 import type { Registration } from '../../../../../common/api/schemas/registration';
 import { useDataStore } from '../../../stores/data';
-import type { WeaponSchema } from '../../../../../common/api/schemas/weapon';
+import type { SideEvent } from '../../../../../common/api/schemas/sideevent';
 const props = defineProps<{
     registrations: Registration[];
-    weapon: WeaponSchema;
+    event: SideEvent;
 }>();
 const emits = defineEmits(['onEdit', 'onSelect']);
-
 
 function fencerData()
 {
@@ -48,7 +47,7 @@ import SortableHeader from './SortableHeader.vue';
 import ParticipantTable from './ParticipantTable.vue';
 </script>
 <template>
-    <SortableHeader :weapon="props.weapon" :sortable="false" :sorter="[]" />
-    <ParticipantTable :dataList="fencerData()" :weapon="props.weapon"  @onEdit="(e) => $emit('onEdit', e)" @onSelect="(e) => $emit('onSelect', e)" />
+    <SortableHeader :event="props.event" :sortable="false" :sorter="[]" />
+    <ParticipantTable :dataList="fencerData()" :event="props.event"  @onEdit="(e) => $emit('onEdit', e)" @onSelect="(e) => $emit('onSelect', e)" />
     <tbody><tr class='filler'><td colspan="9"></td></tr></tbody>
 </template>

@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Support\Services\PDFGenerator;
+use App\Support\Services\RegistrationCSVService;
+use App\Support\Services\RegistrationXMLService;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Lumen\Application;
 use Illuminate\Support\Facades\Queue;
@@ -21,6 +23,12 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(PDFGenerator::class, function (Application $app) {
             return new PDFGenerator();
+        });
+        $this->app->singleton(RegistrationCSVService::class, function (Application $app) {
+            return new RegistrationCSVService();
+        });
+        $this->app->singleton(RegistrationXMLService::class, function (Application $app) {
+            return new RegistrationXMLService();
         });
     }
 

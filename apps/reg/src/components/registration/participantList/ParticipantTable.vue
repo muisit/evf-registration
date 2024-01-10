@@ -2,28 +2,28 @@
 import { is_valid } from '../../../../../common/functions';
 import type { Fencer } from '../../../../../common/api/schemas/fencer';
 import type { Registration } from '../../../../../common/api/schemas/registration';
+import type { SideEvent } from '../../../../../common/api/schemas/sideevent';
 import { allowMoreTeams } from '../../../../../common/lib/event';
-import type { WeaponSchema } from '../../../../../common/api/schemas/weapon';
 import { useDataStore } from '../../../stores/data';
 const emits = defineEmits(['onEdit', 'onSelect']);
 const props = defineProps<{
     dataList: Fencer[];
-    weapon?: WeaponSchema;
+    event?: SideEvent;
 }>();
 
 const data = useDataStore();
 
 function getRolesAndEvents(fencer:Fencer)
 {
-    if (!props.weapon) {
+    if (!props.event) {
         return parseAllRolesAndEvents(fencer);
     }
     else {
-        return parseRolesForWeaponOnly(fencer);
+        return parseRolesForCompetitionOnly(fencer);
     }
 }
 
-function parseRolesForWeaponOnly(fencer:Fencer)
+function parseRolesForCompetitionOnly(fencer:Fencer)
 {
     var athleteRoles:Array<string> = [];
     var nonAthleteRoles:Array<string> = [];
@@ -32,23 +32,19 @@ function parseRolesForWeaponOnly(fencer:Fencer)
         fencer.registrations.forEach((reg: Registration) => {
             if (is_valid(reg.sideEventId || '')) {
                 var se = data.sideEventsById['s' + reg.sideEventId];
-                if (se && se.competition && se.competition.weapon && props.weapon && props.weapon.id == se.competition.weapon.id) {
+                if (se && props.event && se.id == props.event.id) {
                     // only display the team if we allow more teams
-                    if (se.competition.category?.type == 'T') {
+                    if (se.competition?.category?.type == 'T') {
                         if(allowMoreTeams(data.currentEvent)) {
                             athleteRoles.push('' + se.competition.category?.name + ' ' + (reg.team || ''));
                         }
-                        else {
-                            // indicate team grand-veterans or veterans
-                            athleteRoles.push(se.competition.category?.name || '');
-                        }
                     }
                 }
-                else if(se && !se.competition && !is_valid(props.weapon?.id)) {
+                else if(se && !se.competition && !is_valid(props.event?.id)) {
                     nonAthleteRoles.push(se.title);
                 }
             }
-            else if(is_valid(reg.roleId || '') && !is_valid(props.weapon?.id)) {
+            else if(is_valid(reg.roleId || '') && !is_valid(props.event?.id)) {
                 var role = data.rolesById['r' + reg.roleId];
                 if (role) {
                     otherRoles.push(role.name || '');
@@ -109,14 +105,14 @@ function filterErrors(fencer:Fencer)
 {
     let errors:string[] = [];
     fencer.registrations?.map((reg:Registration) => {
-        if (!props.weapon) {
+        if (!props.event) {
             if (reg.errors && reg.errors.length) {
                 errors = errors.concat(reg.errors);
             }
         }
-        else if (is_valid(props.weapon.id)) { // support registrations have no rules
+        else if (is_valid(props.event.id)) { // support registrations have no rules
             let se = data.sideEventsById['s' + reg.sideEventId];
-            if (se && se.competition && se.competition.weapon && se.competition.weapon.id == props.weapon.id) {
+            if (se && props.event.id == se.id) {
                 if (reg.errors && reg.errors.length) {
                    errors = errors.concat(reg.errors);
                 }

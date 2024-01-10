@@ -45,6 +45,11 @@ class Event extends Model
         return $this->hasMany(Document::class, 'event_id', 'event_id');
     }
 
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(Registration::class, 'registration_mainevent', 'event_id');
+    }
+
     public function templates(): HasMany
     {
         return $this->hasMany(AccreditationTemplate::class, 'event_id', 'event_id');

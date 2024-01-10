@@ -1,5 +1,8 @@
 import './assets/main.scss';
 
+//import { library } from '@fortawesome/fontawesome-svg-core'
+//import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 
@@ -23,5 +26,5 @@ if (search.length > 0) {
 
 const app = createApp(App, properties);
 app.use(createPinia());
-
+//app.component('font-awesome-icon', FontAwesomeIcon);
 app.mount('#app')
