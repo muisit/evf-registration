@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { computed } from 'vue';
 import { useDataStore } from '../../stores/data';
 import { useAuthStore } from '../../../../common/stores/auth';
 import { format_currency } from '../../../../common/functions';
@@ -37,8 +38,7 @@ function addToGroupCosts(reg:Registration, costs:number, totals:any)
     return totals;
 }
 
-function totals()
-{
+const totals = computed(() => {
     let totals = {
         'wholegroup': 0,
         'pendinggroup': 0,
@@ -89,7 +89,7 @@ function totals()
     totals.remaingroup = totals.wholegroup - totals.ackgroup;
     totals.remainindividual = totals.wholeindividual - totals.ackindividual;
     return totals;
-}
+});
 
 function showHodData()
 {
@@ -99,64 +99,64 @@ function showHodData()
 <template>
     <div class="cashier-footer">
         <table class="payment-details">
-            <tbody v-if="totals()['wholegroup'] > 0">
+            <tbody v-if="totals['wholegroup'] > 0">
                 <tr>
                     <td colspan="2" class="cashier-detail-header">Group Costs</td>
                 </tr>
                 <tr>
                     <td class='label'>Total</td>
-                    <td>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals()['wholegroup']) }}</td>
+                    <td class='text-right'>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals['wholegroup']) }}</td>
                 </tr>
                 <tr v-if="showHodData()">
                     <td class='label'>Received from participants</td>
-                    <td>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals()['receivedgroup']) }}</td>
+                    <td class='text-right'>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals['receivedgroup']) }}</td>
                 </tr>
                 <tr v-if="showHodData()">
                     <td class='label'>Pending from participants</td>
-                    <td>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals()['pendinggroup']) }}</td>
+                    <td class='text-right'>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals['pendinggroup']) }}</td>
                 </tr>
                 <tr>
-                    <td class='label'>Received by organisation</td>
-                    <td>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals()['ackgroup']) }}</td>
+                    <td class='label'>Received by organisers</td>
+                    <td class='text-right'>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals['ackgroup']) }}</td>
                 </tr>
                 <tr>
-                    <td class='label'>Transferrable to organisation</td>
-                    <td>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals()['remaingroup']) }}</td>
+                    <td class='label'>Transfer to organisers</td>
+                    <td class='text-right' :style="{color: totals['remaingroup'] > 0 ? 'red' : 'inherit'}">{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals['remaingroup']) }}</td>
                 </tr>
             </tbody>
-            <tbody v-if="totals()['wholeindividual'] > 0">
+            <tbody v-if="totals['wholeindividual'] > 0">
                 <tr>
                     <td colspan="2" class="cashier-detail-header">Individual Costs</td>
                 </tr>
                 <tr>
                     <td class='label'>Total</td>
-                    <td>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals()['wholeindividual']) }}</td>
+                    <td class='text-right'>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals['wholeindividual']) }}</td>
                 </tr>
                 <tr>
-                    <td class='label'>Received by organisation</td>
-                    <td>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals()['ackindividual']) }}</td>
+                    <td class='label'>Received by organisers</td>
+                    <td class='text-right'>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals['ackindividual']) }}</td>
                 </tr>
                 <tr>
-                    <td class='label'>Transferrable to organisation</td>
-                    <td>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals()['remainindividual']) }}</td>
+                    <td class='label'>Transfer to organisers</td>
+                    <td class='text-right' :style="{color: totals['remainindividual'] > 0 ? 'red' : 'inherit'}">{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals['remainindividual']) }}</td>
                 </tr>
             </tbody>
-            <tbody v-if="totals()['wholeorg'] > 0">
+            <tbody v-if="totals['wholeorg'] > 0">
                 <tr>
                     <td colspan="2" class="cashier-detail-header">Organisation Costs</td>
                 </tr>
                 <tr>
                     <td class='label'>Total</td>
-                    <td>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals()['wholeorg']) }}</td>
+                    <td class='text-right'>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals['wholeorg']) }}</td>
                 </tr>
             </tbody>
-            <tbody v-if="totals()['wholeevf'] > 0">
+            <tbody v-if="totals['wholeevf'] > 0">
                 <tr>
                     <td colspan="2" class="cashier-detail-header">EVF Costs</td>
                 </tr>
                 <tr>
                     <td class='label'>Total</td>
-                    <td>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals()['wholeevf']) }}</td>
+                    <td class='text-right'>{{  data.currentEvent.bank?.symbol }} {{ format_currency(totals['wholeevf']) }}</td>
                 </tr>
             </tbody>
         </table>
