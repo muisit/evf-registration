@@ -92,9 +92,13 @@
         }
 
         .photoid-element {
+            min-width: 300px;
+
             .photo-id {
+                margin-left: 22%;
+
                 img {
-                    width: 60%;
+                    width: 80%;
                 }
             }
             input#photoidupload {
