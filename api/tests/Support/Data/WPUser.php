@@ -8,12 +8,12 @@ use DB;
 class WPUser extends Fixture
 {
     public const TESTUSER = 1045;
-    public const TESTUSER2 = 2879;
-    public const TESTUSER3 = 65535;
-    public const TESTUSER4 = 123126;
+    public const TESTUSER2 = 2879; // organiser
+    public const TESTUSER3 = 65535; // cashier
+    public const TESTUSER4 = 123126; // accreditation
     public const TESTUSER5 = 8912;
-    public const TESTUSERREGISTRAR = 89123;
-    public const TESTUSERORGANISER = 89124;
+    public const TESTUSERREGISTRAR = 89123; // registrar
+    public const TESTUSERORGANISER = 89124; // organiser
     public const TESTUSERHOD = 3883;
     public const TESTUSERGENHOD = 3886;
     public const NOSUCHID = 894772;

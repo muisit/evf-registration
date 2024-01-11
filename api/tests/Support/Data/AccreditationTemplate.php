@@ -12,6 +12,7 @@ class AccreditationTemplate extends Fixture
     public const ORG = 2;
     public const COUNTRY = 3;
     public const REFEREE = 4;
+    public const DEF1 = 10;
 
     protected static function wasBooted($cls)
     {
@@ -34,6 +35,7 @@ class AccreditationTemplate extends Fixture
             'name' => 'Athlete',
             'content' => '{"roles":["0"]}',
             'event_id' => Event::EVENT1,
+            'is_default' => 'N',
         ])->save();
 
         Model::create([
@@ -41,6 +43,7 @@ class AccreditationTemplate extends Fixture
             'name' => 'Organisation',
             'content' => '{"roles":["21","18","16","13","9","10","17","12","11","8","20","14","22"]}',
             'event_id' => Event::EVENT1,
+            'is_default' => 'N',
         ])->save();
 
         Model::create([
@@ -48,6 +51,7 @@ class AccreditationTemplate extends Fixture
             'name' => 'Fed',
             'content' => '{"roles":["4","2","5","19","6"]}',
             'event_id' => Event::EVENT1,
+            'is_default' => 'N',
         ])->save();
 
         Model::create([
@@ -55,6 +59,15 @@ class AccreditationTemplate extends Fixture
             'name' => 'Referee',
             'content' => '{"roles":["7"]}',
             'event_id' => Event::EVENT1,
+            'is_default' => 'N',
+        ])->save();
+
+        Model::create([
+            'id' => self::DEF1,
+            'name' => 'Default',
+            'content' => '{"roles":["7"]}',
+            'event_id' => null,
+            'is_default' => 'Y',
         ])->save();
     }
 }

@@ -2,16 +2,17 @@
 
 namespace App\Models\Policies;
 
-use App\Models\Accreditation as Model;
+use App\Models\AccreditationTemplate as Model;
 use App\Support\Contracts\EVFUser;
 
-class Accreditation
+class AccreditationTemplate
 {
     /**
      * Perform pre-authorization checks.
      */
     public function before(EVFUser $user, string $ability): bool | null
     {
+        \Log::debug("AccreditationTemplate::before");
         if ($user->hasRole("sysop")) return true;
         return null;
     }
@@ -22,10 +23,10 @@ class Accreditation
         $event = request()->get('eventObject');
         $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
 
-        // someone can see an accreditation if he/she is an organiser or handles accreditation
-        // for a valid event. We can remove these roles to restrict the number
-        // of people with broad accreditation access
-        if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId, 'accreditation:' . $eventId])) {
+        // someone can see a template if he/she is an organiser for a valid event.
+        // We can remove these roles to restrict the number of people with broad accreditation access
+        if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId])) {
+            \Log::debug("user has organiser:$eventId set");
             return true;
         }
         return false;
@@ -39,8 +40,8 @@ class Accreditation
      */
     public function viewAny(EVFUser $user): bool | null
     {
-        \Log::debug("testing to see if user is an organiser");
         if ($this->isOrganiser($user)) {
+            \Log::debug("user is organiser");
             return true;
         }
 
@@ -56,6 +57,7 @@ class Accreditation
     public function view(EVFUser $user, Model $model): bool | null
     {
         if ($this->isOrganiser($user)) {
+            \Log::debug("user is organiser");
             return true;
         }
 
@@ -69,10 +71,7 @@ class Accreditation
      */
     public function create(EVFUser $user): bool
     {
-        if ($this->isOrganiser($user)) {
-            return true;
-        }
-
+        // only sysop can create
         return false;
     }
 
@@ -84,7 +83,9 @@ class Accreditation
      */
     public function update(EVFUser $user, Model $model): bool
     {
+        \Log::debug("AccreditationTemplate::update");
         if ($this->isOrganiser($user)) {
+            \Log::debug("user is organiser");
             return true;
         }
 
@@ -99,10 +100,7 @@ class Accreditation
      */
     public function delete(EVFUser $user, Model $model): bool
     {
-        if ($this->isOrganiser($user)) {
-            return true;
-        }
-
+        // only sysop can delete
         return false;
     }
 }
