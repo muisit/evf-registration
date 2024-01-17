@@ -1,0 +1,141 @@
+#app .templates-page {
+    .template-list {
+        tr {
+            td {
+                border-top: 1px solid white;
+                padding: 4px 10px;
+                font-size: larger;
+                vertical-align: middle;
+
+                .el-icon {
+                    padding-top: 2px;
+                }
+            }
+        }
+
+        tr.is_default {
+            td.name {
+                background-color: var(--el-color-primary);
+                color: white;
+            }
+        }
+    }
+
+    .templates-footer {
+        display: flex;
+        justify-content: end;
+        margin: 0px 20%;
+    }
+
+    .el-dialog {
+        .el-form {
+            .el-select {
+                width: 100%;
+            }
+        }
+
+        .template-dnd-editor {
+            display: flex;
+            justify-content: start;
+            flex-direction: row;
+
+            .dragging {
+                opacity: 1.0;
+            }
+
+            .canvas-wrapper {
+                height: 594px;
+                width: 420px;
+                position: relative;
+
+                .canvas-margins {
+                    display: block;
+                    position: absolute;
+                    width: 380px;
+                    height: 554px;
+                    top: 20px;
+                    left: 20px;
+                    background-color: #eee;
+                }
+                .canvas {
+                    display:block;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 420px;
+                    height: 594px;
+                    background-color: #888;
+                    opacity: 0.2;               
+                }
+
+                .canvas-element {
+                    position: absolute;
+                    display: block;
+                    border: 1px solid black;
+                    width: 100%;
+                    height: 100%;
+                    font-size: inherit;
+                    font-style: inherit;
+
+                    .canvas-element-content {
+                        position: relative;
+                        height: 100%;
+                        width: 100%;
+
+                        img { 
+                            width: 100%;
+                            height: 100%;
+                        }
+                    }
+
+                    .canvas-trash {
+                        position: absolute;
+                        top: 0px;
+                        right: 2px;
+                    }
+                }
+            }
+
+            .canvas-style-editor {
+                padding-left: 20px;
+                flex-grow: 1;
+            }
+
+            .toolbox {
+                width: 320px;
+
+                .toolboxline {
+                    max-width: 80%;
+                    border: 1px solid #888;
+                    font-size: small;
+                    font-variant: small-caps;
+                    background-color: #ccc;
+                    color: black;
+                    border-radius: 2px;
+                    margin: 2px 0px;
+                    line-height: 2rem;
+
+                    .el-icon {
+                        position:relative;
+                        top: 4px;
+                        left: 5px;
+                    }
+                    .text {
+                        padding-left: 10px;
+                    }
+                }
+
+                #pictureupload { 
+                    display: none;
+                }
+                .picture-upload {
+                    border: 1px solid #ccc;
+                    display: inline-block;
+                    padding: 6px 12px;
+                    cursor: pointer;
+                    width: 40%;
+                }                    
+            }
+        }
+    }
+}

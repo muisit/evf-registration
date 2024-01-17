@@ -20,6 +20,7 @@ class AccreditationTemplate extends Base
             'template.content' => ['required', 'json'],
             //'template.eventId' => ['required','exists:TD_Event,event_id'], // you cannot update the associated event
             'template.isDefault' => ['required', Rule::in(['Y', 'N'])],
+            'template.copy' => ['nullable', 'boolean']
         ];
     }
 
@@ -40,12 +41,49 @@ class AccreditationTemplate extends Base
     protected function updateModel(array $data): ?Model
     {
         if ($this->model) {
-            $this->model->name = $data['template']['name'];
-            // convert to json back and forth to ensure a valid json entry
-            $this->model->content = json_encode(json_decode($data['template']['content']));
-            $this->model->is_default = $data['template']['isDefault'];
-            //$this->model->event_id = $data['template']['eventId']; // you cannot update the associated event
+            if (isset($data['template']['copy']) && $data['template']['copy']) {
+                $this->model = $this->copyModel($this->model);
+            }
+            else {
+                $this->model->name = $data['template']['name'];
+                // convert to json back and forth to ensure a valid json entry
+                $this->model->content = json_encode(json_decode($data['template']['content']));
+                $this->model->is_default = $data['template']['isDefault'];
+
+                if ($this->model->event_id === null) {
+                    $event = request()->get('eventObject');
+                    if (!empty($event)) {
+                        $this->model->event_id = $event->getKey();
+                    }
+                }
+            }
         }
         return $this->model;
+    }
+
+    private function copyModel(TemplateModel $model): TemplateModel
+    {
+        $retval = new TemplateModel();
+        $retval->name = $model->name . ' (copy)';
+        $event = request()->get('eventObject');
+        $retval->event_id = $event?->getKey() ?? null;
+        $retval->is_default = 'N';
+
+        $content = json_decode($model->content);
+        if (isset($content->pictures)) {
+            $content->pictures = collect($content->pictures)->map(function ($picture) use ($model, $retval) {
+                $path = $model->image($picture->file_id, $picture->file_ext);
+                if (file_exists($path)) {
+                    $copypath = $retval->image($picture->file_id, $picture->file_ext);
+                    @copy($path, $copypath);
+                    if (file_exists($copypath)) {
+                        return $picture;
+                    }
+                }
+                return null;
+            })->filter(fn ($el) => $el !== null);
+        }
+        $retval->content = json_encode($content);
+        return $retval;
     }
 }

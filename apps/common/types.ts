@@ -6,6 +6,10 @@ export interface StringKeyedNumber {
     [key:string]: number;
 }
 
+export interface StringKeyedValues {
+    [key:string]: any;
+}
+
 export interface StringKeyedBoolean {
     [key:string]: boolean;
 }

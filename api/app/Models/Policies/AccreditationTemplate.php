@@ -57,7 +57,6 @@ class AccreditationTemplate
     public function view(EVFUser $user, Model $model): bool | null
     {
         if ($this->isOrganiser($user)) {
-            \Log::debug("user is organiser");
             return true;
         }
 
@@ -83,9 +82,7 @@ class AccreditationTemplate
      */
     public function update(EVFUser $user, Model $model): bool
     {
-        \Log::debug("AccreditationTemplate::update");
         if ($this->isOrganiser($user)) {
-            \Log::debug("user is organiser");
             return true;
         }
 
