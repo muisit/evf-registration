@@ -29,7 +29,7 @@ class PDFGenerator
     const PDF_HEIGHT = 148.5; // A6 portrait in mm
 
     //const PDF_PXTOPT=1.76; // for A4 reports
-    const PDF_PXTOPT = 1.01;
+    const PDF_PXTOPT = 0.69;
     const FONTPATH = "vendor/tecnickcom/tcpdf/fonts";
 
     public $pdf;
@@ -46,7 +46,8 @@ class PDFGenerator
             $data = (object)[];
         }
 
-        $this->pageoption = $data->print ?? 'a4portrait';
+        $content = json_decode($accreditation->template->content);
+        $this->pageoption = (is_object($content) && isset($content->print)) ? $content->print : 'a4portrait';
         $this->pdf = $this->createBasePDF();
         $this->pdf->AddPage();
         $template_id = $this->pdf->startTemplate(self::PDF_WIDTH, self::PDF_HEIGHT, true);
@@ -91,9 +92,9 @@ class PDFGenerator
         $pdf = $this->instantiatePDF();
         $pdf->SetCreator("European Veteran Fencing");
         $pdf->SetAuthor('European Veteran Fencing');
-        $pdf->SetTitle('Accreditation for ' . $this->accreditation->event->event_title);
+        $pdf->SetTitle('Accreditation for ' . $this->accreditation->event->event_name);
         $pdf->SetSubject($this->accreditation->fencer->fencer_surname . ", " . $this->accreditation->fencer->fencer_firstname);
-        $pdf->SetKeywords('EVF, Accreditation,' . $this->accreditation->event->event_title);
+        $pdf->SetKeywords('EVF, Accreditation,' . $this->accreditation->event->event_name);
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(false);
         $pdf->SetMargins(5, 5, 5);
@@ -160,8 +161,8 @@ class PDFGenerator
         if (!empty($this->accreditationId)) {
             $options['align'] = 'C';
 
-            $offset1 = array($this->accreditationId->options["offset"][0], $this->accreditationId->options["offset"][1]);
-            $offset2 = array($this->accreditationId->options["offset"][0], $this->accreditationId->options["offset"][1]);
+            $offset1 = array($this->accreditationId->options()?->offset[0], $this->accreditationId->options()?->offset[1]);
+            $offset2 = array($this->accreditationId->options()?->offset[0], $this->accreditationId->options()?->offset[1]);
             switch ($this->pageoption) {
                 default:
                 case 'a4portrait':
@@ -193,12 +194,14 @@ class PDFGenerator
             }
 
             if ($this->accreditationId->side == "both" || $this->accreditationId->side == "left") {
+                \Log::debug("printing accreditation ID on " . json_encode($offset1));
                 $options["offset"] = $offset1;
-                $this->accreditationId->generate();
+                $this->accreditationId->finalise($options);
             }
             if (!empty($offset2) && ($this->accreditationId->side == "both" || $this->accreditationId->side == "right")) {
+                \Log::debug("printing accreditation ID on " . json_encode($offset2));
                 $options["offset"] = $offset2;
-                $this->accreditationId->generate();
+                $this->accreditationId->finalise($options);
             }
         }
     }

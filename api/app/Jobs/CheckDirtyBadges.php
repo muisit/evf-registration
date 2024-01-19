@@ -63,9 +63,7 @@ class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
             }
 
             $event = $eventsById['e' . $eventId];
-            \Log::debug("checking event " . ($event?->getKey()) . ' and allows: ' . ($event?->allowGenerationOfAccreditations() ? 'true' : 'false'));
             if (!empty($event) && $event->allowGenerationOfAccreditations()) {
-                \Log::debug("dispatching CheckBadge job");
                 $job = new CheckBadge($row->fencer_id, $row->event_id);
                 dispatch($job);
             }

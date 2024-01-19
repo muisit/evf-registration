@@ -53,6 +53,7 @@ const toolboxlist = computed(() => {
     lst.push({name: 'dates'});
     lst.push({name: 'text'});
     lst.push({name: 'qr'});
+    lst.push({name: 'accid'});
     lst.push({name: 'box'});
 
     let pics = availablePictures();

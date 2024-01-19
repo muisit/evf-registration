@@ -53,5 +53,13 @@ $router->group(
                 'uses' => 'Templates\PictureDelete@index'
             ]
         );
+
+        $router->get(
+            '/{templateId}/print',
+            [
+                'as' => 'templates.print',
+                'uses' => 'Templates\Example@index'
+            ]
+        );
     }
 );

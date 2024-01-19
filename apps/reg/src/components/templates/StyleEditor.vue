@@ -11,6 +11,7 @@ const emits = defineEmits(['onUpdate']);
 
 function update(field:string, value:string)
 {
+    console.log('update', field, value);
     emits('onUpdate', {field:field, value:value});
 }
 
@@ -64,7 +65,7 @@ import { ElForm, ElFormItem, ElInput, ElInputNumber, ElSelect, ElOption, ElColor
             <ElFormItem label="Width" v-if="!props.element.hasRatio">
                 <ElInputNumber :min='0' :max='maxWidth' :model-value="props.element.style.width || 0" @update:model-value="(e) => update('width', '' + e)"/>
             </ElFormItem>
-            <span v-if="props.element.hasRatio">Element has a fixed ratio of {{  props.element.ratio }}. Only height can be adjusted.</span>
+            <span v-if="props.element.hasRatio">Element has a fixed ratio of {{  props.element.ratio?.toFixed(2) }}. Only height can be adjusted.</span>
             <ElFormItem label="Height">
                 <ElInputNumber :min='0' :max='maxHeight' :model-value="props.element.style.height || 0" @update:model-value="(e) => update('height', '' + e)"/>
             </ElFormItem>
@@ -90,6 +91,9 @@ import { ElForm, ElFormItem, ElInput, ElInputNumber, ElSelect, ElOption, ElColor
                     <ElOption value="italic" label="Italic"/>
                 </ElSelect>
             </ElFormItem>
+            <ElFormItem label="Fit" v-if="props.element.hasFontSize">
+                <ElCheckbox :model-value="props.element.fitText || false" @update:model-value="(e) => update('fitText', e ? 'Y' : 'N')" />
+            </ElFormItem>
             <ElFormItem label="Text Colour" v-if="props.element.hasColour">
                 <ElColorPicker :model-value="props.element.style.color || '#000000'" @update:model-value="(e) => update('colour', e)"/>
             </ElFormItem>
@@ -104,9 +108,10 @@ import { ElForm, ElFormItem, ElInput, ElInputNumber, ElSelect, ElOption, ElColor
             </ElFormItem>
             <ElFormItem label="Name" v-if="props.element.type == 'name'">
                 <ElRadioGroup :model-value="props.element.name" @update:model-value="(e) => update('name', '' + e)">
-                    <ElRadio label="wholename">Whole name</ElRadio>
-                    <ElRadio label="firstname">Given name only</ElRadio>
-                    <ElRadio label="lastname">Surname only</ElRadio>
+                    {{ props.element.name }}
+                    <ElRadio label="whole">Whole name</ElRadio>
+                    <ElRadio label="first">Given name only</ElRadio>
+                    <ElRadio label="last">Surname only</ElRadio>
                 </ElRadioGroup>               
             </ElFormItem>
             <ElFormItem label="Side" v-if="props.element.type == 'accid'">

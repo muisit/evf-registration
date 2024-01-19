@@ -16,7 +16,7 @@ function deletePicture()
     emits('onDelete');
 }
 
-import { Avatar, CreditCard, Stamp, Location, Flag, Phone, Briefcase, Calendar, Document, Link, FullScreen, Picture, Delete } from '@element-plus/icons-vue';
+import { Avatar, CreditCard, Stamp, Location, Flag, Phone, Briefcase, Calendar, Document, Link, Connection, FullScreen, Picture, Delete } from '@element-plus/icons-vue';
 import { ElIcon } from 'element-plus';
 </script>
 <template>
@@ -32,6 +32,7 @@ import { ElIcon } from 'element-plus';
             <Calendar v-if="props.type == 'dates'" />
             <Document v-if="props.type == 'text'" />
             <Link v-if="props.type == 'qr'" />
+            <Connection v-if="props.type == 'accid'" />
             <FullScreen v-if="props.type == 'box'" />
             <Picture v-if="props.type == 'image'" />
         </ElIcon>
@@ -45,6 +46,7 @@ import { ElIcon } from 'element-plus';
         <span class="text"  v-if="props.type == 'dates'" >Dates</span>
         <span class="text"  v-if="props.type == 'text'" >Text</span>
         <span class="text"  v-if="props.type == 'qr'" >QR Code</span>
+        <span class="text"  v-if="props.type == 'accid'" >Accreditation ID</span>
         <span class="text"  v-if="props.type == 'box'" >Box</span>
         <span class="text"  v-if="props.type == 'img'" >
             {{ props.picture?.file_name }}

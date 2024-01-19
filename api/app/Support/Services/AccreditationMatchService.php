@@ -33,16 +33,13 @@ class AccreditationMatchService
         foreach ($newData as $a1) {
             $foundThis = false;
             foreach ($existingAccreditations as $a2) {
-                \Log::debug("matching " . $a2->getKey() . " with " . json_encode($a1));
                 if ($a2->template_id == $a1['template']->getKey()) {
                     if ($a1['hash'] !== $a2->hash) {
-                        \Log::debug("hash does not match");
                         $a2->data = json_encode($a1['content']);
                         $a2->hash = $a1['hash'];
                         $a2->is_dirty = date('Y-m-d H:i:s');
                     }
                     else {
-                        \Log::debug("hash matches");
                         $a2->is_dirty = null;
                     }
                     $foundIds[] = $a2->getKey();
@@ -66,14 +63,7 @@ class AccreditationMatchService
         }
 
         // the found accreditations need to update their dirty value
-        $this->foundAccreditations = collect($this->foundAccreditations)->map(function (Accreditation $a) {
-            // check that the file actually exists and that we have an accreditation ID set
-            $path = $a->path();
-            if (!file_exists($path) || empty($a->fe_id)) {
-                $a->createId();
-            }
-            return $a;
-        });
+        $this->foundAccreditations = collect($this->foundAccreditations);
 
         // all new data needs to be converted to new accreditations
         foreach ($newAccreditations as $data) {

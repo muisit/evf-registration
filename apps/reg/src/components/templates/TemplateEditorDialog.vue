@@ -6,6 +6,8 @@ import type { StringKeyedStringList } from '../../../../common/types';
 import { useDataStore } from '../../stores/data';
 import { useAuthStore } from '../../../../common/stores/auth';
 import { savetemplate } from '../../../../common/api/templates/savetemplate';
+import { templateprint } from '../../../../common/api/templates/templateprint';
+import { is_valid } from '../../../../common/functions';
 
 const props = defineProps<{
     visible:boolean;
@@ -24,7 +26,7 @@ function closeForm()
 function saveForm(doClose = true)
 {
     auth.isLoading('savetemplate');
-    savetemplate(props.template)
+    return savetemplate(props.template)
         .then((dt) => {
             auth.hasLoaded('savetemplate');
             if (dt) {
@@ -129,6 +131,17 @@ function convertedContentPrint()
     return props.template.content.print || 'a4portrait';
 }
 
+function printForm()
+{
+    return saveForm(false)
+        .then(() => {
+            templateprint(props.template).catch((e) => {
+                console.log(e);
+                alert('There was an error retrieving the example print');
+            });
+        });
+}
+
 import DndEditor from './DndEditor.vue';
 import { ElDialog, ElButton, ElForm, ElFormItem, ElSelect, ElOption, ElInput, ElCheckbox } from 'element-plus';
 import { useData } from 'element-plus/es/components/table-v2/src/composables';
@@ -166,6 +179,7 @@ import { useData } from 'element-plus/es/components/table-v2/src/composables';
       <DndEditor :template="props.template" :fonts="props.fonts" @on-update="(e) => updateContent(e)"/>
       <template #footer>
           <span class="dialog-footer">
+              <ElButton v-if="is_valid($props.template.id)" @click="printForm">Print</ElButton>
               <ElButton type="warning" @click="closeForm">Cancel</ElButton>
               <ElButton type="primary" @click="saveForm">Save</ElButton>
           </span>

@@ -21,6 +21,7 @@ export interface ElementContent {
     hasBackgroundColour ?: boolean;
     resizeable?: boolean;
     onedateonly?: boolean;
+    fitText?: boolean;
     name?: string;
     color2?: string;
     backgroundColor2?: string;

@@ -39,6 +39,7 @@ function updateElement(field:string, value: any)
         case 'fontFamily': element.style.fontFamily = value; break;
         case 'fontStyle': element.style.fontStyle = value; break;
         case 'textAlign': element.style.textAlign = value; break;
+        case 'fitText': element.fitText = value == 'Y'; break;
         case 'name': element.name = value; break;
         case 'onedateonly': element.onedateonly = value == 'Y'; break;
         case 'side': element.side = value; break;

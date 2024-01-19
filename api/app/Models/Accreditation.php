@@ -85,7 +85,7 @@ class Accreditation extends Model
         for ($i = 0; $i < strlen($id); $i++) {
             $total += intval($id[$i]);
         }
-        $control = (10 - ($total % 10) % 10);
+        $control = (10 - ($total % 10)) % 10;
         return $control;
     }
 
@@ -94,18 +94,18 @@ class Accreditation extends Model
         $id1 = random_int(101, 999);
         $id2 = random_int(101, 999);
 
-        $id = sprintf("%d%03d%03d", $this->event_id, $id1, $id2);
+        $id = sprintf("1%03d%03d", $id1, $id2);
 
         // see if there is an open accreditation with this ID. In that case, we generate a new
         $a = Accreditation::where('fe_id', $this->fe_id)->first();
         if (!empty($a) && $a->exists) {
-            if ($tries < 10) {
+            if ($tries < 100) {
                 return $this->createId($tries + 1);
             }
             else {
                 // this should not happen, but we are catching the theoretical case
                 // start with a 0, which no regular id should ever do
-                $id = '0' . $this->event_id . '' . $this->getKey();
+                $id = sprintf("0%06d", $this->getKey());
             }
         }
         $this->fe_id = $id . $this->createControlDigit($id);

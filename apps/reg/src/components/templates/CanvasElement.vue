@@ -79,12 +79,18 @@ import { Delete, Rank } from '@element-plus/icons-vue';
 import { ElIcon } from 'element-plus';
 import EUFlag from '../../assets/euflag.png';
 import PhotoID from '../../assets/photoid.png';
+import QRCode from '../../assets/qrcode.png';
+import ACCId from '../../assets/accid.png';
 </script>
 <template>
     <div class="canvas-element" :style="styleObject" draggable="true" @dragstart="onDragStart">
         <div class="canvas-element-content">
-            <div v-if="['accid', 'qr'].includes(props.element.type)" class="qr">QR</div>
-            <div v-if="props.element.type == 'accid'" class="id-code">000-000</div>
+            <div v-if="props.element.type == 'qr'" class="qr">
+                <img :src="QRCode"/>
+            </div>
+            <div v-if="props.element.type == 'accid'" class="id-code">
+                <img :src="ACCId"/>
+            </div>
             <div v-if="hasText()" class="text">{{ props.element.text }}</div>
             <div v-if="props.element.type == 'cntflag'" class="cntflag">
                 <img :src="EUFlag"></div>
@@ -96,7 +102,7 @@ import PhotoID from '../../assets/photoid.png';
             <div v-if="props.element.type == 'img'" class="image"></div>
             <div v-if="props.element.type == 'name'" class="text">{{ nametext }}</div>
             <div v-if="props.element.type == 'photo'" class="photo">
-                <img :src="PhotoID">
+                <img :src="PhotoID"/>
             </div>
             <div v-if="props.element.type == 'roles'" class="text">Athlete WS4, Team Armourer,<br/>Head of Delegation, Referee</div>
             <ElIcon size="small" class="canvas-trash" @click="deleteItem">

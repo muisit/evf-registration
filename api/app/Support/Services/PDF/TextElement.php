@@ -11,6 +11,8 @@ class TextElement extends Element
     protected $alignment;
     protected $wrap;
     protected $replaceTilde;
+    protected $fitText = false;
+    public $outOfTemplate = false;
 
     public function parse($element)
     {
@@ -19,6 +21,9 @@ class TextElement extends Element
             $this->fontSize = $this->parseFontSize($element);
             $this->fontFamily = $this->parseFontFamily($element);
             $this->alignment = $this->parseAlignment($element);
+        }
+        if (isset($element->fitText) && $element->fitText === true) {
+            $this->fitText = true;
         }
     }
 
@@ -30,6 +35,7 @@ class TextElement extends Element
         $obj->alignment = $this->alignment ?? '';
         $obj->wrap = $this->wrap ?? true;
         $obj->replaceTilde = $this->replaceTilde ?? false;
+        $obj->fitText = $this->fitText ?? false;
         return $obj;
     }
 
@@ -109,10 +115,10 @@ class TextElement extends Element
         if (isset($this->size)) {
             $swidth = $this->size[0];
             $sheight = $this->size[1];
-            if ($swidth < $width) {
+            if ($swidth < $width || $this->outOfTemplate) {
                 $width = $swidth;
             }
-            if ($sheight < $height) {
+            if ($sheight < $height || $this->outOfTemplate) {
                 $height = $sheight;
             }
         }
@@ -122,12 +128,12 @@ class TextElement extends Element
             $this->addFont($font);
         }
 
-        $fontsize = $this->determineFontSize($text, $this->fontSize, $font);
+        $fontsize = (new FontManager($this->generator))->determineFontSize($text, $this->fontSize, $font, $this->fitText ? $this->size[0] : null);
         $this->addFont($font);
         $this->generator->pdf->SetFontSize($fontsize * PDFGenerator::PDF_PXTOPT);
 
         $lineheight = $this->generator->pdf->getCellHeight($this->generator->pdf->GetFontSize());
-        $fontwidth = $this->getTextWidth($text);
+        $fontwidth = floatval($this->generator->pdf->GetStringWidth($text));
         $align = $this->alignment ?? '';
         //$this->pdf->Rect($x, $y - 0.5, $fontwidth,$lineheight, "B",array("all"=>0.5),array(128,0,128));
 
@@ -183,49 +189,7 @@ class TextElement extends Element
         return $text;
     }
 
-    private function determineFontSize($text, $size, $font)
-    {
-        // because fontsize is concerned with the height of the font and we want to
-        // steer on the width of the font, we need to convert the actual text
-        // to a font-size that matches the expected width as configured for the
-        // default Helvetica font
-        if ($font == "helvetica") return $size;
-
-        $this->generator->pdf->SetFontSize($size);
-        $this->generator->pdf->SetFont("helvetica");
-        $textwidthhelvetica = $this->getTextWidth($text);
-
-        $newsize = $size;
-        $this->addFont($font);
-        while (true) {
-            $this->generator->pdf->SetFontSize($newsize);
-            $this->addFont($font);
-            $fontwidth = $this->getTextWidth($text);
-
-            if (abs($fontwidth - $textwidthhelvetica) < 1) {
-                return $newsize;
-            }
-
-            $widthratio = $textwidthhelvetica / $fontwidth;
-            $newsize = $newsize * $widthratio;
-        }
-        return $newsize;
-    }
-
-    private function getTextWidth($txt)
-    {
-        $characters = preg_split('//u', $txt, -1, PREG_SPLIT_NO_EMPTY);
-        $width = 0.0;
-
-        foreach ($characters as $c) {
-            // newline has width 0
-            if (!(ord($c) == 10 || ord($c) == 13)) {
-                $w = floatval($this->generator->pdf->GetCharWidth(ord($c)));
-                $width += $w;
-            }
-        }
-        return $width;
-    }
+    
 
     private function breakText($text, $width)
     {

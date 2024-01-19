@@ -13,15 +13,17 @@ export function elementFactory(x:number, y:number, index:number, type:string, te
 
     switch (type) {
         case 'accid':
-            retval.style.width = 210;
-            retval.style.height = 60;
-            retval.style.fontSize = 30;
+            retval.style.width = 150;
+            retval.style.height = 50;
+            retval.style.fontSize = 18;
             retval.style.fontStyle = 'bold';
             retval.style.fontFamily = 'Helvetica';
             retval.style.color = '#000';
             retval.hasFontSize = true;
             retval.hasColour = true;
             retval.resizeable = true;
+            retval.hasRatio = true;
+            retval.ratio = 3;
             break;
         case 'country':
             retval.text = 'TST';

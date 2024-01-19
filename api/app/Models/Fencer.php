@@ -28,6 +28,9 @@ class Fencer extends Model
 
     public function image()
     {
+        if (empty($this->getKey()) || $this->getKey() < 1) {
+            return resource_path('images/photoid.png');
+        }
         $path = storage_path('app/fencers/fencer_' . $this->getKey() . '.dat');
         return $path;
     }
