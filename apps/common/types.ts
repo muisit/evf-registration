@@ -18,3 +18,7 @@ export interface SelectOption {
     value: string;
     label: string;
 }
+
+export interface ValidationResult {
+    [key:string]: string[];
+}

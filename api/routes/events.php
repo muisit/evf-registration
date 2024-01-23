@@ -15,6 +15,38 @@ $router->group(
             ]
         );
 
+        $router->post(
+            '/',
+            [
+                'as' => 'events.save',
+                'uses' => 'Events\Save@index'
+            ]
+        );
+
+        $router->post(
+            '/sides',
+            [
+                'as' => 'events.savesides',
+                'uses' => 'Events\SaveSides@index'
+            ]
+        );
+
+        $router->get(
+            '/roles',
+            [
+                'as' => 'events.roles',
+                'uses' => 'Events\Roles@index'
+            ]
+        );
+
+        $router->post(
+            '/roles',
+            [
+                'as' => 'events.saveroles',
+                'uses' => 'Events\SaveRoles@index'
+            ]
+        );
+
         $router->get(
             '/overview',
             [

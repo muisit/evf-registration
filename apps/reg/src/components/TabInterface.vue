@@ -46,6 +46,7 @@ import BadgesPage from '../pages/BadgesPage.vue';
 import ParticipantsPage from '../pages/ParticipantsPage.vue';
 import ActionPage from '../pages/ActionPage.vue';
 import TemplatesPage from '../pages/TemplatesPage.vue';
+import EventPage from '../pages/EventPage.vue';
 import { isOpenForRegistration, isOpenForRegistrationView } from '../../../common/lib/event';
 </script>
 <template>
@@ -70,6 +71,9 @@ import { isOpenForRegistration, isOpenForRegistrationView } from '../../../commo
         </ElTabPane>
         <ElTabPane v-if="canOrganise()" label="Templates" name="templates">
             <TemplatesPage :visible="activeTab == 'templates'"/>
+        </ElTabPane>
+        <ElTabPane v-if="auth.isSysop()" label="Event" name="event">
+            <EventPage :visible="activeTab == 'event'"/>
         </ElTabPane>
         <ElTabPane label="Logout" name="logout"></ElTabPane>
     </ElTabs>

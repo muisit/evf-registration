@@ -25,6 +25,7 @@ class Base
         $this->model = $this->createModel($request);
         $validator = $this->createValidator($request);
         if ($validator->fails()) {
+            \Log::debug("validator fails" . json_encode($validator->errors()->getMessages()));
             throw new ValidationException(
                 $validator,
                 new JsonResponse($validator->errors()->getMessages(), 422)

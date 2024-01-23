@@ -139,6 +139,7 @@ export const useDataStore = defineStore('data', () => {
         return eventlist()
             .then((data) => {
                 authStore.hasLoaded('events');
+                console.log('adjusting data.events value');
                 events.value = data;
                 if (events.value && events.value.length > 0) {
                     let eid = parseInt(eventid || '0');
@@ -205,7 +206,12 @@ export const useDataStore = defineStore('data', () => {
             });
         }
         competitionEvents.value = comps;
-        nonCompetitionEvents.value = ses;
+        nonCompetitionEvents.value = ses.sort((a, b) => {
+            if (a.starts == b.starts) {
+                return a.title > b.title ? 1 : -1;
+            }
+            return a.starts > b.starts ? 1 : -1;
+        });
         sideEvents.value = comps.concat(ses);
         sideEvents.value.forEach((data) => sideEventsById.value['s' + data.id] = data);
 
