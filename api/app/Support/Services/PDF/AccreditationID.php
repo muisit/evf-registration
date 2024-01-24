@@ -73,7 +73,6 @@ class AccreditationID extends TextElement
         $this->offset[1] += $this->size[1];
         $this->size[1] = $this->size[1] / 2; // half of 2/3rds for the label
         $this->alignment = 'C';
-        \Log::debug("inserting text at " . json_encode($this->offset));
         $this->outOfTemplate = true;
         $this->insertText($link);
 
