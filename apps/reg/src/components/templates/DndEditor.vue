@@ -52,7 +52,7 @@ function updateElement(field:string, value: any)
 }
 
 const toolboxData:any = ref({});
-function createElement(element)
+function createElement(element:any)
 {
     toolboxData.value = element;
 }
@@ -78,7 +78,7 @@ import StyleEditor from './StyleEditor.vue';
 <template>
     <div class="template-dnd-editor">
         <ToolBox :template="props.template" @on-select="createElement" @on-update="(e) => update(e.field, e.value)"/>
-        <Canvas :elements="props.template.content.elements || []" :template="props.template" :pictures="props.template.content.pictures" @on-add="addElement" @on-update="(e) => update(e.field, e.value)" @on-select="selectElement" @on-delete="deleteElement"/>
+        <Canvas :elements="props.template.content.elements || []" :template="props.template" :pictures="props.template.content.pictures || []" @on-add="addElement" @on-update="(e) => update(e.field, e.value)" @on-select="selectElement" @on-delete="deleteElement"/>
         <StyleEditor :element="selectedElement" :fonts="props.fonts" @on-update="(e) => updateElement(e.field, e.value)"/>
     </div>
 </template>

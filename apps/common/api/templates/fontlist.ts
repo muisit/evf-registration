@@ -1,4 +1,4 @@
-import { StringKeyedStringList } from '../../types';
+import type { StringKeyedStringList } from '../../types';
 import { fetchJson } from '../interface';
 import type { FetchResponse } from '../interface';
 import type { TemplateSchema } from '../schemas/template';

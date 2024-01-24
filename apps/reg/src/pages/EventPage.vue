@@ -317,11 +317,11 @@ import { ElForm, ElFormItem, ElInput, ElInputNumber, ElSelect, ElOption, ElCheck
                         <InputErrors :messages="getErrorMessages('currency')"/>
                     </ElFormItem>
                     <ElFormItem label="Base Fee" :class="getErrorClass('baseFee')">
-                        <div><span class='currency'>{{ eventSymbol }}</span> <ElInputNumber :precision="2" :model-value="currentEvent.bank?.baseFee || 0" @update:model-value="(e) => { if (currentEvent.bank) currentEvent.bank.baseFee = e}" /></div>
+                        <div><span class='currency'>{{ eventSymbol }}</span> <ElInputNumber :precision="2" :model-value="currentEvent.bank?.baseFee || 0" @update:model-value="(e) => { if (currentEvent.bank) currentEvent.bank.baseFee = e || 0}" /></div>
                         <InputErrors :messages="getErrorMessages('baseFee')"/>
                     </ElFormItem>
                     <ElFormItem label="Competition Fee" :class="getErrorClass('competitionFee')">
-                        <div><span class='currency'>{{ eventSymbol }}</span> <ElInputNumber :precision="2" :model-value="currentEvent.bank?.competitionFee || 0" @update:model-value="(e) => { if (currentEvent.bank) currentEvent.bank.competitionFee = e}" /></div>
+                        <div><span class='currency'>{{ eventSymbol }}</span> <ElInputNumber :precision="2" :model-value="currentEvent.bank?.competitionFee || 0" @update:model-value="(e) => { if (currentEvent.bank) currentEvent.bank.competitionFee = e || 0}" /></div>
                         <InputErrors :messages="getErrorMessages('competitionFee')"/>
                     </ElFormItem>
                     <ElFormItem label="Bank Name" :class="getErrorClass('bank')">

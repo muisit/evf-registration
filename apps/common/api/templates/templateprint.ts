@@ -1,5 +1,5 @@
-import { fetchAttachment } from '../interface.ts';
-import type { TemplateSchema } from '../schemas/template.ts';
+import { fetchAttachment } from '../interface';
+import type { TemplateSchema } from '../schemas/template';
 
 export function templateprint(template:TemplateSchema)
 {

@@ -121,7 +121,7 @@ function convertedContentRoles()
     let retval:number[] = [];
     let roles = props.template.content.roles || [];
     for(let v in roles) {
-      retval.push(parseInt(roles[v]));
+      retval.push(parseInt(((roles[v]) as unknown) as string));
     }
     return retval;
 }
@@ -135,10 +135,13 @@ function printForm()
 {
     return saveForm(false)
         .then(() => {
-            templateprint(props.template).catch((e) => {
+            try {
+                templateprint(props.template);
+            }
+            catch (e:any) {
                 console.log(e);
                 alert('There was an error retrieving the example print');
-            });
+            };
         });
 }
 
@@ -164,7 +167,7 @@ import { useData } from 'element-plus/es/components/table-v2/src/composables';
                   collapse-tags-tooltip
                   :max-collapse-tags="4"
                   placeholder="Select">
-                  <ElOption v-for="role in selectableRoles" :key="role.id" :value="role.id" :label="role.name" />
+                  <ElOption v-for="role in selectableRoles" :key="role.id || 0" :value="role.id || 0" :label="role.name || ''" />
               </ElSelect>
           </ElFormItem>
           <ElFormItem label="Print">
@@ -181,7 +184,7 @@ import { useData } from 'element-plus/es/components/table-v2/src/composables';
           <span class="dialog-footer">
               <ElButton v-if="is_valid($props.template.id)" @click="printForm">Print</ElButton>
               <ElButton type="warning" @click="closeForm">Cancel</ElButton>
-              <ElButton type="primary" @click="saveForm">Save</ElButton>
+              <ElButton type="primary" @click="() => saveForm()">Save</ElButton>
           </span>
       </template>
     </ElDialog>

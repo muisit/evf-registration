@@ -9,7 +9,7 @@ const props = defineProps<{
 }>();
 const emits = defineEmits(['onUpdate']);
 
-function update(field:string, value:string)
+function update(field:string, value:any)
 {
     console.log('update', field, value);
     emits('onUpdate', {field:field, value:value});

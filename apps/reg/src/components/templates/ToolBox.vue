@@ -91,7 +91,7 @@ import ToolBoxLine from "./ToolBoxLine.vue";
             :type="item.name"
             :picture="item.picture"
             draggable="true"
-            @dragstart="(e) => select(e, item)"
+            @dragstart="(e:any) => select(e, item)"
             @on-delete="() => deletePicture(item.picture)"
         />
         <div>

@@ -1,4 +1,4 @@
-import { StringKeyedValues } from '../../types';
+import type { StringKeyedValues } from '../../types';
 
 export interface TemplateSchema {
     id: number;

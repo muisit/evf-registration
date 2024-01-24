@@ -7,9 +7,9 @@ const props = defineProps<{
     elements:ElementContent[];
     pictures:PictureContent[];
 }>();
-const emits = defineEmits(['onAdd', 'onUpdate', 'onSelect']);
+const emits = defineEmits(['onAdd', 'onUpdate', 'onSelect', 'onDelete']);
 
-function onDrop(e)
+function onDrop(e:any)
 {
     let target = e.target;
     while (target && !target.className.includes('dropzone')) target = target.parentElement;
