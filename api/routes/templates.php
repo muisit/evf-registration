@@ -31,6 +31,14 @@ $router->group(
             ]
         );
 
+        $router->post(
+            '/remove',
+            [
+                'as' => 'templates.remove',
+                'uses' => 'Templates\Remove@index'
+            ]
+        );
+
         $router->get(
             '/{templateId}/picture/{pictureId}',
             [

@@ -1,6 +1,7 @@
 import { fetchJson } from '../interface';
 import type { FetchResponse } from '../interface';
 import type { TemplateSchema } from '../schemas/template';
+import type { ReturnStatusSchema } from '../schemas/returnstatus';
 
 export const savetemplate = function(template:TemplateSchema) {
     return new Promise<TemplateSchema|null>((resolve, reject) => {     
