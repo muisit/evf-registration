@@ -1,0 +1,26 @@
+#app {
+    .el-form-item {
+        .el-form-item__content {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+        }
+
+        .errors {
+            display: none;
+        }        
+    }
+
+    .el-form-item.validationerror {
+        label, .el-form-item__label {
+            color: red;
+        }
+
+        .messages {
+            display: block;
+            font-size: x-small;
+            line-height: 2.3em;
+            color: #c22;
+        }
+    }
+}

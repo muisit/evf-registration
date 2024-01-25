@@ -12,6 +12,7 @@ class RolesElement extends TextElement
         $txt = $this->data?->roles ?? [];
         $txt = implode(", ", $txt);
         if (strlen(trim($txt))) {
+            \Log::debug("roles: inserting $txt");
             $this->insertText($txt);
         }
     }

@@ -15,16 +15,17 @@ class AccreditationIDTest extends TestCase
         if ($withCall) {
             $pdfstub
                 ->expects($this->once())
-                ->method('write2DBarcode')
+                ->method('write1DBarcode')
                 ->with(
-                    $this->equalTo('mylabel'),
-                    $this->equalTo('QRCODE,H'),
+                    $this->equalTo('11mylabel00000'),
+                    $this->equalTo('I25+'),
                     $this->equalTo(5.0),
                     $this->equalTo(2.5),
                     $this->equalTo(50.0),
-                    $this->equalTo(25.0),
+                    $this->equalTo(16.666666666666664),
+                    $this->equalTo(null),
                     $this->anything(),
-                    $this->equalTo('N')
+                    $this->equalTo('T')
                 );
 
             $pdfstub->expects($this->once())->method('SetTextColorArray');
@@ -100,6 +101,6 @@ class AccreditationIDTest extends TestCase
             'side' => 'left',
         ];
         $obj->withLabel('mylabel')->generate($element);
-        $obj->finalise();
+        $obj->finalise([]);
     }
 }

@@ -170,7 +170,7 @@ class PDFGeneratorImageTest extends TestCase
         $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
-        $this->assertEquals("9fa5f2a4faa7bfb7ddc113b30368f6cb", $hash);
+        $this->assertEquals("c8de221f55e8a4851d36496223544dea", $hash);
     }
 
     public function testImages2()
@@ -188,7 +188,7 @@ class PDFGeneratorImageTest extends TestCase
 
         ];
         $content = $this->createBasicTemplate();
-        $vals=[
+        $vals = [
             [10, 10, 100],
             [20, 120, 50],
             [150, 10, 150],
@@ -221,7 +221,7 @@ class PDFGeneratorImageTest extends TestCase
         $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
-        $this->assertEquals("30ee00eb7ff6070f7578eff1b8b78ff0", $hash);
+        $this->assertEquals("cf9b50b509b3702b8f1c0f1f88d38f3c", $hash);
     }
 
     public function testImages3()
@@ -239,7 +239,7 @@ class PDFGeneratorImageTest extends TestCase
 
         ];
         $content = $this->createBasicTemplate();
-        $vals=[
+        $vals = [
             [10, 10, 100],
             [20, 120, 50],
             [150, 10, 150],
@@ -272,6 +272,6 @@ class PDFGeneratorImageTest extends TestCase
         $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
-        $this->assertEquals("53ad05f0f4b1db30332d84f14cd22490", $hash);
+        $this->assertEquals("4a80e55a3c5ecedda3acd78a08d45266", $hash);
     }
 }

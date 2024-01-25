@@ -84,7 +84,7 @@ class PDFGeneratorElementTest extends TestCase
                     'file_ext' => 'gif'
                 ]
             ]
-                ];
+        ];
     }
 
     public function testText()
@@ -138,7 +138,7 @@ class PDFGeneratorElementTest extends TestCase
         $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
-        $this->assertEquals("0742afc96bf5bd3c2e94fe2ccbe09411", $hash);
+        $this->assertEquals("bfcac244c5a04868581131ce6490a743", $hash);
     }
 
     public function testText2()
@@ -186,7 +186,7 @@ class PDFGeneratorElementTest extends TestCase
         $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
-        $this->assertEquals("a83f3b454178fd5cf893c598a684f8fe", $hash);
+        $this->assertEquals("bbdcf81b7d12974b2be40c9596897268", $hash);
     }
 
     public function testFonts()
@@ -241,7 +241,7 @@ class PDFGeneratorElementTest extends TestCase
         $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
-        $this->assertEquals("961a4d56e18418e05b82b60ed74c83a0", $hash);
+        $this->assertEquals("29ee2ea4ddc1419420c3cce1b1877e48", $hash);
     }
 
     public function testFonts2()
@@ -296,7 +296,7 @@ class PDFGeneratorElementTest extends TestCase
         $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
-        $this->assertEquals("ffb261dec19f58ecb409a716dd4b42cb", $hash);
+        $this->assertEquals("22cca01707a152019596d041c66298c9", $hash);
     }
 
     public function testFonts3()
@@ -316,7 +316,7 @@ class PDFGeneratorElementTest extends TestCase
         $content = $this->createBasicTemplate();
 
         $offset = 20;
-        foreach(
+        foreach (
             [
             "FreeSerif","FreeSerif Bold","FreeSerif Italic","FreeSerif Bold Italic",
             "Eurofurence","Eurofurence Bold","Eurofurence Italic","Eurofurence Bold Italic",
@@ -350,6 +350,6 @@ class PDFGeneratorElementTest extends TestCase
         $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
-        $this->assertEquals("01bdf424862466ad7d6b1ed880b7f893", $hash);
+        $this->assertEquals("92a1dccb627bdd1061833a7ff42571e6", $hash);
     }
 }

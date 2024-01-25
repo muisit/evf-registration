@@ -1,0 +1,35 @@
+#app .event-page {
+    .el-form-item {
+        margin-bottom: 5px;
+
+        label, .el-form-item__label {
+            min-width: 250px;
+            text-align: right;
+        }
+
+        .currency {
+            padding-right: 10px;
+        }
+    }
+    .el-form-item.roles {
+        .el-form-item__content {
+            flex-direction: row;
+            .el-select {
+                padding-right: 10px;
+            }
+        }
+    }
+
+    .el-form-item.config {
+        .el-form-item__content {
+            flex-direction: column;
+            align-items: start;
+        }
+    }
+
+    .el-form-item.buttons {
+        .el-form-item__content {
+            padding-left: 250px;
+        }
+    }
+}

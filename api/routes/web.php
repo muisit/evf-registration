@@ -7,6 +7,7 @@ require('events.php');
 require('fencers.php');
 require('registrations.php');
 require('accreditations.php');
+require('templates.php');
 
 /*
 |--------------------------------------------------------------------------
@@ -24,4 +25,3 @@ $router->get('/', function () use ($router) {
 });
 
 $router->get('/basic', 'Basic@index');
-$router->get('/cron', 'Cron@index');

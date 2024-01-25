@@ -319,6 +319,6 @@ class PDFGeneratorCaseTest extends TestCase
         $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
-        $this->assertEquals("fd5b77b64c65715ad8c88f091d4694e0", $hash);
+        $this->assertEquals("d1aa0674c2d6ffbfdbea552541d4c2fa", $hash);
     }
 }

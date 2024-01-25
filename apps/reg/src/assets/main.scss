@@ -198,13 +198,15 @@
     width: 150px;
 }
 
+@import "validation.scss";
 @import 'pages/overview.scss';
 @import 'pages/registration.scss';
 @import 'pages/cashier.scss';
 @import 'pages/badges.scss';
 @import 'pages/participants.scss';
 @import 'pages/actions.scss';
-
+@import 'pages/templates.scss';
+@import 'pages/event.scss';
 
 #app {
     .el-container {

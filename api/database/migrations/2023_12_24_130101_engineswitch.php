@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         DB::statement("ALTER TABLE TD_Document ENGINE=InnoDB;");
-        DB::statement("ALTER TABLE wp_options ENGINE=InnoDB;");
+        DB::statement("ALTER TABLE " . env('WPDBPREFIX') . "options ENGINE=InnoDB;");
     }
 
     /**

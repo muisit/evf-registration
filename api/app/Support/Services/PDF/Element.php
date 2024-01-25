@@ -85,6 +85,7 @@ class Element
 
         $x = floatval($x * PDFGenerator::PDF_WIDTH / PDFGenerator::APP_WIDTH);
         $y = floatval($y * PDFGenerator::PDF_HEIGHT / PDFGenerator::APP_HEIGHT);
+
         if (is_nan($x) || is_nan($y)) {
             return null;
         }

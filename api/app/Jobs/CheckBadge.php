@@ -88,6 +88,15 @@ class CheckBadge extends Job implements ShouldBeUniqueUntilProcessing
             if (!empty($a->is_dirty)) {
                 $a->is_dirty = null; // make it clean to avoid additional jobs for this accreditation
                 $a->save();
+
+                // check that the file actually exists and that we have an accreditation ID set
+                // If the file does not exist, we regenerate the accreditation id, to allow us to
+                // reset the id if we printed and distributed the wrong documents
+                $path = $a->path();
+                if (!file_exists($path) || empty($a->fe_id)) {
+                    $a->createId();
+                }
+
                 $job = new CreateBadge($a);
                 if ($this->executeSynchronously) {
                     try {

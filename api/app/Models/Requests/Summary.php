@@ -48,13 +48,11 @@ class Summary extends Base
             && isset($data['summary']['typeId'])
             && isset($data['summary']['type'])
         ) {
-            \Log::debug("creating model using " . $data['summary']['type'] . '/' . $data['summary']['typeId']);
             $model = PDFService::modelFactory($data['summary']['type'], intval($data['summary']['typeId']));
             if (!empty($model)) {
                 return true;
             }
         }
-        \Log::debug("data insufficient " . json_encode($data));
         return false;
     }
 
@@ -62,10 +60,8 @@ class Summary extends Base
     {
         $event = request()->get('eventObject');
         if (empty($event) || !$event->exists || get_class($event) != Event::class) {
-            \Log::debug("invalid event " . json_encode($event));
             return false;
         }
-        \Log::debug("testing accredit on event");
         $this->controller->authorize('accredit', $event);
         return true;
     }
@@ -78,7 +74,6 @@ class Summary extends Base
 
     protected function updateModel(array $data): ?Model
     {
-        \Log::debug("creating new summary job");
         $this->job = new SetupSummary(request()->get('eventObject'), $data['summary']['type'], intval($data['summary']['typeId']));
         return new Role();
     }
@@ -86,7 +81,6 @@ class Summary extends Base
     protected function postProcess()
     {
         if (!empty($this->job)) {
-            \Log::debug("dispatching summary job");
             dispatch($this->job);
         }
     }

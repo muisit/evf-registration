@@ -21,7 +21,7 @@ class AccreditationTemplateTest extends TestCase
 
     public function testRelations()
     {
-        $this->assertCount(4, AccreditationTemplate::get());
+        $this->assertCount(5, AccreditationTemplate::get());
         $template = AccreditationTemplate::find(TemplateData::ATHLETE);
         $this->assertEquals(EventData::EVENT1, $template->event_id);
         $this->assertCount(5, $template->accreditations);

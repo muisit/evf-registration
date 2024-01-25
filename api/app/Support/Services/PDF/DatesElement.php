@@ -14,8 +14,8 @@ class DatesElement extends TextElement
             $txt = [$txt[0]];
         }
         $txt = implode("\n", $txt);
-        $txt = str_replace(" ", "~", $txt);
-        $this->replaceTilde = true;
+        //$txt = str_replace(" ", "~", $txt);
+        //$this->replaceTilde = true;
         if (strlen(trim($txt))) {
             $this->insertText($txt);
         }

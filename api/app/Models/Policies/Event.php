@@ -100,4 +100,26 @@ class Event
         }
         return false;
     }
+
+
+    /**
+     * @param User $user
+     *
+     * @return bool
+     */
+    public function create(EVFUser $user): bool
+    {
+        return false; // no one can create an event
+    }
+
+    /**
+     * @param User $user
+     * @param Model $model
+     * 
+     * @return bool
+     */
+    public function update(EVFUser $user, Model $model): bool
+    {
+        return false; // no-one can update an event except through before()
+    }
 }

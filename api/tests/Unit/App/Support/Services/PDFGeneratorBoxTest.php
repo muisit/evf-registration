@@ -154,7 +154,7 @@ class PDFGeneratorBoxTest extends TestCase
         $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
-        $this->assertEquals("4990f3ab6a52368a2537527e75eac012", $hash);
+        $this->assertEquals("b1630292e1636d5affaef3d5618528be", $hash);
     }
 
     public function testBox2()
@@ -197,6 +197,6 @@ class PDFGeneratorBoxTest extends TestCase
         $generator->save($path);
         $hash = hash_file("md5", $path);
         @unlink($path);
-        $this->assertEquals("a34bf3df5fdcc9e4d5091a9bc21e182d", $hash);
+        $this->assertEquals("40093cc405def947f84f3bba0b34f23e", $hash);
     }
 }

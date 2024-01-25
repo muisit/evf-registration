@@ -12,7 +12,6 @@ class Accreditation
      */
     public function before(EVFUser $user, string $ability): bool | null
     {
-        \Log::debug("before rule for Accreditation Policy");
         if ($user->hasRole("sysop")) return true;
         return null;
     }
@@ -22,7 +21,6 @@ class Accreditation
         // see if we have a global request object for the event
         $event = request()->get('eventObject');
         $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
-        \Log::debug("eventId is $eventId");
 
         // someone can see an accreditation if he/she is an organiser or handles accreditation
         // for a valid event. We can remove these roles to restrict the number
