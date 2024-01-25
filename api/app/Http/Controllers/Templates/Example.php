@@ -36,6 +36,7 @@ class Example extends Controller
             $this->authorize('not/ever');
         }
         $this->authorize('view', $template);
+        \Log::debug("authorized to view");
 
         $fencer = new Fencer();
         $fencer->fencer_surname = "FERNANDEZ DEL CASTILLO GARCIA";
@@ -67,7 +68,7 @@ class Example extends Controller
         try {
             $generator = app(PDFGenerator::class);
             $generator->generate($accreditation);
-            $path = tempnam(null, "expdf");
+            $path = realpath(tempnam(null, "expdf"));
             $generator->save($path);
 
             if (file_exists($path)) {
@@ -82,12 +83,12 @@ class Example extends Controller
                 @unlink($path);
             }
             else {
-                $this->authorize('not/ever');
+                return response('Insufficient storage', 507);
             }
         }
         catch (\Exception $e) {
             \Log::debug("caught exception " . $e->getMessage());
-            $this->authorize('not/ever');
+            return response('Internal Server Error', 500);
         }
     }
 }

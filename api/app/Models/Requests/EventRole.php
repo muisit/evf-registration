@@ -19,10 +19,10 @@ class EventRole extends Base
     {
         return [
             'roles.*.id' => ['required', 'integer'], // allow negative values for new events
-            'roles.*.userId' => ['nullable', function ($a, $v, $f) {
+            'roles.*.userId' => ['required', function ($a, $v, $f) {
                 return $this->checkUser($a, $v, $f);
             }],
-            'roles.*.role' => ['nullable', 'string', Rule::in(['organiser','registrar','cashier','accreditation'])],
+            'roles.*.role' => ['required', 'string', Rule::in(['organiser','registrar','cashier','accreditation'])],
         ];
     }
 
@@ -52,7 +52,7 @@ class EventRole extends Base
 
     protected function createModel(Request $request): ?Model
     {
-        $model = $request->get('eventObject');
+        $model = request()->get('eventObject');
         if (empty($model)) {
             // always return a model, but we check for existance in authorize()
             $model = new Event();

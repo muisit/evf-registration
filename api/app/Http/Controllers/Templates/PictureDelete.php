@@ -22,7 +22,6 @@ class PictureDelete extends Controller
      */
     public function index(Request $request, string $templateId, string $pictureId)
     {
-        \Log::debug("picture remove $templateId $pictureId");
         $template = AccreditationTemplate::where('id', $templateId)->first();
         if (empty($template)) {
             $this->authorize('not/ever');

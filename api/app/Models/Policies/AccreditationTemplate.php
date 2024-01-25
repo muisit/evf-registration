@@ -12,7 +12,6 @@ class AccreditationTemplate
      */
     public function before(EVFUser $user, string $ability): bool | null
     {
-        \Log::debug("AccreditationTemplate::before");
         if ($user->hasRole("sysop")) return true;
         return null;
     }
@@ -26,7 +25,6 @@ class AccreditationTemplate
         // someone can see a template if he/she is an organiser for a valid event.
         // We can remove these roles to restrict the number of people with broad accreditation access
         if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId])) {
-            \Log::debug("user has organiser:$eventId set");
             return true;
         }
         return false;
@@ -41,7 +39,6 @@ class AccreditationTemplate
     public function viewAny(EVFUser $user): bool | null
     {
         if ($this->isOrganiser($user)) {
-            \Log::debug("user is organiser");
             return true;
         }
 

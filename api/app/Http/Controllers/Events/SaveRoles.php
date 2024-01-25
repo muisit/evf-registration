@@ -13,7 +13,7 @@ class SaveRoles extends Controller
      * Save event data to the database
      *
      * @OA\Post(
-     *     path = "/events/sides",
+     *     path = "/events/roles",
      *     @OA\RequestBody(ref="#/components/requestBodies/eventroles"),
      *     @OA\Response(
      *         response = "200",

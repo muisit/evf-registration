@@ -19,7 +19,7 @@ class SideEvent extends Base
         return [
             'sides.*.id' => ['required', 'integer'], // allow negative values for new events
             'sides.*.title' => ['nullable', 'string', 'max:255'], // allow empty to delete side events
-            'sides.*.descriptipon' => ['nullable', 'string'],
+            'sides.*.description' => ['nullable', 'string'],
             'sides.*.starts' => ['required', 'date_format:Y-m-d'],
             'sides.*.costs' => ['nullable', 'numeric', 'min:0'],
         ];
@@ -39,7 +39,7 @@ class SideEvent extends Base
 
     protected function createModel(Request $request): ?Model
     {
-        $model = $request->get('eventObject');
+        $model = request()->get('eventObject');
         if (empty($model)) {
             // always return a model, but we check for existance in authorize()
             $model = new Event();
@@ -65,7 +65,7 @@ class SideEvent extends Base
                 }
                 $model->title = $newdata['title'] ?? '';
                 $model->description = $newdata['description'] ?? 0;
-                $model->costs = $newdata['costs'] ?? null;
+                $model->costs = $newdata['costs'] ?? 0.0;
                 $model->starts = $this->safeDate($newdata['starts'] ?? '');
 
                 if (strlen($model->title) > 0) {
