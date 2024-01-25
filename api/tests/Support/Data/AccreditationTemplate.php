@@ -13,6 +13,7 @@ class AccreditationTemplate extends Fixture
     public const COUNTRY = 3;
     public const REFEREE = 4;
     public const DEF1 = 10;
+    public const NOSUCHID = 3883;
 
     protected static function wasBooted($cls)
     {

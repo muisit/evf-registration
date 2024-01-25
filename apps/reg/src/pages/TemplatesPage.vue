@@ -5,6 +5,7 @@ import type { StringKeyedStringList } from '../../../common/types';
 import { templatelist } from '../../../common/api/templates/templatelist';
 import { fontlist } from '../../../common/api/templates/fontlist';
 import { savetemplate, copytemplate } from '../../../common/api/templates/savetemplate';
+import { removetemplate } from '../../../common/api/templates/removetemplate';
 import { useDataStore } from '../stores/data';
 import { useAuthStore } from '../../../common/stores/auth';
 import type { TemplateSchema } from '../../../common/api/schemas/template';
@@ -70,6 +71,28 @@ function copyTemplate(template:TemplateSchema)
         alert("There was an unexpected network error. Please try again or reload the page");
     });
 }
+
+function deleteTemplate(template:TemplateSchema)
+{
+    if (confirm('Are you sure you want to delete the template \'' + template.name + '\'?')) {
+        auth.isLoading('deletetemplate');
+        removetemplate(template).then((dt) => {
+            if (dt?.status != 'ok') {
+                alert('There was an error deleting the template. Please reload the page and try again');
+            }
+            templatelist().then((dt) => {
+                auth.hasLoaded('deletetemplate');
+                templates.value = sortTemplateList(dt);
+            });
+        })
+        .catch((e) => {
+            auth.hasLoaded('deletetemplate');
+            console.log(e);
+            alert('There was an error deleting the template. Please reload the page and try again');
+        })
+    }
+}
+
 
 function createNewTemplate()
 {
@@ -143,9 +166,8 @@ function dialogUpdate(fieldDef: any)
     }
 }
 
-
 import TemplateEditorDialog from '../components/templates/TemplateEditorDialog.vue';
-import { Edit, CopyDocument } from '@element-plus/icons-vue';
+import { Edit, CopyDocument, Delete } from '@element-plus/icons-vue';
 import { ElIcon, ElButton } from 'element-plus';
 </script>
 <template>
@@ -162,6 +184,11 @@ import { ElIcon, ElButton } from 'element-plus';
                 <td>
                     <ElIcon size="large" @click="() => copyTemplate(template)">
                         <CopyDocument />
+                    </ElIcon>
+                </td>
+                <td>
+                    <ElIcon size="large" @click="() => deleteTemplate(template)" v-if="auth.isSysop() && template.isDefault == 'N'">
+                        <Delete />
                     </ElIcon>
                 </td>
             </tr>
