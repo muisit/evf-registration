@@ -57,7 +57,7 @@ class AccreditationCreateService
             $this->rolesById["r" . $r->getKey()] = $r;
         }
 
-        $templates = AccreditationTemplate::where('event_id', $this->event->getKey())->get();
+        $templates = AccreditationTemplate::where('event_id', $this->event->getKey())->where('is_default', 'N')->get();
         foreach ($templates as $t) {
             $this->templates[] = $t;
         }

@@ -11,6 +11,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Query\Builder as QBuilder;
 use Illuminate\Database\Eloquent\Builder as EBuilder;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
+use Carbon\Carbon;
 
 // We check for dirty accreditations in a queue job, so it is naturally placed directly after
 // any regeneration attempts
@@ -40,67 +41,62 @@ class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
      */
     public function handle()
     {
-        \Log::debug("handling accreditations, checking for dirty ones");
+        $events = Event::where('event_open', '>', Carbon::now()->toDateString())->get();
+        foreach ($events as $event) {
+            if ($event->allowGenerationOfAccreditations()) {
+                // make sure all registered fencers have accreditations
+                $this->makeAllRegistrationsDirty($event);
+                $this->checkDirtyAccreditations($event);
+            }
+        }
+    }
+
+    private function checkDirtyAccreditations(Event $event)
+    {
         // only look at accreditations that were made dirty over 10 minutes ago, to avoid creating accreditations
         // when the fencer and registration data is still being updated
         $notafter = date('Y-m-d H:i:s', $this->immediate ? time() : time() - 10 * 60);
         $accreditations = DB::table(Accreditation::tableName())
-            ->select('fencer_id', 'event_id')
+            ->select('fencer_id')
             ->where('is_dirty', '<>', null)
-            ->where('is_dirty', '<', $notafter)
-            ->groupBy('fencer_id', 'event_id')
-            ->orderBy('fencer_id', 'asc')->orderBy('event_id', 'asc')
+            ->where('is_dirty', '<=', $notafter)
+            ->where('event_id', $event->getKey())
+            ->groupBy('fencer_id')
             ->get();
 
-        $eventsById = [];
-
         foreach ($accreditations as $row) {
-            $eventId = $row->event_id;
-            if (!isset($eventsById['e' . $eventId])) {
-                $event = Event::find($eventId);
-                if (!empty($event)) {
-                    $eventsById['e' . $event->getKey()] = $event;
-                }
-            }
-
-            \Log::debug("checking accreditation for " . json_encode($row));
-            $event = $eventsById['e' . $eventId];
-            if (!empty($event) && $event->allowGenerationOfAccreditations()) {
-                \Log::debug("creating job");
-                $job = new CheckBadge($row->fencer_id, $row->event_id);
-                dispatch($job);
-            }
+            $job = new CheckBadge($row->fencer_id, $event->getKey());
+            dispatch($job);
         }
     }
 
-    private function makeAllRegistrationsDirty()
+    private function makeAllRegistrationsDirty(Event $event)
     {
         // loop over all different fencers that are registered and make accreditations dirty.
         // Only select fencers that have no accreditations, so we can make new ones.
         $fids = Registration::select(DB::Raw('distinct registration_fencer'))
-            ->where('registration_mainevent', $this->event->getKey())
+            ->where('registration_mainevent', $event->getKey())
             ->whereNot(function (EBuilder $query) {
-                $queryBuilder = Accreditation::select('*')->where('fencer_id', DB::Raw(Registration::tableName() . '.registration_fencer'))->toBase();
                 $query->whereExists(Accreditation::select('*')->where('fencer_id', DB::Raw(Registration::tableName() . '.registration_fencer')));
             })
             ->get()->pluck('registration_fencer');
 
-        $template = AccreditationTemplate::where('event_id', $this->event->getKey())->first();
+        $template = AccreditationTemplate::where('event_id', $event->getKey())->where('is_default', 'N')->first();
         if (!empty($template)) {
             foreach ($fids as $fid) {
-                $this->makeDirty($fid, $template);
+                $this->makeDirty($fid, $event, $template);
             }
         }
     }
 
-    private function makeDirty(int $fid, AccreditationTemplate $template)
+    private function makeDirty(int $fid, Event $event, AccreditationTemplate $template)
     {
-        $cnt = Accreditation::where('fencer_id', $fid)->where('event_id', $this->event->getKey())->count();
+        $cnt = Accreditation::where('fencer_id', $fid)->where('event_id', $event->getKey())->count();
         if ($cnt == 0) {
             // we create an empty accreditation to signal the queue that this set needs to be reevaluated
             $dt = new Accreditation();
             $dt->fencer_id = $fid;
-            $dt->event_id = $this->event->getKey();
+            $dt->event_id = $event->getKey();
             $dt->data = json_encode([]);
             $dt->template_id = $template->getKey();
             $dt->file_id = null;
@@ -109,7 +105,7 @@ class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
             $dt->save();
         }
         else {
-            Accreditation::where('fencer_id', $fid)->where("event_id", $this->event->getKey())->update(['is_dirty' => date('Y-m-d H:i:s')]);
+            Accreditation::where('fencer_id', $fid)->where("event_id", $event->getKey())->update(['is_dirty' => date('Y-m-d H:i:s')]);
         }
     }
 }
