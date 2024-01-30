@@ -38,13 +38,10 @@ class RegenerateBadges extends Job implements ShouldBeUniqueUntilProcessing
      */
     public function handle()
     {
-        \Log::debug("RegenerateBadges job");
         if ($this->event->exists) {
-            \Log::debug("event exists, making all existing accreditations dirty");
             // make all existing accreditations for this event dirty
             // This is a catch all to make sure we get all accreditations
             Accreditation::where('event_id', $this->event->getKey())->update(['is_dirty' => date('Y-m-d H:i:s')]);
-
             $this->makeAllRegistrationsDirty();
         }
         else {
@@ -64,8 +61,7 @@ class RegenerateBadges extends Job implements ShouldBeUniqueUntilProcessing
             })
             ->get()->pluck('registration_fencer');
 
-        \Log::debug("making new accreditations for " . $fids->count() . ' fencers');
-        $template = AccreditationTemplate::where('event_id', $this->event->getKey())->first();
+        $template = AccreditationTemplate::where('event_id', $this->event->getKey())->where('is_default', 'N')->first();
         if (!empty($template)) {
             foreach ($fids as $fid) {
                 $this->makeDirty($fid, $template);
@@ -77,7 +73,6 @@ class RegenerateBadges extends Job implements ShouldBeUniqueUntilProcessing
     {
         $cnt = Accreditation::where('fencer_id', $fid)->where('event_id', $this->event->getKey())->count();
         if ($cnt == 0) {
-            \Log::debug("creating new accreditation based on a template");
             // we create an empty accreditation to signal the queue that this set needs to be reevaluated
             $dt = new Accreditation();
             $dt->fencer_id = $fid;
@@ -90,7 +85,6 @@ class RegenerateBadges extends Job implements ShouldBeUniqueUntilProcessing
             $dt->save();
         }
         else {
-            \Log::debug("accreditation exists anyway, so making it dirty instead");
             Accreditation::where('fencer_id', $fid)->where("event_id", $this->event->getKey())->update(['is_dirty' => date('Y-m-d H:i:s')]);
         }
     }

@@ -375,7 +375,6 @@ class AccreditationOverviewService
                 $acceptableTemplates = array_merge($acceptableTemplates, $this->templatesByRole[$key]);
             }
         }
-        \Log::debug("acceptable templates for overview are " . json_encode($acceptableTemplates) . "/" . json_encode($acceptableKeys));
 
         $tt = AccreditationTemplate::tableName();
         $at = Accreditation::tableName();
@@ -432,7 +431,7 @@ class AccreditationOverviewService
             ->where($tt . '.event_id', $this->event->getKey())
             ->whereIn($tt . '.id', $acceptableTemplates)
             ->get();
-        \Log::debug("template results are " . json_encode($results->toArray()));
+
         return $this->decorateResults('T', 'Template', $results, false);
     }
 }

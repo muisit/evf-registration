@@ -37,10 +37,12 @@ class AccreditationTemplateTest extends TestCase
 
     public function testByRoleId()
     {
+        $template = AccreditationTemplate::find(TemplateData::ATHLETE);
+        $template->is_default = 'Y';
+        $template->save();
         $result = AccreditationTemplate::byRoleId(Event::find(EventData::EVENT1));
         $this->assertEquals(
             [
-                'r0' => [TemplateData::ATHLETE],
                 'r1' => [TemplateData::COUNTRY],
                 'r2' => [TemplateData::ORG, TemplateData::REFEREE],
                 'r3' => [TemplateData::ORG]

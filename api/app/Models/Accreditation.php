@@ -28,7 +28,7 @@ class Accreditation extends Model
             $dt->event_id = $event->getKey();
             $dt->data = json_encode([]);
 
-            $tmpl = AccreditationTemplate::where('event_id', $event->getKey())->first();
+            $tmpl = AccreditationTemplate::where('event_id', $event->getKey())->where('is_default', 'N')->first();
             if (!empty($tmpl)) {
                 $dt->template_id = $tmpl->getKey();
                 $dt->file_id = null;

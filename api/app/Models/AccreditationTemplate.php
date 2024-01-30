@@ -32,10 +32,9 @@ class AccreditationTemplate extends Model implements AccreditationRelation
 
     public static function byRoleId(Event $event)
     {
-        $templates = self::where('event_id', $event->getKey())->get();
+        $templates = self::where('event_id', $event->getKey())->where('is_default', 'N')->get();
         $templatesByRole = [];
         foreach ($templates as $template) {
-            \Log::debug("parsing template " . $template->getKey());
             $roleIds = $template->forRoles();
             $roles = Role::whereIn('role_id', $roleIds)->get();
             foreach ($roles as $role) {
