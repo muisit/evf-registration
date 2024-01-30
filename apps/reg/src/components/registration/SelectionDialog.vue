@@ -14,7 +14,7 @@ const props = defineProps<{
     fencer:Fencer;
     isadmin: boolean;
 }>();
-const emits = defineEmits(['onClose', 'onUnregister', 'onUpdate', 'onSave']);
+const emits = defineEmits(['onClose', 'onUpdate', 'onSave']);
 const data = useDataStore();
 const auth = useAuthStore();
 const payments = ref('G');
@@ -46,8 +46,22 @@ function closeForm()
 
 function unregister()
 {
-    emits('onUnregister');
-    emits('onClose');
+    let listOfPromises:any = [];
+    props.fencer.registrations?.map((reg:Registration) => {        
+        let promise = data.removeRegistration(props.fencer, data.sideEventsById['s' + reg.sideEventId], reg.roleId);
+        if (promise) {
+            listOfPromises.push(promise);
+        }
+    });
+    if (listOfPromises.length) {
+        Promise.all(listOfPromises).then(() => {
+            emits('onClose');
+        })
+    }
+    else {
+        // no registrations, just close
+        emits('onClose');
+    }
 }
 
 const availableEvents = computed(() => {

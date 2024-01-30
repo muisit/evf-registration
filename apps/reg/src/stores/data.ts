@@ -365,7 +365,7 @@ export const useDataStore = defineStore('data', () => {
             registration.state = 'removing';
             fencerData.value = updateRegistration(fencerData.value, registration);
 
-            deleteregistration(registration.id || 0)
+            return deleteregistration(registration.id || 0)
                 .then((data) => {
                     if (data && data.status == 'ok' && registration) {
                         registration.state = 'removed';
