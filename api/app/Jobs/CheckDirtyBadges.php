@@ -40,6 +40,7 @@ class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
      */
     public function handle()
     {
+        \Log::debug("handling accreditations, checking for dirty ones");
         // only look at accreditations that were made dirty over 10 minutes ago, to avoid creating accreditations
         // when the fencer and registration data is still being updated
         $notafter = date('Y-m-d H:i:s', $this->immediate ? time() : time() - 10 * 60);
@@ -62,8 +63,10 @@ class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
                 }
             }
 
+            \Log::debug("checking accreditation for " . json_encode($row));
             $event = $eventsById['e' . $eventId];
             if (!empty($event) && $event->allowGenerationOfAccreditations()) {
+                \Log::debug("creating job");
                 $job = new CheckBadge($row->fencer_id, $row->event_id);
                 dispatch($job);
             }

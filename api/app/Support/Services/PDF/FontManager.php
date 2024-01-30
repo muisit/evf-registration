@@ -156,12 +156,10 @@ class FontManager
             $this->generator->pdf->SetFontSize($size);
             $this->generator->pdf->SetFont("helvetica");
             $textwidthhelvetica = $this->getTextWidth($text);
-            \Log::debug("text width using helvetica with size $size is $textwidthhelvetica");
 
             $newsize = $size;
             $this->add($font);
             while (true) {
-                \Log::debug("trying $newsize");
                 $this->generator->pdf->SetFontSize($newsize);
                 $this->add($font);
                 $fontwidth = $this->getTextWidth($text);
@@ -176,23 +174,32 @@ class FontManager
         }
 
         if ($fitText !== null && $fitText > 0) {
-            \Log::debug("trying to fit text in " . $fitText . " starting at $newsize");
+            $maxsize = $newsize; // do not increase the size
             while (true) {
-                \Log::debug("trying $newsize");
                 $this->generator->pdf->SetFontSize($newsize);
                 $this->add($font);
                 $fontwidth = $this->getTextWidth($text);
+
+                // if the font size is already small enough, it is fine
+                if ($newsize == $maxsize && ((self::TEXTWIDTH_TO_MM * $factor * $fontwidth) - $fitText) <= 0) {
+                    break;
+                }
     
-                if (abs((self::TEXTWIDTH_TO_MM * $factor * $fontwidth) - $fitText) < 1) {
+                if (abs((self::TEXTWIDTH_TO_MM * $factor * $fontwidth) - $fitText) < 1 && $newsize <= $maxsize) {
                     break;
                 }
 
                 $widthratio = $fitText / (self::TEXTWIDTH_TO_MM * $factor * $fontwidth);
                 $newsize = $newsize * $widthratio;
+
+                // do not increase the font-size to win a few pixels
+                if ($newsize > $maxsize) {
+                    $newsize = $maxsize;
+                    break;
+                }
             }
         }
 
-        \Log::debug("for $font, fontSize is set to $newsize which results in $fontwidth");
         return $newsize;
     }
 
