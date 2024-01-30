@@ -50,7 +50,8 @@ class CheckBadge extends Job implements ShouldBeUniqueUntilProcessing
      *
      * @return void
      */
-    public function handle() {
+    public function handle()
+    {
         return $this->doHandle();
     }
 
@@ -95,6 +96,7 @@ class CheckBadge extends Job implements ShouldBeUniqueUntilProcessing
                 $path = $a->path();
                 if (!file_exists($path) || empty($a->fe_id)) {
                     $a->createId();
+                    $a->save();
                 }
 
                 $job = new CreateBadge($a);

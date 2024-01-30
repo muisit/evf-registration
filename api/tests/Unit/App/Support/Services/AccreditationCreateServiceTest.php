@@ -82,6 +82,21 @@ class AccreditationCreateServiceTest extends TestCase
         $this->assertNotEmpty($output[0]['content']['template_hash']);
     }
 
+    public function testNoDefaultTemplates()
+    {
+        $template = AccreditationTemplate::find(TemplateData::ATHLETE);
+        $template->is_default = 'Y';
+        $template->save();
+
+        $fencer = Fencer::find(FencerData::MCAT1);
+        $event = Event::find(EventData::EVENT1);
+        $service = new AccreditationCreateService($fencer, $event);
+        $output = $service->handle();
+
+        // No valid athlete templates available, so no entries
+        $this->assertCount(0, $output);
+    }
+
     public function testOfficial()
     {
         $fencer = Fencer::find(FencerData::MCAT5);

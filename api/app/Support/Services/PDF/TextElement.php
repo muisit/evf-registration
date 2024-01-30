@@ -189,8 +189,6 @@ class TextElement extends Element
         return $text;
     }
 
-    
-
     private function breakText($text, $width)
     {
         // break the text into pieces based on whitespace, comma, dot and hyphen separation

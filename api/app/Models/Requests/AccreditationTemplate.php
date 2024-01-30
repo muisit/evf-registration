@@ -68,6 +68,8 @@ class AccreditationTemplate extends Base
         $event = request()->get('eventObject');
         $retval->event_id = $event?->getKey() ?? null;
         $retval->is_default = 'N';
+        $retval->content = json_encode([]);
+        $retval->save();
 
         $content = json_decode($model->content);
         if (isset($content->pictures)) {

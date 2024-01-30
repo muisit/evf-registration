@@ -89,18 +89,18 @@ class Accreditation extends Model
         return $control;
     }
 
-    public function createId($tries = 0)
+    public function createId($tries = 100)
     {
-        $id1 = random_int(101, 999);
-        $id2 = random_int(101, 999);
-
-        $id = sprintf("1%03d%03d", $id1, $id2);
-
-        // see if there is an open accreditation with this ID. In that case, we generate a new
-        $a = Accreditation::where('fe_id', $this->fe_id)->first();
-        if (!empty($a) && $a->exists) {
-            if ($tries < 100) {
-                return $this->createId($tries + 1);
+        while (true) {
+            if ($tries > 1) {
+                $tries--;
+                $id1 = random_int(101, 999);
+                $id2 = random_int(101, 999);
+                $id = sprintf("1%03d%03d", $id1, $id2);
+                $a = Accreditation::where('fe_id', $id)->first();
+                if (empty($a)) {
+                    break;
+                }
             }
             else {
                 // this should not happen, but we are catching the theoretical case
