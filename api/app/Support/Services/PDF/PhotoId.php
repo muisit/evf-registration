@@ -45,7 +45,8 @@ class PhotoId extends BasicImage
     private function createWatermark($path)
     {
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-        if ($ext == "jpg" || $ext == "jpeg") {
+        // we expect a '.dat' extension here
+        if ($ext == "dat" || $ext == "jpg" || $ext == "jpeg") {
             $img = imagecreatefromjpeg($path);
         }
         else if ($ext == "png") {
