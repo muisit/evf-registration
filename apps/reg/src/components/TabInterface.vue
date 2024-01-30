@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
+import { generateAccreditations } from '../../../common/lib/event';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
 const auth = useAuthStore();
@@ -29,7 +30,7 @@ function canCashier()
 
 function canAccredit()
 {
-    return canOrganise() || auth.isAccreditor(data.currentEvent.id);
+    return (canOrganise() || auth.isAccreditor(data.currentEvent.id)) && generateAccreditations(data.currentEvent);
 }
 
 function canOrganise()
