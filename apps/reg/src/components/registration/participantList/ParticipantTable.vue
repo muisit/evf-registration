@@ -120,6 +120,14 @@ function filterErrors(fencer:Fencer)
         }
     });
     errors = errors.sort().filter((e,i,a) => i === a.indexOf(e));
+
+    // temporary error to mark people that were just unregistered completely
+    // This only shows in the individual list, because they are no longer part
+    // of a team or the support group
+    if (!fencer.registrations || fencer.registrations.length == 0) {
+        errors = ["This person is not registered for anything yet"];
+    }
+
     return errors;
 }
 
