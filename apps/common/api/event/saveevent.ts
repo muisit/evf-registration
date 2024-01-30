@@ -13,7 +13,7 @@ export const saveevent = function(event:Event) {
             duration: event.duration,
             countryId: event.countryId,
             payments: event.payments,
-            config: event.config
+            config: JSON.stringify(event.config)
         };
 
         if (event.reg_open) data.reg_open = event.reg_open;
