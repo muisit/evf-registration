@@ -10,15 +10,17 @@ use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 class CleanAccreditations extends Job implements ShouldBeUniqueUntilProcessing
 {
     public $event = null;
+    public $forced = false;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Event $event)
+    public function __construct(Event $event, $doForced = false)
     {
         $this->event = $event->withoutRelations();
+        $this->forced = $doForced;
     }
 
     public function uniqueId(): string
@@ -34,8 +36,10 @@ class CleanAccreditations extends Job implements ShouldBeUniqueUntilProcessing
     public function handle()
     {
         if (
-                $this->event->exists
-            && ($this->event->isFinished() || !$this->event->allowGenerationOfAccreditations() )
+                $this->forced
+            ||  (  $this->event->exists
+                && ($this->event->isFinished() || !$this->event->allowGenerationOfAccreditations())
+                )
         ) {
             $this->cleanEventPath();
             Accreditation::where('event_id', $this->event->getKey())->delete();

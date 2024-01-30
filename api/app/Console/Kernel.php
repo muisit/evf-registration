@@ -7,6 +7,7 @@ use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 use App\Jobs\CheckDirtyBadges;
 use App\Jobs\CheckCleanup;
 use App\Jobs\CheckSummaries;
+use App\Console\Commands\QueueCleanAccreditations;
 use App\Console\Commands\QueueCheckDirtyBadges;
 use App\Console\Commands\QueueCheckDirtyDocuments;
 use App\Console\Commands\SendGeneralNotification;
@@ -19,6 +20,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
+        QueueCleanAccreditations::class,
         QueueCheckDirtyBadges::class,
         QueueCheckDirtyDocuments::class,
         SendGeneralNotification::class
