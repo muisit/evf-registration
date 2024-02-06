@@ -44,31 +44,31 @@ class Fixture
 
     public static function loadAll()
     {
-        Fencer::clear();
-        Fencer::create();
-
-        WPUser::clear();
-        WPUser::create();
-
-        Registrar::clear();
-        Registrar::create();
-
-        Event::clear();
-        Event::create();
-        Competition::clear();
-        Competition::create();
-        SideEvent::clear();
-        SideEvent::create();
-        EventRole::clear();
-        EventRole::create();
-        AccreditationTemplate::clear();
-        AccreditationTemplate::create();
-
+        Result::clear();
+        AccreditationUser::clear();
+        Accreditation::clear();
         Registration::clear();
+        AccreditationTemplate::clear();
+        EventRole::clear();
+        SideEvent::clear();
+        Competition::clear();
+        Event::clear();
+        Registrar::clear();
+        WPUser::clear();
+        Fencer::clear();
+
+        Fencer::create();
+        WPUser::create();
+        Registrar::create();
+        Event::create();
+        Competition::create();
+        SideEvent::create();
+        EventRole::create();
+        AccreditationTemplate::create();
         Registration::create();
         Accreditation::clear();
         Accreditation::create();
-
+        AccreditationUser::create();
         Result::create();
     }
 }

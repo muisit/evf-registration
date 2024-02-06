@@ -72,6 +72,7 @@ class Fencer
      */
     public function view(EVFUser $user, Model $model): bool | null
     {
+        \Log::debug("testing view on " . $model->getKey() . " for " . json_encode($user->getAuthRoles()));
         // anyone that can see all data can see this data
         if ($this->viewAny($user)) {
             return true;

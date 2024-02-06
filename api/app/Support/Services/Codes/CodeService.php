@@ -11,25 +11,30 @@ class CodeService
     public $errors = [];
     public CodeProcessStatus $result;
 
-    public function __construct(?Event $event)
+    public function __construct(?Event $event = null)
     {
-        $this->event = $event;
         $this->result = new CodeProcessStatus();
         $this->result->status = "error";
         $this->result->action = "fail";
+        $this->setEvent($event);
     }
 
-    public function setEvent(Event $event)
+    public function setEvent(?Event $event)
     {
         $this->event = $event;
-        $this->result->eventId = $event->getKey();
+        if (!empty($event)) {
+            $this->result->eventId = $event->getKey();
+        }
+        else {
+            $this->result->eventId = 0;
+        }
     }
 
     public function addError($msg)
     {
         \Log::error($msg);
         $this->errors[] = $msg;
-        $this->manager->result->status = 'error';
+        $this->result->status = 'error';
         return false; // allow to return this return code as failure directly
     }
 
@@ -37,11 +42,9 @@ class CodeService
     {
         switch ($action) {
             case 'login':
-                \Log::debug("login service");
                 $this->result->action = "login";
                 return (new LoginService($this))->handle($codes);
             case 'badge':
-                \Log::debug("badge service");
                 $this->result->action = "badge";
                 return (new BadgeService($this))->handle($codes);
             default:

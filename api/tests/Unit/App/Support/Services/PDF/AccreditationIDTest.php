@@ -17,7 +17,7 @@ class AccreditationIDTest extends TestCase
                 ->expects($this->once())
                 ->method('write1DBarcode')
                 ->with(
-                    $this->equalTo('11mylabel00000'),
+                    $this->equalTo('mylabel'),
                     $this->equalTo('I25+'),
                     $this->equalTo(5.0),
                     $this->equalTo(2.5),

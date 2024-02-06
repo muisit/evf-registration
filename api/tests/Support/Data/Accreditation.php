@@ -53,7 +53,7 @@ class Accreditation extends Fixture
             'file_id' => null,
             'generated' => null,
             'is_dirty' => null,
-            'fe_id' => '1002011'
+            'fe_id' => '1270578'
         ])->save();
 
         // has a registration for MFCAT2 and MFTEAM
@@ -138,7 +138,7 @@ class Accreditation extends Fixture
             'file_id' => null,
             'generated' => null,
             'is_dirty' => null,
-            'fe_id' => null
+            'fe_id' => '1954492'
         ])->save();
 
         Model::create([

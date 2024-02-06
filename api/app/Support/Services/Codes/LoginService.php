@@ -41,7 +41,7 @@ class LoginService
             return $this->manager->addError("Invalid code");
         }
 
-        if ($this->manager->event->exists && $accreditations[0]->event_id != $this->manager->event->getKey()) {
+        if (!empty($this->manager->event) && $this->manager->event->exists && $accreditations[0]->event_id != $this->manager->event->getKey()) {
             // scanning a badge from a different event, that happens to have rights still
             return $this->manager->addError("Access denied");
         }

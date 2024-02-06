@@ -28,14 +28,13 @@ class SessionGuard extends SessionGuardBase
         }
 
         $id = $this->session->get('wpuser');
-        if (! is_null($id) && $this->user = $this->provider->retrieveWPUserById($id)) {
+        if (!empty($id) && $this->user = $this->provider->retrieveWPUserById($id)) {
             $this->fireAuthenticatedEvent($this->user);
         }
         $id = $this->session->get('accreditationuser');
-        if (! is_null($id) && $this->user = $this->provider->retrieveAccreditationUserById($id)) {
+        if (empty($user) && !empty($id) && $this->user = $this->provider->retrieveAccreditationUserById($id)) {
             $this->fireAuthenticatedEvent($this->user);
         }
-
         return $this->user;
     }
 

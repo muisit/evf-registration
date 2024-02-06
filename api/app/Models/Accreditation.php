@@ -71,6 +71,8 @@ class Accreditation extends Model
 
     public function delete()
     {
+        // delete all linked AccreditationUsers
+        AccreditationUser::where('accreditation_id', $this->getKey())->delete();
         $path = $this->path();
         if (file_exists($path)) {
             @unlink($path);
@@ -106,6 +108,7 @@ class Accreditation extends Model
                 // this should not happen, but we are catching the theoretical case
                 // start with a 0, which no regular id should ever do
                 $id = sprintf("0%06d", $this->getKey());
+                break;
             }
         }
         $this->fe_id = $id;

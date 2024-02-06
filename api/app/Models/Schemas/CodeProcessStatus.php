@@ -50,7 +50,7 @@ class CodeProcessStatus
     /**
      * Optional data field: fencer
      */
-    public ?Fencer $fencer;
+    public ?Fencer $fencer = null;
 
     public function __construct($id = 0, $status = 'error', $action = 'error', ?string $message = null)
     {
@@ -62,6 +62,7 @@ class CodeProcessStatus
 
     public function setFencer(FencerModel $fencer)
     {
+        \Log::debug("setting fencer on CodeProcessStatus");
         $this->fencer = new Fencer($fencer);
     }
 }

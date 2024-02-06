@@ -73,6 +73,7 @@ class Code
         if ($this->id2 < 101 || $this->id2 > 999) return false;
         if ($this->baseFunction < 1 || $this->baseFunction > 9) return false;
         if ($this->addFunction < 0 || $this->addFunction > 9) return false;
+        if (!is_numeric($this->payload)) return false;
         if (intval($this->payload) < 0 || intval($this->payload) > 9999) return false;
         if ($this->validation < 0 || $this->validation > 9) return false;
 

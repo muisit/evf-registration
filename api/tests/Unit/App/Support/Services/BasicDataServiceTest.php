@@ -14,7 +14,7 @@ class BasicDataServiceTest extends TestCase
 {
     public function testCreate()
     {
-        $service = new BasicDataService();
+        $service = new BasicDataService("");
         $schema = $service->create();
 
         $this->assertCount(7, $schema->categories);

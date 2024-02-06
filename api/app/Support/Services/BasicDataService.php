@@ -12,7 +12,7 @@ use DB;
 
 class BasicDataService
 {
-    public function create(string $restrict): BasicData
+    public function create(string $restrict = ''): BasicData
     {
         $retval = new BasicData();
 

@@ -21,6 +21,11 @@ abstract class TestCase extends BaseTestCase
         $request = request();
         $this->app->instance('request', $request);
         $this->app->useStoragePath(realpath(__DIR__ . '/../_output'));
+
+        // allow setting the session ID to log in users, outside full requests
+        $request->setUserResolver(function ($guard = null) {
+            return $this->app->make('auth')->guard($guard)->user();
+        });
     }
 
     /**
@@ -48,6 +53,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (! $this->app['session']->isStarted()) {
             $this->app['session']->start();
+            request()->setLaravelSession($this->app['session']);
         }
 
         return $this;
