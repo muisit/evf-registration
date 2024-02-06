@@ -23,6 +23,13 @@ co*)
                 echo "updating REGISTER build version before commit"
                 scripts/updateversion register micro
             fi
+
+            HASACCREDITATION=`git status --porcelain | grep "^ *M  *apps/accredit"`
+            if [[ ! "x$HASACCREDITATION" = "x" ]]
+            then
+                echo "updating ACCREDITATION build version before commit"
+                scripts/updateversion accreditation micro
+            fi
         fi
     fi
     ;;
