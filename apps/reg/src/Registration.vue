@@ -15,9 +15,9 @@ const dataStore = useDataStore();
 // Then we set the default country
 // And we retrieve all events this user has access to
 watch(
-    () => authStore.isGuest,
+    () => [authStore.isGuest, authStore.registrationUser],
     (nw) => {
-        if(nw) {
+        if(nw[0] || !nw[1]) {
             authStore.sendMe();
         }
         else {

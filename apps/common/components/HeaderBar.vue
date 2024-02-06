@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import imgUrl from '../../../common/assets/banner.png';
+import imgUrl from '../assets/banner.png';
 
 </script>
 <template>

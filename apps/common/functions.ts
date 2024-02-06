@@ -1,5 +1,12 @@
 import dayjs from 'dayjs';
 
+export function getId(id:any):number
+{
+    if (!id) return id;
+    if (id.id) return id.id;
+    return parseInt(id);
+}
+
 export function is_valid(id:any)
 {
     if (!id) return false;

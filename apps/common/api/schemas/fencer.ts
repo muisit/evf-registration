@@ -19,6 +19,9 @@ export interface Fencer {
     birthYear?: string;
     registrations?: Array<Registration>;
     fullGender?: string;
+
+    // accreditation data
+    accreditationRole ?:string;
 }
 
 export interface FencerList extends Array<Fencer>{};

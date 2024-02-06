@@ -12,14 +12,14 @@ use DB;
 
 class BasicDataService
 {
-    public function create(): BasicData
+    public function create(string $restrict): BasicData
     {
         $retval = new BasicData();
 
-        $retval->add($this->getCategories());
-        $retval->add($this->getWeapons());
-        $retval->add($this->getCountries());
-        $retval->add($this->getRoles());
+        if ($restrict == '' || $restrict == 'categories') $retval->add($this->getCategories());
+        if ($restrict == '' || $restrict == 'weapons') $retval->add($this->getWeapons());
+        if ($restrict == '' || $restrict == 'countries') $retval->add($this->getCountries());
+        if ($restrict == '' || $restrict == 'roles') $retval->add($this->getRoles());
 
         return $retval;
     }
@@ -41,8 +41,6 @@ class BasicDataService
 
     private function getRoles()
     {
-        $rows = Role::joinRelationship('type')->orderBy('role_type_id', 'asc')->orderBy('role_name', 'asc')->get()->toArray();
-        return Role::hydrate($rows);
+        return Role::with('type')->orderBy('role_type', 'asc')->orderBy('role_name', 'asc')->get();
     }
 }
-

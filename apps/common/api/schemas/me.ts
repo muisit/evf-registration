@@ -5,7 +5,8 @@ export interface MeSchema {
     username: string;
     token: string|null;
     credentials: Array<string>|null;
-    countryId: number|null;
+    countryId?: number;
+    eventId?: number;
 
     // front end data
     country?: CountrySchema;

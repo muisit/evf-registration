@@ -24,6 +24,6 @@ class Basic extends Controller
      */
     public function index(Request $request)
     {
-        return response()->json((new BasicDataService())->create());
+        return response()->json((new BasicDataService())->create($request->get('restrict') ?? ''));
     }
 }

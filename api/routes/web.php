@@ -8,6 +8,7 @@ require('fencers.php');
 require('registrations.php');
 require('accreditations.php');
 require('templates.php');
+require('codes.php');
 
 /*
 |--------------------------------------------------------------------------

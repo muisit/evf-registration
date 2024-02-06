@@ -78,7 +78,7 @@ class Accreditation extends Model
         return parent::delete();
     }
 
-    private function createControlDigit(string $id)
+    public static function createControlDigit(string $id)
     {
         // create a control number by adding up all the digits
         $total = 0;
@@ -108,8 +108,13 @@ class Accreditation extends Model
                 $id = sprintf("0%06d", $this->getKey());
             }
         }
-        $this->fe_id = $id . $this->createControlDigit($id);
+        $this->fe_id = $id;
 
         return $this->fe_id;
+    }
+
+    public function getFullAccreditationId()
+    {
+        return sprintf('11%s%1d%04d', $this->fe_id, self::createControlDigit($this->fe_id), 0);
     }
 }

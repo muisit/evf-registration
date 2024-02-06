@@ -253,7 +253,7 @@ class PDFGenerator
                         (new NameElement($this))->withData($data)->generate($el);
                         break;
                     case "accid":
-                        (new AccreditationId($this))->withLabel($this->accreditation->fe_id)->generate($el);
+                        (new AccreditationId($this))->withLabel($this->accreditation->createFullAccreditationId())->generate($el);
                         break;
                     case "category":
                         (new CategoryElement($this))->withData($data)->generate($el);

@@ -28,13 +28,14 @@ class SessionGuard extends SessionGuardBase
         }
 
         $id = $this->session->get('wpuser');
-
-        // First we will try to load the user using the identifier in the session if
-        // one exists. Otherwise we will check for a "remember me" cookie in this
-        // request, and if one exists, attempt to retrieve the user using that.
         if (! is_null($id) && $this->user = $this->provider->retrieveWPUserById($id)) {
             $this->fireAuthenticatedEvent($this->user);
         }
+        $id = $this->session->get('accreditationuser');
+        if (! is_null($id) && $this->user = $this->provider->retrieveAccreditationUserById($id)) {
+            $this->fireAuthenticatedEvent($this->user);
+        }
+
         return $this->user;
     }
 

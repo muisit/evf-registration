@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Country;
 use App\Models\Event;
 use App\Support\Services\DefaultCountryService;
+use App\Support\Services\DefaultEventService;
 
 class GlobalParameters
 {
@@ -25,18 +26,24 @@ class GlobalParameters
 
     private function determineEvent(Request $request)
     {
-        \Log::debug("determining global event");
-        if ($request->has('event')) {
-            $event = Event::where('event_id', $request->get('event'))->first();
-            if (!empty($event) && !$event->isFinished()) {
-                $request->merge(['eventObject' => $event]);
+        // see if the user is linked to a specific event
+        if (!empty($request->user())) {
+            $event = DefaultEventService::determineEvent($request->user());
+        }
+
+        if (empty($event)) {
+            if ($request->has('event')) {
+                $event = Event::where('event_id', $request->get('event'))->first();
             }
+        }
+
+        if (!empty($event) && !$event->isFinished()) {
+            $request->merge(['eventObject' => $event]);
         }
     }
 
     private function determineCountry(Request $request)
     {
-        \Log::debug("determining global country");
         $country = null;
         if (!empty($request->user())) {
             $country = DefaultCountryService::determineCountry($request->user());

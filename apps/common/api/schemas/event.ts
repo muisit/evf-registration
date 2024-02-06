@@ -3,6 +3,7 @@ import type { Bank } from './bank';
 import type { EventType } from './eventtype';
 import type { SideEvent } from './sideevent';
 import type { TemplateSchema } from './template';
+import { StringKeyedStringList } from '../../types';
 
 export interface Event {
     id: number|null;
@@ -24,6 +25,7 @@ export interface Event {
     sideEvents: Array<SideEvent>|null;
     competitions: Array<Competition>|null;
     templates?: Array<TemplateSchema>;
+    codes?: StringKeyedStringList;
 }
 
 export function defaultEvent(): Event

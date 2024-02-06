@@ -48,7 +48,7 @@ import ParticipantsPage from '../pages/ParticipantsPage.vue';
 import ActionPage from '../pages/ActionPage.vue';
 import TemplatesPage from '../pages/TemplatesPage.vue';
 import EventPage from '../pages/EventPage.vue';
-import { isOpenForRegistration, isOpenForRegistrationView } from '../../../common/lib/event';
+import { isOpenForRegistrationView } from '../../../common/lib/event';
 </script>
 <template>
     <ElTabs type="card" @tab-change="onTabChange" v-model="activeTab">

@@ -35,6 +35,11 @@ class Event extends Model
         return $this->hasMany(SideEvent::class, 'event_id', 'event_id');
     }
 
+    public function codes(): HasMany
+    {
+        return $this->hasMany(AccreditationUser::class, 'event_id', 'event_id');
+    }
+
     public function competitions(): HasMany
     {
         return $this->hasMany(Competition::class, 'competition_event', 'event_id');
@@ -116,6 +121,75 @@ class Event extends Model
             }
         }
         // by default, do not use the registration application for events
+        return false;
+    }
+
+    public function useAccreditationApplication()
+    {
+        if (!empty($this->event_config)) {
+            $config = json_decode($this->event_config);
+            if ($config !== false && isset($config->use_accreditation)) {
+                return $config->use_accreditation == true;
+            }
+        }
+        // by default, do not use the accreditation application for events
+        return false;
+    }
+
+    public function generateFunctionalCodes()
+    {
+        AccreditationUser::where('event_id', $this->getKey())->where('accreditation_id', null)->delete();
+        $user = new AccreditationUser();
+        $user->code = $this->generateFunctionalCode(0);
+        $user->type = "organiser";
+        $user->event_id = $this->getKey();
+        $user->save();
+
+        $user = new AccreditationUser();
+        $user->code = $this->generateFunctionalCode(1);
+        $user->type = "accreditation";
+        $user->event_id = $this->getKey();
+        $user->save();
+
+        $user = new AccreditationUser();
+        $user->code = $this->generateFunctionalCode(2);
+        $user->type = "checkin";
+        $user->event_id = $this->getKey();
+        $user->save();
+
+        $user = new AccreditationUser();
+        $user->code = $this->generateFunctionalCode(3);
+        $user->type = "checkout";
+        $user->event_id = $this->getKey();
+        $user->save();
+
+        $user = new AccreditationUser();
+        $user->code = $this->generateFunctionalCode(4);
+        $user->type = "dt";
+        $user->event_id = $this->getKey();
+        $user->save();
+    }
+
+    private function generateFunctionalCode($id)
+    {
+        $id1 = random_int(101, 999);
+        $id2 = random_int(101, 999);
+        $code = sprintf("%d%03d%03d", $id, $id1, $id2);
+        $check = Accreditation::createControlDigit($code);
+        return "99" . $code . $check . sprintf("%04d", $this->getKey());
+    }
+
+    public function checkCode($code)
+    {
+        if (!empty($this->event_config)) {
+            $config = json_decode($this->event_config);
+            if ($config === false) {
+                $config = (object)[];
+            }
+            if (isset($config->codes)) {
+                return in_array($code, $config->codes);
+            }
+        }
         return false;
     }
 }

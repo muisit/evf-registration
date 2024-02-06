@@ -172,6 +172,17 @@ class Event
      */
     public ?array $templates = null;
 
+    /**
+     * Related accreditation codes
+     * 
+     * @var string[]
+     * @OA\Property(
+     *   type="array",
+     *   @OA\Items(type="string")
+     * )
+     */
+    public ?array $codes = null;
+
     public function __construct(?BaseModel $event = null)
     {
         if (!empty($event)) {
@@ -193,6 +204,14 @@ class Event
             $this->feed = $event->event_feed;
             $this->config = json_decode($event->event_config);
 
+            if (request()->user()->can('update', $event)) {
+                $codes = $event->codes()->where('accreditation_id', null)->get();
+                $this->codes = [];
+                foreach ($codes as $code) {
+                    $this->codes[$code->type] = $code->code;
+                }
+            }
+
             // $event->event_in_ranking
             // $event->event_factor
             // $event->event_frontend
@@ -208,9 +227,12 @@ class Event
             }
 
             $this->templates = [];
-            foreach ($event->templates as $template) {
-                $this->templates[] = new AccreditationTemplate($template);
+            if (request()->user()->can('viewAny', AccreditationTemplate::class)) {
+                foreach ($event->templates as $template) {
+                    $this->templates[] = new AccreditationTemplate($template);
+                }
             }
+
         }
     }
 }

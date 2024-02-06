@@ -53,10 +53,12 @@ class Index extends Controller
             $this->authorize("not/ever");
         }
 
+        \Log::debug("testing viewRegistrations for event " . $event->getKey());
         if ($request->user()->can("viewRegistrations", $event)) {
             $country = $request->get('countryObject');
             // superhod cannot set org roles
             $isOrganiser = $request->user()->hasRole(['sysop', 'organiser:' . $event->getKey(), 'registrar:' . $event->getKey()]);
+            \Log::debug("user is organiser: " . ($isOrganiser ? 'true' : 'false'));
 
             // country should be implicitely or explicitely set, except for organisers
             if (empty($country) && !$isOrganiser) {
