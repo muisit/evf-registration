@@ -3,6 +3,7 @@
 namespace Tests\Unit\App\Support;
 
 use App\Models\Accreditation;
+use App\Models\AccreditationUser;
 use App\Models\AccreditationTemplate;
 use App\Models\Event;
 use App\Models\EventRole;
@@ -202,6 +203,7 @@ class AccreditationOverviewServiceTest extends TestCase
         // This makes sure expected roles like Athlete have a relevant default
         // and do not throw an error
         Registration::where('registration_id', '>', 0)->delete();
+        AccreditationUser::where('id', '>', 0)->delete();
         Accreditation::where('id', '>', 0)->delete();
         $event = Event::find(EventData::EVENT1);
         $this->assertNotEmpty($event);

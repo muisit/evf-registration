@@ -82,7 +82,7 @@ class EventTest extends TestCase
         $this->assertInstanceOf(AccreditationTemplateSchema::class, $schema->templates[0]);
 
         $this->assertCount(5, $schema->codes);
-        $this->assertContains("99058223000037", $schema->codes);
+        $this->assertContains("99058223000001", $schema->codes);
     }
 
     public function testUnauthorized()

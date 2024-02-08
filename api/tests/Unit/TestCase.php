@@ -38,6 +38,19 @@ abstract class TestCase extends BaseTestCase
         return require __DIR__ . '/../../bootstrap/app.php';
     }
 
+    public function resetApplication()
+    {
+        $this->app = $this->createApplication();
+        $request = request();
+        $this->app->instance('request', $request);
+        $this->app->useStoragePath(realpath(__DIR__ . '/../_output'));
+
+        // allow setting the session ID to log in users, outside full requests
+        $request->setUserResolver(function ($guard = null) {
+            return $this->app->make('auth')->guard($guard)->user();
+        });
+    }
+
     public function session(array $data)
     {
         $this->startSession();
@@ -91,5 +104,20 @@ abstract class TestCase extends BaseTestCase
         }
 
         return $this;
+    }
+
+    public function assertException($callable, $exception)
+    {
+        $cls = '';
+        try {
+            $callable();
+        }
+        catch (\Exception $e) {
+            $cls = get_class($e);
+            if ($cls != $exception) {
+                $this->assertEquals('', $e->getTraceAsString());
+            }
+        }
+        $this->assertTrue($exception == $cls, "Expected exception $exception");
     }
 }

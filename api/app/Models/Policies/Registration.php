@@ -16,21 +16,6 @@ class Registration
         return null;
     }
 
-    private function isAccreditor(EVFUser $user)
-    {
-        // see if we have a global request object for the event
-        $event = request()->get('eventObject');
-        $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
-
-        // someone can see a fencer if he/she is an organiser or a registrar
-        // for a valid event. We can remove these roles to restrict the number
-        // of people with broad fencer access
-        if (!empty($eventId) && $user->hasRole(['accreditation:' . $eventId])) {
-            return true;
-        }
-        return false;
-    }
-
     private function isOrganiserOrRegistrarOrAccreditor(EVFUser $user)
     {
         // see if we have a global request object for the event
@@ -225,8 +210,9 @@ class Registration
      */
     public function updateState(EVFUser $user, Model $model): bool
     {
+        \Log::debug("testing updateState for " . json_encode($user->getKey()));
         // organisers with registration rights can update a registration model
-        if ($this->isAccreditor($user)) {
+        if ($this->accredit($user)) {
             return true;
         }
 

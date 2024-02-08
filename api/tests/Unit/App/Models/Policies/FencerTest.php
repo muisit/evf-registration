@@ -81,9 +81,9 @@ class FencerTest extends TestCase
         $this->assertFalse($policy->viewAny($superhod));
         $this->assertFalse($policy->viewAny($gerhod));
 
-        // organiser and registrar can see any fencer
+        // organiser, registrar, accreditor can see any fencer
         $this->assertFalse($policy->viewAny($cashier));
-        $this->assertFalse($policy->viewAny($accred));
+        $this->assertTrue($policy->viewAny($accred));
         $this->assertTrue($policy->viewAny($organiser));
         $this->assertTrue($policy->viewAny($registrar));
 
@@ -126,9 +126,9 @@ class FencerTest extends TestCase
         $this->assertTrue($policy->view($superhod, $fencerGER));
         $this->assertTrue($policy->view($superhod, $fencerITA));
 
-        // organiser and registrar can see any individual fencer
+        // organiser, registrar, accreditor can see any individual fencer
         $this->assertFalse($policy->view($cashier, $fencerGER));
-        $this->assertFalse($policy->view($accred, $fencerITA));
+        $this->assertTrue($policy->view($accred, $fencerITA));
         $this->assertTrue($policy->view($organiser, $fencerGER));
         $this->assertTrue($policy->view($registrar, $fencerITA));
 

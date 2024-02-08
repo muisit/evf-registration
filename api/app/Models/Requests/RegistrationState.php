@@ -28,7 +28,7 @@ class RegistrationState extends Base
             }],
             // Absent, Present, Registration-only
             'state.value' => [Rule::in(['A', 'P', 'R'])],
-            'state.previous' => [Rule::in(['A', 'P', 'R'])],
+            'state.previous' => ['nullable', Rule::in(['A', 'P', 'R'])],
         ];
     }
 
@@ -43,10 +43,12 @@ class RegistrationState extends Base
             if (empty($reg) || !$reg->exists) {
                 $fail('invalid list of registration ids');
             }
-            if ($reg->registration_mainevent != $event->getKey()) {
+            else if ($reg->registration_mainevent != $event->getKey()) {
                 $fail('invalid list of registration ids');
             }
-            $this->registrations[] = $reg;
+            else {
+                $this->registrations[] = $reg;
+            }
         }
     }
 

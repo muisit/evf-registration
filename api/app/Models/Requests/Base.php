@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class Base
 {
@@ -34,7 +35,10 @@ class Base
 
         $data = $this->extractInputFromRules($request);
 
-        if (!$this->authorize($request->user(), $data)) {
+        if (empty($request->user())) {
+            throw new AuthorizationException(); // should never occur, all routes guarded by authenticator
+        }
+        if (!$request->user() || !$this->authorize($request->user(), $data)) {
             $this->model = null;
         }
         else {

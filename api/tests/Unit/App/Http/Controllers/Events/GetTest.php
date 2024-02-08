@@ -20,7 +20,9 @@ class GetTest extends TestCase
         $this->assertNotEmpty($output['id']);
         $this->assertNotEmpty($output['name']);
         $this->assertNotEmpty($output['opens']);
-        $this->assertCount(3, $output); // these are all the fields
+        $this->assertNotEmpty($output['competitions']);
+        $this->assertNotEmpty($output['sideEvents']);
+        $this->assertCount(5, $output); // these are all the fields
 
         // test user 2 is sysop
         $this->session(['wpuser' => UserData::TESTUSER2])
