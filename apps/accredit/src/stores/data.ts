@@ -2,28 +2,18 @@ import type { Ref } from 'vue';
 import type { CodeDispatcher } from './lib/codedispatcher';
 import type { Code, CodeUser } from '../../../common/api/schemas/codes';
 import type { Event } from '../../../common/api/schemas/event';
-import type { RoleSchema, RoleById } from '../../../common/api/schemas/role';
+import type { Fencer } from '../../../common/api/schemas/fencer';
 import { ref } from 'vue';
 import { defineStore } from 'pinia'
-import { defaultEvent } from '../../../common/api/schemas/event';
-import { basicData } from '../../../common/api/basicdata';
-import { getEvent as getEventAPI } from '../../../common/api/event/getEvent';
 import { checkcode } from '../../../common/api/codes/checkcode';
 import { is_valid } from '../../../common/functions';
 import { processCode } from './lib/processCode';
 import { useAuthStore } from '../../../common/stores/auth';
+import { useBasicStore } from '../../../common/stores/basic';
 import { registrations } from '../../../common/api/registrations/registrations';
-import { Fencer } from '../../../common/api/schemas/fencer';
 
 export const useDataStore = defineStore('data', () => {
-    const roles:Ref<RoleSchema[]> = ref([]);
-    const countryRoles:Ref<RoleSchema[]> = ref([]);
-    const organisationRoles:Ref<RoleSchema[]> = ref([]);
-    const officialRoles:Ref<RoleSchema[]> = ref([]);
-    const rolesById:Ref<RoleById> = ref({});
-
-    const isLoadingData:Ref<string[]> = ref([]);
-    const event:Ref<Event> = ref(defaultEvent());
+    const subtitle:Ref<string> = ref('');
     const inputValue:Ref<string> = ref('');
     const processingList:Ref<Code[]> = ref([]);
     const dispatcher:Ref<CodeDispatcher> = ref({admin: adminDispatcher, badge: badgeDispatcher});
@@ -31,56 +21,10 @@ export const useDataStore = defineStore('data', () => {
 
     function logout()
     {
-        event.value = defaultEvent();
+        const basicStore = useBasicStore();
+        basicStore.setEvent();
         processingList.value = [];
         dispatcher.value = {admin: adminDispatcher, badge: badgeDispatcher};
-    }
-
-    function hasBasicData() {
-        return roles.value.length > 0;
-    }
-
-    function getBasicData(cb:Function) {
-        if (!hasBasicData()) {
-            const authStore = useAuthStore();
-            authStore.isLoading('basic');
-            return basicData('roles')
-                .then((data) => {
-                    authStore.hasLoaded('basic');
-                    fillData(data);
-                    cb();
-                })
-                .catch((e) => {
-                    authStore.hasLoaded('basic');
-                    console.log(e);
-                    setTimeout(() => { getBasicData(cb); }, 500);
-                });
-        }
-        else {
-            return Promise.resolve();
-        }
-    }
-
-    function fillData(data:any) {
-        roles.value = [];99058223000037
-        officialRoles.value = [];
-        organisationRoles.value = [];
-        countryRoles.value = [];
-        rolesById.value = {};
-
-        if (data.roles) {
-            roles.value = data.roles;
-            roles.value.forEach((item) => {
-                rolesById.value['r' + item.id] = item;
-
-                switch(item.type) {
-                    case 'Org': organisationRoles.value.push(item); break;
-                    case 'FIE':
-                    case 'EVF': officialRoles.value.push(item); break;
-                    default: countryRoles.value.push(item); break;
-                }
-            });
-        }
     }
 
     function setDispatcher(event:string, callback:Function|null|undefined)
@@ -141,7 +85,7 @@ export const useDataStore = defineStore('data', () => {
     function adminDispatcher(code:string, codeObject:Code)
     {
         // scanning an admin code always causes a functional switch
-        checkcode(codeObject, "login")
+        return checkcode(codeObject, "login")
             .then((dt) => {
                 if (dt.status != 'ok' || dt.action != 'login') {
                     throw new Error(dt.message || 'Error while validating code');
@@ -151,7 +95,9 @@ export const useDataStore = defineStore('data', () => {
                     const auth = useAuthStore();
                     auth.eventId = dt.eventId;
                     auth.sendMe();
-                    getEvent(dt.eventId);
+
+                    const basicStore = useBasicStore();
+                    basicStore.getEvent(dt.eventId);
                 }
             })
             .catch((e) => {
@@ -163,7 +109,7 @@ export const useDataStore = defineStore('data', () => {
     function badgeDispatcher(code:string, codeObject:Code)
     {
         // scanning an admin code always causes a functional switch
-        checkcode(codeObject, "badge")
+        return checkcode(codeObject, "badge")
             .then((dt) => {
                 if (dt.status != 'ok' || dt.action != 'badge') {
                     throw new Error(dt.message || 'Error while validating code');
@@ -174,52 +120,17 @@ export const useDataStore = defineStore('data', () => {
                         // scanning a badge from a different event
                         throw new Error("Error while validating code");
                     }
-                    if (!dt.fencer || is_valid(dt.fencer)) {
+                    if (!dt.fencer || !is_valid(dt.fencer)) {
                         throw new Error("Error while validating code");
                     }
-
+                    scannedBadge.value = dt.fencer;
+                    return dt.fencer;
                 }
             })
             .catch((e) => {
                 console.log(e);
                 alert("There was an error with the scanned code. Perhaps it is incorrect. Please try again.");
             });
-    }
-
-    function isLoading(section:string)
-    {
-        if (!isLoadingData.value.includes(section)) {
-            isLoadingData.value.push(section);
-        }
-    }
-
-    function hasLoaded(section:string)
-    {
-        isLoadingData.value = isLoadingData.value.filter((s) => s != section);
-    }
-
-    function isCurrentlyLoading()
-    {
-        return isLoadingData.value.length > 0;
-    }
-
-    function getEvent(eventId:number)
-    {
-        console.log('loading event ', eventId);
-        if (is_valid(eventId)) {
-            const auth = useAuthStore();
-            return getEventAPI(eventId)
-                .then((dt:Event) => {
-                    event.value = dt;
-                    
-                    auth.eventId = event.value.id || 0;
-                })
-                .catch((e:any) => {
-                    console.log(e);
-                    event.value = defaultEvent();
-                    auth.eventId = 0;
-                });
-            }
     }
 
     function addCode(eventCode:string, eventKey:any)
@@ -317,7 +228,10 @@ export const useDataStore = defineStore('data', () => {
 
     function processFullCode(value:string)
     {
-        processingList.value.push(processCode(value, dispatcher.value));
+        let code = processCode(value, dispatcher.value);
+        if (code.original.length > 0) {
+            processingList.value.push(code);
+        }
     }
 
     function getOrgRegistrations()
@@ -326,11 +240,10 @@ export const useDataStore = defineStore('data', () => {
     }
 
     return {
-        roles, officialRoles, organisationRoles, countryRoles, rolesById,
-        logout, isLoading, hasLoaded, isCurrentlyLoading,
+        subtitle,
+        logout,
         inputValue, processingList, addCode, processFullCode,
-        event, getEvent,
-        getOrgRegistrations, getBasicData,
+        getOrgRegistrations, 
         setDispatcher, adminDispatcher, badgeDispatcher, 
         scannedBadge
     };

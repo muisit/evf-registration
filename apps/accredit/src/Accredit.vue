@@ -2,15 +2,24 @@
 import { onMounted, onUnmounted, watch } from 'vue';
 import { useDataStore } from './stores/data';
 import { useAuthStore } from '../../common/stores/auth';
+import { useBasicStore } from '../../common/stores/basic';
 import { is_valid } from '../../common/functions';
 const props = defineProps<{
     event:number;
 }>();
 
 const data = useDataStore();
+const basicStore = useBasicStore();
+
 onMounted(() => {
     document.addEventListener('keydown', onTrackKey);
     document.addEventListener('paste', onPaste);
+
+    basicStore.getBasicData().then(() => {
+        if (is_valid(props.event)) {
+            basicStore.getEvent(props.event);
+        }
+    });
 });
 
 onUnmounted(() => {
@@ -51,9 +60,9 @@ watch(
     (nw) => {
         if(nw[0] || !nw[1]) {
             authStore.sendMe().then(() => {
-                console.log('authstore event set to ', authStore.eventId);
+                // if the user is linked to a specific event, get that event now
                 if (is_valid(authStore.eventId)) {
-                    data.getEvent(authStore.eventId);
+                    basicStore.getEvent(authStore.eventId);
                 }
             });
         }
@@ -61,13 +70,12 @@ watch(
     { immediate: true }
 );
 
-
 import DashboardView from './pages/DashboardView.vue';
 import LoadingService from './components/special/LoadingService.vue';
 </script>
 <template>
     <div>
         <LoadingService/>
-        <DashboardView :event="props.event"/>
+        <DashboardView/>
     </div>
 </template>

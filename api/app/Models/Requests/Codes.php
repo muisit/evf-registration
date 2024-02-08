@@ -17,17 +17,10 @@ class Codes extends Base
     public function rules(): array
     {
         return [
-            'codes.*.original' => ['required', 'string', 'size:14'],
-            'codes.*.baseFunction' => ['required', 'integer', 'min:0', 'max:9'],
-            'codes.*.addFunction' => ['required', 'integer', 'min:0', 'max:9'],
-            'codes.*.id1' => ['required', 'integer', 'min:101', 'max:999'],
-            'codes.*.id2' => ['required', 'integer', 'min:101', 'max:999'],
-            'codes.*.validation' => ['required', 'integer'],
-            'codes.*.payload' => ['required', 'string'],
+            'codes.*' => ['required', 'string', 'size:14'],
             'action' => ['required','max:50'],
         ];
     }
-
 
     public function validate(Request $request): ?Model
     {
@@ -58,16 +51,9 @@ class Codes extends Base
     {
         if ($this->model) {
             foreach ($data['codes'] as $code) {
-                $schema = new Code();
-                $schema->original = $code['original'] ?? '';
-                $schema->baseFunction = $code['baseFunction'] ?? 0;
-                $schema->addFunction = $code['addFunction'] ?? 0;
-                $schema->id1 = $code['id1'] ?? 0;
-                $schema->id2 = $code['id2'] ?? 0;
-                $schema->validation = $code['validation'] ?? 0;
-                $schema->payload = $code['payload'] ?? 0;
-
-                if ($schema->validate()) {
+                $schema = Code::fromString($code);
+                // validate already done in fromString...
+                if ($schema !== false && $schema->validate()) {
                     $this->codes[] = $schema;
                 }
             }

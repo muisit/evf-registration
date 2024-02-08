@@ -3,6 +3,7 @@
 namespace App\Models\Schemas;
 
 use App\Models\Fencer as FencerModel;
+use App\Models\Event;
 
 /**
  * Basic return value
@@ -60,9 +61,8 @@ class CodeProcessStatus
         $this->message = $message;
     }
 
-    public function setFencer(FencerModel $fencer)
+    public function setFencer(FencerModel $fencer, ?Event $event)
     {
-        \Log::debug("setting fencer on CodeProcessStatus");
-        $this->fencer = new Fencer($fencer);
+        $this->fencer = new Fencer($fencer, $event);
     }
 }

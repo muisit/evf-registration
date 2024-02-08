@@ -1,16 +1,11 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted } from 'vue';
-import type { Code } from '../../../common/api/schemas/codes';
 import { useDataStore } from '../stores/data';
 
 const data = useDataStore();
 
-function badgeDispatcher(code:string, codeObject:Code)
-{
-    data.adminDispatcher(code, codeObject);
-}
-
 onMounted(() => {
+    data.subtitle = '';
     data.setDispatcher('badge', data.adminDispatcher);
 });
 onUnmounted(() => {

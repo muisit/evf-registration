@@ -36,12 +36,44 @@ class EventSimple
      */
     public ?string $opens = null;
 
+    /**
+     * Related side events
+     * 
+     * @var SideEvent[]
+     * @OA\Property(
+     *   type="array",
+     *   @OA\Items(type="SideEvent")
+     * )
+     */
+    public ?array $sideEvents = null;
+
+    /**
+     * Related competitions
+     * 
+     * @var Competition[]
+     * @OA\Property(
+     *   type="array",
+     *   @OA\Items(type="Competition")
+     * )
+     */
+    public ?array $competitions = null;
+
     public function __construct(?BaseModel $event = null)
     {
         if (!empty($event)) {
             $this->id = $event->getKey();
             $this->name = $event->event_name;
             $this->opens = $event->event_open;
+
+            $this->sideEvents = [];
+            foreach ($event->sides()->orderBy('title')->get() as $sideEvent) {
+                $this->sideEvents[] = new SideEvent($sideEvent);
+            }
+
+            $this->competitions = [];
+            foreach ($event->competitions as $competition) {
+                $this->competitions[] = new Competition($competition);
+            }
         }
     }
 }

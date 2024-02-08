@@ -33,7 +33,7 @@ class Validate extends Controller
             if ($result !== false) {
                 return response()->json($result);
             }
-            return response()->json(new CodeProcessStatus(0, 'error', $result->action, implode(",", $result->errors)), 403);
+            return response()->json(new CodeProcessStatus(0, 'error', $service->result->action, implode(",", $service->errors)), 403);
         }
         return response()->json(new CodeProcessStatus(0, 'error', 'error', 'Invalid codes'), 403);
     }

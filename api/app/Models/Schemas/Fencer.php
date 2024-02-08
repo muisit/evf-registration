@@ -3,6 +3,7 @@
 namespace App\Models\Schemas;
 
 use App\Models\Fencer as BaseModel;
+use App\Models\Event;
 
 /**
  * Registration model
@@ -67,7 +68,18 @@ class Fencer
      */
     public ?string $photoStatus = null;
 
-    public function __construct(BaseModel $fencer)
+    /**
+     * Contained registrations
+     *
+     * @var Registration[]
+     * @OA\Property(
+     *   type="array",
+     *   @OA\Items(type="Registration")
+     * )
+     */
+    public ?array $registrations = null;
+
+    public function __construct(BaseModel $fencer, ?Event $event = null)
     {
         $this->id = $fencer->getKey();
         $this->firstName = $fencer->fencer_firstname;
@@ -76,5 +88,13 @@ class Fencer
         $this->gender = $fencer->fencer_gender;
         $this->dateOfBirth = $fencer->fencer_dob;
         $this->photoStatus = $fencer->fencer_picture;
+
+        if ($event) {
+            $registrations = $event->registrations()->where('registration_fencer', $fencer->getKey())->get();
+            $this->registrations = [];
+            foreach ($registrations as $reg) {
+                $this->registrations[] = new Registration($reg);
+            }
+        }
     }
 }

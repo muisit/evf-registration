@@ -22,7 +22,7 @@ class CodeService
     public function setEvent(?Event $event)
     {
         $this->event = $event;
-        if (!empty($event)) {
+        if (!empty($event) && $event->exists) {
             $this->result->eventId = $event->getKey();
         }
         else {

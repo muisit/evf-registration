@@ -20,7 +20,7 @@ class BadgeService
             return $this->manager->addError("Invalid parameters");
         }
         $code = $codes[0];
-
+        \Log::debug("code is " . json_encode($code));
         if ($code->baseFunction == 1) {
             // return fencer information based on badge
             return $this->findFencer($code);
@@ -50,7 +50,7 @@ class BadgeService
         $fencer = $accreditations[0]->fencer;
 
         if (Auth::user()->can('view', $fencer)) {
-            $this->manager->result->setFencer($fencer);
+            $this->manager->result->setFencer($fencer, $this->manager->event);
         }
         $this->manager->result->status = 'ok';
         return $this->manager->result;

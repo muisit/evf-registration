@@ -69,6 +69,7 @@ class Code
 
     public function validate()
     {
+        \Log::debug("validating " . json_encode($this));
         if ($this->id1 < 101 || $this->id1 > 999) return false;
         if ($this->id2 < 101 || $this->id2 > 999) return false;
         if ($this->baseFunction < 1 || $this->baseFunction > 9) return false;
@@ -88,6 +89,26 @@ class Code
     public function validateChecksum($value, $validation)
     {
         $control = Accreditation::createControlDigit($value);
+        \Log::debug("checksum $control vs $validation");
         return $control == $validation;
+    }
+
+    public static function fromString(string $code)
+    {
+        \Log::debug("code from string $code");
+        if (strlen($code) < 14) {
+            \Log::debug("code is too short");
+            return false;
+        }
+        $codeObject = new static();
+        $codeObject->original = $code;
+        $codeObject->baseFunction = intval($code[0]);
+        $codeObject->addFunction = intval($code[2]);
+        $codeObject->id1 = intval(substr($code, 3, 3));
+        $codeObject->id2 = intval(substr($code, 6, 3));
+        $codeObject->validation = intval($code[9]);
+        $codeObject->payload = substr($code, 10, 4);
+
+        return $codeObject->validate() ? $codeObject : false;
     }
 }

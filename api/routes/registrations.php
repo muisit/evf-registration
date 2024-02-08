@@ -38,5 +38,13 @@ $router->group(
                 'uses' => 'Registrations\Pay@index'
             ]
         );
+
+        $router->post(
+            '/state',
+            [
+                'as' => 'registrations.state',
+                'uses' => 'Registrations\State@index'
+            ]
+        );
     }
 );

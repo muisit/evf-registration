@@ -16,6 +16,36 @@ class Registration
         return null;
     }
 
+    private function isAccreditor(EVFUser $user)
+    {
+        // see if we have a global request object for the event
+        $event = request()->get('eventObject');
+        $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
+
+        // someone can see a fencer if he/she is an organiser or a registrar
+        // for a valid event. We can remove these roles to restrict the number
+        // of people with broad fencer access
+        if (!empty($eventId) && $user->hasRole(['accreditation:' . $eventId])) {
+            return true;
+        }
+        return false;
+    }
+
+    private function isOrganiserOrRegistrarOrAccreditor(EVFUser $user)
+    {
+        // see if we have a global request object for the event
+        $event = request()->get('eventObject');
+        $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
+
+        // someone can see a fencer if he/she is an organiser or a registrar
+        // for a valid event. We can remove these roles to restrict the number
+        // of people with broad fencer access
+        if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId, 'registrar:' . $eventId, 'accreditation:' . $eventId])) {
+            return true;
+        }
+        return false;
+    }
+
     private function isOrganiserOrRegistrar(EVFUser $user)
     {
         // see if we have a global request object for the event
@@ -184,6 +214,23 @@ class Registration
         }
 
         // all other people cannot create registration data
+        return false;
+    }
+
+    /**
+     * @param User $user
+     * @param Model $model
+     *
+     * @return bool
+     */
+    public function updateState(EVFUser $user, Model $model): bool
+    {
+        // organisers with registration rights can update a registration model
+        if ($this->isAccreditor($user)) {
+            return true;
+        }
+
+        // all other people cannot update the state of registration data
         return false;
     }
 

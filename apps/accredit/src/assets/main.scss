@@ -61,6 +61,11 @@
                     font-weight: 900;
                     font-size: large;
                     text-align: center;
+                    color: var(--el-color-primary);
+
+                    .subtitle {
+                        font-size: small;
+                    }
                 }
 
                 .username {
@@ -206,3 +211,5 @@
 
 @import 'application.scss';
 @import 'admin.scss';
+@import 'accreditation.scss';
+

@@ -1,22 +1,12 @@
 <script lang="ts" setup>
-import { watch } from 'vue';
 import { useDataStore } from '../stores/data';
 import { useAuthStore } from '../../../common/stores/auth';
+import { useBasicStore } from '../../../common/stores/basic';
 import { is_valid } from '../../../common/functions';
-const props = defineProps<{
-    event:number;
-}>();
 
 const data = useDataStore();
 const auth = useAuthStore();
-
-watch(
-    () => props.event,
-    (nw) => {
-        data.getEvent(nw);
-    },
-    { immediate: true }
-);
+const basic = useBasicStore();
 
 function getVersion()
 {
@@ -26,7 +16,6 @@ function getVersion()
 function doLogout()
 {
     auth.logOut().then(() => {
-        auth.eventId = 0;
         data.logout();
     });
 }
@@ -44,14 +33,17 @@ import LoginInterface from '../components/LoginInterface.vue';
         </ElHeader>
         <ElMain>
             <div class="main-header">
-                <div class="event-title" v-if="is_valid(data.event)">{{ data.event.name }}</div>
-                <div class="event-title" v-if="!is_valid(data.event)">No event selected</div>
+                <div class="event-title" v-if="is_valid(basic.event)">
+                    {{ basic.event.name }}
+                    <div class="subtitle">{{ data.subtitle }}</div>
+                </div>
+                <div class="event-title" v-if="!is_valid(basic.event)">No event selected</div>
                 <div v-if="auth.codeUser" class="username">{{ auth.userName }}</div>
                 <div v-if="auth.codeUser" class="logout"><ElButton @click="doLogout" type="primary">Logout</ElButton></div>
                 <div class="version">{{ getVersion() }}</div>
             </div>
 
-            <div v-if="!is_valid(data.event)" class="start-screen">
+            <div v-if="!is_valid(basic.event)" class="start-screen">
                 <LoginInterface />
             </div>
             <div v-else class="full">

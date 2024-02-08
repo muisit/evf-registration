@@ -6,6 +6,7 @@ import type { Code, CodeUser } from '../../../common/api/schemas/codes';
 import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
+import { useBasicStore } from '../../../common/stores/basic';
 import { saveuser } from '../../../common/api/codes/saveuser';
 import { codeusers } from '../../../common/api/codes/codeusers';
 
@@ -14,6 +15,7 @@ const props = defineProps<{
 }>();
 const auth = useAuthStore();
 const data = useDataStore();
+const basic = useBasicStore();
 
 interface UserById {
     [key:string]: CodeUser;
@@ -26,9 +28,6 @@ const suggestionList:Ref<FencerById> = ref({});
 watch(() => props.visible,
     (nw) => {
         if (nw) {
-            auth.isLoading('basic');
-            data.getBasicData(() => { auth.hasLoaded('basic')});
-
             auth.isLoading("accreditationuser");
             codeusers().then((dt) => {
                 auth.hasLoaded("accreditationuser");
@@ -79,6 +78,14 @@ watch(() => props.visible,
 
 function badgeDispatcher(code:string, codeObject:Code)
 {
+    data.badgeDispatcher(code, codeObject).then((dt:Fencer|void) => {
+        if (dt) {
+            let key = 'f' + dt.id;
+            if (fencers.value[key]) {
+                suggestionList.value[key] = fencers.value[key];
+            }
+        }
+    });
 }
 
 function failDispatcher(code:string, codeObject:Code)
@@ -96,8 +103,8 @@ function failDispatcher(code:string, codeObject:Code)
     });
 }
 
-
 onMounted(() => {
+    data.subtitle = 'Administrator Page';
     data.setDispatcher('badge', badgeDispatcher);
     data.setDispatcher('fail', failDispatcher);
 });
@@ -106,7 +113,6 @@ onUnmounted(() => {
     data.setDispatcher('badge', null);
     data.setDispatcher('fail', null);
 });
-
 
 function matchUserRoles()
 {
@@ -161,12 +167,12 @@ const fencerList = computed(() => {
 
 function getRole(fencer:Fencer)
 {
-    let retval = [];
+    let retval:string[] = [];
     fencer.registrations?.map((reg:Registration) => {
         if (reg.roleId) {
             let rid = 'r' + reg.roleId;
-            if (data.rolesById[rid] && ['Org', 'EVF', 'FIE'].includes(data.rolesById[rid].type)) {
-                retval.push(data.rolesById[rid].name);
+            if (basic.rolesById[rid] && ['Org', 'EVF', 'FIE'].includes(basic.rolesById[rid].type)) {
+                retval.push(basic.rolesById[rid].name);
             }
         }
     });

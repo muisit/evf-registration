@@ -5,7 +5,7 @@ import type { CodeProcessStatus } from '../schemas/codeprocessstatus';
 
 export const checkcode = function(code:Code, action:string) {
     return new Promise<CodeProcessStatus>((resolve, reject) => {       
-        return fetchJson('POST', '/codes', {codes: [code], action: action})
+        return fetchJson('POST', '/codes', {codes: [code.original], action: action})
             .then( (data:FetchResponse) => {
                 if(!data || (data.status != 200 && data.status != 403)) {
                     return reject("No response data");
@@ -21,8 +21,10 @@ export const checkcode = function(code:Code, action:string) {
 }
 
 export const checkcodes = function(codes:Code[], action:string) {
-    return new Promise<CodeProcessStatus>((resolve, reject) => {       
-        return fetchJson('POST', '/codes', {codes: codes, action: action})
+    return new Promise<CodeProcessStatus>((resolve, reject) => {  
+        let data:string[] = [];
+        codes.map((cd) => data.push(cd.original));     
+        return fetchJson('POST', '/codes', {codes: data, action: action})
             .then( (data:FetchResponse) => {
                 if(!data || (data.status != 200 && data.status != 403)) {
                     return reject("No response data");
