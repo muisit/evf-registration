@@ -171,8 +171,8 @@ function getRole(fencer:Fencer)
     fencer.registrations?.map((reg:Registration) => {
         if (reg.roleId) {
             let rid = 'r' + reg.roleId;
-            if (basic.rolesById[rid] && ['Org', 'EVF', 'FIE'].includes(basic.rolesById[rid].type)) {
-                retval.push(basic.rolesById[rid].name);
+            if (basic.rolesById[rid] && ['Org', 'EVF', 'FIE'].includes(basic.rolesById[rid].type || '')) {
+                retval.push(basic.rolesById[rid].name || '');
             }
         }
     });

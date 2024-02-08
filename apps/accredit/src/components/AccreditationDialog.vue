@@ -44,18 +44,18 @@ function update(registration:Registration, value: any)
     emits('onUpdate', {registration: registration});
 }
 
-function getRegistrationTitle(registration:Registration)
+function getRegistrationTitle(registration?:Registration)
 {
-    if (is_valid(registration.sideEventId)) {
-        let sideEvent = basic.sideEventsById['s' + registration.sideEventId];
+    if (is_valid(registration?.sideEventId)) {
+        let sideEvent = basic.sideEventsById['s' + registration?.sideEventId];
         if (sideEvent) {
-            return sideEvent.title;
+            return sideEvent.title || '';
         }
     }
-    if (is_valid(registration.roleId)) {
-        let role = basic.rolesById['r' + registration.roleId];
+    if (is_valid(registration?.roleId)) {
+        let role = basic.rolesById['r' + registration?.roleId];
         if (role) {
-            return role.name;
+            return role.name || '';
         }
     }
     return 'Unknown';
@@ -88,15 +88,15 @@ import PhotoId from './special/PhotoId.vue';
     <ElDialog :model-value="props.visible" title="Hand Out Accreditation" :close-on-click-modal="false"  :before-close="(done) => { cancelForm(); done(false); }">
       <PhotoId :fencer="props.fencer" :reloadHash="reloadHash"/>
       <div class="handout-dialog">
-        <div class="field"><b>Name:</b> {{ props.fencer.lastName }}, {{ props.fencer.firstName }}</div>
-        <div class="field"><b>Gender:</b> {{ props.fencer.gender == 'F' ? 'Female' : 'Male' }}</div>
-        <div class="field"><b>DOB:</b> {{ dayjs(props.fencer.dateOfBirth).format('DD-MM-YYYY') }}</div>
+        <div class="field"><b>Name:</b> {{ props.fencer?.lastName }}, {{ props.fencer?.firstName }}</div>
+        <div class="field"><b>Gender:</b> {{ props.fencer?.gender == 'F' ? 'Female' : 'Male' }}</div>
+        <div class="field"><b>DOB:</b> {{ dayjs(props.fencer?.dateOfBirth).format('DD-MM-YYYY') }}</div>
         <div class="field">
-            <b>Country:</b> {{ basic.countriesById['c' + props.fencer.countryId]?.abbr }}: 
-            {{ basic.countriesById['c' + props.fencer.countryId]?.name }}
+            <b>Country:</b> {{ basic.countriesById['c' + props.fencer?.countryId]?.abbr }}: 
+            {{ basic.countriesById['c' + props.fencer?.countryId]?.name }}
         </div>
         <ElForm>
-            <ElFormItem v-for="reg in filteredRegistrations(true)" :key="reg.id" :label="getRegistrationTitle(reg)">
+            <ElFormItem v-for="reg in filteredRegistrations(true)" :key="reg.id || 0" :label="getRegistrationTitle(reg)">
                 <ElSwitch :model-value="switchState(reg)"
                     active-value='P'
                     inactive-value='A'

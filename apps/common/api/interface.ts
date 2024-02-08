@@ -26,7 +26,7 @@ function glueParameters(path:string, data:any)
     return path + glue + elements.join('&');
 }
 
-function simpleFetch(method: string, path:string, data:any, options:object|null = {}, headers={}, postprocessor:any = null) {
+function simpleFetch(method: string, path:string, data:any, options:object|null = {}, headers={}, postprocessor:any = null):Promise<Response|undefined> {
     if(!controller) {
         controller = new AbortController();
     }
@@ -77,6 +77,7 @@ function simpleFetch(method: string, path:string, data:any, options:object|null 
                 console.log("error in fetch: ", err);
                 //throw err;
             }
+            return err;
         });
 }
 

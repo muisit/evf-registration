@@ -3,7 +3,7 @@ import type { Bank } from './bank';
 import type { EventType } from './eventtype';
 import type { SideEvent } from './sideevent';
 import type { TemplateSchema } from './template';
-import { StringKeyedStringList } from '../../types';
+import type { StringKeyedStringList } from '../../types';
 
 export interface Event {
     id: number|null;

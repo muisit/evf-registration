@@ -7,6 +7,7 @@ import type { WeaponSchema, WeaponById } from '../api/schemas/weapon';
 import type { Competition, CompetitionById } from '../api/schemas/competition';
 import type { SideEvent, SideEventById } from '../api/schemas/sideevent';
 import type { Registration } from '../api/schemas/registration';
+import type { BasicDataSchema } from '../api/schemas/basicdata';
 import { ref } from 'vue';
 import { defineStore } from 'pinia'
 import { defaultEvent } from '../api/schemas/event';
@@ -41,7 +42,7 @@ export const useBasicStore = defineStore('basic', () => {
         return roles.value.length > 0;
     }
 
-    function getBasicData() {
+    function getBasicData(): Promise<BasicDataSchema|void> {
         if (!hasBasicData()) {
             const authStore = useAuthStore();
             authStore.isLoading('basic');
@@ -53,11 +54,11 @@ export const useBasicStore = defineStore('basic', () => {
                 .catch((e) => {
                     authStore.hasLoaded('basic');
                     console.log(e);
-                    return new Promise((res) => setTimeout(() => res(getBasicData()), 500));
+                    return new Promise<BasicDataSchema|void>((res) => setTimeout(() => res(getBasicData()), 500));
                 });
         }
         else {
-            return Promise.resolve();
+            return Promise.resolve({});
         }
     }
 
