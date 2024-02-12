@@ -57,4 +57,11 @@ class AccreditationUser extends Model implements AuthenticatableContract, Author
     {
         return $this->belongsTo(Accreditation::class, 'accreditation_id', 'id');
     }
+
+    public function delete()
+    {
+        // delete all linked AccreditationAudit entries
+        AccreditationAudit::where('created_by', $this->getKey())->delete();
+        return parent::delete();
+    }
 }

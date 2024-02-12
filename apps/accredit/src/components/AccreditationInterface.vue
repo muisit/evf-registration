@@ -109,20 +109,17 @@ function updatedPendingChanges(reg:Registration)
     // update our list of changed values
     updatedRegistrations.value = updatedRegistrations.value.map((v) => {
         if (v.registration.id == reg.id) {
-            console.log('updating pending changes to ', (reg.state || 'R'), ' from ', v.state);
             v.state = reg.state || 'R';
         }
         return v;
     });
     if (!updatedRegistrations.value.map((v) => v.registration.id).includes(reg.id)) {
-        console.log('adding pending registrations with state ',  reg.state);
         updatedRegistrations.value.push({registration: reg, state: reg.state || 'R'})
     }
 }
 
 function onDialogUpdate(field:any)
 {
-    console.log('updating registration', field.registration.state);
     auth.isLoading('update');
     registrationsstate([field.registration], field.registration.state).then(() => {
         auth.hasLoaded('update');
@@ -147,7 +144,6 @@ function onDialogUpdate(field:any)
 
 function onDialogCancel()
 {
-    console.log('onDialogCancel');
     let wasUnsetIsPresent:Registration[] = [];
     let wasUnsetIsAbsent:Registration[] = [];
     let wasPresentIsUnset:Registration[] = [];
@@ -158,7 +154,6 @@ function onDialogCancel()
     console.log(Object.assign({}, originalStates.value));
     updatedRegistrations.value.map((v) => {
         let originalState = originalStates.value['r' + v.registration.id] || 'R';
-        console.log('original state is ', originalState, ' vs ', v.state, ' vs', v.registration.state);
         switch (v.state) {
             case 'A':
                 if (originalState == 'R') wasUnsetIsAbsent.push(v.registration);
@@ -209,12 +204,10 @@ function onDialogCancel()
 
 function onDialogRegister(state:string)
 {
-    console.log('onDialogRegister', state);
     auth.isLoading('unregister');
     registrationsstate(fencers.value[currentAccreditation.value].registrations || [], state).then(() => {
         let fencer = fencers.value[currentAccreditation.value];
         fencer.registrations = (fencer.registrations || []).map((reg:Registration) => {
-            console.log('setting registration state to ', state);
             reg.state = state;
             updatedPendingChanges(reg);
             return reg;

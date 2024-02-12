@@ -4,6 +4,7 @@ namespace App\Support\Services\Codes;
 
 use App\Models\Accreditation;
 use App\Models\AccreditationUser;
+use App\Models\AccreditationAudit;
 use App\Models\Schemas\Code;
 use Illuminate\Support\Facades\Auth;
 
@@ -58,6 +59,7 @@ class LoginService
         request()->session()->flush();
         Auth::login($user); // this sets the correct session cookie to remember the AccreditationUser
         $this->manager->result->status = 'ok';
+        AccreditationAudit::createFromAction("login", $accreditations[0], ["code" => $code->original]);
 
         // no need to check view-fencer authorization, this is the own user
         if (!empty($user->fencer)) $this->manager->result->setFencer($user->fencer);

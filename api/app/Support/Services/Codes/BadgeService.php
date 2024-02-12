@@ -4,6 +4,7 @@ namespace App\Support\Services\Codes;
 
 use App\Models\Accreditation;
 use App\Models\AccreditationUser;
+use App\Models\AccreditationAudit;
 use App\Models\Schemas\Code;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,7 +21,7 @@ class BadgeService
             return $this->manager->addError("Invalid parameters");
         }
         $code = $codes[0];
-        \Log::debug("code is " . json_encode($code));
+
         if ($code->baseFunction == 1) {
             // return fencer information based on badge
             return $this->findFencer($code);
@@ -52,6 +53,7 @@ class BadgeService
         if (Auth::user()->can('view', $fencer)) {
             $this->manager->result->setFencer($fencer, $this->manager->event);
         }
+        AccreditationAudit::createFromAction("badge", $accreditations[0], ["code" => $code->original]);
         $this->manager->result->status = 'ok';
         return $this->manager->result;
     }

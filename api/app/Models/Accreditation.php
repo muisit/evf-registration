@@ -71,8 +71,13 @@ class Accreditation extends Model
 
     public function delete()
     {
+        // delete all linked audit entries
+        AccreditationAudit::where('accreditation_id', $this->getKey())->delete();
         // delete all linked AccreditationUsers
-        AccreditationUser::where('accreditation_id', $this->getKey())->delete();
+        // Loop this, because there should only be one or two rows
+        foreach (AccreditationUser::where('accreditation_id', $this->getKey())->get() as $user) {
+            $user->delete(); // invoke method to get additional delete actions
+        };
         $path = $this->path();
         if (file_exists($path)) {
             @unlink($path);

@@ -14,7 +14,9 @@ function parseContent($content)
 {
     $lines = preg_split("/\r\n|\n|\r/", $content);
     foreach ($lines as $line) {
-        interpretLine($line);
+        if (!empty($line) && $line[0] != '#') {
+            interpretLine($line);
+        }
     }
 }
 
