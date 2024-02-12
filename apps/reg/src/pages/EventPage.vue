@@ -101,7 +101,6 @@ function setConfig(e:any, label:string)
             currentEvent.value.config.use_registration = e ? true : false;
             break;
     }
-
 }
 
 function saveData()
@@ -239,10 +238,22 @@ function saveRoles()
         })
 }
 
+function generateCodes()
+{
+    generatecodes().then(() => {
+        data.getEvents(''+ currentEvent.value.id);
+    })
+    .catch((e) => {
+        console.log(e);
+        alert("Error regenerating codes");
+    })
+}
+
 import SideEventInput from '../components/event/SideEventInput.vue';
 import EventRoleInput from '../components/event/EventRoleInput.vue';
 import InputErrors from '../components/special/InputErrors.vue';
 import { ElForm, ElFormItem, ElInput, ElInputNumber, ElSelect, ElOption, ElCheckbox, ElDatePicker, ElButton, ElTabs, ElTabPane } from 'element-plus';
+import { generatecodes } from '../../../common/api/event/generatecodes';
 </script>
 <template>
     <div class="event-page" v-if="props.visible">
@@ -364,6 +375,26 @@ import { ElForm, ElFormItem, ElInput, ElInputNumber, ElSelect, ElOption, ElCheck
                     <EventRoleInput :event="currentEvent" :users="currentRoles.users" @on-update="(e) => addRole()"/>
                     <ElFormItem class="buttons">
                         <ElButton @click="saveRoles" type="primary">Save</ElButton>
+                    </ElFormItem>
+                </ElTabPane>
+                <ElTabPane label="Codes">
+                    <ElFormItem label="Admin Code">
+                        {{ currentEvent.codes && currentEvent.codes['organiser'] }}
+                    </ElFormItem>
+                    <ElFormItem label="Accreditation Code">
+                        {{ currentEvent.codes && currentEvent.codes['accreditation'] }}
+                    </ElFormItem>
+                    <ElFormItem label="Check In Code">
+                        {{ currentEvent.codes && currentEvent.codes['checkin'] }}
+                    </ElFormItem>
+                    <ElFormItem label="Check Out Code">
+                        {{ currentEvent.codes && currentEvent.codes['checkout'] }}
+                    </ElFormItem>
+                    <ElFormItem label="DT Code">
+                        {{ currentEvent.codes && currentEvent.codes['dt'] }}
+                    </ElFormItem>
+                    <ElFormItem class="buttons">
+                        <ElButton @click="generateCodes" type="primary">Generate</ElButton>
                     </ElFormItem>
                 </ElTabPane>
             </ElTabs>

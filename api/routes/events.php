@@ -1,6 +1,22 @@
 <?php
 
-/** @var \Laravel\Lumen\Routing\Router $router */
+// Unauthenticated routes
+$router->group(
+    [
+        'prefix' => '/events'
+    ],
+    function () use ($router) {
+        $router->get(
+            '/{eventId:[1-9][0-9]*}',
+            [
+                'as' => 'events.get',
+                'uses' => 'Events\Get@index'
+            ]
+        );
+    }
+);
+
+// Authenticated routes
 $router->group(
     [
         'prefix' => '/events',
@@ -60,6 +76,14 @@ $router->group(
             [
                 'as' => 'events.statistics',
                 'uses' => 'Events\Statistics@index'
+            ]
+        );
+
+        $router->get(
+            '/generate',
+            [
+                'as' => 'events.generate',
+                'uses' => 'Events\Generate@index'
             ]
         );
 

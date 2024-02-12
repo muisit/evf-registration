@@ -26,7 +26,7 @@ function glueParameters(path:string, data:any)
     return path + glue + elements.join('&');
 }
 
-function simpleFetch(method: string, path:string, data:any, options:object|null = {}, headers={}, postprocessor:any = null) {
+function simpleFetch(method: string, path:string, data:any, options:object|null = {}, headers={}, postprocessor:any = null):Promise<Response|undefined> {
     if(!controller) {
         controller = new AbortController();
     }
@@ -63,12 +63,22 @@ function simpleFetch(method: string, path:string, data:any, options:object|null 
         .then(postprocessor())
         .catch(err => {
             console.log(err);
-            if(err.name != "AbortError") {
-                console.log("error in fetch: ",err);
+            if (err.name == 'csrf') {
+                console.log("received csrf error, getting new token and retrying");
+                return auth.sendMe().then(() => {
+                    console.log("retrying original call");
+                    return simpleFetch(method, path, data, options, headers, postprocessor);
+                });
+            }
+            else if(err.name == "AbortError") {
+                console.log('skipping AbortError in Fetch call');
+            }
+            else {
+                console.log("error in fetch: ", err);
                 //throw err;
             }
+            return err;
         });
-
 }
 
 function validateResponse() {
@@ -77,7 +87,11 @@ function validateResponse() {
             data: await res.json(),
             status: res.status
         };
-        console.log('returning ', dt);
+        if (dt.status == 400) {
+            let err = new Error("X-CSRF Error");
+            err.name = 'csrf';
+            throw err;
+        }
         return dt;
     };
 }

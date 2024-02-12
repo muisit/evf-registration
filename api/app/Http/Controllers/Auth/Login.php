@@ -34,14 +34,12 @@ class Login extends Controller
      */
     public function index(Request $request)
     {
-        if (!empty(Auth::user())) {
-            return response()->json(new ReturnStatus('ok'));
-        }
-
         if ($request->has('username') && $request->has('password')) {
             $username = validate_trim($request->post('username'));
             $password = validate_trim($request->post('password'));
 
+            // flush all data, prevent session mixing between apps
+            $request->session()->flush();
             if (Auth::attempt(['user_email' => $username, 'password' => $password])) {
                 return response()->json(new ReturnStatus('ok'));
             }

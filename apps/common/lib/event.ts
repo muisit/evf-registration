@@ -19,7 +19,6 @@ export function allowYoungerCategory(event:Event|null)
 
 export function generateAccreditations(event:Event|null)
 {
-    console.log('no_accreditations ', event?.config?.no_accreditations);
     if (event && event.config && event.config.no_accreditations == false) {
         return true;
     }

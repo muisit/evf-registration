@@ -12,6 +12,7 @@ export interface Registration {
 
     // front-end data
     errors?: string[];
+    role?: string;
 }
 
 export function defaultRegistration():Registration

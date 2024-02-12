@@ -46,7 +46,8 @@ class QRCodeTest extends TestCase
 
     public function testGenerate()
     {
-        $generator = $this->mockGenerator($this->mockPDF("--1-1-1002011-NED-2-ORG-BELL-Pete--"));
+        // the id is linked to the accreditation row for MFCAT1
+        $generator = $this->mockGenerator($this->mockPDF("--1-1-1270578-NED-2-ORG-BELL-Pete--"));
         $obj = new QRCode($generator);
         $element = (object)[
             "style" => (object) [

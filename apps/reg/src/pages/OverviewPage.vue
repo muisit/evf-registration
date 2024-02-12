@@ -11,9 +11,9 @@ const auth = useAuthStore();
 const data = useDataStore();
 
 watch (
-    () => [props.visible, data.currentEvent.id, data.currentCountry.id],
+    () => [props.visible, data.currentEvent.id, data.currentCountry.id, auth.isGuest],
     (nw, old) => {
-        if (props.visible) {
+        if (props.visible && !auth.isGuest) {
             data.getOverview();
         }
     },

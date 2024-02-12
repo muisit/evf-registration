@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
 import { is_valid } from '../../../common/functions';
@@ -12,17 +11,17 @@ const dataStore = useDataStore();
 
 function waitAsGuest()
 {
-    return authStore && authStore.isGuest && !authStore.isCurrentlyLoading();
+    return authStore && !authStore.registrationUser && !authStore.isCurrentlyLoading();
 }
 
 function nothingAvailable()
 {
-    return !authStore || (authStore.isGuest && authStore.isCurrentlyLoading());
+    return !authStore || (!authStore.registrationUser && authStore.isCurrentlyLoading());
 }
 
 function noEventsAvailable()
 {
-    return authStore && !authStore.isGuest && dataStore && dataStore.events.length < 1 && !authStore.isCurrentlyLoading();
+    return authStore && authStore.registrationUser && dataStore && dataStore.events.length < 1 && !authStore.isCurrentlyLoading();
 }
 
 function getVersion()
@@ -45,8 +44,6 @@ function onLogin(credentials:any)
                 if (authStore.isHod() && authStore.countryId && dataStore.countries.length) {
                     dataStore.setCountry(authStore.countryId);
                 }
-                // retrieve the list of events
-                dataStore.getEvents(props.event);
             }
         })
         .catch((e) => {
@@ -55,9 +52,9 @@ function onLogin(credentials:any)
 }
 
 import { ElIcon, ElContainer, ElHeader, ElFooter, ElMain } from 'element-plus';
-import HeaderBar from '../components/HeaderBar.vue';
+import HeaderBar from '../../../common/components/HeaderBar.vue'
 import TabInterface from '../components/TabInterface.vue';
-import FooterBar from '../components/FooterBar.vue';
+import FooterBar from '../../../common/components/FooterBar.vue';
 import LoginDialog from '../components/LoginDialog.vue';
 import EventSelection from '../components/special/EventSelection.vue';
 import { Loading } from '@element-plus/icons-vue';

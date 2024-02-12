@@ -3,27 +3,29 @@ import type { Bank } from './bank';
 import type { EventType } from './eventtype';
 import type { SideEvent } from './sideevent';
 import type { TemplateSchema } from './template';
+import type { StringKeyedStringList } from '../../types';
 
 export interface Event {
     id: number|null;
     name: string|null;
     opens: string|null;
-    reg_open: string|null;
-    reg_close: string|null;
-    year: number|null;
-    duration: number|null;
-    email: string|null;
-    web: string|null;
-    location: string|null;
-    countryId: number|null;
-    type: EventType|null;
-    bank: Bank|null;
-    payments: string|null;
-    feed: string|null;
-    config: any;
-    sideEvents: Array<SideEvent>|null;
-    competitions: Array<Competition>|null;
+    reg_open?: string;
+    reg_close?: string;
+    year?: number;
+    duration?: number;
+    email?: string;
+    web?: string;
+    location?: string;
+    countryId?: number;
+    type?: EventType;
+    bank?: Bank;
+    payments?: string;
+    feed?: string;
+    config?: any;
+    sideEvents?: Array<SideEvent>;
+    competitions?: Array<Competition>;
     templates?: Array<TemplateSchema>;
+    codes?: StringKeyedStringList;
 }
 
 export function defaultEvent(): Event

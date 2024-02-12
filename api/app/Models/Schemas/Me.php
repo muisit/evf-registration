@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Support\Traits\EVFUser;
 use App\Models\Event;
 use App\Support\Services\DefaultCountryService;
+use App\Support\Services\DefaultEventService;
 
 /**
  * Basic return value
@@ -51,6 +52,14 @@ class Me
     public ?int $countryId = null;
 
     /**
+     * Event associated with this session
+     *
+     * @var int
+     * @OA\Property()
+     */
+    public ?int $eventId = null;
+
+    /**
      * Credentials defined in the back-end system. This should be an indication about what
      * operations are allowed by the back-end system and which are not.
      *
@@ -76,11 +85,15 @@ class Me
             // For HoDs, set the default country for all interactions
             // The countryObject is also influenced by a ?country=<value> parameter,
             // but we recheck if the user actually has the hod:<country-id> role as well
-            if ($user->hasRole('hod')) {
-                $country = DefaultCountryService::determineCountry($user);
-                if (!empty($country)) {
-                    $this->countryId = $country->getKey();
-                }
+            $country = DefaultCountryService::determineCountry($user);
+            if (!empty($country)) {
+                $this->countryId = $country->getKey();
+            }
+
+            // For users linked to a specific event, set the event
+            $event = DefaultEventService::determineEvent($user);
+            if (!empty($event)) {
+                $this->eventId = $event->getKey();
             }
         }
     }

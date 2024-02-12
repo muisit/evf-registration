@@ -45,13 +45,15 @@ class RegistrationPay extends Base
             if (empty($reg) || !$reg->exists) {
                 $fail('invalid list of registration ids');
             }
-            if ($reg->registration_mainevent != $event->getKey()) {
+            else if ($reg->registration_mainevent != $event->getKey()) {
                 $fail('invalid list of registration ids');
             }
-            if ($reg->registration_country != $country->getKey()) {
+            else if ($reg->registration_country != $country->getKey()) {
                 $fail('invalid list of registration ids');
             }
-            $this->registrations[] = $reg;
+            else {
+                $this->registrations[] = $reg;
+            }
         }
     }
 
@@ -78,7 +80,6 @@ class RegistrationPay extends Base
     {
         foreach ($this->registrations as $registration) {
             if ($this->asHod && isset($data['payment']['paidHod'])) {
-                
                 $registration->registration_paid_hod = $data['payment']['paidHod'];
             }
             elseif ($this->asOrg && isset($data['payment']['paidOrg'])) {

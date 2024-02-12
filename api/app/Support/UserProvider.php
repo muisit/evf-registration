@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Illuminate\Contracts\Auth\UserProvider as UserProviderBase;
 use Illuminate\Contracts\Support\Arrayable;
 use App\Models\WPUser;
+use App\Models\AccreditationUser;
 
 class UserProvider implements UserProviderBase
 {
@@ -37,12 +38,18 @@ class UserProvider implements UserProviderBase
      */
     public function retrieveById($identifier)
     {
+        // default action, but not used in the SessionGuard
         return $this->retrieveWPUserById($identifier);
     }
 
     public function retrieveWPUserById($identifier)
     {
         return WPUser::where('ID', $identifier)->first();
+    }
+
+    public function retrieveAccreditationUserById($identifier)
+    {
+        return AccreditationUser::find($identifier);
     }
 
     /**

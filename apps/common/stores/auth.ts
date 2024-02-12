@@ -9,6 +9,8 @@ import type { MeSchema } from '../api/schemas/me';
 export const useAuthStore = defineStore('auth', () => {
     const userName = ref('');
     const isGuest = ref(true);
+    const registrationUser = ref(false);
+    const codeUser = ref(false);
     const token = ref('');
     const credentials:Ref<Array<string>> = ref([]);
     const countryId = ref(0);
@@ -34,14 +36,17 @@ export const useAuthStore = defineStore('auth', () => {
 
     function sendMe() {
         isLoading('me');
-        me().then((data:MeSchema) => {
+        return me().then((data:MeSchema) => {
             hasLoaded('me');
             token.value = data.token || '';
             if (data.status && data.username && data.username.length) {
                 isGuest.value = false;
                 userName.value = data.username;
                 credentials.value = data.credentials || [];
+                codeUser.value = credentials.value.includes('code');
+                registrationUser.value = credentials.value.includes('user');
                 if (data.countryId) countryId.value = data.countryId;
+                if (data.eventId) eventId.value = data.eventId;
             }
         });
     }
@@ -60,9 +65,13 @@ export const useAuthStore = defineStore('auth', () => {
         return logout()
             .then(() => {
                 hasLoaded('logout');
+                console.log('setting guest value to false');
                 isGuest.value = true;
                 userName.value = '';
-                sendMe();
+                registrationUser.value = false;
+                codeUser.value = false;
+                credentials.value = [];
+                countryId.value = 0;
             })
             .catch(() => {
                 hasLoaded('logout');
@@ -70,66 +79,95 @@ export const useAuthStore = defineStore('auth', () => {
             });
     }
 
-    function isSysop() {
-        return credentials.value.includes('sysop');
+    function isRegistrationUser() {
+        return credentials.value.includes('user');
     }
 
-    function isHod() {
-        return credentials.value.includes('hod');
+    function isCodeUser() {
+        return credentials.value.includes('code');
     }
 
-    function isSuperHod() {
-        if (credentials.value.includes("superhod")) return true;
+    function isSysop(type:string = 'user') {
+        return credentials.value.includes('sysop') && credentials.value.includes(type);
     }
 
-    function isHodFor() {
-        if (isSuperHod()) return true;
-        return credentials.value.includes('hod:' + countryId.value);
+    function isHod(type:string = 'user') {
+        let retval = credentials.value.includes('hod') && credentials.value.includes('user');
+        console.log('isHod', retval);
+        return retval;
     }
 
-    function isOrganisation(eid?:number|null|undefined) {
+    function isSuperHod(type:string = 'user') {
+        if (credentials.value.includes("superhod") && credentials.value.includes('user')) return true;
+    }
+
+    function isHodFor(type:string = 'user') {
+        if (isSuperHod(type)) return true;
+        let retval = credentials.value.includes('hod:' + countryId.value) && credentials.value.includes('user');
+        console.log('isHodFor', retval);
+        return retval;
+    }
+
+    function isOrganisation(eid?:number|null|undefined, type:string = 'user') {
         if (!eid) eid = eventId.value;
-        return credentials.value.includes('organisation:' + eid) || isSysop();
+        return (credentials.value.includes('organisation:' + eid) && credentials.value.includes(type)) || isSysop(type );
     }
 
-    function isOrganiser(eid?:number|null|undefined) {
+    function isOrganiser(eid?:number|null|undefined, type:string = 'user') {
         if (!eid) eid = eventId.value;
-        return credentials.value.includes('organiser:' + eid);
+        return credentials.value.includes('organiser:' + eid)  && credentials.value.includes(type);
     }
 
-    function isRegistrar(eid?:number|null|undefined) {
+    function isRegistrar(eid?:number|null|undefined, type:string = 'user') {
         if (!eid) eid = eventId.value;
-        return credentials.value.includes('registrar:' + eid);
+        return credentials.value.includes('registrar:' + eid) && credentials.value.includes(type);
     }
 
-    function isCashier(eid?:number|null|undefined) {
+    function isCashier(eid?:number|null|undefined, type:string = 'user') {
         if (!eid) eid = eventId.value;
-        return credentials.value.includes('cashier:' + eid);
+        return credentials.value.includes('cashier:' + eid) && credentials.value.includes('user');
     }
 
-    function isAccreditor(eid?:number|null|undefined) {
+    function isCheckin(eid?:number|null|undefined, type:string = 'user') {
         if (!eid) eid = eventId.value;
-        return credentials.value.includes('accreditation:' + eid);
+        return credentials.value.includes('checkin:' + eid) && credentials.value.includes('code');
     }
 
-    function canSwitchCountry(eid?:number|null|undefined) {
+    function isCheckout(eid?:number|null|undefined, type:string = 'user') {
         if (!eid) eid = eventId.value;
-        return isSysop() || isOrganiser(eid) || isRegistrar(eid) || isSuperHod();
+        return credentials.value.includes('checkout:' + eid) && credentials.value.includes('code');
     }
 
-    function canRegister(eid?:number|null|undefined) {
-        return isSysop() || isOrganiser(eid) || isRegistrar(eid);
+    function isAccreditor(eid?:number|null|undefined, type:string = 'user') {
+        if (!eid) eid = eventId.value;
+        return credentials.value.includes('accreditation:' + eid) && credentials.value.includes(type);
     }
 
-    function canCashier(eid?:number|null|undefined) {
-        return isSysop() || isOrganiser(eid) || isCashier(eid);
+    function isDT(eid?:number|null|undefined, type:string = 'user') {
+        if (!eid) eid = eventId.value;
+        return credentials.value.includes('dt:' + eid) && credentials.value.includes('code');
+    }
+
+    function canSwitchCountry(eid?:number|null|undefined, type:string = 'user') {
+        if (!eid) eid = eventId.value;
+        return isSysop(type) || isOrganiser(eid, type) || isRegistrar(eid, type) || isSuperHod(type);
+    }
+
+    function canRegister(eid?:number|null|undefined, type:string = 'user') {
+        return isSysop(type) || isOrganiser(eid, type) || isRegistrar(eid, type);
+    }
+
+    function canCashier(eid?:number|null|undefined, type:string = 'user') {
+        return isSysop(type) || isOrganiser(eid, type) || isCashier(eid, type);
     }
 
     return {
-        userName, isGuest, token, credentials, countryId, eventId,
+        userName, isGuest, codeUser, registrationUser, token, credentials, countryId, eventId,
         isLoading, hasLoaded, isCurrentlyLoading, isLoadingData,
         sendMe, logIn, logOut,
+        isRegistrationUser, isCodeUser,
         isSysop, isHod, isSuperHod, isHodFor, isOrganisation, isOrganiser, isRegistrar, isCashier, isAccreditor,
+        isCheckin, isCheckout, isDT,
         canRegister, canCashier, canSwitchCountry
     }
 })

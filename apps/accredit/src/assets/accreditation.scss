@@ -1,0 +1,50 @@
+.accreditor-interface {
+    .table-wrapper {
+        min-height: 500px;
+        border: 1px solid black;
+        width: 80%;
+        overflow: scroll;
+
+        .processed-list {
+            width: 100%;
+
+            tr {
+                td {
+                    padding: 2px 4px;
+                }
+            }
+        }
+    }
+
+    .el-dialog {
+        .photoid-element {
+            float:right;
+        }
+        
+        .handout-dialog {
+            .field {
+                font-size: large;
+                padding-bottom: 10px;
+
+                b {
+                    display: inline-block;
+                    width: 90px;
+                }
+            }
+        }
+
+        .el-form {
+            label {
+                width: 50%;
+            }
+
+            .switch-state {
+                padding-left: 15px;
+            }
+        }
+
+        .el-dialog__footer {
+            clear: both;
+        }
+    }
+}

@@ -1,6 +1,6 @@
-import type { SideEvent } from "../../../../common/api/schemas/sideevent";
-import { is_valid } from "../../../../common/functions";
-import { useDataStore } from "../data";
+import type { SideEvent } from "../../api/schemas/sideevent";
+import { is_valid } from "../../functions";
+import { useDataStore } from "../../../reg/src/stores/data";
 
 export function abbreviateSideEvent(se:SideEvent)
 {
@@ -16,7 +16,7 @@ export function abbreviateSideEvent(se:SideEvent)
         abbr = "";
         for(var i in words) {
             var word = words[i];
-            abbr += word[0];
+            abbr += word[0].toLocaleUpperCase();
         }
     }
     return abbr;    

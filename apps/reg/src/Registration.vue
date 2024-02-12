@@ -3,7 +3,7 @@ import { watch } from 'vue';
 import { useAuthStore } from '../../common/stores/auth';
 import { useDataStore } from './stores/data';
 const props = defineProps<{
-    event:string;
+    event?:string;
 }>();
 
 const authStore = useAuthStore();
@@ -15,9 +15,9 @@ const dataStore = useDataStore();
 // Then we set the default country
 // And we retrieve all events this user has access to
 watch(
-    () => authStore.isGuest,
+    () => [authStore.isGuest, authStore.registrationUser],
     (nw) => {
-        if(nw) {
+        if(nw[0] || !nw[1]) {
             authStore.sendMe();
         }
         else {
@@ -38,6 +38,6 @@ import LoadingService from './components/special/LoadingService.vue';
 <template>
     <div>
         <LoadingService/>
-        <DashboardView :event="props.event"/>
+        <DashboardView :event="props.event || '0'"/>
     </div>
 </template>

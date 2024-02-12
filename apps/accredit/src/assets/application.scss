@@ -1,0 +1,47 @@
+.input-component {
+    position: absolute;
+    right: -50px;
+    height: 34px;
+    background-color: #ccc;
+    border-radius: 4px;
+
+    .field {
+        background-color: white;
+        border-radius: 4px;
+        border: 1px solid #444;
+        margin: 4px;
+        padding: 2px 10px 2px 2px;
+        height: 20px;
+        line-height: 20px;
+    }
+}
+
+.start-screen .input-component {
+    right: 100px;
+}
+
+.scan-logger {
+    position: absolute;
+    right: -50px;
+    top: 35px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    width: 17em;
+    height: 300px;
+    overflow: hidden;
+    padding: 4px;
+
+    .code {
+        margin: 2px 4px;
+        font-weight: bold;
+    }
+
+    .error {
+        color: red;
+    }
+}
+
+.accredit {
+    min-height: 70vh;
+    position: relative;
+}

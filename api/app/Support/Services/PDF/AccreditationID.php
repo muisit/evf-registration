@@ -3,6 +3,7 @@
 namespace App\Support\Services\PDF;
 
 use App\Support\Services\PDFGenerator;
+use App\Models\Accreditation;
 
 class AccreditationID extends TextElement
 {
@@ -50,13 +51,11 @@ class AccreditationID extends TextElement
             'text' => false,
         ];
 
-        $size = 14 - 2 - strlen($this->label);
-        if ($size < 0) $size = 0;
-        $link = sprintf("11%s%s", $this->label, str_repeat('0', $size));
-        // QRCODE,H : QR-CODE Best error correction
+        $link = $this->label;
+
         $originalSize = $this->size;
         $originalOffset = $this->offset;
-        $this->size[1] = 2/3 * $originalSize[1]; // 2/3rds for the code, 1/3rd for the label
+        $this->size[1] = (2 / 3) * $originalSize[1]; // 2/3rds for the code, 1/3rd for the label
         $this->generator->pdf->write1DBarcode(
             $link,
             'I25+',

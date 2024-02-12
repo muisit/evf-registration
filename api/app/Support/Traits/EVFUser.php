@@ -28,7 +28,6 @@ trait EVFUser {
             $this->_role_cache = $this->getAuthRoles();
         }
         if (!is_array($role)) $role = [$role];
-        \Log::debug("testing for " . json_encode($role) . " in " . json_encode($this->_role_cache));
         return count(array_intersect($role, $this->_role_cache)) > 0;
     }
 

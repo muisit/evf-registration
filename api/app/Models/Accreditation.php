@@ -71,6 +71,13 @@ class Accreditation extends Model
 
     public function delete()
     {
+        // delete all linked audit entries
+        AccreditationAudit::where('accreditation_id', $this->getKey())->delete();
+        // delete all linked AccreditationUsers
+        // Loop this, because there should only be one or two rows
+        foreach (AccreditationUser::where('accreditation_id', $this->getKey())->get() as $user) {
+            $user->delete(); // invoke method to get additional delete actions
+        };
         $path = $this->path();
         if (file_exists($path)) {
             @unlink($path);
@@ -78,7 +85,7 @@ class Accreditation extends Model
         return parent::delete();
     }
 
-    private function createControlDigit(string $id)
+    public static function createControlDigit(string $id)
     {
         // create a control number by adding up all the digits
         $total = 0;
@@ -106,10 +113,16 @@ class Accreditation extends Model
                 // this should not happen, but we are catching the theoretical case
                 // start with a 0, which no regular id should ever do
                 $id = sprintf("0%06d", $this->getKey());
+                break;
             }
         }
-        $this->fe_id = $id . $this->createControlDigit($id);
+        $this->fe_id = $id;
 
         return $this->fe_id;
+    }
+
+    public function getFullAccreditationId()
+    {
+        return sprintf('11%s%1d%04d', $this->fe_id, self::createControlDigit($this->fe_id), 0);
     }
 }
