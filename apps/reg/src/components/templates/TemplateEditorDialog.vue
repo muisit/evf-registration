@@ -147,7 +147,6 @@ function printForm()
 
 import DndEditor from './DndEditor.vue';
 import { ElDialog, ElButton, ElForm, ElFormItem, ElSelect, ElOption, ElInput, ElCheckbox } from 'element-plus';
-import { useData } from 'element-plus/es/components/table-v2/src/composables';
 </script>
 <template>
     <ElDialog width="80%" class='template-dialog' :model-value="props.visible" title="Template Editor" :close-on-click-modal="false"  :before-close="(done) => { closeForm(); done(false); }">
