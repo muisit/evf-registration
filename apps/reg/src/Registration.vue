@@ -3,7 +3,7 @@ import { watch } from 'vue';
 import { useAuthStore } from '../../common/stores/auth';
 import { useDataStore } from './stores/data';
 const props = defineProps<{
-    event:string;
+    event?:string;
 }>();
 
 const authStore = useAuthStore();
@@ -38,6 +38,6 @@ import LoadingService from './components/special/LoadingService.vue';
 <template>
     <div>
         <LoadingService/>
-        <DashboardView :event="props.event"/>
+        <DashboardView :event="props.event || '0'"/>
     </div>
 </template>

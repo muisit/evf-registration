@@ -17,7 +17,7 @@ export const saveevent = function(event:Event) {
         };
 
         if (event.reg_open) data.reg_open = event.reg_open;
-        if (event.reg_close) data.reg_open = event.reg_close;
+        if (event.reg_close) data.reg_close = event.reg_close;
         if (event.email) data.email = event.email;
         if (event.web) data.web = event.web;
         if (event.location) data.location = event.location;

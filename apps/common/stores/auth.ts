@@ -47,7 +47,6 @@ export const useAuthStore = defineStore('auth', () => {
                 registrationUser.value = credentials.value.includes('user');
                 if (data.countryId) countryId.value = data.countryId;
                 if (data.eventId) eventId.value = data.eventId;
-                console.log(data);
             }
         });
     }
@@ -66,9 +65,13 @@ export const useAuthStore = defineStore('auth', () => {
         return logout()
             .then(() => {
                 hasLoaded('logout');
+                console.log('setting guest value to false');
                 isGuest.value = true;
                 userName.value = '';
-                sendMe();
+                registrationUser.value = false;
+                codeUser.value = false;
+                credentials.value = [];
+                countryId.value = 0;
             })
             .catch(() => {
                 hasLoaded('logout');
@@ -89,7 +92,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     function isHod(type:string = 'user') {
-        return credentials.value.includes('hod') && credentials.value.includes('user');
+        let retval = credentials.value.includes('hod') && credentials.value.includes('user');
+        console.log('isHod', retval);
+        return retval;
     }
 
     function isSuperHod(type:string = 'user') {
@@ -98,7 +103,9 @@ export const useAuthStore = defineStore('auth', () => {
 
     function isHodFor(type:string = 'user') {
         if (isSuperHod(type)) return true;
-        return credentials.value.includes('hod:' + countryId.value) && credentials.value.includes('user');
+        let retval = credentials.value.includes('hod:' + countryId.value) && credentials.value.includes('user');
+        console.log('isHodFor', retval);
+        return retval;
     }
 
     function isOrganisation(eid?:number|null|undefined, type:string = 'user') {

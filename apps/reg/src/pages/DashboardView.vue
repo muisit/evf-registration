@@ -44,8 +44,6 @@ function onLogin(credentials:any)
                 if (authStore.isHod() && authStore.countryId && dataStore.countries.length) {
                     dataStore.setCountry(authStore.countryId);
                 }
-                // retrieve the list of events
-                dataStore.getEvents(props.event);
             }
         })
         .catch((e) => {

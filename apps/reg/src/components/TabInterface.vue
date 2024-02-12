@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { generateAccreditations } from '../../../common/lib/event';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
+import { isOpenForRegistrationView } from '../../../common/lib/event';
 const auth = useAuthStore();
 const data = useDataStore();
 
@@ -11,7 +12,6 @@ const activeTab = ref('overview');
 function onTabChange(name:TabPaneName)
 {
     if (name == 'logout') {
-        console.log("calling logout");
         auth.logOut().then(() => {
             activeTab.value = 'overview';
         });
@@ -48,7 +48,6 @@ import ParticipantsPage from '../pages/ParticipantsPage.vue';
 import ActionPage from '../pages/ActionPage.vue';
 import TemplatesPage from '../pages/TemplatesPage.vue';
 import EventPage from '../pages/EventPage.vue';
-import { isOpenForRegistrationView } from '../../../common/lib/event';
 </script>
 <template>
     <ElTabs type="card" @tab-change="onTabChange" v-model="activeTab">
