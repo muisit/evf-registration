@@ -195,7 +195,7 @@ class FencerTest extends TestCase
         $this->assertTrue($policy->create($registrar));
 
         // AccreditationUser cannot create
-        $this->assertFalse($policy->viewAny($codeuser));
+        $this->assertFalse($policy->create($codeuser));
 
         // gerhod can create fencers
         $this->assertTrue($policy->create($gerhod));
@@ -246,7 +246,7 @@ class FencerTest extends TestCase
         $this->assertTrue($policy->update($registrar, $fencerITA));
 
         // AccreditationUser cannot update
-        $this->assertFalse($policy->viewAny($codeuser));
+        $this->assertFalse($policy->update($codeuser, $fencerGER));
 
         // gerhod can only update ger fencers
         $this->assertTrue($policy->update($gerhod, $fencerGER));
@@ -298,7 +298,7 @@ class FencerTest extends TestCase
         $this->assertTrue($policy->pictureState($registrar));
 
         // AccreditationUser has no business with picture states
-        $this->assertFalse($policy->viewAny($codeuser));
+        $this->assertFalse($policy->pictureState($codeuser));
 
         // gerhod can not update picture states
         $this->assertFalse($policy->pictureState($gerhod));

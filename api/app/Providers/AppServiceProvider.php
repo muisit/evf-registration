@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Queue\Events\JobFailed;
 use App\Notifications\JobFailure;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Laravel\Lumen\Http\ResponseFactory as LumenResponseFactory;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->singleton(ResponseFactory::class, function () {
+            return new LumenResponseFactory();
+        });
         $this->app->singleton(PDFGenerator::class, function (Application $app) {
             return new PDFGenerator();
         });
