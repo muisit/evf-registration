@@ -46,7 +46,15 @@ class EventTest extends TestCase
         $this->assertEquals($e1['baseFee'], $e2['baseFee']);
         $this->assertEquals($e1['competitionFee'], $e2['competitionFee']);
         $this->assertEquals($e1['payments'], $e2['payments']);
-        $this->assertEquals($e1['config'], $e2['config']);
+
+        $a1 = json_decode($e1['config'], true);
+        $a2 = json_decode($e2['config'], true);
+        $a2keys = array_keys($a2);
+        $this->assertEquals(count(array_keys($a1)), count($a2keys));
+        foreach ($a1 as $key => $value) {
+            $this->assertTrue(in_array($key, $a2keys));
+            $this->assertEquals($value, $a2[$key]);
+        }
     }
 
     private function modelToData(Event $e)

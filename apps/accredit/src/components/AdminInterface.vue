@@ -2,6 +2,7 @@
 import type { Ref } from 'vue';
 import type { Fencer, FencerById } from '../../../common/api/schemas/fencer';
 import type { Registration } from '../../../common/api/schemas/registration';
+import type { Event } from '../../../common/api/schemas/event';
 import type { Code, CodeUser } from '../../../common/api/schemas/codes';
 import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { useAuthStore } from '../../../common/stores/auth';
@@ -9,6 +10,8 @@ import { useDataStore } from '../stores/data';
 import { useBasicStore } from '../../../common/stores/basic';
 import { saveuser } from '../../../common/api/codes/saveuser';
 import { codeusers } from '../../../common/api/codes/codeusers';
+import { saveeventconfig } from '../../../common/api/event/saveeventconfig';
+import { defaultEvent } from '../../../common/api/schemas/event';
 
 const props = defineProps<{
     visible:boolean;
@@ -21,9 +24,20 @@ interface UserById {
     [key:string]: CodeUser;
 }
 
+const activeTab = ref('users');
 const fencers:Ref<FencerById> = ref({});
 const codeUsers:Ref<UserById> = ref({});
 const suggestionList:Ref<FencerById> = ref({});
+
+const currentEvent:Ref<Event> = ref(defaultEvent());
+watch(() => [props.visible, auth.userName, basic.event.id],
+    (nw) => {
+        if (nw[0] && auth.isOrganiser(basic.event.id, 'code')) {
+            currentEvent.value = Object.assign({}, basic.event);
+        }
+    },
+    {immediate: true}
+);
 
 watch(() => props.visible,
     (nw) => {
@@ -216,31 +230,100 @@ function setUserRole(fencer:Fencer, value:string)
     });
 }
 
-import { ElSelect, ElOption } from 'element-plus';
+
+function configValue(label:string)
+{
+    switch(label) {
+        case 'require_cards':
+            return currentEvent.value.config.require_cards || false;
+        case 'require_documents':
+            return currentEvent.value.config.require_documents || false;
+        case "allow_incomplete_checkin":
+            return currentEvent.value.config.allow_incomplete_checkin || false;
+        case "allow_hod_checkout":
+            return currentEvent.value.config.allow_hod_checkout || false;
+    }
+    return false;
+}
+
+function setConfig(e:any, label:string)
+{
+    switch(label) {
+        case 'require_cards':
+            currentEvent.value.config.require_cards = e ? true : false;
+            break;
+        case "require_documents":
+            currentEvent.value.config.require_documents = e ? true : false;
+            break;
+        case "allow_incomplete_checkin":
+            currentEvent.value.config.allow_incomplete_checkin = e ? true : false;
+            break;
+        case "allow_hod_checkout":
+            currentEvent.value.config.allow_hod_checkout = e ? true : false;
+            break;
+    }
+}
+
+function saveConfig()
+{
+    auth.isLoading('saveconfig');
+    saveeventconfig(currentEvent.value.config).then(() => {
+        auth.hasLoaded('saveconfig');
+        basic.getEvent(basic.event.id || 0);
+    })
+    .catch((e) => {
+        auth.hasLoaded('saveconfig');
+        console.log(e);
+        alert("There was an error storing the configuration. Please reload the page and try again");
+    })
+}
+
+import { ElSelect, ElOption, ElTabs, ElTabPane, ElForm, ElFormItem, ElCheckbox, ElButton } from 'element-plus';
 </script>
 <template>
-    <div class="admin-interface" v-if="auth.isOrganiser(auth.eventId, 'code')">
-        <table class="fencer-list">
-            <tbody>
-                <tr v-for="fencer in fencerList" :key="fencer.id" class="accreditation-user">
-                    <td class="lastname">{{ fencer.lastName}}</td>
-                    <td class="firstname">{{ fencer.firstName}}</td>
-                    <td class="role">{{ getRole(fencer) }}</td>
-                    <td>
-                        <ElSelect :model-value="fencer.accreditationRole || 'none'" @update:model-value="(e) => setUserRole(fencer, e)">
-                            <ElOption value="none" label="None" />
-                            <ElOption value="organiser" label="Admin"/>
-                            <ElOption value="accreditation" label="Accreditation Hand-out"/>
-                            <ElOption value="checkin" label="Weapon Check-in"/>
-                            <ElOption value="checkout" label="Weapon Check-out"/>
-                            <ElOption value="dt" label="DT"/>
-                        </ElSelect>
-                    </td>
-                    <td>
-                        {{ getUserBadge(fencer) }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="main-app admin-interface" v-if="auth.isOrganiser(auth.eventId, 'code')">
+        <ElTabs v-model="activeTab">
+            <ElTabPane label="Users" name="users">
+                <table class="fencer-list">
+                    <tbody>
+                        <tr v-for="fencer in fencerList" :key="fencer.id" class="accreditation-user">
+                            <td class="lastname">{{ fencer.lastName}}</td>
+                            <td class="firstname">{{ fencer.firstName}}</td>
+                            <td class="role">{{ getRole(fencer) }}</td>
+                            <td>
+                                <ElSelect :model-value="fencer.accreditationRole || 'none'" @update:model-value="(e) => setUserRole(fencer, e)">
+                                    <ElOption value="none" label="None" />
+                                    <ElOption value="organiser" label="Admin"/>
+                                    <ElOption value="accreditation" label="Accreditation Hand-out"/>
+                                    <ElOption value="checkin" label="Weapon Check-in"/>
+                                    <ElOption value="checkout" label="Weapon Check-out"/>
+                                    <ElOption value="dt" label="DT"/>
+                                </ElSelect>
+                            </td>
+                            <td>
+                                {{ getUserBadge(fencer) }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </ElTabPane>
+            <ElTabPane label="Configuration" name="config">
+                <ElFormItem label="Cards" class="config">
+                    <ElCheckbox :model-value="configValue('require_cards')" @update:model-value="(e) => setConfig(e, 'require_cards')" label="Require scanning a card during check-in"/>
+                </ElFormItem>
+                <ElFormItem label="Documents" class="config">
+                    <ElCheckbox :model-value="configValue('require_documents')" @update:model-value="(e) => setConfig(e, 'require_documents')" label="Require scanning documents during check-in"/>
+                </ElFormItem>
+                <ElFormItem label="Process" class="config">
+                    <ElCheckbox :model-value="configValue('allow_incomplete_checkin')" @update:model-value="(e) => setConfig(e, 'allow_incomplete_checkin')" label="Allow check-in with missing card or document"/>
+                </ElFormItem>
+                <ElFormItem label="HoD" class="config">
+                    <ElCheckbox :model-value="configValue('allow_hod_checkout')" @update:model-value="(e) => setConfig(e, 'allow_hod_checkout')" label="Allow check-out by the Head of Delegation"/>
+                </ElFormItem>
+                <ElFormItem class="buttons">
+                    <ElButton @click="saveConfig" type="primary">Save</ElButton>
+                </ElFormItem>
+                </ElTabPane>
+        </ElTabs>
     </div>
 </template>

@@ -46,5 +46,13 @@ $router->group(
                 'uses' => 'Accreditations\Summary@index'
             ]
         );
+
+        $router->post(
+            '/document',
+            [
+                'as' => 'acrreditations.document',
+                'uses' => 'Accreditations\SaveDocument@index'
+            ]
+        );
     }
 );

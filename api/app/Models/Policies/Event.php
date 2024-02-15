@@ -114,6 +114,16 @@ class Event
 
     /**
      * @param User $user
+     *
+     * @return bool
+     */
+    public function configure(EVFUser $user, Model $model): bool
+    {
+        return $this->organise($user, $model);
+    }
+
+    /**
+     * @param User $user
      * @param Model $model
      * 
      * @return bool

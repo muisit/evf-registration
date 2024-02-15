@@ -226,9 +226,18 @@ import AccreditationDialog from './AccreditationDialog.vue';
 import { ElSelect, ElOption } from 'element-plus';
 </script>
 <template>
-    <div class="accreditor-interface" v-if="auth.isAccreditor(auth.eventId, 'code')">
+    <div class="main-app accreditor-interface" v-if="auth.isAccreditor(auth.eventId, 'code')">
         <div class="table-wrapper">
             <table class="processed-list style-stripes">
+                <thead>
+                    <tr>
+                        <th>Badge</th>
+                        <th colspan="2">Name</th>
+                        <th>Gender</th>
+                        <th>Country</th>
+                        <th>Roles/Competitions</th>
+                    </tr>
+                </thead>
                 <tbody>
                     <tr v-for="(code, i) in accreditationList" :key="i" class="accreditation-badge">
                         <td class="code">{{ code }}</td>

@@ -1,5 +1,6 @@
 import { extractCode } from "./extractCode";
 import type { CodeDispatcher } from "./codedispatcher";
+import { useBasicStore } from "../../../../common/stores/basic";
 import dayjs from "dayjs";
 
 export function processCode(code:string, dispatcher:CodeDispatcher)
@@ -17,12 +18,20 @@ export function processCode(code:string, dispatcher:CodeDispatcher)
             if (dispatcher.badge) dispatcher.badge(code, codeObject);
             break;
         case 2:
+            codeObject.data = codeObject.id2 || 0;
             if (dispatcher.success) dispatcher.success(code, codeObject);
             if (dispatcher.card) dispatcher.card(code, codeObject);
             break;
         case 3:
-            if (dispatcher.success) dispatcher.success(code, codeObject);
-            if (dispatcher.document) dispatcher.document(code, codeObject);
+            const basicStore = useBasicStore();
+            codeObject.data = (((codeObject.id1 || 0) % 10)*1000) + (codeObject.id2 || 0);
+            if (basicStore.event && (basicStore.event?.id || 0) != (codeObject.payload || 0)) {
+                if (dispatcher.fail) dispatcher.fail(code, codeObject);
+            }
+            else {
+                if (dispatcher.success) dispatcher.success(code, codeObject);
+                if (dispatcher.document) dispatcher.document(code, codeObject);
+            }
             break;
         case 9:
             if (dispatcher.success) dispatcher.success(code, codeObject);

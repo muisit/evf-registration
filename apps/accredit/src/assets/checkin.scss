@@ -1,4 +1,4 @@
-.accreditor-interface {
+.checkin-interface {
     .table-wrapper {
         min-height: 500px;
         border: 1px solid black;
@@ -8,20 +8,20 @@
         .processed-list {
             width: 100%;
 
-            tr {
-                td {
-                    padding: 2px 4px;
-                }
+
+            tr.pending {
+                background-color: rgb(255, 177, 60);
             }
         }
     }
+
 
     .el-dialog {
         .photoid-element {
             float:right;
         }
         
-        .handout-dialog {
+        .checkin-dialog {
             .field {
                 font-size: large;
                 padding-bottom: 10px;
@@ -31,15 +31,11 @@
                     width: 90px;
                 }
             }
-        }
 
-        .el-form {
-            label {
-                width: 50%;
-            }
-
-            .switch-state {
-                padding-left: 15px;
+            .card {
+                font-size: x-large;
+                font-weight: bold;
+                padding-top: 20px;
             }
         }
 

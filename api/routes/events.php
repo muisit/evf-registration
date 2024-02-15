@@ -40,6 +40,14 @@ $router->group(
         );
 
         $router->post(
+            '/config',
+            [
+                'as' => 'events.saveconfig',
+                'uses' => 'Events\SaveConfig@index'
+            ]
+        );
+
+        $router->post(
             '/sides',
             [
                 'as' => 'events.savesides',

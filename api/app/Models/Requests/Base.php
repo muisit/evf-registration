@@ -36,9 +36,12 @@ class Base
         $data = $this->extractInputFromRules($request);
 
         if (empty($request->user())) {
+            \Log::debug("authorize fails due to no user");
             throw new AuthorizationException(); // should never occur, all routes guarded by authenticator
         }
+        \Log::debug("authorizing request");
         if (!$request->user() || !$this->authorize($request->user(), $data)) {
+            \Log::debug("authorize fails");
             $this->model = null;
         }
         else {
@@ -72,13 +75,16 @@ class Base
     {
         if (!empty($this->model)) {
             if (!$this->model->exists) {
+                \Log::debug("checking create policy");
                 $this->controller->authorize('create', get_class($this->model));
             }
             else {
                 $this->controller->authorize('update', $this->model);
             }
+            \Log::debug("returning true for authorize");
             return true;
         }
+        \Log::debug("authorize fails due to empty model");
         return false;
     }
 

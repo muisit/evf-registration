@@ -137,7 +137,6 @@ export const useBasicStore = defineStore('basic', () => {
 
         const authStore = useAuthStore();
         if (!pEvent || !is_valid(pEvent)) {
-            console.log("no valid event for setEvent");
             event.value = defaultEvent();
             authStore.eventId = 0;
             return;
@@ -211,12 +210,37 @@ export const useBasicStore = defineStore('basic', () => {
         });
     }
 
+    function eventRequiresCards()
+    {
+        if (event.value.config && event.value.config.require_cards) return true;
+        return false;
+    }
+
+    function eventRequiresDocuments()
+    {
+        if (event.value.config && event.value.config.require_documents) return true;
+        return false;
+    }
+
+    function eventAllowsIncompleteCheckin()
+    {
+        if (event.value.config && event.value.config.allow_incomplete_checkin) return true;
+        return false;
+    }
+    
+    function eventAllowsCheckoutByHod()
+    {
+        if (event.value.config && event.value.config.allow_hod_checkout) return true;
+        return false;
+    }
+
     return {
         roles, officialRoles, organisationRoles, countryRoles, rolesById, 
         countries, countriesById, categories, categoriesById, weapons, weaponsById,
         getBasicData,
         event, competitions, competitionsById, sideEvents, sideEventsById,
         competitionEvents, nonCompetitionEvents, getEvent, setEvent,
-        decorateRegistrations
+        decorateRegistrations,
+        eventRequiresCards, eventRequiresDocuments, eventAllowsIncompleteCheckin, eventAllowsCheckoutByHod
     };
 });

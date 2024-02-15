@@ -2,11 +2,13 @@
 
 namespace Tests\Unit\App\Models\Policies;
 
+use App\Models\AccreditationUser;
 use App\Models\Country;
 use App\Models\Event;
 use App\Models\Fencer;
 use App\Models\WPUser;
 use App\Models\Policies\Fencer as Policy;
+use Tests\Support\Data\AccreditationUser as AccUserData;
 use Tests\Support\Data\EventRole as RoleData;
 use Tests\Support\Data\Fencer as FencerData;
 use Tests\Support\Data\Registrar as RegistrarData;
@@ -39,6 +41,7 @@ class FencerTest extends TestCase
         $unpriv = WPUser::where("ID", UserData::TESTUSER5)->first();
         $cashier = WPUser::where("ID", UserData::TESTUSER3)->first();
         $accred = WPUser::where("ID", UserData::TESTUSER4)->first();
+        $codeuser = AccreditationUser::find(AccUserData::ACCREDITATION);
 
         // administrators can view always
         $this->assertTrue($policy->before($admin, 'view'));
@@ -56,6 +59,7 @@ class FencerTest extends TestCase
         // organisation cannot see it due to before
         $this->assertEmpty($policy->before($cashier, 'view'));
         $this->assertEmpty($policy->before($accred, 'view'));
+        $this->assertEmpty($policy->before($codeuser, 'view'));
 
         // unprivileged cannot
         $this->assertEmpty($policy->before($unpriv, 'view'));
@@ -76,16 +80,20 @@ class FencerTest extends TestCase
         $accred = WPUser::where("ID", UserData::TESTUSER4)->first();
         $organiser = WPUser::where("ID", UserData::TESTUSERORGANISER)->first();
         $registrar = WPUser::where("ID", UserData::TESTUSERREGISTRAR)->first();
+        $codeuser = AccreditationUser::find(AccUserData::ACCREDITATION);
 
         // a superhod or hod cannot see all fencers
         $this->assertFalse($policy->viewAny($superhod));
         $this->assertFalse($policy->viewAny($gerhod));
 
-        // organiser, registrar, accreditor can see any fencer
+        // organiser, registrar can see any fencer
         $this->assertFalse($policy->viewAny($cashier));
-        $this->assertTrue($policy->viewAny($accred));
+        $this->assertFalse($policy->viewAny($accred));
         $this->assertTrue($policy->viewAny($organiser));
         $this->assertTrue($policy->viewAny($registrar));
+
+        // AccreditationUser can see
+        $this->assertTrue($policy->viewAny($codeuser));
 
         // unprivileged cannot
         $this->assertFalse($policy->viewAny($unpriv));
@@ -121,6 +129,7 @@ class FencerTest extends TestCase
         $accred = WPUser::where("ID", UserData::TESTUSER4)->first();
         $organiser = WPUser::where("ID", UserData::TESTUSERORGANISER)->first();
         $registrar = WPUser::where("ID", UserData::TESTUSERREGISTRAR)->first();
+        $codeuser = AccreditationUser::find(AccUserData::ACCREDITATION);
 
         // a superhod can see any individual fencer
         $this->assertTrue($policy->view($superhod, $fencerGER));
@@ -128,9 +137,12 @@ class FencerTest extends TestCase
 
         // organiser, registrar, accreditor can see any individual fencer
         $this->assertFalse($policy->view($cashier, $fencerGER));
-        $this->assertTrue($policy->view($accred, $fencerITA));
+        $this->assertFalse($policy->view($accred, $fencerITA));
         $this->assertTrue($policy->view($organiser, $fencerGER));
         $this->assertTrue($policy->view($registrar, $fencerITA));
+
+        // AccreditationUser can see
+        $this->assertTrue($policy->viewAny($codeuser));
 
         // gerhod can only see ger fencers
         $this->assertTrue($policy->view($gerhod, $fencerGER));
@@ -170,6 +182,7 @@ class FencerTest extends TestCase
         $accred = WPUser::where("ID", UserData::TESTUSER4)->first();
         $organiser = WPUser::where("ID", UserData::TESTUSERORGANISER)->first();
         $registrar = WPUser::where("ID", UserData::TESTUSERREGISTRAR)->first();
+        $codeuser = AccreditationUser::find(AccUserData::ACCREDITATION);
 
         // a superhod can create fencers
         $this->assertTrue($policy->create($superhod));
@@ -180,6 +193,9 @@ class FencerTest extends TestCase
         $this->assertFalse($policy->create($accred));
         $this->assertTrue($policy->create($organiser));
         $this->assertTrue($policy->create($registrar));
+
+        // AccreditationUser cannot create
+        $this->assertFalse($policy->viewAny($codeuser));
 
         // gerhod can create fencers
         $this->assertTrue($policy->create($gerhod));
@@ -217,6 +233,7 @@ class FencerTest extends TestCase
         $accred = WPUser::where("ID", UserData::TESTUSER4)->first();
         $organiser = WPUser::where("ID", UserData::TESTUSERORGANISER)->first();
         $registrar = WPUser::where("ID", UserData::TESTUSERREGISTRAR)->first();
+        $codeuser = AccreditationUser::find(AccUserData::ACCREDITATION);
 
         // a superhod can update any individual fencer
         $this->assertTrue($policy->update($superhod, $fencerGER));
@@ -227,6 +244,9 @@ class FencerTest extends TestCase
         $this->assertFalse($policy->update($accred, $fencerITA));
         $this->assertTrue($policy->update($organiser, $fencerGER));
         $this->assertTrue($policy->update($registrar, $fencerITA));
+
+        // AccreditationUser cannot update
+        $this->assertFalse($policy->viewAny($codeuser));
 
         // gerhod can only update ger fencers
         $this->assertTrue($policy->update($gerhod, $fencerGER));
@@ -266,6 +286,7 @@ class FencerTest extends TestCase
         $accred = WPUser::where("ID", UserData::TESTUSER4)->first();
         $organiser = WPUser::where("ID", UserData::TESTUSERORGANISER)->first();
         $registrar = WPUser::where("ID", UserData::TESTUSERREGISTRAR)->first();
+        $codeuser = AccreditationUser::find(AccUserData::ACCREDITATION);
 
         // a superhod cannot update picture states
         $this->assertFalse($policy->pictureState($superhod));
@@ -275,6 +296,9 @@ class FencerTest extends TestCase
         $this->assertFalse($policy->pictureState($accred));
         $this->assertTrue($policy->pictureState($organiser));
         $this->assertTrue($policy->pictureState($registrar));
+
+        // AccreditationUser has no business with picture states
+        $this->assertFalse($policy->viewAny($codeuser));
 
         // gerhod can not update picture states
         $this->assertFalse($policy->pictureState($gerhod));
