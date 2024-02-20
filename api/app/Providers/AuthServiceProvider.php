@@ -2,11 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\Event;
 use App\Models\WPUser;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use App\Support\SessionGuard;
 use App\Support\UserProvider;
+use App\Support\Contracts\EVFUser;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -45,5 +48,18 @@ class AuthServiceProvider extends ServiceProvider
         Gate::policy(\App\Models\AccreditationTemplate::class, \App\Models\Policies\AccreditationTemplate::class);
         Gate::policy(\App\Models\AccreditationUser::class, \App\Models\Policies\AccreditationUser::class);
         Gate::policy(\App\Models\WPUser::class, \App\Models\Policies\WPUser::class);
+
+        Broadcast::channel('accredit.{eventId}', function (EVFUser $user, int $eventId) {
+            return $user->hasRole('code') && $user->hasRole("accreditation:" . $eventId);
+        });
+        Broadcast::channel('checkin.{eventId}', function (EVFUser $user, int $eventId) {
+            return $user->hasRole('code') && $user->hasRole("checkin:" . $eventId);
+        });
+        Broadcast::channel('checkout.{eventId}', function (EVFUser $user, int $eventId) {
+            return $user->hasRole('code') && $user->hasRole("checkin:" . $eventId);
+        });
+        Broadcast::channel('dt.{eventId}', function (EVFUser $user, int $eventId) {
+            return $user->hasRole('code') && $user->hasRole("dt:" . $eventId);
+        });
     }
 }

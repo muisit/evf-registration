@@ -1,27 +1,24 @@
 {
-    "name": "laravel/lumen",
-    "description": "The Laravel Lumen Framework.",
+    "name": "laravel/evf",
+    "description": "The Laravel Framework.",
     "keywords": [
         "framework",
-        "laravel",
-        "lumen"
+        "laravel"
     ],
     "license": "MIT",
     "type": "project",
     "require": {
         "php": "^8.1",
         "bepsvpt/secure-headers": "^7.4",
-        "darkaonline/swagger-lume": "10.*",
-        "illuminate/cookie": "^10.18",
-        "illuminate/mail": "^10.38",
-        "illuminate/notifications": "^10.38",
         "kirschbaum-development/eloquent-power-joins": "^3.3",
-        "laravel/lumen-framework": "^10.0",
+        "laravel/framework": "^10.0",
+        "laravel/sanctum": "^3.3",
+        "laravel/tinker": "^2.9",
         "league/flysystem": "^3.21",
         "setasign/fpdi": "^2.6",
         "supportpal/pollcast": "^1.2",
         "tecnickcom/tcpdf": "^6.6",
-        "zircote/swagger-php": "3.*"
+        "zircote/swagger-php": "^4.8"
     },
     "require-dev": {
         "codeception/codeception": "^5.0",

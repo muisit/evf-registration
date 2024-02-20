@@ -6,22 +6,21 @@ use App\Models\Country;
 use App\Models\Event;
 use App\Models\Fencer;
 use App\Models\WPUser;
+use App\Http\Controllers\Events\Save;
 use App\Models\Requests\Event as EventRequest;
 use Tests\Support\Data\Event as EventData;
 use Tests\Support\Data\Fencer as FencerData;
 use Tests\Support\Data\WPUser as UserData;
 use Tests\Support\Data\Registrar as RegistrarData;
 use Tests\Support\Data\EventRole as EventRoleData;
-use Laravel\Lumen\Routing\Controller;
+use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Tests\Unit\TestCase;
-use Mockery;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class EventTest extends TestCase
 {
-    public $authorizeCalls = [];
-
     private function dataEquals($e1, $e2)
     {
         $this->assertEquals($e1['id'], $e2['id']);
@@ -120,44 +119,35 @@ class EventTest extends TestCase
         ];
     }
 
+    private function setRequest($testData)
+    {
+        $event = Event::where('event_id', EventData::EVENT1)->first();
+        $country = Country::where('country_id', Country::GER)->first();
+        request()->merge([
+            'eventObject' => $event,
+            'countryObject' => $country,
+            'event' => $testData
+        ]);
+    }
+
+    private function createRequest()
+    {
+        return new EventRequest(new Save());
+    }
+
     private function baseTest($testData, $user)
     {
-        $this->authorizeCalls = [];
-        $stubController = $this->createMock(Controller::class);
-        $stubController
-            ->method('authorize')
-            ->with(
-                $this->callback(function ($arg) {
-                    $this->authorizeCalls[] = $arg;
-                    return true;
-                }),
-                $this->callback(fn($arg) => empty($arg) || $arg == Event::class || get_class($arg) == Event::class)
-            )
-            ->willReturn(true);
-
-        $request = new EventRequest($stubController);
-
-        $stub = $this->createMock(Request::class);
-        $stub->expects($this->any())->method('user')->willReturn($user);
-        $stub->expects($this->once())->method('get')->with('event')->willReturn($testData);
-        $stub->expects($this->any())->method('all')->willReturn(['event' => $testData]);
-        $stub->expects($this->any())->method('only')->willReturn(['event' => $testData]);
-        return $request->validate($stub);
+        $this->setRequest($testData);
+        $this->unsetUser();
+        $this->session(['wpuser' => $user->getKey()]);
+        return $this->createRequest()->validate(request());
     }
 
     public function testUpdate()
     {
-        request()->merge([
-            'eventObject' => Event::where('event_id', EventData::EVENT1)->first(),
-            'countryObject' => Country::where('country_id', Country::GER)->first()
-        ]);
-
         $testData = $this->testData();
         $user = WPUser::where('ID', UserData::TESTUSER)->first();
         $model = $this->baseTest($testData, $user);
-
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
         $this->assertNotEmpty($model);
         $this->dataEquals($testData, $this->modelToData($model));
         $this->modelsEqual($model, Event::where('event_id', $model->getKey())->first());
@@ -170,694 +160,961 @@ class EventTest extends TestCase
             'countryObject' => Country::where('country_id', Country::GER)->first()
         ]);
         $testData = $this->testData();
-        $user = WPUser::where('ID', UserData::TESTUSERORGANISER)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
 
-        $user = WPUser::where('ID', UserData::TESTUSERREGISTRAR)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData) {
+            $user = WPUser::where('ID', UserData::TESTUSERORGANISER)->first();
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
 
-        $user = WPUser::where('ID', UserData::TESTUSERHOD)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData) {
+            $user = WPUser::where('ID', UserData::TESTUSERREGISTRAR)->first();
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
 
-        $user = WPUser::where('ID', UserData::TESTUSERGENHOD)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData) {
+            $user = WPUser::where('ID', UserData::TESTUSERHOD)->first();
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
 
-        // no privileges
-        $user = WPUser::where('ID', UserData::TESTUSER5)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData) {
+            $user = WPUser::where('ID', UserData::TESTUSERGENHOD)->first();
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
 
-        // cashier
-        $user = WPUser::where('ID', UserData::TESTUSER3)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData) {
+            // no privileges
+            $user = WPUser::where('ID', UserData::TESTUSER5)->first();
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
 
-        // accreditation
-        $user = WPUser::where('ID', UserData::TESTUSER3)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData) {
+            // cashier
+            $user = WPUser::where('ID', UserData::TESTUSER3)->first();
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
+
+        $this->assertException(function () use ($testData) {
+            // accreditation
+            $user = WPUser::where('ID', UserData::TESTUSER3)->first();
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
     }
 
     public function testValidateName()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['name']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['name']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['name'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['name'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['name'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['name'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['name'] = 'aa';
-        $validator = Validator::make($testData, $rules);
+
+        $data['name'] = 'aa';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['name'] = str_repeat('a', 100);
-        $validator = Validator::make($testData, $rules);
+
+        $data['name'] = str_repeat('a', 100);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['name'] = str_repeat('a', 101);
-        $validator = Validator::make($testData, $rules);
+
+        $data['name'] = str_repeat('a', 101);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateOpens()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['opens']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['opens']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['opens'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['opens'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['opens'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['opens'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['opens'] = 1;
-        $validator = Validator::make($testData, $rules);
+
+        $data['opens'] = 1;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['opens'] = '2020-11-02';
-        $validator = Validator::make($testData, $rules);
+
+        $data['opens'] = '2020-11-02';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['opens'] = '11-02-2022';
-        $validator = Validator::make($testData, $rules);
+
+        $data['opens'] = '11-02-2022';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateYear()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['year']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['year']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['year'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['year'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['year'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['year'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['year'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['year'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['year'] = 2020;
-        $validator = Validator::make($testData, $rules);
+
+        $data['year'] = 2020;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['year'] = '2020';
-        $validator = Validator::make($testData, $rules);
+
+        $data['year'] = '2020';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['year'] = 2090;
-        $validator = Validator::make($testData, $rules);
+
+        $data['year'] = 2090;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['year'] = 2091;
-        $validator = Validator::make($testData, $rules);
+
+        $data['year'] = 2091;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateDuration()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['duration']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['duration']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['duration'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['duration'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['duration'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['duration'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['duration'] = 0;
-        $validator = Validator::make($testData, $rules);
+
+        $data['duration'] = 0;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['duration'] = 1;
-        $validator = Validator::make($testData, $rules);
+
+        $data['duration'] = 1;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['duration'] = '1';
-        $validator = Validator::make($testData, $rules);
+
+        $data['duration'] = '1';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['duration'] = 20;
-        $validator = Validator::make($testData, $rules);
+
+        $data['duration'] = 20;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['duration'] = 21;
-        $validator = Validator::make($testData, $rules);
+
+        $data['duration'] = 21;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateEmail()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['email']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['email']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['email'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['email'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['email'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['email'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['email'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['email'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['email'] = 'me@example.org';
-        $validator = Validator::make($testData, $rules);
+
+        $data['email'] = 'me@example.org';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['email'] = 'me+filter@e.xa.mple.org';
-        $validator = Validator::make($testData, $rules);
+
+        $data['email'] = 'me+filter@e.xa.mple.org';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['email'] = 'me+filter@e.xa.mple.or.g';
-        $validator = Validator::make($testData, $rules);
+
+        $data['email'] = 'me+filter@e.xa.mple.or.g';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes()); // should fail on the TLD, but filter apparently does not
     }
 
     public function testValidateWeb()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['web']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['web']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['web'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['web'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['web'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['web'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['web'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['web'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['web'] = 'https://www.example.org';
-        $validator = Validator::make($testData, $rules);
+
+        $data['web'] = 'https://www.example.org';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['web'] = 'ftp://www.uri.nl';
-        $validator = Validator::make($testData, $rules);
+
+        $data['web'] = 'ftp://www.uri.nl';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['web'] = 'http://www.veteransfencing.eu:9982/register/me?query=this#anchor';
-        $validator = Validator::make($testData, $rules);
+
+        $data['web'] = 'http://www.veteransfencing.eu:9982/register/me?query=this#anchor';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
     }
 
     public function testValidateLocation()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['location']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['location']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['location'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['location'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['location'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['location'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['location'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['location'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['location'] = str_repeat('a', 45);
-        $validator = Validator::make($testData, $rules);
+
+        $data['location'] = str_repeat('a', 45);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['location'] = str_repeat('a', 46);
-        $validator = Validator::make($testData, $rules);
+
+        $data['location'] = str_repeat('a', 46);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateCountryId()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['countryId']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['countryId']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['countryId'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['countryId'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['countryId'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['countryId'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['countryId'] = Country::GER;
-        $validator = Validator::make($testData, $rules);
+
+        $data['countryId'] = Country::GER;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['countryId'] = '' . Country::GER;
-        $validator = Validator::make($testData, $rules);
+
+        $data['countryId'] = '' . Country::GER;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['countryId'] = 2090;
-        $validator = Validator::make($testData, $rules);
+
+        $data['countryId'] = 2090;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateSymbol()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['symbol']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['symbol']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['symbol'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['symbol'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['symbol'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['symbol'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['symbol'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['symbol'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['symbol'] = str_repeat('a', 10);
-        $validator = Validator::make($testData, $rules);
+
+        $data['symbol'] = str_repeat('a', 10);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['symbol'] = str_repeat('a', 11);
-        $validator = Validator::make($testData, $rules);
+
+        $data['symbol'] = str_repeat('a', 11);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateCurrency()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['currency']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['currency']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['currency'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['currency'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['currency'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['currency'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['currency'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['currency'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['currency'] = str_repeat('a', 30);
-        $validator = Validator::make($testData, $rules);
+
+        $data['currency'] = str_repeat('a', 30);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['currency'] = str_repeat('a', 31);
-        $validator = Validator::make($testData, $rules);
+
+        $data['currency'] = str_repeat('a', 31);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateBank()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['bank']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['bank']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['bank'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['bank'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['bank'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['bank'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['bank'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['bank'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['bank'] = str_repeat('a', 100);
-        $validator = Validator::make($testData, $rules);
+
+        $data['bank'] = str_repeat('a', 100);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['bank'] = str_repeat('a', 101);
-        $validator = Validator::make($testData, $rules);
+
+        $data['bank'] = str_repeat('a', 101);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateAccount()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['account']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['account']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['account'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['account'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['account'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['account'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['account'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['account'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['account'] = str_repeat('a', 100);
-        $validator = Validator::make($testData, $rules);
+
+        $data['account'] = str_repeat('a', 100);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['account'] = str_repeat('a', 101);
-        $validator = Validator::make($testData, $rules);
+
+        $data['account'] = str_repeat('a', 101);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateAddress()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['address']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['address']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['address'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['address'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['address'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['address'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['address'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['address'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateIban()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['iban']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['iban']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['iban'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['iban'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['iban'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['iban'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['iban'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['iban'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['iban'] = str_repeat('a', 40);
-        $validator = Validator::make($testData, $rules);
+
+        $data['iban'] = str_repeat('a', 40);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['iban'] = str_repeat('a', 41);
-        $validator = Validator::make($testData, $rules);
+
+        $data['iban'] = str_repeat('a', 41);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateSwift()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['swift']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['swift']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['swift'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['swift'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['swift'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['swift'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['swift'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['swift'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['swift'] = str_repeat('a', 20);
-        $validator = Validator::make($testData, $rules);
+
+        $data['swift'] = str_repeat('a', 20);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['swift'] = str_repeat('a', 21);
-        $validator = Validator::make($testData, $rules);
+
+        $data['swift'] = str_repeat('a', 21);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateReference()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['reference']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['reference']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['reference'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['reference'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['reference'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['reference'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['reference'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['reference'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['reference'] = str_repeat('a', 255);
-        $validator = Validator::make($testData, $rules);
+
+        $data['reference'] = str_repeat('a', 255);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['reference'] = str_repeat('a', 256);
-        $validator = Validator::make($testData, $rules);
+
+        $data['reference'] = str_repeat('a', 256);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateRegOpen()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['reg_open']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['reg_open']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['reg_open'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['reg_open'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['reg_open'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['reg_open'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['reg_open'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['reg_open'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['reg_open'] = '2019-01-01';
-        $validator = Validator::make($testData, $rules);
+
+        $data['reg_open'] = '2019-01-01';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['reg_open'] = '2019';
-        $validator = Validator::make($testData, $rules);
+
+        $data['reg_open'] = '2019';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['reg_open'] = '01-01-2019';
-        $validator = Validator::make($testData, $rules);
+
+        $data['reg_open'] = '01-01-2019';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateRegClose()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['reg_close']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['reg_close']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['reg_close'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['reg_close'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['reg_close'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['reg_close'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['reg_close'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['reg_close'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['reg_close'] = '2019-01-01';
-        $validator = Validator::make($testData, $rules);
+
+        $data['reg_close'] = '2019-01-01';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['reg_close'] = '2019';
-        $validator = Validator::make($testData, $rules);
+
+        $data['reg_close'] = '2019';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['reg_close'] = '01-01-2019';
-        $validator = Validator::make($testData, $rules);
+
+        $data['reg_close'] = '01-01-2019';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateBaseFee()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['baseFee']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['baseFee']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['baseFee'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['baseFee'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['baseFee'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['baseFee'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['baseFee'] = -1;
-        $validator = Validator::make($testData, $rules);
+
+        $data['baseFee'] = -1;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['baseFee'] = 0;
-        $validator = Validator::make($testData, $rules);
+
+        $data['baseFee'] = 0;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['baseFee'] = 10.1;
-        $validator = Validator::make($testData, $rules);
+
+        $data['baseFee'] = 10.1;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['baseFee'] = '10.1';
-        $validator = Validator::make($testData, $rules);
+
+        $data['baseFee'] = '10.1';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['baseFee'] = 2090002002.213311;
-        $validator = Validator::make($testData, $rules);
+
+        $data['baseFee'] = 2090002002.213311;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
     }
 
     public function testValidateCompetitionFee()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['competitionFee']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['competitionFee']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['competitionFee'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['competitionFee'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['competitionFee'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['competitionFee'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['competitionFee'] = -1;
-        $validator = Validator::make($testData, $rules);
+
+        $data['competitionFee'] = -1;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['competitionFee'] = 0;
-        $validator = Validator::make($testData, $rules);
+
+        $data['competitionFee'] = 0;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['competitionFee'] = 10.1;
-        $validator = Validator::make($testData, $rules);
+
+        $data['competitionFee'] = 10.1;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['competitionFee'] = '10.1';
-        $validator = Validator::make($testData, $rules);
+
+        $data['competitionFee'] = '10.1';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['competitionFee'] = 2090002002.213311;
-        $validator = Validator::make($testData, $rules);
+
+        $data['competitionFee'] = 2090002002.213311;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
     }
 
     public function testValidatePayments()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['payments']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['payments']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['payments'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['payments'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['payments'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['payments'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['payments'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['payments'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['payments'] = 'all';
-        $validator = Validator::make($testData, $rules);
+
+        $data['payments'] = 'all';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['payments'] = 'group';
-        $validator = Validator::make($testData, $rules);
+
+        $data['payments'] = 'group';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['payments'] = 'individual';
-        $validator = Validator::make($testData, $rules);
+
+        $data['payments'] = 'individual';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['payments'] = 'both';
-        $validator = Validator::make($testData, $rules);
+
+        $data['payments'] = 'both';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
     }
 
     public function testValidateConfig()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new EventRequest($stubController))->rules();
-        $testData = ['event' => $this->testData()];
-        $validator = Validator::make($testData, $rules);
+        $data = $this->testData();
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['event']['config']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['config']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['config'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['config'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['config'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['config'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['event']['config'] = 2019;
-        $validator = Validator::make($testData, $rules);
+
+        $data['config'] = 2019;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes()); // a raw integer is a valid JSON object
-        $testData['event']['config'] = '{}';
-        $validator = Validator::make($testData, $rules);
+
+        $data['config'] = '{}';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['event']['config'] = json_encode([1,2,3,4, 'a' => 'b', 'c' => [3,2,1]]);
-        $validator = Validator::make($testData, $rules);
+
+        $data['config'] = json_encode([1,2,3,4, 'a' => 'b', 'c' => [3,2,1]]);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
     }
 }

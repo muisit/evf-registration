@@ -42,20 +42,20 @@ class SaveTest extends TestCase
     public function testRoute()
     {
         $data = $this->createRegistrationData();
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+        $response = $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->post('/registrations', ['event' => EventData::EVENT1, 'country' => Country::GER, 'registration' => $data], ['X-CSRF-Token' => 'aaa']);
 
         // we expect the updated registration and a 200 status
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertEquals(RegistrationData::REG1, $output['id']);
         $this->assertEquals('G', $output['payment']);
         $this->assertStatus(200);
 
         $data["id"] = 0;
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+        $response = $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->post('/registrations', ['event' => EventData::EVENT1, 'country' => Country::GER, 'registration' => $data], ['X-CSRF-Token' => 'aaa']);
         // we expect a non-empty JSON result and a 200 status
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertNotEmpty($output);
         $this->assertEquals($data['fencerId'], $output['fencerId']);
         $this->assertEquals($data['payment'], $output['payment']);

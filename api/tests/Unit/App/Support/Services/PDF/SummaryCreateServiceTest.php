@@ -12,7 +12,7 @@ use Tests\Support\Data\Event as EventData;
 use App\Support\Services\PDF\SummaryCreateService;
 use App\Support\Services\PDFService;
 use Tests\Unit\TestCase;
-use Laravel\Lumen\Application;
+use Illuminate\Foundation\Application;
 
 class SummaryCreateServiceTest extends TestCase
 {

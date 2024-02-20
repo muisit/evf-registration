@@ -6,60 +6,50 @@ use App\Models\Country;
 use App\Models\Event;
 use App\Models\Fencer;
 use App\Models\WPUser;
+use App\Http\Controllers\Fencers\PhotoSave;
 use App\Models\Requests\FencerPhoto as FencerRequest;
 use Tests\Support\Data\Event as EventData;
 use Tests\Support\Data\Fencer as FencerData;
 use Tests\Support\Data\WPUser as UserData;
 use Tests\Support\Data\Registrar as RegistrarData;
 use Tests\Support\Data\EventRole as EventRoleData;
-use Laravel\Lumen\Routing\Controller;
+use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use Tests\Unit\TestCase;
-use Mockery;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class FencerPhotoTest extends TestCase
 {
-    public $authorizeCalls = [];
-
-    public function fixtures()
-    {
-        FencerData::create();
-        UserData::create();
-        RegistrarData::create();
-        EventRoleData::create();
-    }
-
     private function modelsEqual(Fencer $f1, Fencer $f2)
     {
         $this->assertEquals($f1->getKey(), $f2->getKey());
         $this->assertEquals($f1->fencer_picture, $f2->fencer_picture);
     }
 
+    private function setRequest($testData)
+    {
+        $event = Event::where('event_id', EventData::EVENT1)->first();
+        $country = Country::where('country_id', Country::GER)->first();
+        request()->merge([
+            'eventObject' => $event,
+            'countryObject' => $country,
+            'fencer' => $testData
+        ]);
+    }
+
+    private function createRequest()
+    {
+        return new FencerRequest(new PhotoSave());
+    }
+
     private function baseTest($testData, $user)
     {
-        $this->authorizeCalls = [];
-        $stubController = $this->createMock(Controller::class);
-        $stubController
-            ->method('authorize')
-            ->with(
-                $this->callback(function ($arg) {
-                    $this->authorizeCalls[] = $arg;
-                    return true;
-                }),
-                $this->callback(fn($arg) => empty($arg) || $arg == Fencer::class || get_class($arg) == Fencer::class)
-            )
-            ->willReturn(true);
-
-        $request = new FencerRequest($stubController);
-
-        $stub = $this->createMock(Request::class);
-        $stub->expects($this->any())->method('user')->willReturn($user);
-        $stub->expects($this->once())->method('get')->with('fencer')->willReturn($testData);
-        $stub->expects($this->any())->method('all')->willReturn(['fencer' => $testData]);
-        $stub->expects($this->any())->method('only')->willReturn(['fencer' => $testData]);
-        return $request->validate($stub);
+        $this->setRequest($testData);
+        $this->unsetUser();
+        $this->session(['wpuser' => $user->getKey()]);
+        return $this->createRequest()->validate(request());
     }
 
     public function testUpdate()
@@ -75,8 +65,6 @@ class FencerPhotoTest extends TestCase
         $user = WPUser::where('ID', UserData::TESTUSER)->first();
         $model = $this->baseTest($testData, $user);
 
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
         $this->assertNotEmpty($model);
         $this->assertEquals(FencerData::MCAT1, $model->getKey());
         $this->assertNotEquals($testData['firstName'], $model->fencer_firstname);
@@ -99,8 +87,6 @@ class FencerPhotoTest extends TestCase
         ];
         $user = WPUser::where('ID', UserData::TESTUSER)->first();
         $model = $this->baseTest($testData, $user);
-
-        $this->assertCount(0, $this->authorizeCalls);
         $this->assertEmpty($model);
     }
 
@@ -118,8 +104,10 @@ class FencerPhotoTest extends TestCase
         $user = WPUser::where('ID', UserData::TESTUSERORGANISER)->first();
         $model = $this->baseTest($testData, $user);
         $this->assertNotEmpty($model);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+
+        $user = WPUser::where('ID', UserData::TESTUSER)->first();
+        $model = $this->baseTest($testData, $user);
+        $this->assertNotEmpty($model);
     }
 
     public function testUnauthorized()
@@ -129,65 +117,75 @@ class FencerPhotoTest extends TestCase
             'photoStatus' => 'Y'
         ];
 
-        // no privileges
-        $user = WPUser::where('ID', UserData::TESTUSER5)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertEmpty($model);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
 
-        // cashier
-        $user = WPUser::where('ID', UserData::TESTUSER3)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertEmpty($model);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData) {
+            // no privileges
+            $user = WPUser::where('ID', UserData::TESTUSER5)->first();
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
 
-        // accreditation
-        $user = WPUser::where('ID', UserData::TESTUSER3)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertEmpty($model);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData) {
+            // cashier
+            $user = WPUser::where('ID', UserData::TESTUSER3)->first();
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
+
+        $this->assertException(function () use ($testData) {
+            // accreditation
+            $user = WPUser::where('ID', UserData::TESTUSER3)->first();
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
     }
 
     public function testValidatePhoto()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new FencerRequest($stubController))->rules();
-
-        $testData = [
-            'fencer' => [
-                'id' => FencerData::MCAT1,
-                'photoStatus' => 'Y'
-            ]
+        $data = [
+            'id' => FencerData::MCAT1,
+            'photoStatus' => 'Y'
         ];
-        $validator = Validator::make($testData, $rules);
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['fencer']['photoStatus']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['photoStatus']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes()); // status is required
-        $testData['fencer']['photoStatus'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['photoStatus'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['photoStatus'] = 'aa';
-        $validator = Validator::make($testData, $rules);
+
+        $data['photoStatus'] = 'aa';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['photoStatus'] = null;
-        $validator = Validator::make($testData, $rules);
+
+        $data['photoStatus'] = null;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['photoStatus'] = 'N';
-        $validator = Validator::make($testData, $rules);
+
+        $data['photoStatus'] = 'N';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['fencer']['photoStatus'] = 'R';
-        $validator = Validator::make($testData, $rules);
+
+        $data['photoStatus'] = 'R';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['fencer']['photoStatus'] = 'Y';
-        $validator = Validator::make($testData, $rules);
+
+        $data['photoStatus'] = 'Y';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['fencer']['photoStatus'] = 'A';
-        $validator = Validator::make($testData, $rules);
+
+        $data['photoStatus'] = 'A';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
     }
 }

@@ -1,58 +1,39 @@
 <?php
 
-/** @var \Laravel\Lumen\Routing\Router $router */
-$router->group(
+Route::group(
     [
         'prefix' => '/accreditations',
         'middleware' => 'auth'
     ],
-    function () use ($router) {
-        $router->get(
+    function () {
+        Route::get(
             '/{fencerId}/badge/{templateId}',
-            [
-                'as' => 'accreditations.badge',
-                'uses' => 'Accreditations\Badge@index'
-            ]
-        );
+            'Accreditations\Badge@index'
+        )->name('accreditations.badge');
 
-        $router->get(
+        Route::get(
             '/overview',
-            [
-                'as' => 'acrreditations.overview',
-                'uses' => 'Accreditations\Overview@index'
-            ]
-        );
+            'Accreditations\Overview@index'
+        )->name('acrreditations.overview');
    
-        $router->get(
+        Route::get(
             '/regenerate',
-            [
-                'as' => 'acrreditations.regenerate',
-                'uses' => 'Accreditations\Regenerate@index'
-            ]
-        );
+            'Accreditations\Regenerate@index'
+        )->name('acrreditations.regenerate');
 
-        $router->get(
+        Route::get(
             '/summary/{summaryId}',
-            [
-                'as' => 'acrreditations.download',
-                'uses' => 'Accreditations\Download@index'
-            ]
-        );
+            'Accreditations\Download@index'
+        )->name('acrreditations.download');
 
-        $router->post(
+        Route::post(
             '/summary',
-            [
-                'as' => 'acrreditations.summary',
-                'uses' => 'Accreditations\Summary@index'
-            ]
-        );
+            'Accreditations\Summary@index'
+        )->name('acrreditations.summary');
 
-        $router->post(
+        Route::post(
             '/document',
-            [
-                'as' => 'acrreditations.document',
-                'uses' => 'Accreditations\SaveDocument@index'
-            ]
-        );
+            'Accreditations\SaveDocument@index'
+        )->name('acrreditations.document');
     }
 );

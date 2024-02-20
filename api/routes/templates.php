@@ -1,73 +1,49 @@
 <?php
 
-/** @var \Laravel\Lumen\Routing\Router $router */
-$router->group(
+Route::group(
     [
         'prefix' => '/templates',
         'middleware' => 'auth'
     ],
-    function () use ($router) {
-        $router->get(
+    function () {
+        Route::get(
             '/',
-            [
-                'as' => 'templates.index',
-                'uses' => 'Templates\Index@index'
-            ]
-        );
+            'Templates\Index@index'
+        )->name('templates.index');
 
-        $router->get(
+        Route::get(
             '/fonts',
-            [
-                'as' => 'templates.fonts',
-                'uses' => 'Templates\Fonts@index'
-            ]
-        );
+            'Templates\Fonts@index'
+        )->name('templates.fonts');
 
-        $router->post(
+        Route::post(
             '/',
-            [
-                'as' => 'templates.save',
-                'uses' => 'Templates\Save@index'
-            ]
-        );
+            'Templates\Save@index'
+        )->name('templates.save');
 
-        $router->post(
+        Route::post(
             '/remove',
-            [
-                'as' => 'templates.remove',
-                'uses' => 'Templates\Remove@index'
-            ]
-        );
+            'Templates\Remove@index'
+        )->name('templates.remove');
 
-        $router->get(
+        Route::get(
             '/{templateId}/picture/{pictureId}',
-            [
-                'as' => 'templates.picture',
-                'uses' => 'Templates\Picture@index'
-            ]
-        );
+            'Templates\Picture@index'
+        )->name('templates.picture');
 
-        $router->post(
+        Route::post(
             '/{templateId}/picture',
-            [
-                'as' => 'templates.picturesave',
-                'uses' => 'Templates\PictureSave@index'
-            ]
-        );
-        $router->post(
-            '/{templateId}/picture/{pictureId}/remove',
-            [
-                'as' => 'templates.picturedelete',
-                'uses' => 'Templates\PictureDelete@index'
-            ]
-        );
+            'Templates\PictureSave@index'
+        )->name('templates.picturesave');
 
-        $router->get(
+        Route::post(
+            '/{templateId}/picture/{pictureId}/remove',
+            'Templates\PictureDelete@index'
+        )->name('templates.picturedelete');
+
+        Route::get(
             '/{templateId}/print',
-            [
-                'as' => 'templates.print',
-                'uses' => 'Templates\Example@index'
-            ]
-        );
+            'Templates\Example@index'
+        )->name('templates.print');
     }
 );

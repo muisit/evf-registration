@@ -13,8 +13,8 @@ class BasicTest extends TestCase
      */
     public function testRoute()
     {
-        $this->get('/basic');
-        $output = $this->response->json();
+        $response = $this->get('/basic');
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(count($output['categories']) > 0);
         $this->assertTrue(count($output['roles']) > 0);

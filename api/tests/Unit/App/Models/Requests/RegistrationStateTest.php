@@ -147,18 +147,18 @@ class RegistrationStateTest extends TestCase
         $model = $this->baseTest($data);
         $this->assertNotEmpty($model);
 
-        $this->assertException(function () use ($reg) {
-            $this->resetApplication();
-            $this->session(['accreditationuser' => UserData::ADMIN]);
-            $data = [
-                'registrations' => [$reg->registration_id],
-                'value' => 'A',
-            ];
-            $model = $this->baseTest($data);
-        }, AuthorizationException::class);
+        // ADMIN is organiser, which assigns accreditation rights
+        $this->unsetUser();
+        $this->session(['accreditationuser' => UserData::ADMIN]);
+        $data = [
+            'registrations' => [$reg->registration_id],
+            'value' => 'A',
+        ];
+        $model = $this->baseTest($data);
+        $this->assertNotEmpty($model);
 
         $this->assertException(function () use ($reg) {
-            $this->resetApplication();
+            $this->unsetUser();
             $this->session(['accreditationuser' => UserData::CHECKIN]);
             $data = [
                 'registrations' => [$reg->registration_id],
@@ -168,7 +168,7 @@ class RegistrationStateTest extends TestCase
         }, AuthorizationException::class);
 
         $this->assertException(function () use ($reg) {
-            $this->resetApplication();
+            $this->unsetUser();
             $this->session(['accreditationuser' => UserData::CHECKOUT]);
             $data = [
                 'registrations' => [$reg->registration_id],
@@ -178,7 +178,7 @@ class RegistrationStateTest extends TestCase
         }, AuthorizationException::class);
 
         $this->assertException(function () use ($reg) {
-            $this->resetApplication();
+            $this->unsetUser();
             $this->session(['accreditationuser' => UserData::DT]);
             $data = [
                 'registrations' => [$reg->registration_id],
@@ -188,7 +188,7 @@ class RegistrationStateTest extends TestCase
         }, AuthorizationException::class);
 
         $this->assertException(function () use ($reg) {
-            $this->resetApplication();
+            $this->unsetUser();
             $this->session(['accreditationuser' => UserData::NOSUCHID]);
             $data = [
                 'registrations' => [$reg->registration_id],

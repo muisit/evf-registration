@@ -29,20 +29,23 @@ class SaveTest extends TestCase
     {
         $template = $this->createTemplateData();
         $template['name'] = 'Pete';
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
-            ->post('/templates', ['template' => $template], ['X-CSRF-Token' => 'aaa']);
+        $response = $this->withSession(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+            ->withHeaders(['X-CSRF-Token' => 'aaa'])
+            ->post('/templates', ['template' => $template]);
 
         // we expect the updated fencer and a 200 status
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertEquals(TemplateData::COUNTRY, $output['id']);
         $this->assertEquals('Pete', $output['name']);
         $this->assertStatus(200);
 
         $fencer["id"] = 0;
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
-            ->post('/templates', ['template' => $template], ['X-CSRF-Token' => 'aaa']);
-        // we expect a non-empty JSON result and a 200 status
-        $output = $this->response->json();
+        $response = $this->withSession(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+            ->withHeaders(['X-CSRF-Token' => 'aaa'])
+            ->post('/templates', ['template' => $template]);
+
+            // we expect a non-empty JSON result and a 200 status
+        $output = $response->json();
         $this->assertNotEmpty($output);
         $this->assertEquals($template['name'], $output['name']);
         $this->assertEquals($template['content'], json_encode($output['content']));
@@ -53,7 +56,8 @@ class SaveTest extends TestCase
         $template = $this->createTemplateData();
         $template['name'] = 'Pete';
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSERORGANISER])
-            ->post('/templates', ['template' => $template], ['X-CSRF-Token' => 'aaa'])
+            ->withHeaders(['X-CSRF-Token' => 'aaa'])
+            ->post('/templates', ['template' => $template])
             ->assertStatus(200);
     }
 
@@ -61,25 +65,30 @@ class SaveTest extends TestCase
     {
         $template = $this->createTemplateData();
         $this->session(['_token' => 'aaa'])
-        ->post('/templates', ['template' => $template], ['X-CSRF-Token' => 'aaa'])
+            ->withHeaders(['X-CSRF-Token' => 'aaa'])
+            ->post('/templates', ['template' => $template])
             ->assertStatus(401);
 
         // CSRF check
-        $this->session(['_token' => 'aaa'])
-            ->post('/templates', ['template' => $template], ['X-CSRF-Token' => 'bbb'])
+        $this->session(['_token' => 'bbb'])
+            ->withHeaders(['X-CSRF-Token' => 'aaa'])
+            ->post('/templates', ['template' => $template])
             ->assertStatus(400);
 
         // test user 5 has no privileges
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER5])
-            ->post('/templates', ['template' => $template], ['X-CSRF-Token' => 'aaa'])
+            ->withHeaders(['X-CSRF-Token' => 'aaa'])
+            ->post('/templates', ['template' => $template])
             ->assertStatus(403);
 
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSERHOD])
-            ->post('/templates', ['template' => $template], ['X-CSRF-Token' => 'aaa'])
+            ->withHeaders(['X-CSRF-Token' => 'aaa'])
+            ->post('/templates', ['template' => $template])
             ->assertStatus(403);
 
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER4])
-            ->post('/templates', ['template' => $template], ['X-CSRF-Token' => 'aaa'])
+            ->withHeaders(['X-CSRF-Token' => 'aaa'])
+            ->post('/templates', ['template' => $template])
             ->assertStatus(403);
     }
 
@@ -88,7 +97,8 @@ class SaveTest extends TestCase
         $template = $this->createTemplateData();
         $template['name'] = '';
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
-            ->post('/templates', ['template' => $template], ['X-CSRF-Token' => 'aaa'])
+            ->withHeaders(['X-CSRF-Token' => 'aaa'])
+            ->post('/templates', ['template' => $template])
             ->assertStatus(422);
     }
 
@@ -97,9 +107,9 @@ class SaveTest extends TestCase
         $template = $this->createTemplateData();
         $template['isDefault'] = 'R';
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
-            ->post('/templates', ['template' => $template], ['X-CSRF-Token' => 'aaa'])
+            ->withHeaders(['X-CSRF-Token' => 'aaa'])
+            ->post('/templates', ['template' => $template])
             ->assertStatus(422);
-
     }
 
     public function testValidateContent()
@@ -107,7 +117,8 @@ class SaveTest extends TestCase
         $template = $this->createTemplateData();
         $template['content'] = 'aaa';
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
-            ->post('/templates', ['template' => $template], ['X-CSRF-Token' => 'aaa'])
+            ->withHeaders(['X-CSRF-Token' => 'aaa'])
+            ->post('/templates', ['template' => $template])
             ->assertStatus(422);
     }
 }

@@ -9,6 +9,7 @@ import type { AccreditationDocument } from '../../../common/api/schemas/accredit
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
 import { useBasicStore } from '../../../common/stores/basic';
+import { useBroadcasterStore } from '../../../common/stores/broadcaster';
 import { is_valid, parse_date } from '../../../common/functions';
 import { savedocument } from '../../../common/api/accreditations/savedocument';
 import { dayjs } from 'element-plus';
@@ -19,6 +20,11 @@ const props = defineProps<{
 const auth = useAuthStore();
 const data = useDataStore();
 const basic = useBasicStore();
+const broadcaster = useBroadcasterStore();
+
+broadcaster.subscribeToCheckin((type, content) => {
+    console.log(type, content);
+});
 
 interface ProcessedEntity {
     badge?: Code;

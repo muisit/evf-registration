@@ -1,14 +1,15 @@
 <?php
 
-/** @var \Laravel\Lumen\Routing\Router $router */
-
-require('auth.php');
-require('events.php');
-require('fencers.php');
-require('registrations.php');
-require('accreditations.php');
-require('templates.php');
-require('codes.php');
+Route::group(["namespace" => "App\Http\Controllers"], function () {
+    require('auth.php');
+    require('events.php');
+    require('fencers.php');
+    require('registrations.php');
+    require('accreditations.php');
+    require('templates.php');
+    require('codes.php');
+});
+require('pollcast.php');
 
 /*
 |--------------------------------------------------------------------------
@@ -21,8 +22,8 @@ require('codes.php');
 |
 */
 
-$router->get('/', function () use ($router) {
+Route::get('/', function () {
     return env('APP_VERSION');
 });
 
-$router->get('/basic', 'Basic@index');
+Route::get('/basic', '\App\Http\Controllers\Basic@index');

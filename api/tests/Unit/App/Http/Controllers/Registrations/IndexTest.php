@@ -20,10 +20,10 @@ class IndexTest extends TestCase
 
     public function testRoute()
     {
-        $this->session(['wpuser' => UserData::TESTUSER])
+        $response = $this->session(['wpuser' => UserData::TESTUSER])
             ->get('/registrations?event=' . EventData::EVENT1);
 
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertCount(6, $output['registrations']); // 6 organisation roles
         $this->assertCount(3, $output['fencers']); // MCAT4, MCAT5 and MCAT3 (invited to Gala)
@@ -31,10 +31,10 @@ class IndexTest extends TestCase
 
     public function testRouteWithCountry()
     {
-        $this->session(['wpuser' => UserData::TESTUSER])
+        $response = $this->session(['wpuser' => UserData::TESTUSER])
             ->get('/registrations?event=' . EventData::EVENT1 . '&country=' . Country::ITA);
 
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertCount(2, $output['registrations']); // 2 registrations for ITA
         $this->assertCount(1, $output['fencers']); // only MCAT2
@@ -42,19 +42,19 @@ class IndexTest extends TestCase
 
     public function testRouteWithHod()
     {
-        $this->session(['wpuser' => UserData::TESTUSERHOD])
+        $response = $this->session(['wpuser' => UserData::TESTUSERHOD])
             ->get('/registrations?event=' . EventData::EVENT1);
 
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertCount(8, $output['registrations']); // 8 registrations for GER
         $this->assertCount(5, $output['fencers']); // MCAT1, MCAT1B, MCAT1C, MCAT5, WCAT1
 
         // country parameter has no effect
-        $this->session(['wpuser' => UserData::TESTUSERHOD])
+        $response = $this->session(['wpuser' => UserData::TESTUSERHOD])
             ->get('/registrations?event=' . EventData::EVENT1 . '&country=' . Country::ITA);
 
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertCount(8, $output['registrations']);
         $this->assertCount(5, $output['fencers']);

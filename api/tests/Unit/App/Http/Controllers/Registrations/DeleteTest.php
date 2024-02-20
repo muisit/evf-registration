@@ -43,11 +43,11 @@ class DeleteTest extends TestCase
     public function testRoute()
     {
         $reg = $this->saveRegistration();
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+        $response = $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->post('/registrations/delete', ['event' => EventData::EVENT1, 'country' => Country::GER, 'registration' => ['id' => $reg->registration_id]], ['X-CSRF-Token' => 'aaa']);
 
         // we a 200 status and a ResponseStatus of 'ok'
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertEquals('ok', $output['status']);
         $this->assertStatus(200);
         $this->assertEmpty(Registration::find($reg->registration_id));

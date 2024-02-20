@@ -38,20 +38,20 @@ class SaveTest extends TestCase
     {
         $fencer = $this->createFencerData();
         $fencer['firstName'] = 'Pete';
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+        $response = $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->post('/fencers', ['fencer' => $fencer], ['X-CSRF-Token' => 'aaa']);
 
         // we expect the updated fencer and a 200 status
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertEquals(FencerData::MCAT1, $output['id']);
         $this->assertEquals('Pete', $output['firstName']);
         $this->assertStatus(200);
 
         $fencer["id"] = 0;
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+        $response = $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->post('/fencers', ['fencer' => $fencer], ['X-CSRF-Token' => 'aaa']);
         // we expect a non-empty JSON result and a 406 status
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertNotEmpty($output);
         $this->assertEquals($fencer['firstName'], $output['firstName']);
         $this->assertEquals($fencer['lastName'], $output['lastName']);

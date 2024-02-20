@@ -18,7 +18,7 @@ use Tests\Support\Data\Registrar as RegistrarData;
 use Tests\Support\Data\EventRole as EventRoleData;
 use Tests\Support\Data\Registration as RegistrationData;
 use Tests\Support\Data\SideEvent as SideEventData;
-use Laravel\Lumen\Routing\Controller;
+use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\App;

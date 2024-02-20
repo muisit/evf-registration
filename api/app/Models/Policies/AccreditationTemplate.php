@@ -38,7 +38,6 @@ class AccreditationTemplate
      */
     public function viewAny(EVFUser $user): bool | null
     {
-        \Log::debug("template policy viewany for " . json_encode($user));
         if ($this->isOrganiser($user)) {
             return true;
         }

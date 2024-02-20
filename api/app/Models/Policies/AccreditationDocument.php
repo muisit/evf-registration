@@ -15,16 +15,13 @@ class AccreditationDocument
 
         if (!empty($model) && !empty($eventId)) {
             if ($eventId != $model->accreditation->event_id) {
-                \Log::debug("auth fails because $eventId != " . $model->accreditation->event_id);
                 return false;
             }
         }
 
         if (!empty($eventId) && $user->hasRole(['checkin:' . $eventId])) {
-            \Log::debug("has checkIn");
             return true;
         }
-        \Log::debug("auth fails because checkin role not found");
         return false;
     }
 
@@ -83,13 +80,10 @@ class AccreditationDocument
      */
     public function create(EVFUser $user): bool
     {
-        \Log::debug("checking create policy");
         if ($this->isCheckin($user)) {
-            \Log::debug("create allowed");
             return true;
         }
 
-        \Log::debug("create not allowed");
         return false;
     }
 
@@ -101,7 +95,6 @@ class AccreditationDocument
      */
     public function update(EVFUser $user, Model $model): bool
     {
-        \Log::debug("checking update policy");
         if ($this->isCheckin($user) || $this->isCheckout($user)) {
             return true;
         }

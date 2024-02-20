@@ -3,8 +3,6 @@
 namespace Tests\Unit\App\Http\Controllers\Fencers;
 
 use App\Models\Country;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-use Laravel\Lumen\Testing\DatabaseTransactions;
 use Tests\Unit\TestCase;
 use Tests\Support\Data\WPUser as UserData;
 use Tests\Support\Data\Registrar as RegistrarData;
@@ -24,10 +22,10 @@ class AutocompleteTest extends TestCase
 
     public function testRoute()
     {
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+        $response = $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->get('/fencers/autocomplete?name=T&event=' . EventData::EVENT1);
 
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertCount(2, $output);
@@ -56,7 +54,7 @@ class AutocompleteTest extends TestCase
         // GET route only
         $this->session(['wpuser' => UserData::NOSUCHID])
             ->post('/fencers/autocomplete?event=' . EventData::EVENT1, ["a" => 2])
-            ->assertStatus(400);
+            ->assertStatus(405);
 
         // test user 4 is not organisation for NOSUCHEVENT
         $this->session(['wpuser' => UserData::TESTUSER4])

@@ -39,7 +39,6 @@ class Accreditation
      */
     public function viewAny(EVFUser $user): bool | null
     {
-        \Log::debug("testing to see if user is an organiser");
         if ($this->isOrganiser($user)) {
             return true;
         }

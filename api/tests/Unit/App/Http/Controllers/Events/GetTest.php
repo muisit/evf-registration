@@ -12,9 +12,9 @@ class GetTest extends TestCase
 {
     public function testRoute()
     {
-        $this->get('/events/' . EventData::EVENT1);
+        $response = $this->get('/events/' . EventData::EVENT1);
 
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertNotEmpty($output['id']);

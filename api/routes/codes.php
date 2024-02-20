@@ -1,43 +1,34 @@
 <?php
 
 // Unauthenticated route
-$router->group(
+Route::group(
     [
         'prefix' => '/codes'
     ],
-    function () use ($router) {
-        $router->post(
+    function () {
+        Route::post(
             '/',
-            [
-                'as' => 'codes.validate',
-                'uses' => 'Codes\Validate@index'
-            ]
-        );
+            'Codes\Validate@index'
+        )->name('codes.validate');
     }
 );
 
 
 // Authenticated routes
-$router->group(
+Route::group(
     [
         'prefix' => '/codes',
         'middleware' => 'auth'
     ],
-    function () use ($router) {
-        $router->get(
+    function () {
+        Route::get(
             '/users',
-            [
-                'as' => 'codeusers.list',
-                'uses' => 'Codes\Users@index'
-            ]
-        );
+            'Codes\Users@index'
+        )->name('codeusers.list');
 
-        $router->post(
+        Route::post(
             '/users',
-            [
-                'as' => 'codeusers.save',
-                'uses' => 'Codes\SaveUser@index'
-            ]
-        );
+            'Codes\SaveUser@index'
+        )->name('codeusers.save');
     }
 );

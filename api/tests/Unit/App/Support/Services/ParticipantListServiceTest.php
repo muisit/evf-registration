@@ -9,7 +9,7 @@ use App\Models\Fencer;
 use App\Support\Services\ParticipantListService;
 use App\Support\Services\RegistrationXMLService;
 use App\Support\Services\RegistrationCSVService;
-use Laravel\Lumen\Application;
+use Illuminate\Foundation\Application;
 use Tests\Support\Data\Fencer as FencerData;
 use Tests\Support\Data\SideEvent as EventData;
 use Tests\Support\Data\Registration as RegistrationData;

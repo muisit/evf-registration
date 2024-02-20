@@ -41,6 +41,7 @@ function interpretLine($line)
             $pdf = new TCPDF($orientation, "mm", $page, true, 'UTF-8', false, 3);
             $pdf->SetDefaultMonospacedFont('courier');
             $pdf->SetFont('helvetica', '', 14, '', true);
+            $pdf->SetAutoPageBreak(true, 0);
             fprintf(STDERR, "    document created\r\n");
             break;
         case 'page':
@@ -54,6 +55,10 @@ function interpretLine($line)
             break;
         case 'background':
             $configuration['background'] = parseColour($tokens['1'] ?? '#ffffff');
+            break;
+        case 'convertfont':
+            echo "converting font " . $tokens[1] . " to " . $configuration['fontdir'] . "\r\n";
+            TCPDF_FONTS::addTTFFont($tokens[1], '', '', 32, $configuration['fontdir'] ?? '');
             break;
         case 'colour':
             $configuration['colour'] = parseColour($tokens['1'] ?? '#000000');
@@ -70,7 +75,12 @@ function interpretLine($line)
         case 'font':
             if ($pdf) {
                 if (strlen($tokens[2] ?? '')) {
-                    $pdf->AddFont($tokens[1], $tokens[3] ?? "", $tokens[2], true);
+                    // font <name> <path> <style>
+                    $fname = $tokens[2];
+                    if (!file_exists($fname)) {
+                        $fname = $configuration['fontdir'] . $tokens[2];
+                    }
+                    $pdf->AddFont($tokens[1], $tokens[3] ?? "", $fname, true);
                 }
                 else {
                     $pdf->AddFont($tokens[1] ?? 'helvetica', "", "", true);
@@ -80,6 +90,9 @@ function interpretLine($line)
             break;
         case 'fontsize':
             if ($pdf) $pdf->SetFontSize(parseFloat($tokens[1] ?? '10'));
+            break;
+        case 'fontdir':
+            $configuration['fontdir'] = $tokens[1];
             break;
         case 'lineheight': // lineheight 1.5
             $configuration['lineheight'] = floatval($tokens[1] ?? '0');
@@ -100,43 +113,43 @@ function interpretLine($line)
             if($pdf) $pdf->setCreator($tokens[1] ?? '');
             break;
         case 'author':
-            if($pdf) $pdf->setAuthor($tokens[1] ?? '');
+            if ($pdf) $pdf->setAuthor($tokens[1] ?? '');
             break;
         case 'title':
-            if($pdf) $pdf->setTitle($tokens[1] ?? '');
+            if ($pdf) $pdf->setTitle($tokens[1] ?? '');
             break;
         case 'subject':
-            if($pdf) $pdf->setSubject($tokens[1] ?? '');
+            if ($pdf) $pdf->setSubject($tokens[1] ?? '');
             break;
         case 'keywords':
-            if($pdf) $pdf->setKeywords($tokens[1] ?? '');
+            if ($pdf) $pdf->setKeywords($tokens[1] ?? '');
             break;
         case 'printheader':
-            if($pdf) {
+            if ($pdf) {
                 $pdf->setPrintHeader(parseBoolean($tokens[1] ?? ''));
             }
             break;
         case 'printfooter':
-            if($pdf) $pdf->setPrintFooter(parseBoolean($tokens[1] ?? ''));
+            if ($pdf) $pdf->setPrintFooter(parseBoolean($tokens[1] ?? ''));
             break;
         case 'margins':
-            if($pdf) {
+            if ($pdf) {
                 $pdf->SetMargins(
-                        parseFloat($tokens[1] ?? '5'),
-                        parseFloat($tokens[2] ?? '5'),
-                        parseFloat($tokens[3] ?? '5'),
-                        parseBoolean($tokens[4] ?? '')
+                    parseFloat($tokens[1] ?? '5'),
+                    parseFloat($tokens[2] ?? '5'),
+                    parseFloat($tokens[3] ?? '5'),
+                    parseBoolean($tokens[4] ?? '')
                 );
             }
             break;
         case 'autobreak':
-            if($pdf) $pdf->setAutoPageBreak(parseBoolean($tokens[1] ?? ''));
+            if ($pdf) $pdf->setAutoPageBreak(parseBoolean($tokens[1] ?? ''));
             break;
         case 'imagescale':
-            if($pdf) $pdf->setKeywords(parseFloat($tokens[1] ?? '0'));
+            if ($pdf) $pdf->setKeywords(parseFloat($tokens[1] ?? '0'));
             break;
         case 'fontsubsetting':
-            if($pdf) $pdf->setFontSubsetting(parseBoolean($tokens[1] ?? ''));
+            if ($pdf) $pdf->setFontSubsetting(parseBoolean($tokens[1] ?? ''));
             break;
     }
 }
@@ -251,9 +264,32 @@ function putTextAt($tokens)
         $width = parseFloat($tokens[4] ?? '0');
         $lineheight = $configuration['lineheight'] ?? 0;
         $textalign = $configuration['textalign'] ?? '';
-        fprintf(STDERR, "    putting text '$text' at $x, $y\r\n");
+
+        if ($width > 0) {
+            adjustToFit($text, $width, $pdf->GetFontSizePt());
+        }
+
+        fprintf(STDERR, "    putting text '$text' at $x, $y over $width\r\n");
         $pdf->SetXY($x, $y);
         $pdf->Cell($width, $lineheight, $text); //, $border = 0, $ln = 0, $textalign, $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'B');
+    }
+}
+
+function adjustToFit($text, $width, $fontsize)
+{
+    global $pdf;
+    fprintf(STDERR, "    setting fontsize to $fontsize\r\n");
+    $pdf->SetFontSize($fontsize);
+    $fontwidth = floatval($pdf->GetStringWidth($text));
+    if ($fontwidth < $width) {
+        return $fontsize;
+    }
+
+    $widthratio = $width / $fontwidth;
+    $newsize = $fontsize * $widthratio;
+    fprintf(STDERR, "    adjusting fontsize using $widthratio to $newsize\r\n");
+    if ($newsize < $fontsize) {
+        $pdf->SetFontSize($newsize);
     }
 }
 

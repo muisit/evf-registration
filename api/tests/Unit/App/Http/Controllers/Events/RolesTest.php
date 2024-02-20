@@ -12,10 +12,10 @@ class RolesTest extends TestCase
 {
     public function testRoute()
     {
-        $this->session(['wpuser' => UserData::TESTUSER])
+        $response = $this->session(['wpuser' => UserData::TESTUSER])
             ->get('/events/roles?event=' . EventData::EVENT1);
 
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['roles']));

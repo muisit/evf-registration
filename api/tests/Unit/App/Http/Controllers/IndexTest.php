@@ -2,8 +2,6 @@
 
 namespace Tests\Unit\App\Http\Controllers;
 
-use Laravel\Lumen\Testing\DatabaseMigrations;
-use Laravel\Lumen\Testing\DatabaseTransactions;
 use Tests\Unit\TestCase;
 
 class IndexTest extends TestCase
@@ -15,11 +13,11 @@ class IndexTest extends TestCase
      */
     public function testRoute()
     {
-        $this->get('/');
+        $response = $this->get('/');
 
         $this->assertEquals(
             env('APP_VERSION'),
-            $this->response->getContent()
+            $response->getContent()
         );
     }
 }

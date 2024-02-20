@@ -39,19 +39,19 @@ class DuplicateTest extends TestCase
     public function testRoute()
     {
         $fencer = $this->createFencerData();
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+        $response = $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->post('/fencers/duplicate', ['fencer' => $fencer], ['X-CSRF-Token' => 'aaa']);
 
         // we expect an empty result and a 200 status
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertEmpty($output);
         $this->assertStatus(200);
 
         $fencer["id"] = FencerData::NOSUCHFENCER;
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+        $response = $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->post('/fencers/duplicate', ['fencer' => $fencer], ['X-CSRF-Token' => 'aaa']);
         // we expect a non-empty JSON result and a 406 status
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertNotEmpty($output);
         $this->assertEquals(FencerData::MCAT1, $output['id']);
         $this->assertStatus(409);

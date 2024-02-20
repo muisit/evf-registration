@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Requests\AccreditationDocument as DocumentRequest;
 use App\Models\Schemas\AccreditationDocument as DocumentSchema;
+use App\Events\CheckinEvent;
 use Auth;
 
 class SaveDocument extends Controller
@@ -34,6 +35,10 @@ class SaveDocument extends Controller
         $form = new DocumentRequest($this);
         $model = $form->validate($request);
         if (!empty($model) && $model !== false) {
+            $bcEvent = new CheckinEvent();
+            $bcEvent->$request->get('eventObject');
+            $bcEvent->content = json_encode(new DocumentSchema($model));
+            dispatch($bcEvent);
             return response()->json(new DocumentSchema($model));
         }
         return response()->json([]);

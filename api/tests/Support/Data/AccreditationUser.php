@@ -2,6 +2,7 @@
 
 namespace Tests\Support\Data;
 
+use App\Models\AccreditationAudit;
 use App\Models\AccreditationUser as Model;
 use Illuminate\Support\Facades\DB;
 
@@ -24,6 +25,7 @@ class AccreditationUser extends Fixture
 
     protected static function clear()
     {
+        DB::table(AccreditationAudit::tableName())->delete();
         DB::table(Model::tableName())->delete();
     }
 

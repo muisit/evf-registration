@@ -33,7 +33,6 @@ class Country
         // organisers can switch between countries and see country-related data
         $event = request()->get('eventObject');
         $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
-        \Log::debug('event ' . json_encode(request()->all()));
         if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId, 'registrar:' . $eventId])) {
             return true;
         }

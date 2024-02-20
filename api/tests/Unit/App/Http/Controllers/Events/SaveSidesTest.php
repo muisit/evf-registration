@@ -17,10 +17,10 @@ class SaveSidesTest extends TestCase
 
     public function testRoute()
     {
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+        $response = $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->post('/events/sides?event=' . EventData::EVENT1, $this->testData(), ['X-CSRF-Token' => 'aaa']);
 
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['status']));

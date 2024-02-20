@@ -1,50 +1,34 @@
 <?php
 
-/** @var \Laravel\Lumen\Routing\Router $router */
-$router->group(
+Route::group(
     [
         'prefix' => '/registrations',
         'middleware' => 'auth'
     ],
-    function () use ($router) {
-        $router->get(
+    function () {
+        Route::get(
             '/',
-            [
-                'as' => 'registrations.list',
-                'uses' => 'Registrations\Index@index'
-            ]
-        );
+            'Registrations\Index@index'
+        )->name('registrations.list');
 
-        $router->post(
+        Route::post(
             '/',
-            [
-                'as' => 'registrations.save',
-                'uses' => 'Registrations\Save@index'
-            ]
-        );
+            'Registrations\Save@index'
+        )->name('registrations.save');
 
-        $router->post(
+        Route::post(
             '/delete',
-            [
-                'as' => 'registrations.delete',
-                'uses' => 'Registrations\Delete@index'
-            ]
-        );
+            'Registrations\Delete@index'
+        )->name('registrations.delete');
 
-        $router->post(
+        Route::post(
             '/pay',
-            [
-                'as' => 'registrations.pay',
-                'uses' => 'Registrations\Pay@index'
-            ]
-        );
+            'Registrations\Pay@index'
+        )->name('registrations.pay');
 
-        $router->post(
+        Route::post(
             '/state',
-            [
-                'as' => 'registrations.state',
-                'uses' => 'Registrations\State@index'
-            ]
-        );
+            'Registrations\State@index'
+        )->name('registrations.state');
     }
 );

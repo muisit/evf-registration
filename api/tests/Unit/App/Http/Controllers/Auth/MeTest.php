@@ -2,8 +2,6 @@
 
 namespace Tests\Unit\App\Http\Controllers\Auth;
 
-use Laravel\Lumen\Testing\DatabaseMigrations;
-use Laravel\Lumen\Testing\DatabaseTransactions;
 use Tests\Unit\TestCase;
 use Tests\Support\Data\AccreditationUser as CodeUserData;
 use Tests\Support\Data\WPUser as UserData;
@@ -44,7 +42,7 @@ class MeTest extends TestCase
         $response = $this->session(['wpuser' => UserData::TESTUSER])->get('/auth/me');
 
         $this->assertNotEmpty($response);
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['status']));
@@ -61,7 +59,7 @@ class MeTest extends TestCase
         $response = $this->session(['accreditationuser' => CodeUserData::ADMIN])->get('/auth/me');
 
         $this->assertNotEmpty($response);
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['status']));
@@ -85,7 +83,7 @@ class MeTest extends TestCase
         $response = $this->session(['wpuser' => UserData::TESTUSERHOD])->get('/auth/me');
 
         $this->assertNotEmpty($response);
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['status']));
