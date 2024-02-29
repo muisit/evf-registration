@@ -30,16 +30,16 @@ export const useBroadcasterStore = defineStore('broadcaster', () => {
     function subscribeToCheckin(cb:Function)
     {
         manager.private('checkin.' + authStore.eventId)
-            .listen('CheckinEvent', (e) => {
+            .listen('CheckinEvent', (e:any) => {
                 cb('CheckinEvent', e);
             })
-            .listen('ProcessStartEvent', (e) => {
+            .listen('ProcessStartEvent', (e:any) => {
                 cb('ProcessStartEvent', e);
             })
-            .listen('ProcessEndEvent', (e) => {
+            .listen('ProcessEndEvent', (e:any) => {
                 cb('ProcessEndEvent', e);
             })
-            .listen('CheckoutEvent', (e) => {
+            .listen('CheckoutEvent', (e:any) => {
                 cb('CheckoutEvent', e);
             });
     }
@@ -47,16 +47,16 @@ export const useBroadcasterStore = defineStore('broadcaster', () => {
     function subscribeToCheckout(cb:Function)
     {
         manager.private('checkout.' + authStore.eventId)
-            .listen('CheckinEvent', (e) => {
+            .listen('CheckinEvent', (e:any) => {
                 cb('CheckinEvent', e);
             })
-            .listen('ProcessStartEvent', (e) => {
+            .listen('ProcessStartEvent', (e:any) => {
                 cb('ProcessStartEvent', e);
             })
-            .listen('ProcessEndEvent', (e) => {
+            .listen('ProcessEndEvent', (e:any) => {
                 cb('ProcessEndEvent', e);
             })
-            .listen('CheckoutEvent', (e) => {
+            .listen('CheckoutEvent', (e:any) => {
                 cb('CheckoutEvent', e);
             });
     }
@@ -64,13 +64,13 @@ export const useBroadcasterStore = defineStore('broadcaster', () => {
     function subscribeToDt(cb:Function)
     {
         manager.private('dt.' + authStore.eventId)
-            .listen('CheckinEvent', (e) => {
+            .listen('CheckinEvent', (e:any) => {
                 cb('CheckinEvent', e);
             })
-            .listen('AccreditationHandoutEvent', (e) => {
+            .listen('AccreditationHandoutEvent', (e:any) => {
                 cb('AccreditationHandoutEvent', e);
             })
-            .listen('CheckoutEvent', (e) => {
+            .listen('CheckoutEvent', (e:any) => {
                 cb('CheckoutEvent', e);
             });
     }

@@ -1,4 +1,4 @@
-import { PresenceChannel as Channel } from 'laravel-echo'
+import type { PresenceChannel as Channel } from 'laravel-echo'
 import { PrivateChannel } from './private-channel'
 
 export class PresenceChannel extends PrivateChannel implements Channel {

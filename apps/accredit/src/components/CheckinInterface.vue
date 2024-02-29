@@ -36,7 +36,7 @@ const currentEntity:Ref<ProcessedEntity> = ref({});
 watch(() => auth.credentials,
     (nw) => {
         if (auth.isCheckin()) {
-            broadcaster.subscribeToCheckin((type, content:AccreditationDocument) => {
+            broadcaster.subscribeToCheckin((type:string, content:AccreditationDocument) => {
                 if (props.visible) {
                     switch (type) {
                         case 'CheckinEvent':

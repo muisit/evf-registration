@@ -137,7 +137,7 @@ const compListByDate = computed(() => {
     });
 });
 
-function failDispatcher(code:string, codeObject:Code)
+function failDispatcher()
 {
     onDialogClose();
 }
@@ -184,9 +184,7 @@ function loadAllRegistrations()
             if (r.fencerId && (!r.roleId || r.roleId == 0)) {
                 registrationList.value[key].push(r.fencerId || 0);
                 let fkey = 'f' + r.fencerId;
-                if (fencerList.value[fkey] && fencerList.value[fkey].fencer && fencerList.value[fkey].fencer.registrations) {
-                    fencerList.value[fkey].fencer.registrations.push(r);
-                }
+                fencerList.value[fkey]?.fencer?.registrations?.push(r);
             }
         });
 

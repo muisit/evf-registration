@@ -31,7 +31,7 @@ const currentBadge:Ref<Code|null> = ref(null);
 watch(() => auth.credentials,
     (nw) => {
         if (auth.isCheckout()) {
-            broadcaster.subscribeToCheckout((type, content:AccreditationDocument) => {
+            broadcaster.subscribeToCheckout((type:string, content:AccreditationDocument) => {
                 moveDocumentToList(content);
             });
         }
@@ -201,7 +201,7 @@ watch(() => props.visible,
     { immediate: true }
 )
 
-function getCountry(cid)
+function getCountry(cid:number)
 {
     let key = 'c' + cid;
     if (basic.countriesById[key]) {
