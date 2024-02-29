@@ -2,6 +2,10 @@
 
 namespace App\Models\Requests;
 
+use App\Events\CheckinEvent;
+use App\Events\ProcessStartEvent;
+use App\Events\ProcessEndEvent;
+use App\Events\CheckoutEvent;
 use App\Models\Accreditation;
 use App\Models\AccreditationDocument as DocumentModel;
 use App\Models\Role;
@@ -17,18 +21,18 @@ class AccreditationDocument extends Base
     public function rules(): array
     {
         return [
-            'doc.id' => ['nullable', 'integer', 'min:0'],
-            'doc.badge' => ['required', 'string', 'size:14'],
+            'doc.id' => ['required', 'integer', 'min:0'],
+            'doc.badge' => ['nullable', 'string', 'size:14'],
             'doc.card' => ['nullable', 'integer', 'min:0', 'max:999'],
             'doc.document' => ['nullable', 'integer', 'min:0', 'max:9999'],
-            'doc.fencerId' => ['required', 'integer', 'exists:TD_Fencer,fencer_id'],
+            'doc.fencerId' => ['nullable', 'integer', 'exists:TD_Fencer,fencer_id'],
             'payload' => ['nullable', 'json'],
+            'status' => ['nullable', 'string', Rule::in(['C', 'P', 'G', 'E', 'O'])]
         ];
     }
 
     protected function authorize(EVFUser $user, array $data): bool
     {
-        \Log::debug("authorizing user based on data");
         if (!parent::authorize($user, $data)) {
             return false;
         }
@@ -45,47 +49,85 @@ class AccreditationDocument extends Base
     {
         $validator = parent::createValidator($request);
         $validator->after(function ($validator) use ($request) {
-            $data = $request->only('doc.badge', 'doc.fencerId');
-            if (!$this->checkBadge($data)) {
-                $validator->errors()->add(
-                    'badge',
-                    'Badge code incorrect'
-                );
-            }
-            if (!$this->checkFencer($data)) {
-                $validator->errors()->add(
-                    'fencerId',
-                    'Fencer not set correctly'
-                );
+            $data = $request->only('doc.badge', 'doc.fencerId', 'doc.document', 'doc.card');
+            if (!$this->model->exists) {
+                if (!$this->checkBadge($data)) {
+                    $validator->errors()->add(
+                        'badge',
+                        'Badge code incorrect'
+                    );
+                }
+                if (!$this->checkFencer($data)) {
+                    $validator->errors()->add(
+                        'fencerId',
+                        'Fencer not set correctly'
+                    );
+                }
+                if (!$this->checkCard($data)) {
+                    $validator->errors()->add(
+                        'card',
+                        'Card is in use already'
+                    );
+                }
+                if (!$this->checkDocument($data)) {
+                    $validator->errors()->add(
+                        'document',
+                        'Document is in use already'
+                    );
+                }
             }
         });
         return $validator;
     }
 
+    private function checkCard($data)
+    {
+        $event = request()->get('eventObject');
+        $card = $data['doc']['card'] ?? '';
+        if (!empty($card) && !empty($event)) {
+            $docs = DocumentModel::where('card', $card)
+                ->joinRelationship('accreditation')
+                ->where(Accreditation::tableName() . '.event_id', $event->getKey())
+                ->where('status', '<>', DocumentModel::STATUS_CHECKOUT)
+                ->count();
+            return $docs == 0;
+        }
+        return true;
+    }
+
+    private function checkDocument($data)
+    {
+        $event = request()->get('eventObject');
+        $document = $data['doc']['document'] ?? '';
+        if (!empty($document) && !empty($event)) {
+            $docs = DocumentModel::where('document_nr', $document)
+                ->joinRelationship('accreditation')
+                ->where(Accreditation::tableName() . '.event_id', $event->getKey())
+                ->count();
+            return $docs == 0;
+        }
+        return true;
+    }
+
     private function checkBadge($data)
     {
         $badge = $data['doc']['badge'] ?? '';
-        \Log::debug("checking badge $badge");
         if (strlen($badge) != 14) {
-            \Log::debug("badge has wrong size");
             return false;
         }
         $feid = substr($badge, 2, 7);
         if ($this->model->exists) {
             if ($this->model->accreditation->fe_id != $feid) {
-                \Log::debug("model has different accreditation");
                 return false;
             }
         }
         else {
             $event = request()->get('eventObject');
             if (empty($event)) {
-                \Log::debug("event is not set");
                 return false;
             }
             $accreditation = Accreditation::where('event_id', $event->getKey())->where('fe_id', $feid)->first();
             if (empty($accreditation)) {
-                \Log::debug("accreditation not found");
                 return false;
             }
             $this->model->accreditation_id = $accreditation->getKey();
@@ -97,7 +139,6 @@ class AccreditationDocument extends Base
     {
         $fencerId = $data['doc']['fencerId'] ?? 0;
         if ($this->model->accreditation->fencer_id != $fencerId) {
-            \Log::debug("fencer does not match accreditation");
             return false;
         }
         return true;
@@ -120,14 +161,70 @@ class AccreditationDocument extends Base
     protected function updateModel(array $data): ?Model
     {
         if ($this->model) {
-            $this->model->card = isset($data['doc']['card']) ? intval($data['doc']['card']) : $this->model->card;
-            $this->model->document_nr = isset($data['doc']['document']) ? intval($data['doc']['document']) : $this->model->document_nr;
+            if (!$this->model->exists) {
+                $this->model->status = DocumentModel::STATUS_CREATED;
+                $this->model->checkin = Carbon::now()->toDateTimeString();
+                $this->model->card = isset($data['doc']['card']) ? intval($data['doc']['card']) : $this->model->card;
+                $this->model->document_nr = isset($data['doc']['document']) ? intval($data['doc']['document']) : $this->model->document_nr;
+            }
 
             if (isset($data['doc']['payload'])) {
                 $payload = (array)$data['doc']['payload'];
                 $this->model->payload = array_merge($this->model->payload ?? [], $payload);
             }
+
+            if (isset($data['doc']['status'])) {
+                $this->model->status = $data['doc']['status'];
+                switch ($this->model->status) {
+                    case DocumentModel::STATUS_CREATED:
+                        $this->model->process_start = null;
+                        $this->model->process_end = null;
+                        $this->model->checkout = null;
+                        break;
+                    case DocumentModel::STATUS_PROCESSING:
+                        $this->model->process_start = Carbon::now()->toDateTimeString();
+                        $this->model->process_end = null;
+                        $this->model->checkout = null;
+                        break;
+                    case DocumentModel::STATUS_PROCESSED_GOOD:
+                    case DocumentModel::STATUS_PROCESSED_ERROR:
+                        $this->model->process_end = Carbon::now()->toDateTimeString();
+                        $this->model->checkout = null;
+                        break;
+                    case DocumentModel::STATUS_CHECKOUT:
+                        $this->model->checkout = Carbon::now()->toDateTimeString();
+                        break;
+                }
+            }
         }
         return $this->model;
     }
+
+    protected function postProcess()
+    {
+        parent::postProcess();
+        if (!empty($this->model)) {
+            \Log::debug("postProcess AccreditationDocument for status " . $this->model->status);
+            switch ($this->model->status) {
+                case DocumentModel::STATUS_CREATED:
+                    CheckinEvent::dispatch(request()->get('eventObject'), $this->model);
+                    break;
+                case DocumentModel::STATUS_PROCESSING:
+                    ProcessStartEvent::dispatch(request()->get('eventObject'), $this->model);
+                    $this->model->process_start = Carbon::now()->toDateTimeString();
+                    break;
+                case DocumentModel::STATUS_PROCESSED_GOOD:
+                case DocumentModel::STATUS_PROCESSED_ERROR:
+                    ProcessEndEvent::dispatch(request()->get('eventObject'), $this->model);
+                    $this->model->process_end = Carbon::now()->toDateTimeString();
+                    break;
+                case DocumentModel::STATUS_CHECKOUT:
+                    CheckoutEvent::dispatch(request()->get('eventObject'), $this->model);
+                    $this->model->checkout = Carbon::now()->toDateTimeString();
+                    break;
+
+            }
+        }
+    }
+
 }

@@ -49,17 +49,24 @@ class AuthServiceProvider extends ServiceProvider
         Gate::policy(\App\Models\AccreditationUser::class, \App\Models\Policies\AccreditationUser::class);
         Gate::policy(\App\Models\WPUser::class, \App\Models\Policies\WPUser::class);
 
+        // subscribe authentications. Each channel is linked to a front-end functionality
+        // named after the role, so only users with access to that functionality can
+        // subscribe
+        // Who can post is not determined by this authentication, but by the system generating
+        // specific events for specific channels.
         Broadcast::channel('accredit.{eventId}', function (EVFUser $user, int $eventId) {
             return $user->hasRole('code') && $user->hasRole("accreditation:" . $eventId);
         });
         Broadcast::channel('checkin.{eventId}', function (EVFUser $user, int $eventId) {
-            return $user->hasRole('code') && $user->hasRole("checkin:" . $eventId);
+            \Log::debug("checkin, user has roles " . json_encode($user->getAuthRoles()));
+            return $user->hasRole('code') && $user->hasRole(["checkin:" . $eventId]);
         });
         Broadcast::channel('checkout.{eventId}', function (EVFUser $user, int $eventId) {
-            return $user->hasRole('code') && $user->hasRole("checkin:" . $eventId);
+            \Log::debug("checkout, user has roles " . json_encode($user->getAuthRoles()));
+            return $user->hasRole('code') && $user->hasRole(["checkout:" . $eventId]);
         });
         Broadcast::channel('dt.{eventId}', function (EVFUser $user, int $eventId) {
-            return $user->hasRole('code') && $user->hasRole("dt:" . $eventId);
+            return $user->hasRole('code') && $user->hasRole(["dt:" . $eventId]);
         });
     }
 }

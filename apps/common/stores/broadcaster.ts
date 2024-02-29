@@ -26,18 +26,61 @@ export const useBroadcasterStore = defineStore('broadcaster', () => {
 
     // initialise the broadcaster
     manager = broadcaster();
-    console.log(manager);
 
     function subscribeToCheckin(cb:Function)
     {
-        console.log(manager);
         manager.private('checkin.' + authStore.eventId)
             .listen('CheckinEvent', (e) => {
                 cb('CheckinEvent', e);
+            })
+            .listen('ProcessStartEvent', (e) => {
+                cb('ProcessStartEvent', e);
+            })
+            .listen('ProcessEndEvent', (e) => {
+                cb('ProcessEndEvent', e);
+            })
+            .listen('CheckoutEvent', (e) => {
+                cb('CheckoutEvent', e);
             });
     }
 
+    function subscribeToCheckout(cb:Function)
+    {
+        manager.private('checkout.' + authStore.eventId)
+            .listen('CheckinEvent', (e) => {
+                cb('CheckinEvent', e);
+            })
+            .listen('ProcessStartEvent', (e) => {
+                cb('ProcessStartEvent', e);
+            })
+            .listen('ProcessEndEvent', (e) => {
+                cb('ProcessEndEvent', e);
+            })
+            .listen('CheckoutEvent', (e) => {
+                cb('CheckoutEvent', e);
+            });
+    }
+
+    function subscribeToDt(cb:Function)
+    {
+        manager.private('dt.' + authStore.eventId)
+            .listen('CheckinEvent', (e) => {
+                cb('CheckinEvent', e);
+            })
+            .listen('AccreditationHandoutEvent', (e) => {
+                cb('AccreditationHandoutEvent', e);
+            })
+            .listen('CheckoutEvent', (e) => {
+                cb('CheckoutEvent', e);
+            });
+    }
+
+    function unsubscribe(channel:string)
+    {
+        manager.leaveChannel(channel + '.' + authStore.eventId);
+    }
+
     return {
-        subscribeToCheckin
+        unsubscribe, subscribeToCheckin, subscribeToCheckout, subscribeToDt
     }
 });

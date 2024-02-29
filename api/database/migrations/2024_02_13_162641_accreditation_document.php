@@ -18,11 +18,19 @@ return new class extends Migration
             $table->unsignedInteger('card')->nullable();
             $table->unsignedInteger('document_nr')->nullable();
             $table->text('payload')->nullable();
-            $table->timestamps();
+            $table->string('status', 1)->default('C');
+            $table->timestamp('updated_at')->nullable()->default(null);
+            $table->timestamp('created_at')->nullable()->default(null);
             $table->unsignedBigInteger('created_by')->nullable();
             $table->foreign('created_by')->references('id')->on('accreditation_codes');
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->foreign('updated_by')->references('id')->on('accreditation_codes');
+
+            $table->dateTime('checkin')->nullable();
+            $table->dateTime('process_start')->nullable();
+            $table->dateTime('process_end')->nullable();
+            $table->dateTime('checkout')->nullable();
+            $table->string('checkout_badge', 14)->nullable();
         });
     }
 

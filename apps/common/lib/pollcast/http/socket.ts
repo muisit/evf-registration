@@ -34,7 +34,7 @@ export class Socket {
    */
   private channels: { [name: string]: { [event: string]: Function[] } } = {}
 
-  constructor (options: any, csrfToken: string | null) {
+  constructor (options: any, csrfToken: Function | string | null) {
     this.options = options
     this.options.csrfToken = csrfToken
   }
@@ -170,8 +170,11 @@ export class Socket {
   private createRequest (method: string, url: string): Request {
     const request = new Request(method, url)
     request.setWithCredentials(this.options.withCredentials || false);
-    console.log('setting s-csrf');
-    request.setRequestHeader('X-CSRF-Token', this.options.csrfToken);
+    let csrf = this.options.csrfToken;
+    if (typeof csrf == 'function') {
+        csrf = csrf();
+    }
+    request.setRequestHeader('X-CSRF-Token', csrf);
     return request
   }
 

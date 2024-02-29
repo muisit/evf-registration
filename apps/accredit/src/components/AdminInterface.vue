@@ -4,7 +4,7 @@ import type { Fencer, FencerById } from '../../../common/api/schemas/fencer';
 import type { Registration } from '../../../common/api/schemas/registration';
 import type { Event } from '../../../common/api/schemas/event';
 import type { Code, CodeUser } from '../../../common/api/schemas/codes';
-import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
 import { useBasicStore } from '../../../common/stores/basic';
@@ -42,6 +42,11 @@ watch(() => [props.visible, auth.userName, basic.event.id],
 watch(() => props.visible,
     (nw) => {
         if (nw) {
+            data.subtitle = 'Administrator Page';
+            data.clearDispatchers();
+            data.setDispatcher('badge', badgeDispatcher);
+            data.setDispatcher('fail', failDispatcher);
+
             auth.isLoading("accreditationuser");
             codeusers().then((dt) => {
                 auth.hasLoaded("accreditationuser");
@@ -116,17 +121,6 @@ function failDispatcher(code:string, codeObject:Code)
         }
     });
 }
-
-onMounted(() => {
-    data.subtitle = 'Administrator Page';
-    data.setDispatcher('badge', badgeDispatcher);
-    data.setDispatcher('fail', failDispatcher);
-});
-
-onUnmounted(() => {
-    data.setDispatcher('badge', null);
-    data.setDispatcher('fail', null);
-});
 
 function matchUserRoles()
 {
@@ -242,6 +236,8 @@ function configValue(label:string)
             return currentEvent.value.config.allow_incomplete_checkin || false;
         case "allow_hod_checkout":
             return currentEvent.value.config.allow_hod_checkout || false;
+        case "mark_process_start":
+            return currentEvent.value.config.mark_process_start || false;
     }
     return false;
 }
@@ -260,6 +256,9 @@ function setConfig(e:any, label:string)
             break;
         case "allow_hod_checkout":
             currentEvent.value.config.allow_hod_checkout = e ? true : false;
+            break;
+        case "mark_process_start":
+            currentEvent.value.config.mark_process_start = e ? true : false;
             break;
     }
 }
@@ -319,6 +318,9 @@ import { ElSelect, ElOption, ElTabs, ElTabPane, ElForm, ElFormItem, ElCheckbox, 
                 </ElFormItem>
                 <ElFormItem label="HoD" class="config">
                     <ElCheckbox :model-value="configValue('allow_hod_checkout')" @update:model-value="(e) => setConfig(e, 'allow_hod_checkout')" label="Allow check-out by the Head of Delegation"/>
+                </ElFormItem>
+                <ElFormItem label="Process" class="config">
+                    <ElCheckbox :model-value="configValue('mark_process_start')" @update:model-value="(e) => setConfig(e, 'mark_process_start')" label="Mark start of the weapons check process"/>
                 </ElFormItem>
                 <ElFormItem class="buttons">
                     <ElButton @click="saveConfig" type="primary">Save</ElButton>

@@ -15,6 +15,7 @@ class Cors
      */
     public function handle($request, Closure $next)
     {
+        \Log::debug("CORS middleware");
         $headers = [
             'Access-Control-Allow-Origin'      => $this->getOrigin(),
             'Access-Control-Allow-Methods'     => 'POST, GET, OPTIONS, PUT, DELETE',

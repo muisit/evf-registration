@@ -9,7 +9,7 @@ Route::group(["namespace" => "App\Http\Controllers"], function () {
     require('templates.php');
     require('codes.php');
 });
-require('pollcast.php');
+//require('pollcast.php');
 
 /*
 |--------------------------------------------------------------------------

@@ -1,0 +1,77 @@
+.accredit.dt {
+    .scan-logger {
+        display: none;
+    }
+}
+
+.dt-interface {
+    .competition-line {
+        display: flex;
+        flex-direction: row;
+        padding-bottom: 5px;
+
+        .title {
+            width: 40px;
+            font-weight: bold;
+        }
+
+        .date {
+            width: 60px;
+            font-weight: bold;
+        }
+
+        .number {
+            width: 80px;
+            text-align: right;
+        }
+
+        .search {
+            padding-left: 10px;
+        }
+    }
+
+    .el-dialog {
+        .summary {
+            padding-bottom: 15px;
+
+            .label {
+                font-weight: bold;
+                padding-left: 15px;
+            }
+            .label.first {
+                padding-left: 0px;
+            }
+        }
+
+        .dt-listing {
+            thead {
+                th {
+                    font-weight: bold;
+                    text-align: left;
+                    padding: 2px 4px;
+                }
+            }
+            tbody {
+                tr {
+                    td {
+                        padding: 2px 4px;
+                    }
+                }
+
+                tr.absent {
+                    background-color: #f88;
+                }
+                tr.present {
+                    background-color: #88f;
+                }
+                tr.checkin { 
+                    background-color: #ff8;
+                }
+                tr.done {
+                    background-color: #8f8;
+                }
+
+            }
+        }
+    }
+}

@@ -234,6 +234,12 @@ export const useBasicStore = defineStore('basic', () => {
         return false;
     }
 
+    function eventMarksStartOfProcessing()
+    {
+        if (event.value.config && event.value.config.mark_process_start) return true;
+        return false;
+    }
+
     return {
         roles, officialRoles, organisationRoles, countryRoles, rolesById, 
         countries, countriesById, categories, categoriesById, weapons, weaponsById,
@@ -241,6 +247,7 @@ export const useBasicStore = defineStore('basic', () => {
         event, competitions, competitionsById, sideEvents, sideEventsById,
         competitionEvents, nonCompetitionEvents, getEvent, setEvent,
         decorateRegistrations,
-        eventRequiresCards, eventRequiresDocuments, eventAllowsIncompleteCheckin, eventAllowsCheckoutByHod
+        eventRequiresCards, eventRequiresDocuments, eventAllowsIncompleteCheckin, eventAllowsCheckoutByHod,
+        eventMarksStartOfProcessing
     };
 });

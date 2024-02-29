@@ -1,15 +1,14 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted } from 'vue';
 import { useDataStore } from '../stores/data';
 
 const data = useDataStore();
 
 onMounted(() => {
     data.subtitle = '';
+    console.log('setting badge dispatcher for login');
+    data.clearDispatchers();
     data.setDispatcher('badge', data.adminDispatcher);
-});
-onUnmounted(() => {
-    data.setDispatcher('badge', null);
 });
 
 import InputComponent from './InputComponent.vue';

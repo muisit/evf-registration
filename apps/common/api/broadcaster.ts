@@ -1,10 +1,7 @@
 import Echo from 'laravel-echo';
 import PollcastConnector from '../lib/pollcast/pollcast'
-import { useAuthStore } from '../stores/auth';
 
 export const broadcaster = () => {
-    console.log('creating new pollcastConnector for Echo', import.meta.env.VITE_API_URL + "/pollcast/connect");
-    const auth = useAuthStore();
     let retval = new Echo({
         broadcaster: PollcastConnector,
         routes: {

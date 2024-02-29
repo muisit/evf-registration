@@ -14,7 +14,7 @@ export const registrations = function() {
         }, (err) => {
             reject(err);
         }).catch((err) => {
-                return reject(err);
+            return reject(err);
         });
     });
 }
@@ -31,7 +31,7 @@ export const allRegistrations = function() {
         }, (err) => {
             reject(err);
         }).catch((err) => {
-                return reject(err);
+            return reject(err);
         });
     });
 }

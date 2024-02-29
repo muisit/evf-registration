@@ -7,15 +7,18 @@ export function processCode(code:string, dispatcher:CodeDispatcher)
 {
     let codeObject = extractCode(code);
     codeObject.scannedTime = dayjs().format('MM-DD HH:mm:ss');
-
+    console.log(codeObject);
     switch (codeObject.baseFunction || 0) {
         default:
         case 0:
             if (dispatcher.fail) dispatcher.fail(code, codeObject);
             break;
         case 1:
-            if (dispatcher.success) dispatcher.success(code, codeObject);
-            if (dispatcher.badge) dispatcher.badge(code, codeObject);
+            if (dispatcher.success) dispatcher.success(code, codeObject);           
+            if (dispatcher.badge) {
+                console.log('calling badge dispatcher');
+                dispatcher.badge(code, codeObject);
+            }
             break;
         case 2:
             codeObject.data = codeObject.id2 || 0;

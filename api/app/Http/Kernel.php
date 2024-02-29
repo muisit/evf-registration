@@ -28,7 +28,6 @@ class Kernel extends HttpKernel
         'web' => [
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \App\Http\Middleware\Cors::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\CSRFCheck::class,
@@ -39,7 +38,6 @@ class Kernel extends HttpKernel
         'api' => [
             \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\Cors::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \App\Http\Middleware\CSRFCheck::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,

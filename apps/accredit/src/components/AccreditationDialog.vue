@@ -16,7 +16,6 @@ const reloadHash = ref(random_hash());
 
 function cancelForm()
 {
-    console.log('emitting onCancel');
     emits('onCancel');
     emits('onClose');
 }
@@ -39,7 +38,6 @@ function registerForm()
 
 function update(registration:Registration, value: any)
 {
-    console.log('switching to ', value);
     registration.state = value == 'P' ? 'P' : 'A';
     emits('onUpdate', {registration: registration});
 }

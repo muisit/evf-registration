@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Support\Services\PDFService;
 use Carbon\Carbon;
 
@@ -62,6 +63,11 @@ class Accreditation extends Model
     public function template(): BelongsTo
     {
         return $this->belongsTo(AccreditationTemplate::class, 'template_id', 'id');
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(AccreditationDocument::class);
     }
 
     public function path($makeAbsolute = true)
@@ -124,5 +130,22 @@ class Accreditation extends Model
     public function getFullAccreditationId()
     {
         return sprintf('11%s%1d%04d', $this->fe_id, self::createControlDigit($this->fe_id), 0);
+    }
+
+    public function getDatesOfAccreditation()
+    {
+        $dates = [];
+        $registrations = Registration::where('registration_fencer', $this->fencer->getKey())
+            ->where('registration_mainevent', $this->event->getKey())
+            ->with('sideEvent')
+            ->with('sideEvent.competition')
+            ->get();
+        foreach ($registrations as $registration) {
+            if (!empty($registration->sideEvent) && !empty($registration->sideEvent->competition)) {
+                $dt = (new Carbon($registration->sideEvent->starts))->format('D d');
+                $dates[$dt] = true;
+            }
+        }
+        return array_keys($dates);
     }
 }

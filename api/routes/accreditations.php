@@ -14,26 +14,41 @@ Route::group(
         Route::get(
             '/overview',
             'Accreditations\Overview@index'
-        )->name('acrreditations.overview');
+        )->name('accreditations.overview');
    
         Route::get(
             '/regenerate',
             'Accreditations\Regenerate@index'
-        )->name('acrreditations.regenerate');
+        )->name('accreditations.regenerate');
 
         Route::get(
             '/summary/{summaryId}',
             'Accreditations\Download@index'
-        )->name('acrreditations.download');
+        )->name('accreditations.download');
 
         Route::post(
             '/summary',
             'Accreditations\Summary@index'
-        )->name('acrreditations.summary');
+        )->name('accreditations.summary');
 
         Route::post(
             '/document',
             'Accreditations\SaveDocument@index'
-        )->name('acrreditations.document');
+        )->name('accreditations.document');
+
+        Route::post(
+            '/handout',
+            'Accreditations\Handout@index'
+        )->name('accreditations.handout');
+
+        Route::get(
+            '/documents',
+            'Accreditations\Documents@index'
+        )->name('accreditations.documents');
+
+        Route::get(
+            '/statistics',
+            'Accreditations\Statistics@index'
+        )->name('accreditations.statistics');
     }
 );

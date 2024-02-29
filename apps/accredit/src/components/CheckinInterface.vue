@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import type { Code } from '../../../common/api/schemas/codes';
 import type { Fencer, FencerById } from '../../../common/api/schemas/fencer';
@@ -22,10 +22,6 @@ const data = useDataStore();
 const basic = useBasicStore();
 const broadcaster = useBroadcasterStore();
 
-broadcaster.subscribeToCheckin((type, content) => {
-    console.log(type, content);
-});
-
 interface ProcessedEntity {
     badge?: Code;
     card?: Code;
@@ -34,8 +30,58 @@ interface ProcessedEntity {
 }
 
 const fencers:Ref<FencerById> = ref({});
-const processedList:Ref<ProcessedEntity[]> = ref([]);
+const processedList:Ref<AccreditationDocument[]> = ref([]);
 const currentEntity:Ref<ProcessedEntity> = ref({});
+
+watch(() => auth.credentials,
+    (nw) => {
+        if (auth.isCheckin()) {
+            broadcaster.subscribeToCheckin((type, content:AccreditationDocument) => {
+                if (props.visible) {
+                    switch (type) {
+                        case 'CheckinEvent':
+                            matchDocument('checkin', content);
+                            break;
+                        case 'CheckoutEvent':
+                            matchDocument('checkout', content);
+                            break;
+                        case 'ProcessStartEvent':
+                            matchDocument('start', content);
+                            break;
+                        case 'ProcessEndEvent':
+                            matchDocument('end', content);
+                            break;
+                    }
+                }
+            });
+        }
+        else {
+            broadcaster.unsubscribe('checkin');
+        }
+    },
+    { immediate: true }
+);
+
+function matchDocument(event:string, doc:AccreditationDocument)
+{
+    if (event == 'checkout') {
+        processedList.value = processedList.value.filter((d:AccreditationDocument) => d.id != doc.id);
+    }
+    else {
+        let found = false;
+        processedList.value = processedList.value.map((d:AccreditationDocument) => {
+            if (d.id == doc.id) {
+                found = true;
+                return doc;
+            }
+            return d;
+        });
+        if (!found) {
+            processedList.value.unshift(doc);
+        }
+    }
+}
+
 
 function badgeDispatcher(code:string, codeObject:Code)
 {
@@ -89,24 +135,23 @@ function failDispatcher(code:string, codeObject:Code)
     }
 }
 
-onMounted(() => {
-    data.subtitle = "Weapon Control Check-in";
-    data.setDispatcher('badge', badgeDispatcher);
-    data.setDispatcher('card', cardDispatcher);
-    data.setDispatcher('document', documentDispatcher);
-    data.setDispatcher('fail', failDispatcher);
-});
+watch(() => props.visible,
+    (nw) => {
+        if (nw) {
+            data.clearDispatchers();
+            data.subtitle = "Weapon Control Check-in";
+            data.setDispatcher('badge', badgeDispatcher);
+            data.setDispatcher('card', cardDispatcher);
+            data.setDispatcher('document', documentDispatcher);
+            data.setDispatcher('fail', failDispatcher);
+        }
+    },
+    { immediate: true }
+)
 
-onUnmounted(() => {
-    data.setDispatcher('badge', null);
-    data.setDispatcher('card', null);
-    data.setDispatcher('document', null);
-    data.setDispatcher('fail', null);
-});
-
-function getCountry(fencer?:Fencer)
+function getCountry(cid:number)
 {
-    let key = 'c' + fencer?.countryId;
+    let key = 'c' + cid;
     if (basic.countriesById[key]) {
         return basic.countriesById[key].abbr;
     }
@@ -134,22 +179,6 @@ function getDays(fencer?:Fencer)
     }).join(', ');
 }
 
-function rowIncomplete(entity:ProcessedEntity)
-{
-    if (!entity.badge) return true;
-    if (basic.eventRequiresCards() && !basic.eventAllowsIncompleteCheckin() &&  !entity.card) return true;
-    if (basic.eventRequiresDocuments() && !basic.eventAllowsIncompleteCheckin() && !entity.document) return true;
-    return false;
-}
-
-function combinedList()
-{
-    if (!currentEntity.value.badge && !currentEntity.value.card && !currentEntity.value.document) {
-        return processedList.value;
-    }
-    return [currentEntity.value].concat(processedList.value);
-}
-
 const dialogVisible = ref(false);
 function onDialogClose()
 {
@@ -158,7 +187,7 @@ function onDialogClose()
 
 function onDialogSubmit()
 {
-    let doc:AccreditationDocument = {badge:''};
+    let doc:AccreditationDocument = {id: 0};
     if (basic.eventRequiresCards() && !basic.eventAllowsIncompleteCheckin() && !currentEntity.value.card) {
         alert("Cannot check in without a connected card");
         return false;
@@ -186,21 +215,39 @@ function onDialogSubmit()
     savedocument(doc).then((dt) => {
         auth.hasLoaded('savedocument');
 
-        if (!dt || !dt.entered) {
+        if (!dt || !dt.checkin) {
             throw new Error("invalid response");
         }
-        console.log("return value is ", dt);
-        let lst = processedList.value.slice();
-        currentEntity.value.entered = dt?.entered;
-        lst.unshift(currentEntity.value);
-        processedList.value = lst;
+        processedList.value.unshift(dt);
         currentEntity.value = {};
         onDialogClose();
     })
     .catch((e) => {
         auth.hasLoaded('savedocument');
-        console.log(e);
-        alert("There was an error processing the data. Please reload the page and try again.");
+        if (e.status == 422 && e.data) {
+            // validation error
+            let txt='';
+            if (e.data.card) {
+                txt += e.data.card.join('; ') + '\r\n';
+            }
+            if (e.data.document) {
+                txt += e.data.document.join('; ') + '\r\n';
+            }
+            if (e.data.badge) {
+                txt += e.data.badge.join('; ') + '\r\n';
+            }
+            if (txt.length > 0) {
+                alert(txt);
+            }
+            else {
+                console.log(e);
+                alert("There was an error processing the data. Please reload the page and try again.");
+            }
+        }
+        else {
+            console.log(e);
+            alert("There was an error processing the data. Please reload the page and try again.");
+        }
     })
 }
 
@@ -215,11 +262,11 @@ import CheckinDialog from './CheckinDialog.vue';
 <template>
     <div class="main-app checkin-interface" v-if="auth.isCheckin(auth.eventId, 'code')">
         <div class="table-wrapper">
-            <table class="processed-list style-stripes">
+            <table class="processed-list">
                 <thead>
                     <tr>
                         <th>Badge</th>
-                        <th colspan="2">Name</th>
+                        <th>Name</th>
                         <th>Country</th>
                         <th>Competitions</th>
                         <th v-if="basic.eventRequiresCards()">Card</th>
@@ -228,20 +275,34 @@ import CheckinDialog from './CheckinDialog.vue';
                     </tr>                    
                 </thead>
                 <tbody>
-                    <tr v-for="(entity, i) in combinedList()" :key="i" :class="{ 'checkin-row': true, 'pending': rowIncomplete(entity)}">
-                        <td class="code">{{ entity.badge?.original }}</td>
-                        <td class="lastname">{{ fencers[entity.badge?.original || '']?.lastName || '' }}</td>
-                        <td class="firstname">{{ fencers[entity.badge?.original || '']?.firstName || '' }}</td>
-                        <td class="country">{{ getCountry(fencers[entity.badge?.original || '']) }}</td>
-                        <td class="days">{{ getDays(fencers[entity.badge?.original || ''])}}</td>
-                        <td  v-if="basic.eventRequiresCards()" class="code">{{ entity.card?.data }}</td>
-                        <td  v-if="basic.eventRequiresDocuments()" class="code">{{ entity.document?.data }}</td>
-                        <td class="date">{{ dayjs(entity.entered).format('ddd D HH:mm') }}</td>
+                    <tr v-if="currentEntity.badge || currentEntity.card || currentEntity.document" :class="{
+                            'checkin-row': true,
+                            'pending': true
+                        }">
+                        <td class="code">{{ currentEntity.badge?.original }}</td>
+                        <td class="name">{{ fencers[currentEntity.badge?.original || '']?.lastName || '' }}, {{ fencers[currentEntity.badge?.original || '']?.firstName || '' }}</td>
+                        <td class="country">{{ getCountry(fencers[currentEntity.badge?.original || '']?.countryId || 0) }}</td>
+                        <td class="days">{{ getDays(fencers[currentEntity.badge?.original || ''])}}</td>
+                        <td  v-if="basic.eventRequiresCards()" class="code">{{ currentEntity.card?.data }}</td>
+                        <td  v-if="basic.eventRequiresDocuments()" class="code">{{ currentEntity.document?.data }}</td>
+                        <td class="date">{{ dayjs(currentEntity.entered).format('ddd D HH:mm') }}</td>
+                    </tr>
+                    <tr v-for="doc in processedList" :key="doc.id" :class="{
+                            'checkin-row': true,
+                            'started': doc.processStart && !doc.processEnd,
+                            'processed': doc.processEnd && !doc.checkout
+                        }">
+                        <td class="code">{{ doc.badge }}</td>
+                        <td class="name">{{ doc.name }}</td>
+                        <td class="country">{{ basic.countriesById['c' + doc.countryId].abbr }}</td>
+                        <td class="days">{{ doc.dates?.join(', ') }}</td>
+                        <td  v-if="basic.eventRequiresCards()" class="code">{{ doc.card}}</td>
+                        <td  v-if="basic.eventRequiresDocuments()" class="code">{{ doc.document }}</td>
+                        <td class="date">{{ dayjs(doc.checkin).format('ddd D HH:mm') }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        {{  dialogVisible }}
         <CheckinDialog
             :fencer="fencers[currentEntity.badge?.original || ''] || null"
             :card="currentEntity.card || null"

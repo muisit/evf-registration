@@ -189,7 +189,7 @@ return [
         //App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\PollcastServiceProvider::class,
+        SupportPal\Pollcast\ServiceProvider::class,
         //SwaggerLume\ServiceProvider::class,
         Kirschbaum\PowerJoins\PowerJoinsServiceProvider::class,
         Illuminate\Mail\MailServiceProvider::class,
