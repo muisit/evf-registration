@@ -36,15 +36,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        DB::listen(function ($query) {
-            \Log::debug(
-                $query->sql,
-                $query->bindings,
-                $query->time
-            );
-        });
         Queue::failing(function (JobFailed $event) {
-            \Log::debug("received JobFailed event" . json_encode($event));
             $notification = new JobFailure($event);
             Notification::route('mail', 'webmaster@veteransfencing.eu')->notify($notification);
         });
