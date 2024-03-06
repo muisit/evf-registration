@@ -16,7 +16,7 @@ class LoginTest extends TestCase
 
     public function testRoute()
     {
-        $this
+        $response = $this
             ->session(['_token' => 'aaa'])
             ->post(
                 route('auth.login'),
@@ -24,8 +24,8 @@ class LoginTest extends TestCase
                 ['X-CSRF-Token' => 'aaa']
             );
 
-        $this->assertNotEmpty($this->response);
-        $output = $this->response->json();
+        $this->assertNotEmpty($response);
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['status']));
@@ -35,7 +35,7 @@ class LoginTest extends TestCase
 
     public function testLoginWithName()
     {
-        $this
+        $response = $this
             ->session(['_token' => 'aaa'])
             ->post(
                 route('auth.login'),
@@ -43,8 +43,8 @@ class LoginTest extends TestCase
                 ['X-CSRF-Token' => 'aaa']
             );
 
-        $this->assertNotEmpty($this->response);
-        $output = $this->response->json();
+        $this->assertNotEmpty($response);
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['status']));
@@ -54,7 +54,7 @@ class LoginTest extends TestCase
 
     public function testRouteUnauth()
     {
-        $this
+        $response = $this
             ->session(['_token' => 'aaa'])
             ->post(
                 route('auth.login'),
@@ -62,8 +62,8 @@ class LoginTest extends TestCase
                 ['X-CSRF-Token' => 'aaa']
             );
 
-        $this->assertNotEmpty($this->response);
-        $output = $this->response->json();
+        $this->assertNotEmpty($response);
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['status']));

@@ -14,11 +14,11 @@ class PictureDeleteTest extends TestCase
 {
     public function testRoute()
     {
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+        $response = $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->post('/templates/' . TemplateData::ATHLETE . '/picture/a928a/remove?event=' . EventData::EVENT1, [], ['X-CSRF-Token' => 'aaa'])
             ->assertStatus(404);
 
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
 
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSERORGANISER])

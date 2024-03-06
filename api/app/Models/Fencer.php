@@ -51,4 +51,14 @@ class Fencer extends Model
             Accreditation::makeDirty($this, null);
         }
     }
+
+    public function getCountryOfRegistration(Event $event)
+    {
+        $country = Registration::where('registration_fencer', $this->getKey())
+            ->where('registration_mainevent', $event->getKey())
+            ->where('registration_country', '<>', null)
+            ->pluck('registration_country')
+            ->first();
+        return empty($country) ? 0 : $country;
+    }
 }

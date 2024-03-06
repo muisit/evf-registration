@@ -1,106 +1,80 @@
 <?php
 
 // Unauthenticated routes
-$router->group(
+Route::group(
     [
         'prefix' => '/events'
     ],
-    function () use ($router) {
-        $router->get(
-            '/{eventId:[1-9][0-9]*}',
-            [
-                'as' => 'events.get',
-                'uses' => 'Events\Get@index'
-            ]
-        );
+    function () {
+        Route::get(
+            '/{eventId}',
+            'Events\Get@index'
+        )
+        ->name('events.get')
+        ->where('eventId', '[1-9][0-9]*');
     }
 );
 
 // Authenticated routes
-$router->group(
+Route::group(
     [
         'prefix' => '/events',
         'middleware' => 'auth'
     ],
-    function () use ($router) {
-        $router->get(
+    function () {
+        Route::get(
             '/',
-            [
-                'as' => 'events.list',
-                'uses' => 'Events\Index@index'
-            ]
-        );
+            'Events\Index@index'
+        )->name('events.list');
 
-        $router->post(
+        Route::post(
             '/',
-            [
-                'as' => 'events.save',
-                'uses' => 'Events\Save@index'
-            ]
-        );
+            'Events\Save@index'
+        )->name('events.save');
 
-        $router->post(
+        Route::post(
+            '/config',
+            'Events\SaveConfig@index'
+        )->name('events.saveconfig');
+
+        Route::post(
             '/sides',
-            [
-                'as' => 'events.savesides',
-                'uses' => 'Events\SaveSides@index'
-            ]
-        );
+            'Events\SaveSides@index'
+        )->name('events.savesides');
 
-        $router->get(
+        Route::get(
             '/roles',
-            [
-                'as' => 'events.roles',
-                'uses' => 'Events\Roles@index'
-            ]
-        );
+            'Events\Roles@index'
+        )->name('events.roles');
 
-        $router->post(
+        Route::post(
             '/roles',
-            [
-                'as' => 'events.saveroles',
-                'uses' => 'Events\SaveRoles@index'
-            ]
-        );
+            'Events\SaveRoles@index'
+        )->name('events.saveroles');
 
-        $router->get(
+        Route::get(
             '/overview',
-            [
-                'as' => 'events.overview',
-                'uses' => 'Events\Overview@index'
-            ]
-        );
+            'Events\Overview@index'
+        )->name('events.overview');
 
-        $router->get(
+        Route::get(
             '/statistics',
-            [
-                'as' => 'events.statistics',
-                'uses' => 'Events\Statistics@index'
-            ]
-        );
+            'Events\Statistics@index'
+        )->name('events.statistics');
 
-        $router->get(
+        Route::get(
             '/generate',
-            [
-                'as' => 'events.generate',
-                'uses' => 'Events\Generate@index'
-            ]
-        );
+            'Events\Generate@index'
+        )->name('events.generate');
 
-        $router->get(
+        Route::get(
             '/xml/{sideEventId}',
-            [
-                'as' => 'events.downloadxml',
-                'uses' => 'Events\Download@asXML'
-            ]
-        );
+            'Events\Download@asXML'
+        )->name('events.downloadxml');
 
-        $router->get(
+        Route::get(
             '/csv/{sideEventId}',
-            [
-                'as' => 'events.downloadcsv',
-                'uses' => 'Events\Download@asCSV'
-            ]
-        );
+            'Events\Download@asCSV'
+        )->name('events.downloadcsv');
     }
 );

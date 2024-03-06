@@ -99,6 +99,14 @@ class Registration
      */
     public ?string $team = null;
 
+    /**
+     * Country identifier: the country on which behalf this registration was made
+     *
+     * @var int
+     * @OA\Property()
+     */
+    public ?int $countryId = null;
+
     public function __construct(BaseModel $registration)
     {
         $this->id = $registration->getKey();
@@ -112,5 +120,6 @@ class Registration
         $this->paidHod = $registration->registration_paid_hod;
         $this->state = $registration->registration_state;
         $this->team = $registration->registration_team;
+        $this->countryId = intval($registration->registration_country) > 0 ? $registration->registration_country : null;
     }
 }

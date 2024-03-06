@@ -8,6 +8,7 @@ export interface Code {
     payload?: string;
 
     scannedTime?:string;
+    data: number;
 }
 
 export interface CodeUser {

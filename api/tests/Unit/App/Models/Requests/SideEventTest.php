@@ -10,16 +10,14 @@ use App\Models\Requests\SideEvent as SideEventRequest;
 use Tests\Support\Data\Event as EventData;
 use Tests\Support\Data\WPUser as UserData;
 use Tests\Support\Data\SideEvent as SideEventData;
-use Laravel\Lumen\Routing\Controller;
+use App\Http\Controllers\Events\SaveSides;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Tests\Unit\TestCase;
-use Mockery;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class SideEventTest extends TestCase
 {
-    public $authorizeCalls = [];
-
     private function testData()
     {
         return [[
@@ -31,98 +29,84 @@ class SideEventTest extends TestCase
         ]];
     }
 
+    private function setRequest($testData)
+    {
+        $event = Event::where('event_id', EventData::EVENT1)->first();
+        $country = Country::where('country_id', Country::GER)->first();
+        request()->merge([
+            'eventObject' => $event,
+            'countryObject' => $country,
+            'sides' => $testData
+        ]);
+    }
+
+    private function createRequest($testData)
+    {
+        $this->setRequest($testData);
+        return new SideEventRequest(new SaveSides());
+    }
+
     private function baseTest($testData, $user)
     {
-        $this->authorizeCalls = [];
-        $stubController = $this->createMock(Controller::class);
-        $stubController
-            ->method('authorize')
-            ->with(
-                $this->callback(function ($arg) {
-                    $this->authorizeCalls[] = $arg;
-                    return true;
-                }),
-                $this->callback(fn($arg) => empty($arg) || $arg == Event::class || get_class($arg) == Event::class)
-            )
-            ->willReturn(true);
-
-        $request = new SideEventRequest($stubController);
-
-        $stub = $this->createMock(Request::class);
-        $stub->expects($this->any())->method('user')->willReturn($user);
-        $stub->expects($this->any())->method('get')->with('sides')->willReturn($testData);
-        $stub->expects($this->any())->method('all')->willReturn(['sides' => $testData]);
-        $stub->expects($this->any())->method('only')->willReturn(['sides' => $testData]);
-        return $request->validate($stub);
+        if (!empty($user)) {
+            $this->session(['wpuser' => $user->getKey()]);
+        }
+        return $this->createRequest($testData)->validate(request());
     }
 
     public function testUpdate()
     {
-        request()->merge([
-            'eventObject' => Event::where('event_id', EventData::EVENT1)->first(),
-            'countryObject' => Country::where('country_id', Country::GER)->first()
-        ]);
-
-        $testData = $this->testData();
         $user = WPUser::where('ID', UserData::TESTUSER)->first();
-        $model = $this->baseTest($testData, $user);
-
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
-        $this->assertNotEmpty($model); // event object
+        $model = $this->baseTest($this->testData(), $user);
+        $this->assertNotEmpty($model);
     }
 
     public function testAuthorization()
     {
-        request()->merge([
-            'eventObject' => Event::where('event_id', EventData::EVENT1)->first(),
-            'countryObject' => Country::where('country_id', Country::GER)->first()
-        ]);
         $testData = $this->testData();
         $user = WPUser::where('ID', UserData::TESTUSERORGANISER)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData, $user) {
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
 
         $user = WPUser::where('ID', UserData::TESTUSERREGISTRAR)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData, $user) {
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
 
         $user = WPUser::where('ID', UserData::TESTUSERHOD)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData, $user) {
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
 
         $user = WPUser::where('ID', UserData::TESTUSERGENHOD)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData, $user) {
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
 
         // no privileges
         $user = WPUser::where('ID', UserData::TESTUSER5)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData, $user) {
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
 
         // cashier
         $user = WPUser::where('ID', UserData::TESTUSER3)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData, $user) {
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
 
         // accreditation
         $user = WPUser::where('ID', UserData::TESTUSER3)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
+        $this->assertException(function () use ($testData, $user) {
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
     }
 
     public function testValidateId()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new SideEventRequest($stubController))->rules();
         $testData = ['sides' => $this->testData()];
+        $rules = (new SideEventRequest(new SaveSides()))->rules();
         $validator = Validator::make($testData, $rules);
         $this->assertTrue($validator->passes());
 
@@ -148,8 +132,7 @@ class SideEventTest extends TestCase
 
     public function testValidateTitle()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new SideEventRequest($stubController))->rules();
+        $rules = (new SideEventRequest(new SaveSides()))->rules();
         $testData = ['sides' => $this->testData()];
         $validator = Validator::make($testData, $rules);
         $this->assertTrue($validator->passes());
@@ -176,8 +159,7 @@ class SideEventTest extends TestCase
 
     public function testValidateDescription()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new SideEventRequest($stubController))->rules();
+        $rules = (new SideEventRequest(new SaveSides()))->rules();
         $testData = ['sides' => $this->testData()];
         $validator = Validator::make($testData, $rules);
         $this->assertTrue($validator->passes());
@@ -201,8 +183,7 @@ class SideEventTest extends TestCase
 
     public function testValidateStarts()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new SideEventRequest($stubController))->rules();
+        $rules = (new SideEventRequest(new SaveSides()))->rules();
         $testData = ['sides' => $this->testData()];
         $validator = Validator::make($testData, $rules);
         $this->assertTrue($validator->passes());
@@ -232,8 +213,7 @@ class SideEventTest extends TestCase
 
     public function testValidateCosts()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new SideEventRequest($stubController))->rules();
+        $rules = (new SideEventRequest(new SaveSides()))->rules();
         $testData = ['sides' => $this->testData()];
         $validator = Validator::make($testData, $rules);
         $this->assertTrue($validator->passes());

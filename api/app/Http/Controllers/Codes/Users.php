@@ -27,11 +27,11 @@ class Users extends Controller
      */
     public function index(Request $request)
     {
+        $retval = [];
         $event = $request->get('eventObject');
         if (!empty($event) && $request->user()->can('view', $event)) {
             // only list the users linked to an accreditation, not the 'system' users, to prevent accidental lockout
             $users = AccreditationUser::where('event_id', $event->getKey())->whereNot('accreditation_id', null)->with('accreditation')->get();
-            $retval = [];
             foreach ($users as $user) {
                 $retval[] = new UserSchema($user);
             }

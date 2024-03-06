@@ -89,7 +89,7 @@ class Event extends Base
             $this->model->event_web = $data['event']['web'] ?? null;
             $this->model->event_location = $data['event']['location'] ?? null;
             $this->model->event_country = $data['event']['countryId'] ?? null;
-            $this->model->event_config = $this->safeConfig($data['event']['config'] ?? '{}');
+            $this->model->event_config = json_encode(array_merge(json_decode($this->model->event_config, true), $this->safeConfig($data['event']['config'] ?? '{}')));
             $this->model->event_payments = $data['event']['payments'] ?? 'group';
             $this->model->event_currency_symbol = $data['event']['symbol'] ?? '€';
             $this->model->event_currency_name = $data['event']['currency'] ?? 'EUR';
@@ -110,13 +110,13 @@ class Event extends Base
         if (!is_object($obj)) {
             $obj = json_decode($obj);
         }
-        return json_encode((object)[
+        return [
             "allow_registration_lower_age" => $obj->allow_registration_lower_age ?? false,
             "allow_more_teams" => $obj->allow_more_teams ?? false,
             "no_accreditations" => $obj->no_accreditations ?? true,
             "use_accreditation" => $obj->use_accreditation ?? false,
             "use_registration" => $obj->use_registration ?? true,
-        ]);
+        ];
     }
 
     private function safeDate($dt)

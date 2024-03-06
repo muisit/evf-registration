@@ -25,8 +25,9 @@ class JobFailure extends MailNotification
      */
     public function toMail($notifiable)
     {
-        $feurl = env('APP_FE_URL', env('APP_URL'));
-        $baselink = htmlentities(url($feurl), ENT_QUOTES, 'utf-8');
+        $feurl = env('APP_FE_URL', env('APP_URL', ''));
+        $url = url($feurl);
+        $baselink = htmlentities($url, ENT_QUOTES, 'utf-8');
 
         return (new MailMessage())
             ->subject('[EVF] Job Failed')

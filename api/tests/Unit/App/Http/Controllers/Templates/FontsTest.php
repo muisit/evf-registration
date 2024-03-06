@@ -10,17 +10,17 @@ use Tests\Support\Data\Event as EventData;
 use Tests\Support\Data\EventRole as EventRoleData;
 use Tests\Support\Data\AccreditationTemplate as TemplateData;
 use App\Support\Services\PDFGenerator;
-use Laravel\Lumen\Application;
+use Illuminate\Foundation\Application;
 
 class FontsTest extends TestCase
 {
     public function testRoute()
     {
-        $this->session(['wpuser' => UserData::TESTUSER])
+        $response = $this->session(['wpuser' => UserData::TESTUSER])
             ->get('/templates/fonts')
             ->assertStatus(200);
 
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertCount(42, $output);

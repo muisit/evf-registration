@@ -12,12 +12,12 @@ class LogoutTest extends TestCase
     {
         UserData::create();
 
-        $this
+        $response = $this
             ->session(['wpuser' => UserData::TESTUSER])
             ->get(route('auth.logout'));
 
-        $this->assertNotEmpty($this->response);
-        $output = $this->response->json();
+        $this->assertNotEmpty($response);
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['status']));

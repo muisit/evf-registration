@@ -6,23 +6,22 @@ use App\Models\Country;
 use App\Models\Event;
 use App\Models\Fencer;
 use App\Models\WPUser;
+use App\Http\Controllers\Fencers\Save;
 use App\Models\Requests\Fencer as FencerRequest;
 use Tests\Support\Data\Event as EventData;
 use Tests\Support\Data\Fencer as FencerData;
 use Tests\Support\Data\WPUser as UserData;
 use Tests\Support\Data\Registrar as RegistrarData;
 use Tests\Support\Data\EventRole as EventRoleData;
-use Laravel\Lumen\Routing\Controller;
+use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use Tests\Unit\TestCase;
-use Mockery;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class FencerTest extends TestCase
 {
-    public $authorizeCalls = [];
-
     public function fixtures()
     {
         FencerData::create();
@@ -41,29 +40,28 @@ class FencerTest extends TestCase
         $this->assertEquals($f1->fencer_picture, $f2->fencer_picture);
     }
 
+    private function setRequest($testData)
+    {
+        $event = Event::where('event_id', EventData::EVENT1)->first();
+        $country = Country::where('country_id', Country::GER)->first();
+        request()->merge([
+            'eventObject' => $event,
+            'countryObject' => $country,
+            'fencer' => $testData
+        ]);
+    }
+
+    private function createRequest()
+    {
+        return new FencerRequest(new Save());
+    }
+
     private function baseTest($testData, $user)
     {
-        $this->authorizeCalls = [];
-        $stubController = $this->createMock(Controller::class);
-        $stubController
-            ->method('authorize')
-            ->with(
-                $this->callback(function ($arg) {
-                    $this->authorizeCalls[] = $arg;
-                    return true;
-                }),
-                $this->callback(fn($arg) => empty($arg) || $arg == Fencer::class || get_class($arg) == Fencer::class)
-            )
-            ->willReturn(true);
-
-        $request = new FencerRequest($stubController);
-
-        $stub = $this->createMock(Request::class);
-        $stub->expects($this->any())->method('user')->willReturn($user);
-        $stub->expects($this->once())->method('get')->with('fencer')->willReturn($testData);
-        $stub->expects($this->any())->method('all')->willReturn(['fencer' => $testData]);
-        $stub->expects($this->any())->method('only')->willReturn(['fencer' => $testData]);
-        return $request->validate($stub);
+        $this->setRequest($testData);
+        $this->unsetUser();
+        $this->session(['wpuser' => $user->getKey()]);
+        return $this->createRequest()->validate(request());
     }
 
     public function testUpdate()
@@ -78,8 +76,6 @@ class FencerTest extends TestCase
         $user = WPUser::where('ID', UserData::TESTUSER)->first();
         $model = $this->baseTest($testData, $user);
 
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('update', $this->authorizeCalls[0]);
         $this->assertNotEmpty($model);
         $this->assertEquals(FencerData::MCAT1, $model->getKey());
         $this->assertEquals($testData['firstName'], $model->fencer_firstname);
@@ -103,8 +99,6 @@ class FencerTest extends TestCase
         $user = WPUser::where('ID', UserData::TESTUSER)->first();
         $model = $this->baseTest($testData, $user);
 
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('create', $this->authorizeCalls[0]);
         $this->assertNotEmpty($model);
         $this->assertTrue($model->getKey() > 0);
         $this->assertEquals($testData['firstName'], $model->fencer_firstname);
@@ -118,10 +112,6 @@ class FencerTest extends TestCase
 
     public function testAuthorization()
     {
-        request()->merge([
-            'eventObject' => Event::where('event_id', EventData::EVENT1)->first(),
-            'countryObject' => Country::where('country_id', Country::GER)->first()
-        ]);
         $testData = [
             'id' => 0,
             'firstName' => 'aa',
@@ -133,26 +123,18 @@ class FencerTest extends TestCase
         $user = WPUser::where('ID', UserData::TESTUSERORGANISER)->first();
         $model = $this->baseTest($testData, $user);
         $this->assertNotEmpty($model);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('create', $this->authorizeCalls[0]);
 
         $user = WPUser::where('ID', UserData::TESTUSERREGISTRAR)->first();
         $model = $this->baseTest($testData, $user);
         $this->assertNotEmpty($model);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('create', $this->authorizeCalls[0]);
 
         $user = WPUser::where('ID', UserData::TESTUSERHOD)->first();
         $model = $this->baseTest($testData, $user);
         $this->assertNotEmpty($model);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('create', $this->authorizeCalls[0]);
 
         $user = WPUser::where('ID', UserData::TESTUSERGENHOD)->first();
         $model = $this->baseTest($testData, $user);
         $this->assertNotEmpty($model);
-        $this->assertCount(1, $this->authorizeCalls);
-        $this->assertEquals('create', $this->authorizeCalls[0]);
     }
 
     public function testUnauthorized()
@@ -165,260 +147,312 @@ class FencerTest extends TestCase
             'gender' => 'M',
         ];
 
-        // no privileges
-        $user = WPUser::where('ID', UserData::TESTUSER5)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertEmpty($model);
-        $this->assertCount(2, $this->authorizeCalls);
-        $this->assertEquals('not/ever', $this->authorizeCalls[1]);
+        $this->assertException(function () use ($testData) {
+            // no privileges
+            $user = WPUser::where('ID', UserData::TESTUSER5)->first();
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
 
-        // cashier
-        $user = WPUser::where('ID', UserData::TESTUSER3)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertEmpty($model);
-        $this->assertCount(2, $this->authorizeCalls);
-        $this->assertEquals('not/ever', $this->authorizeCalls[1]);
+        $this->assertException(function () use ($testData) {
+            // cashier
+            $user = WPUser::where('ID', UserData::TESTUSER3)->first();
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
 
-        // accreditation
-        $user = WPUser::where('ID', UserData::TESTUSER3)->first();
-        $model = $this->baseTest($testData, $user);
-        $this->assertEmpty($model);
-        $this->assertCount(2, $this->authorizeCalls);
-        $this->assertEquals('not/ever', $this->authorizeCalls[1]);
+        $this->assertException(function () use ($testData) {
+            // accreditation
+            $user = WPUser::where('ID', UserData::TESTUSER3)->first();
+            $model = $this->baseTest($testData, $user);
+        }, AuthorizationException::class);
     }
 
     public function testValidateFirstName()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new FencerRequest($stubController))->rules();
-
-        $testData = [
-            'fencer' => [
-                'id' => 0,
-                'firstName' => 'aa',
-                'lastName' => 'bb',
-                'countryId' => Country::GER,
-                'gender' => 'M',
-            ]
+        $data = [
+            'id' => 0,
+            'firstName' => 'aa',
+            'lastName' => 'bb',
+            'countryId' => Country::GER,
+            'gender' => 'M',
         ];
-        $validator = Validator::make($testData, $rules);
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['fencer']['firstName']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['firstName']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['firstName'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['firstName'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['firstName'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['firstName'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['firstName'] = 'aa';
-        $validator = Validator::make($testData, $rules);
+
+        $data['firstName'] = 'aa';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['fencer']['firstName'] = '1234567890123456789012345678901234567890123456';
-        $validator = Validator::make($testData, $rules);
+
+        $data['firstName'] = '1234567890123456789012345678901234567890123456';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['firstName'] = '123456789012345678901234567890123456789012345';
-        $validator = Validator::make($testData, $rules);
+
+        $data['firstName'] = '123456789012345678901234567890123456789012345';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
     }
 
     public function testValidateLastName()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new FencerRequest($stubController))->rules();
-
-        $testData = [
-            'fencer' => [
-                'id' => 0,
-                'firstName' => 'aa',
-                'lastName' => 'bb',
-                'countryId' => Country::GER,
-                'gender' => 'M',
-            ]
+        $data = [
+            'id' => 0,
+            'firstName' => 'aa',
+            'lastName' => 'bb',
+            'countryId' => Country::GER,
+            'gender' => 'M',
         ];
-        $validator = Validator::make($testData, $rules);
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['fencer']['lastName']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['lastName']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['lastName'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['lastName'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['lastName'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['lastName'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['lastName'] = '123456789012345678901234567890123456789012345';
-        $validator = Validator::make($testData, $rules);
+
+        $data['lastName'] = '123456789012345678901234567890123456789012345';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['fencer']['lastName'] = '1234567890123456789012345678901234567890123456';
-        $validator = Validator::make($testData, $rules);
+
+        $data['lastName'] = '1234567890123456789012345678901234567890123456';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['lastName'] = 'aa';
-        $validator = Validator::make($testData, $rules);
+
+        $data['lastName'] = 'aa';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
     }
 
     public function testValidateCountry()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new FencerRequest($stubController))->rules();
-
-        $testData = [
-            'fencer' => [
-                'id' => 0,
-                'firstName' => 'aa',
-                'lastName' => 'bb',
-                'countryId' => Country::GER,
-                'gender' => 'M',
-            ]
+        $data = [
+            'id' => 0,
+            'firstName' => 'aa',
+            'lastName' => 'bb',
+            'countryId' => Country::GER,
+            'gender' => 'M',
         ];
-        $validator = Validator::make($testData, $rules);
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['fencer']['countryId']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['countryId']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['countryId'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['countryId'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['countryId'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['countryId'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['countryId'] = '0';
-        $validator = Validator::make($testData, $rules);
+
+        $data['countryId'] = '0';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['countryId'] = null;
-        $validator = Validator::make($testData, $rules);
+
+        $data['countryId'] = null;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['countryId'] = Country::ITA;
-        $validator = Validator::make($testData, $rules);
+
+        $data['countryId'] = Country::ITA;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
     }
 
     public function testValidateGender()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new FencerRequest($stubController))->rules();
-
-        $testData = [
-            'fencer' => [
-                'id' => 0,
-                'firstName' => 'aa',
-                'lastName' => 'bb',
-                'countryId' => Country::GER,
-                'gender' => 'M',
-            ]
+        $data = [
+            'id' => 0,
+            'firstName' => 'aa',
+            'lastName' => 'bb',
+            'countryId' => Country::GER,
+            'gender' => 'M',
         ];
-        $validator = Validator::make($testData, $rules);
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
         
-        unset($testData['fencer']['gender']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['gender']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['gender'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['gender'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['gender'] = 'a';
-        $validator = Validator::make($testData, $rules);
+
+        $data['gender'] = 'a';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['gender'] = 'm';
-        $validator = Validator::make($testData, $rules);
+
+        $data['gender'] = 'm';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['gender'] = 'WW';
-        $validator = Validator::make($testData, $rules);
+
+        $data['gender'] = 'WW';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['gender'] = null;
-        $validator = Validator::make($testData, $rules);
+
+        $data['gender'] = null;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['gender'] = 'M';
-        $validator = Validator::make($testData, $rules);
+
+        $data['gender'] = 'M';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['fencer']['gender'] = 'F';
-        $validator = Validator::make($testData, $rules);
+
+        $data['gender'] = 'F';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
     }
 
     public function testValidateDob()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new FencerRequest($stubController))->rules();
-
-        $testData = [
-            'fencer' => [
-                'id' => 0,
-                'firstName' => 'aa',
-                'lastName' => 'bb',
-                'countryId' => Country::GER,
-                'gender' => 'M',
-            ]
+        $data = [
+            'id' => 0,
+            'firstName' => 'aa',
+            'lastName' => 'bb',
+            'countryId' => Country::GER,
+            'gender' => 'M',
         ];
-        $validator = Validator::make($testData, $rules);
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['fencer']['dateOfBirth']);
-        $validator = Validator::make($testData, $rules);        $validator = Validator::make($testData, $rules);
+        unset($data['dateOfBirth']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
+        $this->assertTrue($validator->passes());
 
+        $data['dateOfBirth'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['fencer']['dateOfBirth'] = '';
-        $validator = Validator::make($testData, $rules);
-        $this->assertTrue($validator->passes());
-        $testData['fencer']['dateOfBirth'] = '29 january 2023';
-        $validator = Validator::make($testData, $rules);
+
+        $data['dateOfBirth'] = '29 january 2023';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['dateOfBirth'] = Carbon::now()->addMinutes(2)->toDateString();
-        $validator = Validator::make($testData, $rules);
+
+        $data['dateOfBirth'] = Carbon::now()->addMinutes(2)->toDateString();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['dateOfBirth'] = null;
-        $validator = Validator::make($testData, $rules);
+
+        $data['dateOfBirth'] = null;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['fencer']['dateOfBirth'] = Carbon::now()->subDays(1)->toDateString();
-        $validator = Validator::make($testData, $rules);
+
+        $data['dateOfBirth'] = Carbon::now()->subDays(1)->toDateString();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
     }
 
     public function testValidatePhoto()
     {
-        $stubController = $this->createMock(Controller::class);
-        $rules = (new FencerRequest($stubController))->rules();
-
-        $testData = [
-            'fencer' => [
-                'id' => 0,
-                'firstName' => 'aa',
-                'lastName' => 'bb',
-                'countryId' => Country::GER,
-                'gender' => 'M',
-            ]
+        $data = [
+            'id' => 0,
+            'firstName' => 'aa',
+            'lastName' => 'bb',
+            'countryId' => Country::GER,
+            'gender' => 'M',
         ];
-        $validator = Validator::make($testData, $rules);
+        $request = $this->createRequest();
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        unset($testData['fencer']['photoStatus']);
-        $validator = Validator::make($testData, $rules);
+        unset($data['photoStatus']);
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['fencer']['photoStatus'] = '';
-        $validator = Validator::make($testData, $rules);
+
+        $data['photoStatus'] = '';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['fencer']['photoStatus'] = 'aa';
-        $validator = Validator::make($testData, $rules);
+
+        $data['photoStatus'] = 'aa';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
-        $testData['fencer']['photoStatus'] = null;
-        $validator = Validator::make($testData, $rules);
+
+        $data['photoStatus'] = null;
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['fencer']['photoStatus'] = 'N';
-        $validator = Validator::make($testData, $rules);
+
+        $data['photoStatus'] = 'N';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['fencer']['photoStatus'] = 'R';
-        $validator = Validator::make($testData, $rules);
+
+        $data['photoStatus'] = 'R';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['fencer']['photoStatus'] = 'Y';
-        $validator = Validator::make($testData, $rules);
+
+        $data['photoStatus'] = 'Y';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
-        $testData['fencer']['photoStatus'] = 'A';
-        $validator = Validator::make($testData, $rules);
+
+        $data['photoStatus'] = 'A';
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
     }
 }

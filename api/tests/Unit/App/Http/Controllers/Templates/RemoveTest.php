@@ -15,11 +15,11 @@ class RemoveTest extends TestCase
 {
     public function testRoute()
     {
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+        $response = $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->post('/templates/remove', ['template' => ['id' => TemplateData::ATHLETE]], ['X-CSRF-Token' => 'aaa']);
 
         // we expect an Ok result nd a 200 status
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['status']));

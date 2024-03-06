@@ -3,7 +3,7 @@
 namespace App\Models\Requests;
 
 use App\Support\Contracts\EVFUser;
-use Laravel\Lumen\Routing\Controller;
+use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\Model;
@@ -26,7 +26,6 @@ class Base
         $this->model = $this->createModel($request);
         $validator = $this->createValidator($request);
         if ($validator->fails()) {
-            \Log::debug("validator fails" . json_encode($validator->errors()->getMessages()));
             throw new ValidationException(
                 $validator,
                 new JsonResponse($validator->errors()->getMessages(), 422)
@@ -38,6 +37,7 @@ class Base
         if (empty($request->user())) {
             throw new AuthorizationException(); // should never occur, all routes guarded by authenticator
         }
+
         if (!$request->user() || !$this->authorize($request->user(), $data)) {
             $this->model = null;
         }

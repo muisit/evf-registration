@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Registrations;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Accreditation;
+use App\Models\AccreditationDocument;
 use App\Models\Event;
 use App\Models\Fencer;
 use App\Models\Registration;
@@ -53,12 +55,10 @@ class Index extends Controller
             $this->authorize("not/ever");
         }
 
-        \Log::debug("testing viewRegistrations for event " . $event->getKey());
         if ($request->user()->can("viewRegistrations", $event)) {
             $country = $request->get('countryObject');
             // superhod cannot set org roles
-            $isOrganiser = $request->user()->hasRole(['sysop', 'organiser:' . $event->getKey(), 'registrar:' . $event->getKey()]);
-            \Log::debug("user is organiser: " . ($isOrganiser ? 'true' : 'false'));
+            $isOrganiser = $request->user()->hasRole(['sysop', 'organiser:' . $event->getKey(), 'registrar:' . $event->getKey(), 'dt:' . $event->getKey()]);
 
             // country should be implicitely or explicitely set, except for organisers
             if (empty($country) && !$isOrganiser) {
@@ -67,7 +67,7 @@ class Index extends Controller
             else {
                 $getAll = $request->get('all');
                 if ($getAll) {
-                    $this->authorize('organise', $event);
+                    $this->authorize('viewAllRegistrations', $event);
                 }
                 $retval = new RegistrationsSchema();
                 $query = Registration::where('registration_mainevent', $event->getKey());
@@ -75,10 +75,14 @@ class Index extends Controller
                     $query = $query->where('registration_country', (empty($country) ? null : $country->getKey()));
                 }
                 $rows = $query->with('fencer')->get();
-                
+                $documents = [];
+                if ($getAll && $request->user()->can('dt', $event)) {
+                    $documents = AccreditationDocument::joinRelationship('accreditation')->with('accreditation')->where(Accreditation::tableName() . '.event_id', $event->getKey())->get();
+                }
+
                 if (!emptyResult($rows)) {
                     foreach ($rows as $row) {
-                        $retval->add($row);
+                        $retval->add($row, $documents);
                     }
                 }
                 $retval->finalize();

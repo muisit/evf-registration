@@ -12,7 +12,7 @@ const data = useDataStore();
 
 function hasPicture()
 {
-    return ['Y','A','R'].includes(props.fencer.photoStatus);
+    return ['Y','A','R'].includes(props.fencer?.photoStatus);
 }
 
 function getPhotoUrl()

@@ -10,7 +10,6 @@ class DefaultEventService
     public static function determineEvent(EVFUser $user): ?Event
     {
         $event = null;
-        \Log::debug("user roles are " . json_encode($user->getAuthRoles()));
         if ($user->hasRole("organisation")) {
             $roles = $user->rolesLike("organisation:");
             $events = [];

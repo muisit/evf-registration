@@ -61,6 +61,22 @@ class Event
         return false;
     }
 
+    /**
+     * @param User $user
+     * @param Model $model
+     * 
+     * @return bool
+     */
+    public function viewAllRegistrations(EVFUser $user, Model $model): bool | null
+    {
+        // the organiser and the DT can view all registrations
+        if ($this->organise($user, $model) || $this->dt($user, $model)) {
+            return true;
+        }
+        // all other people cannot view all registrations
+        return false;
+    }
+
     // can perform organiser functions for this event
     public function organise(EVFUser $user, Model $model): bool | null
     {
@@ -101,6 +117,15 @@ class Event
         return false;
     }
 
+    // can perform DT functions for this event
+    public function dt(EVFUser $user, Model $model): bool | null
+    {
+        // see if we have a global request object for the event
+        if ($user->hasRole(['organiser:' . $model->getKey(), 'dt:' . $model->getKey()])) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * @param User $user
@@ -110,6 +135,16 @@ class Event
     public function create(EVFUser $user): bool
     {
         return false; // no one can create an event
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return bool
+     */
+    public function configure(EVFUser $user, Model $model): bool
+    {
+        return $this->organise($user, $model);
     }
 
     /**

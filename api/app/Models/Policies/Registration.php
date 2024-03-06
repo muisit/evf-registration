@@ -69,7 +69,6 @@ class Registration
 
         $countryObject = request()->get('countryObject');
         if (!empty($countryObject)) {
-            \Log::debug("testing " . ($testForId === null ? 'true':'false') . " and " . $countryObject->getKey());
             if ($testForId === null || ($countryObject->getKey() == $testForId)) {
                 return $user->can('hod', $countryObject);
             }
@@ -210,8 +209,7 @@ class Registration
      */
     public function updateState(EVFUser $user, Model $model): bool
     {
-        \Log::debug("testing updateState for " . json_encode($user->getKey()));
-        // organisers with registration rights can update a registration model
+        // organisers with accreditation rights can update a registration model
         if ($this->accredit($user)) {
             return true;
         }

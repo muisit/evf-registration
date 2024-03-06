@@ -9,6 +9,7 @@ export interface Registration {
     paidHod: string|null;
     state: string|null;
     team: string|null;
+    countryId?: number|null;
 
     // front-end data
     errors?: string[];

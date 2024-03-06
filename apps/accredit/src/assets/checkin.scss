@@ -1,0 +1,51 @@
+.checkin-interface {
+    .table-wrapper {
+        min-height: 500px;
+        border: 1px solid black;
+        width: 100%;
+        overflow: scroll;
+
+        .processed-list {
+            width: 100%;
+
+            tr.pending {
+                background-color: rgb(255, 177, 60);
+            }
+            tr.started {
+                background-color: rgb(251, 233, 137);
+            }
+            tr.processed {
+                background-color: rgb(55, 235, 124);
+            }
+        }
+    }
+
+
+    .el-dialog {
+        .photoid-element {
+            float:right;
+        }
+        
+        .checkin-dialog {
+            .field {
+                font-size: large;
+                padding-bottom: 10px;
+
+                b {
+                    display: inline-block;
+                    width: 90px;
+                }
+            }
+
+            .card {
+                font-size: x-large;
+                font-weight: bold;
+                padding-top: 20px;
+            }
+        }
+
+        .el-dialog__footer {
+            clear: both;
+        }
+    }
+}

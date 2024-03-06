@@ -10,6 +10,10 @@ class Registration extends Model
 {
     use PowerJoins;
 
+    public const STATE_PRESENT = 'P';
+    public const STATE_CANCELLED = 'A';
+    public const STATE_REGISTERED = 'R';
+
     protected $table = 'TD_Registration';
     protected $primaryKey = 'registration_id';
     protected $guarded = [];

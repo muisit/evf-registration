@@ -2,11 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\Event;
 use App\Models\WPUser;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use App\Support\SessionGuard;
 use App\Support\UserProvider;
+use App\Support\Contracts\EVFUser;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -41,8 +44,29 @@ class AuthServiceProvider extends ServiceProvider
         Gate::policy(\App\Models\Country::class, \App\Models\Policies\Country::class);
         Gate::policy(\App\Models\Registration::class, \App\Models\Policies\Registration::class);
         Gate::policy(\App\Models\Accreditation::class, \App\Models\Policies\Accreditation::class);
+        Gate::policy(\App\Models\AccreditationDocument::class, \App\Models\Policies\AccreditationDocument::class);
         Gate::policy(\App\Models\AccreditationTemplate::class, \App\Models\Policies\AccreditationTemplate::class);
         Gate::policy(\App\Models\AccreditationUser::class, \App\Models\Policies\AccreditationUser::class);
         Gate::policy(\App\Models\WPUser::class, \App\Models\Policies\WPUser::class);
+
+        // subscribe authentications. Each channel is linked to a front-end functionality
+        // named after the role, so only users with access to that functionality can
+        // subscribe
+        // Who can post is not determined by this authentication, but by the system generating
+        // specific events for specific channels.
+        Broadcast::channel('accredit.{eventId}', function (EVFUser $user, int $eventId) {
+            return $user->hasRole('code') && $user->hasRole("accreditation:" . $eventId);
+        });
+        Broadcast::channel('checkin.{eventId}', function (EVFUser $user, int $eventId) {
+            \Log::debug("checkin, user has roles " . json_encode($user->getAuthRoles()));
+            return $user->hasRole('code') && $user->hasRole(["checkin:" . $eventId]);
+        });
+        Broadcast::channel('checkout.{eventId}', function (EVFUser $user, int $eventId) {
+            \Log::debug("checkout, user has roles " . json_encode($user->getAuthRoles()));
+            return $user->hasRole('code') && $user->hasRole(["checkout:" . $eventId]);
+        });
+        Broadcast::channel('dt.{eventId}', function (EVFUser $user, int $eventId) {
+            return $user->hasRole('code') && $user->hasRole(["dt:" . $eventId]);
+        });
     }
 }

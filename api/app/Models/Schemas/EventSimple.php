@@ -58,12 +58,21 @@ class EventSimple
      */
     public ?array $competitions = null;
 
+    /**
+     * JSON configuration settings
+     *
+     * @var string
+     * @OA\Property()
+     */
+    public $config = null;
+
     public function __construct(?BaseModel $event = null)
     {
         if (!empty($event)) {
             $this->id = $event->getKey();
             $this->name = $event->event_name;
             $this->opens = $event->event_open;
+            $this->config = json_decode($event->event_config);
 
             $this->sideEvents = [];
             foreach ($event->sides()->orderBy('title')->get() as $sideEvent) {

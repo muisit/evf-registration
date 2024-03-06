@@ -29,6 +29,7 @@ export const useDataStore = defineStore('data', () => {
 
     function setDispatcher(event:string, callback:Function|null|undefined)
     {
+        console.log('setting dispatcher for ', event);
         switch (event) {
             case 'fail': 
                 if (callback) {
@@ -80,6 +81,16 @@ export const useDataStore = defineStore('data', () => {
                 break;
             // cannot override admin dispatcher
         }
+    }
+
+    function clearDispatchers()
+    {
+        delete dispatcher.value.success;
+        delete dispatcher.value.fail;
+        delete dispatcher.value.complete;
+        delete dispatcher.value.badge;
+        delete dispatcher.value.card;
+        delete dispatcher.value.document;
     }
 
     function adminDispatcher(code:string, codeObject:Code)
@@ -244,7 +255,7 @@ export const useDataStore = defineStore('data', () => {
         logout,
         inputValue, processingList, addCode, processFullCode,
         getOrgRegistrations, 
-        setDispatcher, adminDispatcher, badgeDispatcher, 
+        setDispatcher, clearDispatchers, adminDispatcher, badgeDispatcher, 
         scannedBadge
     };
 });

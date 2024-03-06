@@ -1,74 +1,49 @@
 <?php
 
-/** @var \Laravel\Lumen\Routing\Router $router */
-$router->group(
+Route::group(
     [
         'prefix' => '/fencers',
         'middleware' => 'auth'
     ],
-    function () use ($router) {
-        $router->get(
+    function () {
+        Route::get(
             '/',
-            [
-                'as' => 'fencers.index',
-                'uses' => 'Fencers\Index@index'
-            ]
-        );
+            'Fencers\Index@index'
+        )->name('fencers.index');
 
-        $router->get(
+        Route::get(
             '/{fencerId}/photo',
-            [
-                'as' => 'fencers.photo',
-                'uses' => 'Fencers\Photo@index'
-            ]
-        );
+            'Fencers\Photo@index'
+        )->name('fencers.photo');
 
-        $router->get(
+        Route::get(
             '/{fencerId}/accreditations',
-            [
-                'as' => 'fencers.accreditations',
-                'uses' => 'Fencers\Accreditations@index'
-            ]
-        );
+            'Fencers\Accreditations@index'
+        )->name('fencers.accreditations');
 
-        $router->post(
+        Route::post(
             '/{fencerId}/photo',
-            [
-                'as' => 'fencers.photosave',
-                'uses' => 'Fencers\PhotoSave@index'
-            ]
-        );
+            'Fencers\PhotoSave@index'
+        )->name('fencers.photosave');
 
-        $router->post(
+        Route::post(
             '/{fencerId}/photostate',
-            [
-                'as' => 'fencers.photostate',
-                'uses' => 'Fencers\PhotoState@index'
-            ]
-        );
+            'Fencers\PhotoState@index'
+        )->name('fencers.photostate');
 
-        $router->get(
+        Route::get(
             '/autocomplete',
-            [
-                'as' => 'fencers.ac',
-                'uses' => 'Fencers\Autocomplete@index'
-            ]
-        );
+            'Fencers\Autocomplete@index'
+        )->name('fencers.ac');
 
-        $router->post(
+        Route::post(
             '/duplicate',
-            [
-                'as' => 'fencers.duplicate',
-                'uses' => 'Fencers\Duplicate@index'
-            ]
-        );
+            'Fencers\Duplicate@index'
+        )->name('fencers.duplicate');
 
-        $router->post(
+        Route::post(
             '/',
-            [
-                'as' => 'fencers.save',
-                'uses' => 'Fencers\Save@index'
-            ]
-        );
+            'Fencers\Save@index'
+        )->name('fencers.save');
     }
 );

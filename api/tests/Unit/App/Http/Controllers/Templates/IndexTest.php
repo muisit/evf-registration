@@ -3,8 +3,6 @@
 namespace Tests\Unit\App\Http\Controllers\Templates;
 
 use App\Models\Country;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-use Laravel\Lumen\Testing\DatabaseTransactions;
 use Tests\Unit\TestCase;
 use Tests\Support\Data\WPUser as UserData;
 use Tests\Support\Data\Registrar as RegistrarData;
@@ -15,11 +13,11 @@ class IndexTest extends TestCase
 {
     public function testRoute()
     {
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+        $response = $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->get('/templates?event=' . EventData::EVENT1)
             ->assertStatus(200);
 
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertCount(5, $output); // 4 templates and a default

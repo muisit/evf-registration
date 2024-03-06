@@ -28,7 +28,6 @@ class Result extends Fixture
 
     protected static function clear()
     {
-        \Log::debug("clearing result table");
         DB::table(Model::tableName())->delete();
     }
 
@@ -37,7 +36,6 @@ class Result extends Fixture
         Competition::create();
         Fencer::create();
         self::booted();
-        \Log::debug("creating results");
 
         Model::create([
             'result_id' => self::MFCAT1,

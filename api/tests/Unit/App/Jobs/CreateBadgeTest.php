@@ -14,7 +14,7 @@ use Tests\Support\Data\Accreditation as AccreditationData;
 use Tests\Support\Data\AccreditationTemplate as TemplateData;
 use Tests\Unit\TestCase;
 use Illuminate\Support\Facades\Queue;
-use Laravel\Lumen\Application;
+use Illuminate\Foundation\Application;
 
 class CreateBadgeTest extends TestCase
 {

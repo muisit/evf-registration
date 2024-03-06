@@ -2,6 +2,10 @@ export interface StringKeyedStringList {
     [key:string]: string[];
 }
 
+export interface StringKeyedIdList {
+    [key:string]: number[];
+}
+
 export interface StringKeyedString {
     [key:string]: string;
 }

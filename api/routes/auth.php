@@ -1,8 +1,7 @@
 <?php
 
-/** @var \Laravel\Lumen\Routing\Router $router */
-$router->group(['middleware' => 'throttle:2,1'], function () use ($router) {
-    $router->post('/auth/login', ['as' => 'auth.login', 'uses' => 'Auth\Login@index']);
+Route::group(['middleware' => 'throttle:2,1'], function () {
+    Route::post('/auth/login', 'Auth\Login@index')->name('auth.login');
 });
-$router->get('/auth/me', ['as' => 'auth.me', 'uses' => 'Auth\Me@index']);
-$router->get('/auth/logout', ['as' => 'auth.logout', 'uses' => 'Auth\Logout@index']);
+Route::get('/auth/me', 'Auth\Me@index')->name('auth.me');
+Route::get('/auth/logout', 'Auth\Logout@index')->name('auth.logout');

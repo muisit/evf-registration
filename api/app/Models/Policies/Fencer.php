@@ -16,7 +16,7 @@ class Fencer
         return null;
     }
 
-    private function isOrganiserOrRegistrarOrAccreditor(EVFUser $user)
+    private function isOrganiserOrRegistrarOrCodeUser(EVFUser $user)
     {
         // see if we have a global request object for the event
         $event = request()->get('eventObject');
@@ -25,9 +25,15 @@ class Fencer
         // someone can see a fencer if he/she is an organiser or a registrar/accreditor
         // for a valid event. We can remove these roles to restrict the number
         // of people with broad fencer access
-        if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId, 'registrar:' . $eventId, 'accreditation:' . $eventId])) {
+        if (!empty($eventId) && $user->hasRole(['organiser:' . $eventId, 'registrar:' . $eventId])) {
             return true;
         }
+
+        // if this is an accreditation-user for the current event, allow it
+        if ($user->hasRole(['code']) && $user->hasRole(['organisation:' . $eventId])) {
+            return true;
+        }
+
         return false;
     }
 
@@ -71,7 +77,7 @@ class Fencer
      */
     public function viewAny(EVFUser $user): bool | null
     {
-        if ($this->isOrganiserOrRegistrarOrAccreditor($user)) {
+        if ($this->isOrganiserOrRegistrarOrCodeUser($user)) {
             return true;
         }
 

@@ -32,11 +32,11 @@ class PhotoStateTest extends TestCase
     public function testRoute()
     {
         $fencer = $this->createFencerData();
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+        $response = $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->post('/fencers/' . $fencer['id'] . '/photostate', ['fencer' => $fencer], ['X-CSRF-Token' => 'aaa']);
 
         // we expect a ResponseStatus
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['status']));
         $this->assertEquals("ok", $output['status']);
@@ -103,10 +103,10 @@ class PhotoStateTest extends TestCase
             ->assertStatus(403);
 
         $fencer["id"] = 0;
-        $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
+        $response = $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->post('/fencers/' . $fencer['id'] . '/photostate', ['fencer' => $fencer], ['X-CSRF-Token' => 'aaa']);
         // we expect a non-empty JSON result and a 406 status
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['status']));
         $this->assertEquals("error", $output['status']);

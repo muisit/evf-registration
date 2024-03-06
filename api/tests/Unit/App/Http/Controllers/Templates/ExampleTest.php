@@ -10,7 +10,7 @@ use Tests\Support\Data\Event as EventData;
 use Tests\Support\Data\EventRole as EventRoleData;
 use Tests\Support\Data\AccreditationTemplate as TemplateData;
 use App\Support\Services\PDFGenerator;
-use Laravel\Lumen\Application;
+use Illuminate\Foundation\Application;
 
 class ExampleTest extends TestCase
 {

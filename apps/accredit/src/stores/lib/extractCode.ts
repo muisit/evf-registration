@@ -23,7 +23,7 @@ function calculateUPCChecksum(lst:string[])
 
 export function extractCode(code:string): Code
 {
-    let retval:Code = { original: code };
+    let retval:Code = { original: code, data: -1 };
     if (code.length > 13) {
         let index = 0;
         let baseFunc = code[index];
@@ -43,7 +43,7 @@ export function extractCode(code:string): Code
             let check = calculateValidation(code.split('').slice(index + 2, index + 9));
             if (check != retval.validation) {
                 console.log('invalid code detected, validation says ', check, retval.validation);
-                return { original: code };
+                return { original: code, data: -1 };
             }
 
             retval.payload = code[index + 10] + code[index + 11] + code[index + 12] + code[index + 13]
@@ -52,7 +52,7 @@ export function extractCode(code:string): Code
                 let finalValue = parseInt(code[index + 14]);
                 let upcCheck = calculateUPCChecksum(code.split('').slice(0, code.length - 1));
                 if (! ((upcCheck === 0 && finalValue === 0) || (finalValue == (10 - upcCheck)))) {
-                    return {original: code};
+                    return {original: code, data: -1};
                 }
             }
         }

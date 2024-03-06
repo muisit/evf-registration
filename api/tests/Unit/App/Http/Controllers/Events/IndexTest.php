@@ -18,10 +18,10 @@ class IndexTest extends TestCase
 
     public function testRoute()
     {
-        $this->session(['wpuser' => UserData::TESTUSER])
+        $response = $this->session(['wpuser' => UserData::TESTUSER])
             ->get('/events');
 
-        $output = $this->response->json();
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertCount(1, $output);
@@ -46,10 +46,10 @@ class IndexTest extends TestCase
     public function testSimpleUserNoResults()
     {
         // test user 5 has no privileges
-        $this->session(['wpuser' => UserData::TESTUSER5])
+        $response = $this->session(['wpuser' => UserData::TESTUSER5])
             ->get('/events')
             ->assertStatus(200);
-        $output = $this->response->getContent();
+        $output = $response->getContent();
         $this->assertEquals("[]", $output);
     }
 
@@ -66,32 +66,32 @@ class IndexTest extends TestCase
         $event = Event::find(EventData::EVENT1);
         $event->event_config = json_encode(['use_registration' => true]);
         $event->save();
-        $this->session(['wpuser' => UserData::TESTUSER])->get('/events');
-        $output = $this->response->json();
+        $response = $this->session(['wpuser' => UserData::TESTUSER])->get('/events');
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertCount(1, $output);
 
         $event->event_config = json_encode(['use_registration' => false]);
         $event->save();
-        $this->session(['wpuser' => UserData::TESTUSER])->get('/events');
-        $output = $this->response->json();
+        $response = $this->session(['wpuser' => UserData::TESTUSER])->get('/events');
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertCount(0, $output);
 
         $event->event_config = json_encode(['use_registrations' => true]);
         $event->save();
-        $this->session(['wpuser' => UserData::TESTUSER])->get('/events');
-        $output = $this->response->json();
+        $response = $this->session(['wpuser' => UserData::TESTUSER])->get('/events');
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertCount(0, $output);
 
         $event->event_config = '';
         $event->save();
-        $this->session(['wpuser' => UserData::TESTUSER])->get('/events');
-        $output = $this->response->json();
+        $response = $this->session(['wpuser' => UserData::TESTUSER])->get('/events');
+        $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertCount(0, $output);

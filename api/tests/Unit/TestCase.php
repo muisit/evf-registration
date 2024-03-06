@@ -2,10 +2,12 @@
 
 namespace Tests\Unit;
 
-use Laravel\Lumen\Testing\TestCase as BaseTestCase;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Session;
-use Laravel\Lumen\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\Support\Data\Fixture;
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Application;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -31,24 +33,20 @@ abstract class TestCase extends BaseTestCase
     /**
      * Creates the application.
      *
-     * @return \Laravel\Lumen\Application
+     * @return Illuminate\Foundation\Application
      */
     public function createApplication()
     {
-        return require __DIR__ . '/../../bootstrap/app.php';
+        $app = require __DIR__ . '/../../bootstrap/app.php';
+
+        $app->make(Kernel::class)->bootstrap();
+
+        return $app;
     }
 
-    public function resetApplication()
+    public function unsetUser()
     {
-        $this->app = $this->createApplication();
-        $request = request();
-        $this->app->instance('request', $request);
-        $this->app->useStoragePath(realpath(__DIR__ . '/../_output'));
-
-        // allow setting the session ID to log in users, outside full requests
-        $request->setUserResolver(function ($guard = null) {
-            return $this->app->make('auth')->guard($guard)->user();
-        });
+        return $this->app->make('auth')->guard()->forgetUser();
     }
 
     public function session(array $data)
@@ -115,7 +113,7 @@ abstract class TestCase extends BaseTestCase
         catch (\Exception $e) {
             $cls = get_class($e);
             if ($cls != $exception) {
-                $this->assertEquals('', $e->getTraceAsString());
+                $this->assertEquals($exception, $cls . ':' . $e->getTraceAsString());
             }
         }
         $this->assertTrue($exception == $cls, "Expected exception $exception");

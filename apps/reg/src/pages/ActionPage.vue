@@ -26,7 +26,7 @@ const statisticsValue:Ref<EventStatistics> = ref({
     queue: 0,
     failed: 0
 });
-const selectedFencers:Ref<Registrations> = ref({registrations:[], fencers: []});
+const selectedFencers:Ref<Registrations> = ref({registrations:[], fencers: [], documents: []});
 const selectedFencer:Ref<Fencer|null> = ref(null);
 const currentIndex:Ref<number> = ref(0);
 const currentSelection:Ref<string> = ref('new');

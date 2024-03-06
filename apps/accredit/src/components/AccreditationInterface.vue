@@ -10,6 +10,7 @@ import { useAuthStore } from '../../../common/stores/auth';
 import { useBasicStore } from '../../../common/stores/basic';
 import { useDataStore } from '../stores/data';
 import { registrationsstate } from '../../../common/api/registrations/registrationsstate';
+import { handout } from '../../../common/api/accreditations/handout';
 
 const props = defineProps<{
     visible:boolean;
@@ -35,17 +36,24 @@ function badgeDispatcher(code:string, codeObject:Code)
     auth.isLoading('badge');
     data.badgeDispatcher(code, codeObject).then((dt:Fencer|void) => {
         auth.hasLoaded('badge');
+
         if (dt) {
+            if (code != currentAccreditation.value && currentAccreditation.value.length >= 14) {
+                // we scan several badges after each other. Scanning a new badge
+                // confirms handing out the previous badge
+                console.log('handing out the previous accreditation');
+                handout(currentAccreditation.value);
+                currentAccreditation.value = '';
+            }
+
             accreditationList.value.unshift(code);
             currentAccreditation.value = code;
             updatedRegistrations.value = [];
             originalStates.value = {};
 
             dt.registrations = (dt.registrations || []).map((reg:Registration) => {
-                console.log('loading reg', reg.id, reg.state);
                 originalStates.value['r' + reg.id] = reg.state || 'R';
                 if (!reg.state || !['A', 'P'].includes(reg.state)) {
-                    console.log('pushing registration to list of updated registrations with state R: ', reg.state);
                     updatedRegistrations.value.push({registration: reg, state: 'R'});
                     reg.state = 'P';
                 }
@@ -70,20 +78,30 @@ function badgeDispatcher(code:string, codeObject:Code)
 function failDispatcher(code:string, codeObject:Code)
 {
     // assume the user hit the 'enter' key
-    // We assume the 'enter' key means clicking the 'Present' button, so just close the dialog
+    // We assume the 'enter' key means clicking the 'Ok' button, so just close the dialog
     dialogVisible.value = false;
+
+    // closing the dialog this way means confirming the handing-out of the badge
+    console.log(currentAccreditation.value, currentAccreditation.value.length);
+    if (currentAccreditation.value.length >= 14) {
+        console.log('handing out the previous accreditation after closing dialog due to fail scan');
+        handout(currentAccreditation.value);
+        currentAccreditation.value = '';
+    }
+    currentAccreditation.value = '';
 }
 
-onMounted(() => {
-    data.subtitle = "Accreditation Handout";
-    data.setDispatcher('badge', badgeDispatcher);
-    data.setDispatcher('fail', failDispatcher);
-});
-
-onUnmounted(() => {
-    data.setDispatcher('badge', null);
-    data.setDispatcher('fail', null);
-});
+watch(() => props.visible,
+    (nw) => {
+        if (nw) {
+            data.subtitle = "Accreditation Handout";
+            data.clearDispatchers();
+            data.setDispatcher('badge', badgeDispatcher);
+            data.setDispatcher('fail', failDispatcher);
+        }
+    },
+    { immediate: true }
+);
 
 function getRole(fencer?:Fencer)
 {
@@ -101,6 +119,12 @@ function getCountry(fencer?:Fencer)
 
 function onDialogClose()
 {
+    console.log(currentAccreditation.value, currentAccreditation.value.length);
+    if (currentAccreditation.value.length >= 14) {
+        console.log('handing out the previous accreditation after closing dialog due to fail scan');
+        handout(currentAccreditation.value);
+        currentAccreditation.value = '';
+    }
     dialogVisible.value = false;
 }
 
@@ -151,7 +175,6 @@ function onDialogCancel()
     let wasAbsentIsUnset:Registration[] = [];
     let wasAbsentIsPresent:Registration[] = [];
 
-    console.log(Object.assign({}, originalStates.value));
     updatedRegistrations.value.map((v) => {
         let originalState = originalStates.value['r' + v.registration.id] || 'R';
         switch (v.state) {
@@ -164,8 +187,7 @@ function onDialogCancel()
                 if (originalState == 'A') wasAbsentIsPresent.push(v.registration);
                 break;
             default:
-                // should never occur, these list remain empty
-                console.log('v.state is ', v.state);
+                // should never occur, these lists remain empty
                 if (originalState == 'P') wasPresentIsUnset.push(v.registration);
                 if (originalState == 'A') wasAbsentIsUnset.push(v.registration);
                 break;
@@ -194,6 +216,8 @@ function onDialogCancel()
     }
     Promise.all(promises).then(() => {
         auth.hasLoaded('cancel');
+        // cancelling means not handing out the badge
+        currentAccreditation.value = '';
     })
     .catch((e) => {
         console.log(e);
@@ -226,9 +250,18 @@ import AccreditationDialog from './AccreditationDialog.vue';
 import { ElSelect, ElOption } from 'element-plus';
 </script>
 <template>
-    <div class="accreditor-interface" v-if="auth.isAccreditor(auth.eventId, 'code')">
+    <div class="main-app accreditor-interface" v-if="auth.isAccreditor(auth.eventId, 'code')">
         <div class="table-wrapper">
             <table class="processed-list style-stripes">
+                <thead>
+                    <tr>
+                        <th>Badge</th>
+                        <th colspan="2">Name</th>
+                        <th>Gender</th>
+                        <th>Country</th>
+                        <th>Roles/Competitions</th>
+                    </tr>
+                </thead>
                 <tbody>
                     <tr v-for="(code, i) in accreditationList" :key="i" class="accreditation-badge">
                         <td class="code">{{ code }}</td>
