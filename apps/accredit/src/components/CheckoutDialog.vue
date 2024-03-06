@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { is_valid, random_hash, valid_date } from '../../../common/functions';
-import type { Registration } from '../../../common/api/schemas/registration';
+import { random_hash } from '../../../common/functions';
 import type { Fencer } from '../../../common/api/schemas/fencer';
 import type { AccreditationDocument } from '../../../common/api/schemas/accreditationdocument';
 import type { Code } from '../../../common/api/schemas/codes';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useBasicStore } from '../../../common/stores/basic';
 import { savedocument } from '../../../common/api/accreditations/savedocument';
+import { fencerIsHod } from './lib/fencerIsHod';
 import { dayjs } from 'element-plus';
 
 const props = defineProps<{
@@ -45,32 +45,23 @@ function endProcess()
     });
 }
 
-function fencerIsHod()
-{
-    let retval = false;
-    if (props.fencer && props.fencer.registrations) {
-        props.fencer.registrations.map((r:Registration) => {
-            if (!is_valid(r.sideEventId) && is_valid(r.roleId)) {
-                // the Head-of-Delegation role is fixed to ID 2
-                if (r.roleId == 2) {
-                    // check that this person is in fact HoD of the country of the fencer
-                    retval = props.document?.countryId == r.countryId;
-                }
-            }
-        });
-    }
-    return retval;
-}
-
 function isAllowed()
 {
     if (props.fencer && props.badge && props.document
        && props.document.processEnd && !props.document.checkout
        && (props.document.badge == props.badge.original
-          || fencerIsHod()
+          || fencerIsHod(props.fencer, props.document?.countryId || 0)
           )
     ) {
         return true;
+    }
+    return false;
+}
+
+function isOwnBag()
+{
+    if (props.fencer && props.document) {
+        return props.fencer.id == props.document.fencerId;
     }
     return false;
 }
@@ -83,7 +74,8 @@ import PhotoId from './special/PhotoId.vue';
       <PhotoId v-if="props.fencer != null" :fencer="props.fencer" :reloadHash="reloadHash"/>
       <div v-if="props.fencer != null" :class="{
         checkoutdialog: true,
-        checkoutAllowed: isAllowed()
+        checkoutAllowed: isAllowed(),
+        checkoutByHod: fencerIsHod(props.fencer, props.document?.countryId || 0) && !isOwnBag()
         }">
         <div class="title field"><b>Recipient</b></div>
         <div class="field"><b>Name:</b> {{ props.fencer?.lastName }}, {{ props.fencer?.firstName }}</div>
@@ -93,13 +85,19 @@ import PhotoId from './special/PhotoId.vue';
             <b>Country:</b> {{ basic.countriesById['c' + props.fencer?.countryId]?.name }}
         </div>
       </div>
-      <div :class="{
+      <div v-if="!isOwnBag()" :class="{
         checkoutdialog: true,
         checkoutAllowed: isAllowed()
         }">
         <div class="title field"><b>Owner</b></div>
         <div class="field"><b>Name:</b> {{ props.document?.name }}</div>
         <div class="field"><b>Country:</b> {{ basic.countriesById['c' + props.document?.countryId]?.name }}</div>
+      </div>
+      <div :class="{
+        checkoutdialog: true,
+        checkoutAllowed: isAllowed()
+      }">
+        <div class="title field"><b>Details</b></div>
         <div class="field"><b>Dates:</b> {{ props.document?.dates?.join(', ') }}</div>
         <div class="field" v-if="props.document?.card"><b>Card:</b> {{ props.document?.card }}</div>
         <div class="field" v-if="props.document?.document"><b>Document:</b> {{ props.document?.document }}</div>

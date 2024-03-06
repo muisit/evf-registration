@@ -27,6 +27,7 @@ const checkedOutDocumentList:Ref<Array<AccreditationDocument>> = ref([]);
 const currentDocument:Ref<AccreditationDocument|null> = ref(null);
 const currentFencer:Ref<Fencer|null> = ref(null);
 const currentBadge:Ref<Code|null> = ref(null);
+const markedDocumentList:Ref<Array<number>> = ref([]);
 
 watch(() => auth.credentials,
     (nw) => {
@@ -51,10 +52,18 @@ function badgeDispatcher(code:string, codeObject:Code)
             currentFencer.value = dt;
             currentBadge.value = codeObject;
 
+            // create a list of all documents for this fencer. If this fencer
+            // is a HoD, add all documents of fencers of that country
+            markedDocumentList.value = [];
+            const isHod = fencerIsHod(dt, dt.countryId || 0);
             let found:AccreditationDocument|null = null;
             pendingDocumentList.value.map((doc:AccreditationDocument) => {
                 if (doc.badge == code) {
                     found = doc;
+                    markedDocumentList.value.push(doc.id || 0);
+                }
+                else if(doc.countryId == dt.countryId && isHod) {
+                    markedDocumentList.value.push(doc.id || 0);
                 }
             });
 
@@ -69,6 +78,10 @@ function badgeDispatcher(code:string, codeObject:Code)
             processedDocumentList.value.map((doc:AccreditationDocument) => {
                 if (doc.badge == code) {
                     found = doc;
+                    markedDocumentList.value.push(doc.id || 0);
+                }
+                else if(doc.countryId == dt.countryId && isHod) {
+                    markedDocumentList.value.push(doc.id || 0);
                 }
             });
 
@@ -77,12 +90,14 @@ function badgeDispatcher(code:string, codeObject:Code)
             // first, then the badge of the recipient to check that that person is 
             // allowed to receive it.
             if (!checkoutDialog.value) {
-                if (found != null) {
+                // only open it if we have exactly one document pending
+                if (found != null && markedDocumentList.value.length == 1) {
                     return startCheckout(found)
                 }
-                else {
+                else if (!found) {
                     alert("You scanned a badge for which no bag is being processed. Please scan again, or reload the page");
                 }
+                // else we have several, pick the right one manually
             }
         }
     })
@@ -283,6 +298,7 @@ function moveDocumentToList(doc:AccreditationDocument)
 
 import StartProcessDialog from './StartProcessDialog.vue';
 import CheckoutDialog from './CheckoutDialog.vue';
+import { fencerIsHod } from './lib/fencerIsHod';
 </script>
 <template>
     <div class="main-app checkout-interface" v-if="auth.isCheckout(auth.eventId, 'code')">
@@ -298,12 +314,14 @@ import CheckoutDialog from './CheckoutDialog.vue';
                         <th v-if="basic.eventRequiresDocuments()">Doc</th>
                         <th>Checkin</th>
                         <th v-if="basic.eventMarksStartOfProcessing()">Start</th>
+                        <th></th>
                     </tr>                    
                 </thead>
                 <tbody>
                     <tr v-for="entity in pendingDocumentList" :key="entity.id" :class="{
                             'checkout-row': true,
-                            'started': entity.status == 'P'
+                            'started': entity.status == 'P',
+                            'pendinglist': markedDocumentList.includes(entity.id || 0)
                         }" @dblclick="() => startProcess(entity)">
                         <td class="code">{{ entity.badge }}</td>
                         <td class="name">{{ entity.name }}</td>
@@ -313,6 +331,7 @@ import CheckoutDialog from './CheckoutDialog.vue';
                         <td v-if="basic.eventRequiresDocuments()" class="code">{{ entity.document }}</td>
                         <td class="date">{{ dayjs(entity.checkin).format('ddd D HH:mm') }}</td>
                         <td class="date" v-if="basic.eventMarksStartOfProcessing()">{{ entity.processStart ? dayjs(entity.processStart).format('ddd D HH:mm') : '' }}</td>
+                        <td class="mark">&nbsp;</td>
                     </tr>
                 </tbody>
             </table>
@@ -329,13 +348,15 @@ import CheckoutDialog from './CheckoutDialog.vue';
                         <th v-if="basic.eventRequiresDocuments()">Doc</th>
                         <th>Checkin</th>
                         <th>Processed</th>
+                        <th></th>
                     </tr>                    
                 </thead>
                 <tbody>
                     <tr v-for="entity in processedDocumentList" :key="entity.id"  :class="{
                             'checkout-row': true,
                             'processed': true,
-                            'error': entity.status == 'E'
+                            'error': entity.status == 'E',
+                            'pendinglist': markedDocumentList.includes(entity.id || 0)
                         }" @dblclick="() => startCheckout(entity)">
                         <td class="code">{{ entity.badge }}</td>
                         <td class="name">{{ entity.name }}</td>
@@ -345,6 +366,7 @@ import CheckoutDialog from './CheckoutDialog.vue';
                         <td v-if="basic.eventRequiresDocuments()" class="code">{{ entity.document }}</td>
                         <td class="date">{{ dayjs(entity.checkin).format('ddd D HH:mm') }}</td>
                         <td class="date">{{ dayjs(entity.processEnd).format('ddd D HH:mm') }}</td>
+                        <td class="mark">&nbsp;</td>
                     </tr>
                 </tbody>
             </table>
@@ -360,6 +382,7 @@ import CheckoutDialog from './CheckoutDialog.vue';
                         <th v-if="basic.eventRequiresCards()">Card</th>
                         <th v-if="basic.eventRequiresDocuments()">Doc</th>
                         <th>Checkout</th>
+                        <th></th>
                     </tr>                    
                 </thead>
                 <tbody>
@@ -371,6 +394,7 @@ import CheckoutDialog from './CheckoutDialog.vue';
                         <td v-if="basic.eventRequiresCards()" class="code">{{ entity.card }}</td>
                         <td v-if="basic.eventRequiresDocuments()" class="code">{{ entity.document }}</td>
                         <td class="date">{{ dayjs(entity.checkout).format('ddd D HH:mm') }}</td>
+                        <td class="mark">&nbsp;</td>
                     </tr>
                 </tbody>
             </table>

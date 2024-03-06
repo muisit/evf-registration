@@ -32,24 +32,28 @@ function createCode($func, $addfunction, $id1, $id2, $payload)
 }
 
 
-function createCardCodes($max = 1000)
+function createCardCodes($start, $max = 1000)
 {
-    for ($i = 0; $i < $max; $i++) {
+    $retval = [];
+    for ($i = $start; $i < $max; $i++) {
         $id1 = random_int(101, 999);
         $addfunc = random_int(0, 9);
-        echo createCode(2, $addfunc, $id1, $i, 0);
+        $retval[] = ['code' => createCode(2, $addfunc, $id1, $i, 0), 'card' => $i];
     }
+    return $retval;
 }
 
-function createDocumentCodes($max = 2500)
+function createDocumentCodes($start, $max = 2500, $event = 37)
 {
-    for ($i = 0; $i < $max; $i++) {
+    $retval = [];
+    for ($i = $start; $i < $max; $i++) {
         $id1 = random_int(101, 999);
         $addfunc = intval($id1 / 100) % 10;
         $id1 = (10 * $id1) % 1000;
         $overflow = intval($i / 1000);
         $id1 += $overflow;
         $id2 = $i % 1000;
-        echo createCode(3, $addfunc, $id1, $id2, 0);
+        $retval[] = ['code' => createCode(3, $addfunc, $id1, $id2, $event), 'document' => $i];
     }
+    return $retval;
 }

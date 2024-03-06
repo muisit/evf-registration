@@ -21,6 +21,9 @@
             tr.error {
                 background-color: rgb(253, 108, 108);
             }
+            tr.pendinglist td.mark {
+                background-color: rgb(234, 126, 255);
+            }
         }
     }
 
@@ -61,7 +64,7 @@
         }
 
         .checkoutByHod {
-            background-color: #88f;
+            background-color: #b9b9ff;
         }
 
         .el-dialog__footer {

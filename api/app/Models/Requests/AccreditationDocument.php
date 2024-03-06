@@ -204,7 +204,6 @@ class AccreditationDocument extends Base
     {
         parent::postProcess();
         if (!empty($this->model)) {
-            \Log::debug("postProcess AccreditationDocument for status " . $this->model->status);
             switch ($this->model->status) {
                 case DocumentModel::STATUS_CREATED:
                     CheckinEvent::dispatch(request()->get('eventObject'), $this->model);
@@ -222,7 +221,6 @@ class AccreditationDocument extends Base
                     CheckoutEvent::dispatch(request()->get('eventObject'), $this->model);
                     $this->model->checkout = Carbon::now()->toDateTimeString();
                     break;
-
             }
         }
     }

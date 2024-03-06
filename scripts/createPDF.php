@@ -61,7 +61,30 @@ function interpretLine($line)
             TCPDF_FONTS::addTTFFont($tokens[1], '', '', 32, $configuration['fontdir'] ?? '');
             break;
         case 'colour':
-            $configuration['colour'] = parseColour($tokens['1'] ?? '#000000');
+            $configuration['colour'] = parseColour($tokens[1] ?? '#000000');
+            break;
+        case 'border':
+            // border <all|L|T|R|B|clear> [<color>] [<width>]
+            $borderDir = $tokens[1];
+            if (!isset($configuration['border'])) {
+                $configuration['border'] = [
+                    'L' => ['width' => 0.5, 'color' => parseColour('#000000')],
+                    'T' => ['width' => 0.5, 'color' => parseColour('#000000')],
+                    'R' => ['width' => 0.5, 'color' => parseColour('#000000')],
+                    'B' => ['width' => 0.5, 'color' => parseColour('#000000')],
+                ];
+            }
+            if ($borderDir == 'clear') {
+                unset($configuration['border']);
+            }
+            else {
+                $color = parseColour($tokens[2] ?? '#000000');
+                $width = parseFloat($tokens[3] ?? '0.5');
+                if ($borderDir == 'all' || $borderDir == 'L') $configuration['border']['L'] = ['width' => $width, 'color' => $color];
+                if ($borderDir == 'all' || $borderDir == 'T') $configuration['border']['T'] = ['width' => $width, 'color' => $color];
+                if ($borderDir == 'all' || $borderDir == 'R') $configuration['border']['R'] = ['width' => $width, 'color' => $color];
+                if ($borderDir == 'all' || $borderDir == 'B') $configuration['border']['B'] = ['width' => $width, 'color' => $color];
+            }
             break;
         case 'box':
             makeBoxAt($tokens);
@@ -151,6 +174,48 @@ function interpretLine($line)
         case 'fontsubsetting':
             if ($pdf) $pdf->setFontSubsetting(parseBoolean($tokens[1] ?? ''));
             break;
+        case 'template':
+            // template <id> [<width>] [<height>]
+            // template end
+            // template print <id> x y [<width>] [<height>]
+            $templateid = $tokens[1];
+            if ($templateid == 'end') {
+                $pdf->endTemplate();
+            }
+            else if($templateid == 'print') {
+                $templateid = $tokens[2];
+                if (isset($configuration['templates']) && isset($configuration['templates'][$templateid])) {
+                    $id = $configuration['templates'][$templateid]['id'];
+                    $w = $configuration['templates'][$templateid]['width'];
+                    $h = $configuration['templates'][$templateid]['height'];
+                    $x = parseFloat($tokens[3] ?? 0);
+                    $y = parseFloat($tokens[4] ?? 0);
+                    $w = parseFloat($tokens[5] ?? $w);
+                    $h = parseFloat($tokens[6] ?? $h);
+                    fprintf(STDERR, "    template at $x,$y -> $w,$h\r\n");
+                    $pdf->printTemplate($id, $x, $y, $w, $h, $align = '', $palign = '', $fitonpage = false);
+                }
+            }
+            else {
+                $w = floatval($tokens[2] ?? $pdf->getPageWidth());
+                $h = floatval($tokens[3] ?? $pdf->getPageHeight());
+                $template_id = $pdf->startTemplate($w, $h, true);
+                if (!isset($configuration['templates'])) {
+                    $configuration['templates'] = [];
+                }
+                fprintf(STDERR, "    starting template $w,$h\r\n");
+                $configuration['templates'][$templateid] = ['id' => $template_id, 'width' => $w, 'height' => $h];
+            }
+            break;
+        case 'image':
+            $path = $tokens[1];
+            $x = floatval($tokens[2] ?? 0.0);
+            $y = floatval($tokens[3] ?? 0.0);
+            $w = floatval($tokens[4] ?? 0.0);
+            $h = floatval($tokens[5] ?? 0.0);
+            $pdf->setJPEGQuality(90);
+            $pdf->Image($path, $x, $y, $w, $h, $type = '', $link = '', $align = '', $resize = true, $dpi = 600, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = 'CM', $hidden = false, $fitonpage = false, $alt = false, $altimgs = []);
+            break;
     }
 }
 
@@ -207,7 +272,7 @@ function putQRCode($tokens)
                         'T' // position box top at the pointer
                     );
                     break;
-            }              
+            }
         }
     }
 }
@@ -238,6 +303,7 @@ function saveDocument($filename)
 
 function makeBoxAt($tokens)
 {
+    // box x y width height 
     global $configuration;
     global $pdf;
     if ($pdf) {
@@ -248,7 +314,7 @@ function makeBoxAt($tokens)
 
         if ($width > 0 && $height > 0 && $x >= 0 && $y >= 0) {
             fprintf(STDERR, "    printing box at $x, $y -> $width, $height\r\n");
-            $pdf->Rect($x, $y, $width, $height, "F", ["all" => 0], $configuration['background'] ?? '#000000');
+            $pdf->Rect($x, $y, $width, $height, "F", $configuration['border'] ?? ["all" => 0], $configuration['background'] ?? '#000000');
         }
     }
 }
