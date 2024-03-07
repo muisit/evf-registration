@@ -51,7 +51,7 @@ class Accreditation extends Fixture
             'hash' => null,
             'file_hash' => null,
             'file_id' => null,
-            'generated' => null,
+            'generated' => '2020-01-01',
             'is_dirty' => null,
             'fe_id' => '1270578'
         ])->save();
@@ -66,7 +66,7 @@ class Accreditation extends Fixture
             'hash' => null,
             'file_hash' => null,
             'file_id' => null,
-            'generated' => null,
+            'generated' => '2020-01-01',
             'is_dirty' => null,
             'fe_id' => null
         ])->save();
@@ -80,7 +80,7 @@ class Accreditation extends Fixture
             'hash' => null,
             'file_hash' => null,
             'file_id' => null,
-            'generated' => null,
+            'generated' => '2020-01-01',
             'is_dirty' => null,
             'fe_id' => null
         ])->save();
@@ -94,7 +94,7 @@ class Accreditation extends Fixture
             'hash' => null,
             'file_hash' => null,
             'file_id' => null,
-            'generated' => null,
+            'generated' => '2020-01-01',
             'is_dirty' => null,
             'fe_id' => null
         ])->save();
@@ -108,7 +108,7 @@ class Accreditation extends Fixture
             'hash' => null,
             'file_hash' => null,
             'file_id' => null,
-            'generated' => null,
+            'generated' => '2020-01-01',
             'is_dirty' => null,
             'fe_id' => null
         ])->save();
@@ -122,7 +122,7 @@ class Accreditation extends Fixture
             'hash' => null,
             'file_hash' => null,
             'file_id' => null,
-            'generated' => null,
+            'generated' => '2020-01-01',
             'is_dirty' => null,
             'fe_id' => null
         ])->save();
@@ -136,7 +136,7 @@ class Accreditation extends Fixture
             'hash' => null,
             'file_hash' => null,
             'file_id' => null,
-            'generated' => null,
+            'generated' => '2020-01-01',
             'is_dirty' => null,
             'fe_id' => '1954492'
         ])->save();
@@ -150,7 +150,7 @@ class Accreditation extends Fixture
             'hash' => null,
             'file_hash' => null,
             'file_id' => null,
-            'generated' => null,
+            'generated' => '2020-01-01',
             'is_dirty' => null,
             'fe_id' => null
         ])->save();
@@ -164,7 +164,7 @@ class Accreditation extends Fixture
             'hash' => null,
             'file_hash' => null,
             'file_id' => null,
-            'generated' => null,
+            'generated' => '2020-01-01',
             'is_dirty' => null,
             'fe_id' => null
         ])->save();

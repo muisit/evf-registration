@@ -133,7 +133,7 @@ class SummarySplitService
             case 'Event': $name = $this->model->title; break;
             case 'Template': $name = $this->model->name;
         }
-        return $doc->type . "_" . $name . '_' . $doc->getKey() . ".pdf";
+        return $doc->type . "_" . str_replace(' ', '_', $name) . '_' . $doc->getKey() . ".pdf";
     }
 
     private function findExistingDocuments()
