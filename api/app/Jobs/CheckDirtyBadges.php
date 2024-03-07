@@ -68,6 +68,23 @@ class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
             $job = new CheckBadge($row->fencer_id, $event->getKey());
             dispatch($job);
         }
+
+        // also get all accreditations that were generated, but that do not have a
+        // file, a generation time, but also not an is_dirty value
+        // These accreditations were created while the application was set to 'do not generate'
+        $accreditations = DB::table(Accreditation::tableName())
+            ->select('fencer_id')
+            ->where('is_dirty', null)
+            ->where('generated', null)
+            ->where('file_id', null)
+            ->where('event_id', $event->getKey())
+            ->groupBy('fencer_id')
+            ->get();
+
+        foreach ($accreditations as $row) {
+            $job = new CheckBadge($row->fencer_id, $event->getKey());
+            dispatch($job);
+        }
     }
 
     private function makeAllRegistrationsDirty(Event $event)
