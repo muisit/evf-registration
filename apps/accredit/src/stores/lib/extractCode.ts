@@ -42,7 +42,6 @@ export function extractCode(code:string): Code
             retval.validation = parseInt(code[index + 9]);
             let check = calculateValidation(code.split('').slice(index + 2, index + 9));
             if (check != retval.validation) {
-                console.log('invalid code detected, validation says ', check, retval.validation);
                 return { original: code, data: -1 };
             }
 

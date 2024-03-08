@@ -1,8 +1,8 @@
 import type { Ref } from 'vue';
 import type { CodeDispatcher } from './lib/codedispatcher';
-import type { Code, CodeUser } from '../../../common/api/schemas/codes';
-import type { Event } from '../../../common/api/schemas/event';
+import type { Code } from '../../../common/api/schemas/codes';
 import type { Fencer } from '../../../common/api/schemas/fencer';
+import type { CodeProcessStatus } from '../../../common/api/schemas/codeprocessstatus';
 import { ref } from 'vue';
 import { defineStore } from 'pinia'
 import { checkcode } from '../../../common/api/codes/checkcode';
@@ -11,7 +11,6 @@ import { processCode } from './lib/processCode';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useBasicStore } from '../../../common/stores/basic';
 import { registrations } from '../../../common/api/registrations/registrations';
-import { CodeProcessStatus } from '../../../common/api/schemas/codeprocessstatus';
 
 export const useDataStore = defineStore('data', () => {
     const subtitle:Ref<string> = ref('');
