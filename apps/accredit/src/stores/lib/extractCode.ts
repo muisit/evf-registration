@@ -54,6 +54,7 @@ export function extractCode(code:string): Code
                     return {original: code, data: -1};
                 }
             }
+            retval.original = code.slice(index, index + 14);
         }
     }
     return retval;

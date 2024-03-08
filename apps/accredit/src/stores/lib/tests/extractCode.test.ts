@@ -42,7 +42,7 @@ test('doc', () => {
 
 test('longbadge', () => {
     expect(extractCode('0111535403900004')).toStrictEqual({
-        original: '0111535403900004',
+        original: '11153540390000',
         baseFunction: 1,
         addFunction: 1,
         id1: 535,
@@ -85,7 +85,7 @@ test('prefixed', () => {
 // with an odd number of zeroes, the upcChecksum does not change
 test('prefixed 2', () => {
     expect(extractCode('00000111535403900004')).toStrictEqual({
-        original: '00000111535403900004',
+        original: '11153540390000',
         baseFunction: 1,
         addFunction: 1,
         id1: 535,
