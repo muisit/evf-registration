@@ -142,10 +142,17 @@ class Accreditation extends Model
             ->get();
         foreach ($registrations as $registration) {
             if (!empty($registration->sideEvent) && !empty($registration->sideEvent->competition)) {
-                $dt = (new Carbon($registration->sideEvent->starts))->format('D d');
+                $dt = (new Carbon($registration->sideEvent->starts))->format('Y-m-d');
                 $dates[$dt] = true;
             }
         }
-        return array_keys($dates);
+        $lst = array_keys($dates);
+        sort($lst);
+        return array_map(
+            function ($dt) {
+                return (new Carbon($dt))->format('D d');
+            },
+            $lst
+        );
     }
 }

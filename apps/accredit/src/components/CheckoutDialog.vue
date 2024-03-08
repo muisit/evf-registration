@@ -45,6 +45,25 @@ function endProcess()
     });
 }
 
+function reprocess()
+{
+    auth.isLoading('savedocument');
+    savedocument({id: props.document?.id || 0, status: 'P'}).then((dt) => {
+        auth.hasLoaded('savedocument');
+        if (dt) {
+            emits('onSubmit', dt);
+        }
+        else {
+            throw new Error("invalid response");
+        }
+    })
+    .catch((e) => {
+        console.log(e);
+        auth.hasLoaded('savedocument');
+        alert("There was an error saving the state of this bag. Please reload the page and try again");
+    });
+}
+
 function isAllowed()
 {
     if (props.fencer && props.badge && props.document
@@ -101,6 +120,14 @@ import PhotoId from './special/PhotoId.vue';
         <div class="field"><b>Dates:</b> {{ props.document?.dates?.join(', ') }}</div>
         <div class="field" v-if="props.document?.card"><b>Card:</b> {{ props.document?.card }}</div>
         <div class="field" v-if="props.document?.document"><b>Document:</b> {{ props.document?.document }}</div>
+        <div class="field" v-if="props.document?.status == 'C'"><b>Status:</b> Pending processing</div>
+        <div class="field" v-if="props.document?.status == 'P'"><b>Status:</b> Being processed</div>
+        <div class="field" v-if="props.document?.status == 'G'"><b>Status:</b> No issues, ready for checkout</div>
+        <div class="field" v-if="props.document?.status == 'E'"><b>Status:</b> ISSUES WITH MATERIAL, ready for checkout</div>
+        <div class="field" v-if="props.document?.status == 'O'"><b>Status:</b> Checked out</div>
+      </div>
+      <div v-if="props.document?.status == 'C' || props.document?.status == 'P'" class="error">
+        This bag is still marked as being processed. Make sure you are checking out the right bag.
       </div>
       <div v-if="props.document?.status == 'E'" class="error">
         There were issues with the material during control. Please indicate this to the recipient.
@@ -108,6 +135,7 @@ import PhotoId from './special/PhotoId.vue';
       <template #footer>
         <span class="dialog-footer">
           <ElButton type="warning" @click="closeForm">Cancel</ElButton>
+          <ElButton @click="reprocess">Reprocess</ElButton>
           <ElButton type="primary" @click="endProcess">Checkout</ElButton>
         </span>
       </template>

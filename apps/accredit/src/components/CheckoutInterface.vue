@@ -243,6 +243,7 @@ function onDialogClose()
 {
     startProcessDialog.value = false;
     checkoutDialog.value = false;
+    currentFencer.value = null;
 }
 
 function onDialogSubmit(doc:AccreditationDocument)
@@ -278,21 +279,27 @@ function moveDocumentToList(doc:AccreditationDocument)
         return d;
     });
 
-    console.log(foundInPending, foundInProcessed, foundInCheckedOut, doc.processStart, doc.processEnd, doc.checkout);
-    if (doc.processStart && doc.processEnd && doc.checkout && !foundInCheckedOut) {
+    console.log('moving document', doc.processEnd, doc.checkout, foundInCheckedOut, foundInProcessed, foundInPending);
+    if (doc.checkout && !foundInCheckedOut) {
+        console.log('adding document to checkoutList');
         pendingDocumentList.value = pendingDocumentList.value.filter((d:AccreditationDocument) => d.id != doc.id);
         processedDocumentList.value = processedDocumentList.value.filter((d:AccreditationDocument) => d.id != doc.id);
         checkedOutDocumentList.value.unshift(doc);
     }
-    if (doc.processStart && doc.processEnd && !doc.checkout && !foundInProcessed) {
+    else if (doc.processEnd && !doc.checkout && !foundInProcessed) {
+        console.log('adding document to processedList');
         pendingDocumentList.value = pendingDocumentList.value.filter((d:AccreditationDocument) => d.id != doc.id);
         checkedOutDocumentList.value = checkedOutDocumentList.value.filter((d:AccreditationDocument) => d.id != doc.id);
         processedDocumentList.value.unshift(doc);
     }
-    if (!doc.processEnd && !doc.checkout && !foundInPending) {
+    else if (!doc.processEnd && !doc.checkout && !foundInPending) {
+        console.log('adding document to pendingList');
         processedDocumentList.value = processedDocumentList.value.filter((d:AccreditationDocument) => d.id != doc.id);
         checkedOutDocumentList.value = checkedOutDocumentList.value.filter((d:AccreditationDocument) => d.id != doc.id);
         pendingDocumentList.value.unshift(doc);
+    }
+    else {
+        console.log('skipping moving document');
     }
 }
 
