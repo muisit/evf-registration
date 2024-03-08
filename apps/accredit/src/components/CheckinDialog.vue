@@ -27,12 +27,23 @@ function closeForm()
     emits('onSubmit');
 }
 
+function getRegistrationDate(registration?:Registration)
+{
+    if (is_valid(registration?.sideEventId)) {
+        let sideEvent = basic.sideEventsById['s' + registration?.sideEventId];
+        if (sideEvent) {
+            return parse_date(sideEvent.starts).format('ddd D');
+        }
+    }
+    return '';
+}
+
 function getRegistrationTitle(registration?:Registration)
 {
     if (is_valid(registration?.sideEventId)) {
         let sideEvent = basic.sideEventsById['s' + registration?.sideEventId];
         if (sideEvent) {
-            return parse_date(sideEvent.starts).format('ddd D') + ' ' + sideEvent.title || '';
+            return sideEvent.title || '';
         }
     }
     return '';
@@ -68,7 +79,7 @@ import PhotoId from './special/PhotoId.vue';
         </div>
         <div class="field">
             <div v-for="reg in sortedRegistrations()" :key="reg.id || 0" class="sideevent">
-                {{ getRegistrationTitle(reg) }}
+                <div class='date'>{{ getRegistrationDate(reg) }}</div><div class="title">{{ getRegistrationTitle(reg) }}</div>
             </div>
         </div>
         <div class="card" v-if="props.card">

@@ -97,7 +97,7 @@ watch(() => props.visible,
 
 function badgeDispatcher(code:string, codeObject:Code)
 {
-    data.badgeDispatcher(code, codeObject).then((dt:Fencer|void) => {
+    data.badgeDispatcher(codeObject.original, codeObject).then((dt:Fencer|void) => {
         if (dt) {
             let key = 'f' + dt.id;
             if (fencers.value[key]) {

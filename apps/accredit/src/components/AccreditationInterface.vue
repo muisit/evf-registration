@@ -34,7 +34,7 @@ const originalStates:Ref<StringKeyedString> = ref({});
 function badgeDispatcher(code:string, codeObject:Code)
 {
     auth.isLoading('badge');
-    data.badgeDispatcher(code, codeObject).then((dt:Fencer|void) => {
+    data.badgeDispatcher(codeObject.original, codeObject).then((dt:Fencer|void) => {
         auth.hasLoaded('badge');
 
         if (dt) {
@@ -46,8 +46,8 @@ function badgeDispatcher(code:string, codeObject:Code)
                 currentAccreditation.value = '';
             }
 
-            accreditationList.value.unshift(code);
-            currentAccreditation.value = code;
+            accreditationList.value.unshift(codeObject.original);
+            currentAccreditation.value = codeObject.original;
             updatedRegistrations.value = [];
             originalStates.value = {};
 
@@ -64,7 +64,7 @@ function badgeDispatcher(code:string, codeObject:Code)
                 registrationsstate(updatedRegistrations.value.map((v) => v.registration), 'P', 'R');
             }
 
-            fencers.value[code] = dt;
+            fencers.value[codeObject.original] = dt;
             dialogVisible.value = true;
         }
     })
@@ -82,9 +82,7 @@ function failDispatcher(code:string, codeObject:Code)
     dialogVisible.value = false;
 
     // closing the dialog this way means confirming the handing-out of the badge
-    console.log(currentAccreditation.value, currentAccreditation.value.length);
     if (currentAccreditation.value.length >= 14) {
-        console.log('handing out the previous accreditation after closing dialog due to fail scan');
         handout(currentAccreditation.value);
         currentAccreditation.value = '';
     }
