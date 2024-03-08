@@ -76,7 +76,7 @@ class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
             ->select('fencer_id')
             ->where('is_dirty', null)
             ->where('generated', null)
-            ->where('file_id', null)
+            ->where('file_hash', null)
             ->where('event_id', $event->getKey())
             ->groupBy('fencer_id')
             ->get();

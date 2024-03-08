@@ -1,4 +1,5 @@
 import type { Fencer } from "./fencer";
+import type { Accreditation } from './accreditation';
 
 export interface CodeProcessStatus {
     eventId: number;
@@ -6,4 +7,5 @@ export interface CodeProcessStatus {
     action: string;
     message?: string;
     fencer?: Fencer;
+    accreditations ?: Accreditation[];
 };

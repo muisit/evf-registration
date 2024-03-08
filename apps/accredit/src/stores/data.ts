@@ -11,6 +11,7 @@ import { processCode } from './lib/processCode';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useBasicStore } from '../../../common/stores/basic';
 import { registrations } from '../../../common/api/registrations/registrations';
+import { CodeProcessStatus } from '../../../common/api/schemas/codeprocessstatus';
 
 export const useDataStore = defineStore('data', () => {
     const subtitle:Ref<string> = ref('');
@@ -18,6 +19,7 @@ export const useDataStore = defineStore('data', () => {
     const processingList:Ref<Code[]> = ref([]);
     const dispatcher:Ref<CodeDispatcher> = ref({admin: adminDispatcher, badge: badgeDispatcher});
     const scannedBadge:Ref<Fencer|null> = ref(null);
+    const lastCodeResult:Ref<CodeProcessStatus|null> = ref(null);
 
     function logout()
     {
@@ -102,6 +104,7 @@ export const useDataStore = defineStore('data', () => {
                     throw new Error(dt.message || 'Error while validating code');
                 }
                 else {
+                    lastCodeResult.value = dt;
                     logout();
                     const auth = useAuthStore();
                     auth.eventId = dt.eventId;
@@ -126,6 +129,7 @@ export const useDataStore = defineStore('data', () => {
                     throw new Error(dt.message || 'Error while validating code');
                 }
                 else {
+                    lastCodeResult.value = dt;
                     const auth = useAuthStore();
                     if (auth.eventId != dt.eventId) {
                         // scanning a badge from a different event
@@ -256,6 +260,6 @@ export const useDataStore = defineStore('data', () => {
         inputValue, processingList, addCode, processFullCode,
         getOrgRegistrations, 
         setDispatcher, clearDispatchers, adminDispatcher, badgeDispatcher, 
-        scannedBadge
+        scannedBadge, lastCodeResult
     };
 });

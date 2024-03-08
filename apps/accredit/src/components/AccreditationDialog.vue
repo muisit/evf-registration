@@ -4,6 +4,7 @@ import { is_valid, random_hash, valid_date } from '../../../common/functions';
 import type { Registration } from '../../../common/api/schemas/registration';
 import type { Fencer } from '../../../common/api/schemas/fencer';
 import { useBasicStore } from '../../../common/stores/basic';
+import { useDataStore } from '../stores/data';
 import { dayjs } from 'element-plus';
 
 const props = defineProps<{
@@ -11,6 +12,7 @@ const props = defineProps<{
     fencer?:Fencer;
 }>();
 const emits = defineEmits(['onClose', 'onUpdate', 'onCancel', 'onUnregister', 'onRegister']);
+const data = useDataStore();
 const basic = useBasicStore();
 const reloadHash = ref(random_hash());
 
@@ -102,6 +104,9 @@ import PhotoId from './special/PhotoId.vue';
                     <span class='switch-state'>{{ switchStateLong(reg) }}</span>
             </ElFormItem>
         </ElForm>
+        <div v-if="data.lastCodeResult?.accreditations?.length > 1" class="morebadges">
+            This person has {{ data.lastCodeResult?.accreditations?.length }} badges. Please handout all of them!
+        </div>
       </div>
       <template #footer>
         <span class="dialog-footer">

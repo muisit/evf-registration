@@ -49,6 +49,11 @@ class Accreditation
      * Has File indicator
      */
     public string $hasFile;
+
+    /*
+     * Full accreditation id (badge code)
+     */
+    public string $code;
     
     public function __construct(?Model $accreditation)
     {
@@ -59,6 +64,7 @@ class Accreditation
             $this->template = $accreditation->template?->name;
             $this->templateId = $accreditation->template_id;
             $this->hasFile = !empty($accreditation->generated) && !empty($accreditation->file_hash) ? 'Y' : 'N';
+            $this->code = $accreditation->getFullAccreditationId();
         }
     }
 }

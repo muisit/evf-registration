@@ -53,6 +53,11 @@ class CodeProcessStatus
      */
     public ?Fencer $fencer = null;
 
+    /**
+     * Optional data field: accreditations
+     */
+    public ?array $accreditations = null;
+
     public function __construct($id = 0, $status = 'error', $action = 'error', ?string $message = null)
     {
         $this->eventId = $id;
@@ -64,5 +69,14 @@ class CodeProcessStatus
     public function setFencer(FencerModel $fencer, ?Event $event)
     {
         $this->fencer = new Fencer($fencer, $event);
+    }
+
+    public function setAccreditations(FencerModel $fencer, Event $event)
+    {
+        $accreditations = $fencer->accreditations()->where('event_id', $event->getKey())->get();
+        $this->accreditations = [];
+        foreach ($accreditations as $accreditation) {
+            $this->accreditations[] = new Accreditation($accreditation);
+        }
     }
 }
