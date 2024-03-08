@@ -7,6 +7,7 @@ use App\Models\Schemas\Code;
 use Illuminate\Database\Eloquent\Model;
 use App\Support\Contracts\EVFUser;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 
 class Codes extends Base
