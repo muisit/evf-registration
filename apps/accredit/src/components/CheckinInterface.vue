@@ -86,10 +86,10 @@ function matchDocument(event:string, doc:AccreditationDocument)
 function badgeDispatcher(code:string, codeObject:Code)
 {
     auth.isLoading('badge');
-    data.badgeDispatcher(code, codeObject).then((dt:Fencer|void) => {
+    data.badgeDispatcher(codeObject.original, codeObject).then((dt:Fencer|void) => {
         auth.hasLoaded('badge');
         if (dt) {
-            fencers.value[code] = dt;
+            fencers.value[codeObject.original] = dt;
             currentEntity.value.badge = codeObject;
             dialogVisible.value = true;
         }

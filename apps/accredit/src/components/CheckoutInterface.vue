@@ -46,7 +46,7 @@ watch(() => auth.credentials,
 function badgeDispatcher(code:string, codeObject:Code)
 {
     auth.isLoading('badge');
-    data.badgeDispatcher(code, codeObject).then((dt:Fencer|void) => {
+    data.badgeDispatcher(codeObject.original, codeObject).then((dt:Fencer|void) => {
         auth.hasLoaded('badge');
         if (dt) {
             currentFencer.value = dt;
@@ -58,7 +58,7 @@ function badgeDispatcher(code:string, codeObject:Code)
             const isHod = fencerIsHod(dt, dt.countryId || 0);
             let found:AccreditationDocument|null = null;
             pendingDocumentList.value.map((doc:AccreditationDocument) => {
-                if (doc.badge == code) {
+                if (doc.badge == codeObject.original) {
                     found = doc;
                     markedDocumentList.value.push(doc.id || 0);
                 }
@@ -76,7 +76,7 @@ function badgeDispatcher(code:string, codeObject:Code)
             // the processed list. If not, the found value will keep pointing to
             // the pending list value as expected
             processedDocumentList.value.map((doc:AccreditationDocument) => {
-                if (doc.badge == code) {
+                if (doc.badge == codeObject.original) {
                     found = doc;
                     markedDocumentList.value.push(doc.id || 0);
                 }
