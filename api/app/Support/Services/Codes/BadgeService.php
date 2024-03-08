@@ -52,6 +52,7 @@ class BadgeService
 
         if (Auth::user()->can('view', $fencer)) {
             $this->manager->result->setFencer($fencer, $this->manager->event);
+            $this->manager->result->setAccreditations($fencer, $this->manager->event);
         }
         AccreditationAudit::createFromAction("badge", $accreditations[0], ["code" => $code->original]);
         $this->manager->result->status = 'ok';

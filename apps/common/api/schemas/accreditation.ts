@@ -5,6 +5,7 @@ export interface Accreditation {
     fencerId: number;
     template?: string;
     hasFile?: string;
+    code ?: string;
 }
 
 export interface AccreditationList extends Array<Accreditation>{};

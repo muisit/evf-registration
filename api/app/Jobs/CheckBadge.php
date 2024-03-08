@@ -86,7 +86,8 @@ class CheckBadge extends Job implements ShouldBeUniqueUntilProcessing
         $matchService->actualise();
 
         foreach ($matchService->foundAccreditations as $a) {
-            if (!empty($a->is_dirty)) {
+            // if it is dirty, or it was never generated yet
+            if (!empty($a->is_dirty) || !file_exists($a->path())) {
                 $a->is_dirty = null; // make it clean to avoid additional jobs for this accreditation
                 $a->save();
 
