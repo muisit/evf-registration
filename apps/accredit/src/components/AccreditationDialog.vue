@@ -104,7 +104,7 @@ import PhotoId from './special/PhotoId.vue';
                     <span class='switch-state'>{{ switchStateLong(reg) }}</span>
             </ElFormItem>
         </ElForm>
-        <div v-if="data.lastCodeResult?.accreditations?.length > 1" class="morebadges">
+        <div v-if="(data.lastCodeResult?.accreditations?.length || 0) > 1" class="morebadges">
             This person has {{ data.lastCodeResult?.accreditations?.length }} badges. Please handout all of them!
         </div>
       </div>

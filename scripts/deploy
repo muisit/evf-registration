@@ -34,16 +34,19 @@ echo "Copying production .env file for build process" >>$LOG
 cp env.production $WD/api/.env
 cp env.testing $WD/api/.env.testing
 cp env.register $WD/apps/reg/.env
+cp env.accredit $WD/apps/accredit/.env
 echo "APP_ENV=testing" >> $WD/api/tests/.env
 
 cd $WD
 BUILDNR=`php -r '$version=json_decode(file_get_contents("build.json")); echo $version->build;'`
 APIVERSION=`php -r '$version=json_decode(file_get_contents("versions.json")); echo $version->api->major . "." . $version->api->minor . "." . $version->api->micro;'`
 REGVERSION=`php -r '$version=json_decode(file_get_contents("versions.json")); echo $version->register->major . "." . $version->register->minor . "." . $version->register->micro;'`
+ACCRVERSION=`php -r '$version=json_decode(file_get_contents("versions.json")); echo $version->accreditation->major . "." . $version->accreditation->minor . "." . $version->accreditation->micro;'`
 
 echo "Patching versions in env files" >> $LOG
 cat $WD/api/.env | sed "s/APP_VERSION=.*/APP_VERSION=$APIVERSION\.$BUILDNR/" > tmp; mv tmp $WD/api/.env
 cat $WD/apps/reg/.env | sed "s/VITE_VERSION=.*/VITE_VERSION=$REGVERSION\.$BUILDNR/" > tmp; mv tmp $WD/apps/reg/.env
+cat $WD/apps/accredit/.env | sed "s/VITE_VERSION=.*/VITE_VERSION=$ACCRVERSION\.$BUILDNR/" > tmp; mv tmp $WD/apps/accredit/.env
 
 cd api
 
@@ -126,7 +129,7 @@ echo "Building Front Side Applications" >> $LOG
 cd apps
 
 echo "Cleanup" >> $LOG
-rm -rf README.md node_modules reg/node_modules >> $LOG
+rm -rf README.md node_modules reg/node_modules accredit/node_modules >> $LOG
 
 # install/require all modules
 echo "Installing NPM modules" >> $LOG
@@ -165,8 +168,8 @@ fi
 
 
 echo "Creating application files"
-NODE_ENV=development npm run build-only -- --mode development --minify false >> $LOG 2>&1
-#npm run build-only >> $LOG 2>&1
+#NODE_ENV=development npm run build-only -- --mode development --minify false >> $LOG 2>&1
+npm run build-only >> $LOG 2>&1
 
 cd dist
 zip -r -q registration.zip index.html assets
@@ -177,13 +180,56 @@ echo "Finished building Registration application"
 echo "Finished building Registration application" >> $LOG
 cd ..
 
+echo "Building Accreditation Application"
+echo "Building Accreditation Application" >> $LOG
+
+cd accredit
+echo "Installing NPM modules" >> $LOG
+npm install --production=false >> $LOG 2>&1
+chmod u+x node_modules/.bin/* >> $LOG
+
+echo "Running type-check tests for Accreditation Application" >> $LOG
+npm run type-check >> $LOG 2>&1
+EC="$?"
+
+if [[ ! "x$EC" = "x0" ]]
+then
+    echo "Error running type-check tests"
+    echo "Exit code on type-check $EC" >> $LOG
+    exit 1
+fi
+
+echo "Running unit tests for Accreditation Application" >> $LOG
+npm run test:unit -- --run >> $LOG 2>&1
+EC="$?"
+
+if [[ ! "x$EC" = "x0" ]]
+then
+    echo "Error running unit tests"
+    echo "Exit code on unit tests $EC" >> $LOG
+    exit 1
+fi
+
+echo "Creating application files"
+#NODE_ENV=development npm run build-only -- --mode development --minify false >> $LOG 2>&1
+npm run build-only >> $LOG 2>&1
+
+cd dist
+zip -r -q accreditation.zip index.html assets
+mv accreditation.zip ../../..
+cd ..
+
+echo "Finished building Accreditation application"
+echo "Finished building Accreditation application" >> $LOG
+cd ..
+
 echo "Finished building Front Side applications"
 echo "Finished building Front Side applications" >> $LOG
 cd ..
 
 echo "Ready to create deployment file"
 echo "Ready to create deployment file" >> $LOG
-zip -r -q ../$EXT.zip API.zip registration.zip
+zip -r -q ../$EXT.zip API.zip registration.zip accreditation.zip
 cd ..
 
 echo "Provisioning"

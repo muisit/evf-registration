@@ -36,6 +36,19 @@ else
     exit 1
 fi
 
+if [[ -e "accreditation.zip" ]]
+then
+    echo "Unzipping accreditation application"
+    mkdir accreditation
+    cd accreditation
+    unzip -q ../accreditation.zip
+    cd ..
+    rm accreditation.zip
+else
+    echo "ERROR: NO ACCREDITATION APPLICATION"
+    exit 1
+fi
+
 if [[ -e "API.zip" ]]
 then
     echo "Unzipping API application"
@@ -91,6 +104,11 @@ rm index.html assets
 ln -sf $HOME/releases/$WD/registration/index.html .
 ln -sf $HOME/releases/$WD/registration/assets .
 
+cd $HOME/accreditation.veteransfencing.eu
+rm index.html assets
+ln -sf $HOME/releases/$WD/accreditation/index.html .
+ln -sf $HOME/releases/$WD/accreditation/assets .
+
 cd $HOME/api.veteransfencing.eu
 rm index.php
 ln -sf $HOME/releases/$WD/api/public/index.php .
@@ -99,8 +117,9 @@ ln -sf $HOME/releases/$WD/api/public/.htaccess .
 echo "Switching link to latest release"
 mkdir -p $HOME/releases/last
 cd $HOME/releases/last
-rm -f api registration
+rm -f api registration accreditation
 ln -sf $HOME/releases/$WD/registration registration
+ln -sf $HOME/releases/$WD/accreditation accreditation
 ln -sf $HOME/releases/$WD/api api
 
 echo "Cleanup"
