@@ -75,7 +75,7 @@ function endEnabled()
 import { ElDialog, ElForm, ElFormItem, ElSwitch, ElButton } from 'element-plus';
 </script>
 <template>
-    <ElDialog :model-value="props.visible" title="Weapon Control Process Start" :close-on-click-modal="false"  :before-close="(done) => { cancelForm(); done(false); }">
+    <ElDialog :model-value="props.visible" title="Weapon Control Process" :close-on-click-modal="false"  :before-close="(done) => { cancelForm(); done(false); }">
       <div class="startprocess-dialog">
         <div class="field"><b>Name:</b> {{ props.document?.name }}</div>
         <div class="field"><b>Country:</b> {{ basic.countriesById['c' + props.document?.countryId]?.name }}</div>
