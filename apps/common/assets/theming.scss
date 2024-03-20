@@ -67,4 +67,9 @@
     .el-switch {
         --el-switch-off-color: #7cbeff;
     }
+
+    .el-form-item__label {
+        line-height: 14px;
+        padding-top: 8px;
+    }
 }
