@@ -1,0 +1,38 @@
+{
+    "appTitle": "MyEVF",
+    "@appTitle": {
+      "description": "The main title for this application"
+    },
+
+    "navHome": "Home",
+    "@navHome": {
+      "description": "Bottom navigation bar Home button"
+    },
+    "navRanking": "Ranking",
+    "@navRanking": {
+      "description": "Bottom navigation bar Ranking (events) button"
+    },
+    "navResults": "Results",
+    "@navResults": {
+      "description": "Bottom navigation bar Results (equalizer) button"
+    },
+    "navCalendar": "Calendar",
+    "@navCalendar": {
+      "description": "Bottom navigation bar Calendar button"
+    },
+    "navAccount": "Account",
+    "@navAccount": {
+      "description": "Bottom navigation bar Account button"
+    },
+
+    "errorNoPageWidget": "no widget for {currentPageIndex}",
+    "@errorNoPageWidget": {
+      "description": "Error thrown if the selected page index falls outside the programmatic boundaries",
+      "placeHolders": {
+        "currentPageIndex": {
+          "type": "int",
+          "example": "5"
+        }
+      }
+    }
+}

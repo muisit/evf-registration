@@ -38,14 +38,18 @@ fontsize 22
 text 13 11 "Name/Nom/Name:"
 text 13 29 "Country/Pays/Land:"
 fontsize 16
+font helveticaI
 text 13 55 "Indicate the number/Précisez la quantité/Geben Sie die Menge an:"
-fontsize 20
-text 13 65 "_____ x Bodywires/Fils de corps/Körperkabel"
-text 13 75 "_____ x Mask wires/Fils de masque/Maskenkabel"
-text 13 85 "_____ x Weapons/Armes/Waffen"
-text 13 95 "_____ x Lame jackets/Cuirasses électrique/Elektrowesten"
-text 13 105 "_____ x Masks/Masques/Masken"
-text 13 120 "Other/Autre/Andere:"
+font helvetica
+text 13 70  "_____ (max: 4) Body wires/Fils de corps/Körperkabel"
+text 13 83  "_____ (max: 4) Mask wires/Fils de masque/Maskenkabel"
+text 13 96  "_____ (max: 4) Weapons/Armes/Waffen"
+text 13 109  "_____ (max: 2) Lame jackets/Cuirasses électrique/Elektrowesten"
+text 13 122 "_____ (max: 2) Masks/Masques/Masken"
+text 13 135 "_____ (max: 2) Jackets/Vestes/Jacken"
+text 13 148 "_____ (max: 2) Breeches/Pantalons/Hosen"
+text 13 161 "_____ (max: 2) Plastrons/Cuirasses de protection/Unterziehjacken"
+text 13 174 "_____ (max: 2) Gloves/Gants/Handschuhe"
 image "evflogo_bw.png" 157 242 40 40
 template end
 

@@ -4,27 +4,31 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Ensures the request is not vulnerable to cross-site request forgery
  * by checking the bearer token
  */
-class CSRFCheck
+class CSRFCheck extends VerifyCsrfToken
 {
-    public function handle(Request $request, \Closure $next): mixed
+    protected $addHttpCookie = false;
+
+    // do not perform CSRF checks on any of the mobile device API calls
+    protected $except = [
+        'device/*'
+    ];
+
+    protected function runningUnitTests()
     {
-        $method = $request->getRealMethod();
+        // while convenient, we also include CSRF checks in the tests
+        return false;
+    }
 
-        if ($method === 'POST') {
-            $csrfToken = $request->header('X-CSRF-Token');
-
-            if (empty($csrfToken) || $csrfToken != csrf_token()) {
-                \Log::debug("testing $csrfToken vs " . csrf_token() . ' fails');
-                throw new BadRequestHttpException('X-CSRF-Token header must be set');
-            }
-        }
-
-        return $next($request);
+    protected function getTokenFromRequest($request)
+    {
+        // application is ONLY using X-CSRF-TOKEN header
+        return $request->header('X-CSRF-TOKEN');
     }
 }

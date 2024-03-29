@@ -105,7 +105,7 @@ import PhotoId from './special/PhotoId.vue';
             </ElFormItem>
         </ElForm>
         <div v-if="(data.lastCodeResult?.accreditations?.length || 0) > 1" class="morebadges">
-            This person has {{ data.lastCodeResult?.accreditations?.length }} badges. Please handout all of them!
+            This person has {{ data.lastCodeResult?.accreditations?.length }} badges. Please hand out all of them!
         </div>
       </div>
       <template #footer>

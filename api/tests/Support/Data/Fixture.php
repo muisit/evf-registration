@@ -44,6 +44,10 @@ class Fixture
 
     public static function loadAll()
     {
+        DeviceFeed::clear();
+        Device::clear();
+        DeviceUser::clear();
+        WPPost::clear();
         Result::clear();
         AccreditationUser::clear();
         Accreditation::clear();
@@ -70,5 +74,9 @@ class Fixture
         Accreditation::create();
         AccreditationUser::create();
         Result::create();
+        WPPost::create();
+        DeviceUser::create();
+        Device::create();
+        DeviceFeed::create();
     }
 }

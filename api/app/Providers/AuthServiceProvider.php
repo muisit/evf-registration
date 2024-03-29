@@ -2,14 +2,18 @@
 
 namespace App\Providers;
 
+use App\Models\Device;
 use App\Models\Event;
 use App\Models\WPUser;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use App\Support\SessionGuard;
+use App\Support\DeviceGuard;
 use App\Support\UserProvider;
 use App\Support\Contracts\EVFUser;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -67,6 +71,13 @@ class AuthServiceProvider extends ServiceProvider
         });
         Broadcast::channel('dt.{eventId}', function (EVFUser $user, int $eventId) {
             return $user->hasRole('code') && $user->hasRole(["dt:" . $eventId]);
+        });
+
+        Auth::viaRequest('device', function (Request $request) {
+            \Log::debug("searching for bearer token user " . ((string)$request->bearerToken()) . " - " . json_encode($request->headers()));
+            $user = Device::where('uuid', (string) $request->bearerToken())->first()?->user;
+            \Log::debug("found " . json_encode($user));
+            return $user;
         });
     }
 }

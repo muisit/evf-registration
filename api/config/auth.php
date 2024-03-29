@@ -39,6 +39,9 @@ return [
         'api' => [
             'driver' => 'evf',
         ],
+        'device' => [
+            'driver' => 'device',
+        ]
     ],
 
     /*
