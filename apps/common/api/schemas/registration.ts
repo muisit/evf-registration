@@ -14,6 +14,7 @@ export interface Registration {
     // front-end data
     errors?: string[];
     role?: string;
+    saveState?: string;
 }
 
 export function defaultRegistration():Registration

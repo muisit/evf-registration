@@ -93,7 +93,6 @@ export const useAuthStore = defineStore('auth', () => {
 
     function isHod(type:string = 'user') {
         let retval = credentials.value.includes('hod') && credentials.value.includes('user');
-        console.log('isHod', retval);
         return retval;
     }
 
@@ -104,7 +103,6 @@ export const useAuthStore = defineStore('auth', () => {
     function isHodFor(type:string = 'user') {
         if (isSuperHod(type)) return true;
         let retval = credentials.value.includes('hod:' + countryId.value) && credentials.value.includes('user');
-        console.log('isHodFor', retval);
         return retval;
     }
 

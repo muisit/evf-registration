@@ -292,13 +292,13 @@ export const useDataStore = defineStore('data', () => {
     function saveRegistration(pFencer:Fencer, sideEvent:SideEvent|null, roleId:number|null, teamName:string|null, payment:string|null)
     {
         let registration = createOrFindRegistration(pFencer, sideEvent, roleId, teamName, payment);
-        registration.state = 'saving';
+        registration.saveState = 'saving';
         fencerData.value = updateRegistration(fencerData.value, registration);
 
         if (registration) {
             saveregistration(registration).then((data) => {
                     if (data && is_valid(data.id)) {
-                        registration.state = 'saved';
+                        registration.saveState = 'saved';
                         // use a callback to update the back-end id
                         fencerData.value = updateRegistration(fencerData.value, registration, (old:Registration, nw:Registration) => {
                             nw.id = data.id;
@@ -308,8 +308,8 @@ export const useDataStore = defineStore('data', () => {
                         window.setTimeout(() => {
                             // only adjust the state if it is still 'saved', or else we may be clicking quickly
                             fencerData.value = updateRegistration(fencerData.value, registration, (old:Registration, nw: Registration) => {
-                                if (old.state == 'saved') {
-                                    old.state = '';
+                                if (old.saveState == 'saved') {
+                                    old.saveState = '';
                                 }
                                 return old;
                             });
@@ -317,14 +317,14 @@ export const useDataStore = defineStore('data', () => {
                     }
                     else {
                         console.log('error on save of registration for ', pFencer.id, sideEvent?.id, roleId);
-                        registration.state = 'error';
+                        registration.saveState = 'error';
                         fencerData.value = updateRegistration(fencerData.value, registration);
                     }
                 })
                 .catch((e) => {
                     console.log(e);
                     console.log('error on save of registration for ', pFencer.id, sideEvent?.id, roleId);
-                    registration.state = 'error';
+                    registration.saveState = 'error';
                     fencerData.value = updateRegistration(fencerData.value, registration);
             });
         }
@@ -362,27 +362,27 @@ export const useDataStore = defineStore('data', () => {
         let registration = findRegistrationForFencerEventAndRole(pFencer, sideEvent, roleId);
 
         if (registration !== null) {
-            registration.state = 'removing';
+            registration.saveState = 'removing';
             fencerData.value = updateRegistration(fencerData.value, registration);
 
             return deleteregistration(registration.id || 0)
                 .then((data) => {
                     if (data && data.status == 'ok' && registration) {
-                        registration.state = 'removed';
+                        registration.saveState = 'removed';
                         fencerData.value = updateRegistration(fencerData.value, registration);
                         window.setTimeout(() => {
                             if (registration) {
                                 // if someone clicks quickly and re-adds the removed registration,
                                 // the findOrCreate returns the 'removed' entry. Only delete the
                                 // registration if it is still removed
-                                if (registration.state == 'removed') {
+                                if (registration.saveState == 'removed') {
                                     fencerData.value = deleteRegistration(fencerData.value, registration);
                                 }
                             }
                         }, 3000);
                     }
                     else if (registration) {
-                        registration.state = 'error';
+                        registration.saveState = 'error';
                         fencerData.value = updateRegistration(fencerData.value, registration);
                     }
                 })
@@ -390,7 +390,7 @@ export const useDataStore = defineStore('data', () => {
                     console.log(e);
                     console.log('error on save of registration for ', pFencer.id, sideEvent?.id, roleId);
                     if (registration) {
-                        registration.state = 'error';
+                        registration.saveState = 'error';
                         fencerData.value = updateRegistration(fencerData.value, registration);
                     }
             });
@@ -427,8 +427,8 @@ export const useDataStore = defineStore('data', () => {
                             reg.paidHod = paidHod ? 'Y' : 'N';
                         }
                         // only overwrite state if we are not re-saving it
-                        if ((paidHod !== null || paidOrg !== null) || reg.state == 'saved') {
-                            reg.state = state;
+                        if ((paidHod !== null || paidOrg !== null) || reg.saveState == 'saved') {
+                            reg.saveState = state;
                         }
                     }
                     return reg;
