@@ -35,14 +35,14 @@ const registration:Ref<Registration> = computed(() => {
 function inputDisabled()
 {
     if (auth.isHod() && !isOpenForRegistration(data.currentEvent)) return true;
-    if (['error', 'saving', 'removing'].includes(registration.value.state || '')) return true;
+    if (['error', 'saving', 'removing'].includes(registration.value.saveState || '')) return true;
     return false;
 }
 
 function checkboxValue()
 {
-    if (  (is_valid(registration.value.id) && ['', 'saved','saving'].includes(registration.value.state || ''))
-       || (!is_valid(registration.value.id) && registration.value.state == 'saving')
+    if (  (is_valid(registration.value.id) && ['', 'saved','saving'].includes(registration.value.saveState || ''))
+       || (!is_valid(registration.value.id) && registration.value.saveState == 'saving')
     ) {
         return true;
     }
@@ -80,9 +80,9 @@ function update(selection:any)
     }
 }
 
-const hasError = computed(() => registration.value.state == 'error');
-const isSaving = computed(() => registration.value.state == 'saving' || registration.value.state == 'removing');
-const isSaved = computed(() => registration.value.state == 'saved' || registration.value.state == 'removed');
+const hasError = computed(() => registration.value.saveState == 'error');
+const isSaving = computed(() => registration.value.saveState == 'saving' || registration.value.saveState == 'removing');
+const isSaved = computed(() => registration.value.saveState == 'saved' || registration.value.saveState == 'removed');
 
 import { Select, CloseBold, Upload } from '@element-plus/icons-vue';
 import { ElCheckbox, ElSelect, ElOption, ElIcon } from 'element-plus';

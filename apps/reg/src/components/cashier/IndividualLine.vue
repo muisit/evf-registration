@@ -35,9 +35,9 @@ function expand()
 
 function paymentState()
 {
-    let firstState = props.fencer.registrations[0].state || '';
+    let firstState = props.fencer.registrations[0].saveState || '';
     props.fencer.registrations.map((reg:Registration) => {
-        if (reg.state != firstState) {
+        if (reg.saveState != firstState) {
             firstState = '';
         }
     });
@@ -133,7 +133,7 @@ import { Select, CloseBold, Upload, ArrowRight, ArrowDown, CircleCheck } from '@
                 <ArrowDown v-else/>
             </ElIcon>
         </td>
-        <td :class="{'state-icons':true, 'state-error': props.fencer.registrations[0].state == 'error', 'state-upload': props.fencer.registrations[0].state == 'saving', 'state-ok': props.fencer.registrations[0].state == 'saved'}">
+        <td :class="{'state-icons':true, 'state-error': props.fencer.registrations[0].saveState == 'error', 'state-upload': props.fencer.registrations[0].saveState == 'saving', 'state-ok': props.fencer.registrations[0].saveState == 'saved'}">
             <ElIcon>
                 <CloseBold v-if="paymentState() == 'error'" />
                 <Select v-if="paymentState() == 'saved'"/>

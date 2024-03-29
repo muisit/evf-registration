@@ -7,11 +7,11 @@
     "register": {
         "major": 1,
         "minor": 1,
-        "micro": 3
+        "micro": 4
     },
     "accreditation": {
         "major": 1,
         "minor": 0,
-        "micro": 6
+        "micro": 7
     }
 }
