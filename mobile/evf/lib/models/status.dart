@@ -27,4 +27,12 @@ class Status {
         lastResult = values['results']['last'] as String,
         resultCount = values['results']['count'] as int,
         lastRanking = values['ranking']['last'] as String;
+
+  Map<String, dynamic> toJson() => {
+        'id': deviceId,
+        'feed': {'last': lastFeed, 'count': feedCount},
+        'calendar': {'last': lastCalendar, 'count': calendarCount},
+        'results': {'last': lastResult, 'count': resultCount},
+        'ranking': {'last': lastRanking, 'count': 0}
+      };
 }

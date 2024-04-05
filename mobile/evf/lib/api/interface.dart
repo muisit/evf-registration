@@ -35,7 +35,7 @@ class Interface {
     var response = await http.get(
       uri,
       headers: {
-        HttpHeaders.authorizationHeader: Environment.instance.authToken,
+        HttpHeaders.authorizationHeader: 'Bearer ${Environment.instance.authToken}',
       },
     );
     Environment.debug("parsing get response");
@@ -57,7 +57,7 @@ class Interface {
     final uri = Uri.parse(url);
     var response = await http.post(uri,
         headers: {
-          HttpHeaders.authorizationHeader: Environment.instance.authToken,
+          HttpHeaders.authorizationHeader: 'Bearer ${Environment.instance.authToken}',
         },
         body: jsonEncode(this.data));
     Environment.debug("parsing POST response");

@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:evf/providers/calendar_provider.dart';
 import 'package:evf/widgets/components/evf_alert_dialog.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,7 +8,6 @@ import 'package:evf/providers/status_provider.dart';
 import 'package:evf/providers/feed_provider.dart';
 import 'package:evf/cache/file_cache.dart';
 import 'package:evf/models/flavor.dart';
-import 'package:evf/models/device.dart';
 import 'package:evf/api/register_device.dart';
 
 class Environment {
@@ -18,9 +18,9 @@ class Environment {
 
   Environment({required this.flavor})
       : cache = FileCache(),
-        device = Device(id: ''),
         authToken = '',
         feedProvider = FeedProvider(),
+        calendarProvider = CalendarProvider(),
         statusProvider = StatusProvider() {
     Environment._instance = this;
   }
@@ -39,9 +39,9 @@ class Environment {
   }
 
   // general configuration uses public members
-  Device device;
   String authToken;
   FeedProvider feedProvider;
+  CalendarProvider calendarProvider;
   StatusProvider statusProvider;
 
   // convenience methods, only callable after initialization
@@ -77,20 +77,23 @@ class Environment {
     debug("registering device");
     var deviceId = await preference('deviceid');
     if (deviceId == '') {
-      var device = await registerDeviceAndConvert();
-      await set('deviceid', device.deviceId);
+      deviceId = await registerDeviceAndConvert();
+      await set('deviceid', deviceId);
     } else {
       debug("found existing device id $deviceId");
     }
-    debug("setting authToken to ${device.deviceId}");
-    authToken = device.deviceId;
+    debug("setting authToken to $deviceId");
+    authToken = deviceId;
+    debug("calling initialize on cache");
+    // cache requires preferences to be initialized
+    await cache.initialize();
     debug("end of environment initialization");
   }
 }
 
-Future<Device> registerDeviceAndConvert() async {
+Future<String> registerDeviceAndConvert() async {
   Environment.debug("registerDeviceAndConvert");
   var device = await registerDevice();
   Environment.debug("returning json-encoded device");
-  return device;
+  return device.deviceId;
 }

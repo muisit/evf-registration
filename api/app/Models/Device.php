@@ -23,6 +23,6 @@ class Device extends Model
     
     public function user(): BelongsTo
     {
-        return $this->belongsTo(DeviceUser::class);
+        return $this->belongsTo(DeviceUser::class, 'device_user_id', 'id');
     }
 }

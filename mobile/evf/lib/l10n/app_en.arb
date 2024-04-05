@@ -24,6 +24,21 @@
     "@navAccount": {
       "description": "Bottom navigation bar Account button"
     },
+    "navResultsFeed": "Results",
+    "@navLiveFeed": {
+      "description": "Text on the results feed button"
+    },
+
+    "calendarDate": "{date}",
+    "@calendarDate": {
+      "description": "Date format used in the Calendar page",
+      "placeholders": {
+        "date": {
+          "type": "DateTime",
+          "format": "MMMd"
+        }
+      }
+    },
 
     "errorNoPageWidget": "no widget for {currentPageIndex}",
     "@errorNoPageWidget": {

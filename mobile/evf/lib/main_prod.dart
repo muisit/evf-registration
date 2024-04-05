@@ -10,5 +10,5 @@ Future<void> main() async {
   Environment(flavor: Production());
   await initialization();
   FlutterNativeSplash.remove();
-  runApp(MainApp(doDebug: false));
+  runApp(const MainApp(doDebug: false));
 }

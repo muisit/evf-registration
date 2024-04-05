@@ -13,6 +13,6 @@ Future<void> main() async {
   Environment.debug("Initialization finished, removing splash");
   FlutterNativeSplash.remove();
   Environment.debug("Creating MainApp");
-  runApp(MainApp(doDebug: true));
+  runApp(const MainApp(doDebug: true));
   Environment.debug("End of main app loop");
 }

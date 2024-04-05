@@ -54,27 +54,36 @@ class FeedProvider extends ChangeNotifier {
   }
 
   Future loadItemInventory() async {
-    final doc = await Environment.instance.cache.loadJson("feeds.json");
-    inventory = FeedInventory.fromJson(jsonDecode(doc) as List<dynamic>);
+    try {
+      final doc = await Environment.instance.cache.getCache("feeds.json");
+      inventory = FeedInventory.fromJson(jsonDecode(doc) as List<dynamic>);
+    } catch (e) {
+      // if there are problems, start with a clean feed
+      inventory = FeedInventory();
+    }
   }
 
   Future loadItemBlocks() async {
     for (final block in inventory.blocks) {
-      final doc = await Environment.instance.cache.loadJson(block.path);
-      block.load(jsonDecode(doc) as List<dynamic>);
-      // add it to our display list
-      add(block.items);
+      try {
+        final doc = await Environment.instance.cache.getCache(block.path);
+        block.load(jsonDecode(doc) as List<dynamic>);
+        // add it to our display list
+        add(block.items);
+      } catch (e) {
+        // if we failed to load the items, just skip the block
+      }
     }
   }
 
   Future saveItemBlock(FeedBlock block) async {
     final content = block.export();
-    await Environment.instance.cache.storeJson(block.path, jsonEncode(content));
+    await Environment.instance.cache.setCache(block.path, jsonEncode(content));
   }
 
   Future saveItemInventory() async {
     final content = jsonEncode(inventory.toJson());
-    await Environment.instance.cache.storeJson("feeds.json", content);
+    await Environment.instance.cache.setCache("feeds.json", content);
   }
 
   Future loadFeedItems() async {

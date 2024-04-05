@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:evf/api/get_status.dart';
 import 'package:evf/environment.dart';
 import 'package:evf/models/status.dart';
@@ -5,7 +6,7 @@ import 'package:evf/models/status.dart';
 class StatusProvider {
   Status? status;
   bool isLoading = false;
-  DateTime? wasLoaded;
+  DateTime wasLoaded = DateTime.now();
 
   Future<Status> loadStatus() async {
     status ??= Status();
@@ -13,6 +14,7 @@ class StatusProvider {
       isLoading = true;
       try {
         status = await getStatus();
+        Environment.instance.cache.setCache('status.json', jsonEncode(status!.toJson()));
       } catch (e) {
         Environment.error("Could not read back end status");
       }

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:sprintf/sprintf.dart';
 import 'cache_line.dart';
 
 class CacheData {
@@ -19,27 +18,13 @@ class CacheData {
     return '';
   }
 
-  String makeTs(DateTime dt) {
-    return sprintf('%04d%02d%02d%02d%02d%02d%03d', [
-      dt.year,
-      dt.month,
-      dt.day,
-      dt.hour,
-      dt.minute,
-      dt.second,
-      dt.millisecond
-    ]);
-  }
-
-  void setCached({required String key, required String path, DateTime? dt}) {
-    final stamp = makeTs(dt ?? DateTime.now());
-    timestamps[key] = CacheLine(timestamp: stamp, path: path);
+  void setCached({required String key, required String path}) {
+    timestamps[key] = CacheLine(path: path);
   }
 
   bool clearIfOlder(String key, DateTime dt) {
-    final stamp = makeTs(dt);
     if (timestamps.containsKey(key)) {
-      if (timestamps[key]!.timestamp.compareTo(stamp) < 0) {
+      if (timestamps[key]!.date.isBefore(dt)) {
         timestamps.remove(key);
         return true;
       }

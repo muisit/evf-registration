@@ -58,9 +58,9 @@ class DeviceStatusService
             ->where('post_type', 'tribe_events')
             ->get();
         if (count($rows) > 0) {
-            return new BlockStatus($rows[0]->cnt ?? 0, $rows[0]->last ?? '');
+            return new BlockStatus($rows[0]->cnt ?? 0, $rows[0]->last ?? '2024-02-01');
         }
-        return new BlockStatus();
+        return new BlockStatus(1, '2024-02-01');
     }
 
     private function getRankingStatus(): BlockStatus

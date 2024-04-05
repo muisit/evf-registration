@@ -46,6 +46,7 @@ dependencies:
   sprintf: ^7.0.0
   device_info_plus: ^10.0.1
   restart_app: ^1.2.1
+  url_launcher: ^6.2.5
 
 dev_dependencies:
   flutter_test:
@@ -94,7 +95,16 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
 
-fonts:
-  - family: EVF
-    fonts:
-      - asset: assets/fonts/EVF.ttf
+  fonts:
+    - family: EVF
+      fonts:
+        - asset: assets/fonts/EVF.ttf
+    - family: Eurofurence
+      fonts:
+        - asset: assets/fonts/eurofurence--regular.ttf
+        - asset: assets/fonts/eurofurence--light.ttf
+          weight: 100
+        - asset: assets/fonts/eurofurence--italic.ttf
+          style: italic
+        - asset: assets/fonts/eurofurence--bold.ttf
+          weight: 700

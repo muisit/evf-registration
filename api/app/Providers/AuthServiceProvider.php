@@ -74,9 +74,7 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Auth::viaRequest('device', function (Request $request) {
-            \Log::debug("searching for bearer token user " . ((string)$request->bearerToken()) . " - " . json_encode($request->headers()));
             $user = Device::where('uuid', (string) $request->bearerToken())->first()?->user;
-            \Log::debug("found " . json_encode($user));
             return $user;
         });
     }

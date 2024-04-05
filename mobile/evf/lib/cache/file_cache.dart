@@ -4,6 +4,7 @@ import 'package:evf/environment.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:evf/util/random_string.dart';
 import 'cache_data.dart';
+import 'cache_line.dart';
 
 typedef CacheMiss = Future<String> Function();
 
@@ -12,86 +13,138 @@ class FileCache {
 
   Future initialize() async {
     Environment.debug("initializing cache");
-    var content = await loadJson('cache.json');
+    var content = await Environment.instance.preference('cache');
     try {
+      Environment.debug("application cache is $content");
       _cache = CacheData.fromJson(content);
-    } on Exception {
+    } catch (e) {
       Environment.debug("caught error on reading cache, creating empty cache");
       _cache = CacheData.fromJson('{}');
     }
   }
 
-  Future<String> getDirectory(bool persists) async {
-    final directory = persists ? await getApplicationDocumentsDirectory() : await getApplicationCacheDirectory();
-    if (persists && (Platform.isLinux || Platform.isWindows || Platform.isMacOS)) {
-      //
-      return "${directory.path}/evf";
-    }
+  Future<String> _getDirectory() async {
+    final directory = await getApplicationCacheDirectory();
     return directory.path;
   }
 
-  Future<String> loadJson(String path, {bool persists = false}) async {
+  Future<String> _loadFile(String path) async {
     try {
-      Environment.debug("loading json $path");
-      final directory = await getDirectory(persists);
+      Environment.debug("loading file $path");
+      final directory = await _getDirectory();
       Environment.debug("loading from $directory/$path");
       var file = File('$directory/$path');
       Environment.debug("reading as string");
       return await file.readAsString();
-    } on Exception catch (e) {
+    } catch (e) {
       // caught an error, prevent the fail by providing an empty string
       Environment.debug("caught exception ${e.toString()}");
     }
-    Environment.debug("returning empty json document as fail-over");
-    return '{}';
-  }
-
-  Future storeJson(String destination, String content, {bool persists = false}) async {
-    try {
-      final directory = await getDirectory(persists);
-
-      var file = File('$directory/$destination');
-      file.writeAsString(content);
-    } on Exception {
-      // caught an error, don't store the new cache data
-    }
-  }
-
-  Future<String> getCacheOrLoad(String path, CacheMiss? callback, {bool persists = false}) async {
-    if (_cache != null && _cache!.containsKey(path)) {
-      var localpath = _cache!.timestamps[path]!.path;
-      return await loadJson(localpath, persists: persists);
-    }
-    Environment.debug("cache miss on getCacheOrLoad for $path");
-    if (callback != null) {
-      Environment.debug("awaiting cache callback");
-      var content = await callback();
-      Environment.debug("content is $content");
-      Environment.debug("storing content in cache");
-      final directory = await getDirectory(persists);
-      var destination = '$directory/${getRandomString(24)}.json';
-      Environment.debug("trying $destination");
-      while (File(destination).existsSync()) {
-        destination = '$directory/${getRandomString(24)}.json';
-        Environment.debug("trying $destination");
-      }
-      Environment.debug("storing cached file at $destination");
-      await storeJson(destination, content, persists: persists);
-      Environment.debug("cached file stored");
-      if (_cache != null) {
-        _cache!.setCached(key: path, path: destination);
-        Environment.debug("updating cache");
-        await storeJson('cache.json', jsonEncode(_cache!.timestamps));
-        Environment.debug("cache file updated");
-      }
-      return content;
-    }
+    Environment.debug("returning empty string as fail-over");
     return '';
   }
 
-  Future clearCacheIfOlder(String path, DateTime ts) async {
-    if (_cache != null && _cache!.clearIfOlder(path, ts)) {
-      await storeJson('cache.json', jsonEncode(_cache!.timestamps));
+  Future _storeFile(String destination, String content) async {
+    try {
+      final directory = await _getDirectory();
+
+      var file = File('$directory/$destination');
+      Environment.debug("wrotomg writeAsString $content");
+      file.writeAsString(content);
+    } catch (e) {
+      // caught an error, don't store the new cache data
+      Environment.debug("caught error writing file");
     }
+  }
+
+  Future<String> getCache(String path) async {
+    if (_cache != null && _cache!.containsKey(path)) {
+      var localpath = _cache!.timestamps[path]!.path;
+      return await _loadFile(localpath);
+    }
+    return Future.value('');
+  }
+
+  CacheLine getCacheData(String path) {
+    if (_cache != null && _cache!.containsKey(path)) {
+      return _cache!.timestamps[path]!;
+    }
+    return CacheLine(path: '');
+  }
+
+  Future setCache(String path, String content) async {
+    if (_cache != null) {
+      final directory = await _getDirectory();
+      var destination = _getRandomDestination(directory);
+      Environment.debug("storing cached file at $destination");
+      await _storeFile(destination, content);
+
+      Environment.debug("cached file stored");
+      await _clearCacheForKey(path);
+      _cache!.setCached(key: path, path: destination);
+
+      Environment.debug("updating cache");
+      await _updateCache();
+      Environment.debug("cache updated");
+    }
+  }
+
+  Future<String> getCacheOrLoad(String path, CacheMiss? callback) async {
+    if (_cache != null && _cache!.containsKey(path)) {
+      var localpath = _cache!.timestamps[path]!.path;
+      return await _loadFile(localpath);
+    }
+    var content = '';
+    Environment.debug("cache miss on getCacheOrLoad for $path");
+    if (callback != null) {
+      Environment.debug("awaiting cache callback");
+      content = await callback();
+      Environment.debug("content is $content");
+      Environment.debug("storing content in cache");
+      await setCache(path, content);
+    }
+    return content;
+  }
+
+  Future clearCacheIfOlder(String path, DateTime ts) async {
+    if (_cache != null && _cache!.timestamps.containsKey(path)) {
+      var currentData = _cache!.timestamps[path];
+      if (currentData!.date.isBefore(ts)) {
+        await _clearCacheForKey(path);
+        await _updateCache();
+      }
+    }
+  }
+
+  Future _clearCacheForKey(String path) async {
+    if (_cache != null && _cache!.timestamps.containsKey(path)) {
+      var destination = _cache!.timestamps[path]!.path;
+      if (await File(destination).exists()) {
+        try {
+          await File(destination).delete();
+        } catch (e) {
+          // pass on remove errors
+        }
+      }
+      _cache!.timestamps.remove(path);
+    }
+  }
+
+  Future _updateCache() async {
+    final doc = jsonEncode(_cache!.timestamps);
+    Environment.debug("updating cache to $doc");
+    return await Environment.instance.set('cache.json', doc);
+  }
+
+  String _getRandomDestination(String directory) {
+    var filename = getRandomString(24);
+    var destination = '$directory/$filename.json';
+    Environment.debug("trying $destination");
+    while (File(destination).existsSync()) {
+      filename = getRandomString(24);
+      destination = '$directory/$filename.json';
+      Environment.debug("trying $destination");
+    }
+    return filename;
   }
 }
