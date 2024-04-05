@@ -1,12 +1,13 @@
 import 'package:evf/models/calendar.dart';
+import 'package:evf/styles.dart';
 import 'package:flutter/material.dart';
 
 class CalendarLocation extends StatelessWidget {
-  Calendar item;
-  CalendarLocation({required super.key, required this.item});
+  final Calendar item;
+  const CalendarLocation({required super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
-    return Text("${item.location}, ${item.country}", style: TextStyle(fontStyle: FontStyle.italic));
+    return Text("${item.location}, ${item.country}", style: AppStyles.italicText);
   }
 }
