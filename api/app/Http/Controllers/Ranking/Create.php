@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Ranking;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Support\Services\RankingStoreService;
 use App\Models\Schemas\ReturnStatus;
-use Carbon\Carbon;
+use App\Jobs\CreateRanking;
 
 class Create extends Controller
 {
@@ -29,8 +28,10 @@ class Create extends Controller
      */
     public function index(Request $request)
     {
-        $service = new RankingStoreService();
-        $service->handle();
+        \Log::debug("creating ranking store service");
+        $job = new CreateRanking();
+        $job->handle();
+        \Log::debug("returning all ok");
         return response()->json(new ReturnStatus('ok'));
     }
 }

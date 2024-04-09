@@ -36,21 +36,23 @@ class RankingStoreService
 
     private function storePositionsOnRanking(Ranking $ranking, Category $category, Weapon $weapon, array $positions)
     {
+        $storePositions = [];
         foreach ($positions as $position) {
-            $rnk = new RankingPosition();
-            $rnk->fencer_id = $position['id'];
-            $rnk->ranking_id = $ranking->getKey();
-            $rnk->category_id = $category->getKey();
-            $rnk->weapon_id = $weapon->getKey();
-
-            $rnk->position = $position['pos'];
-            $rnk->points = $position['points'];
-
-            if (isset($this->fencerWeaponCache['f' . $rnk->fencer_id]['w' . $rnk->weapon_id])) {
-                $rnk->settings = $this->fencerWeaponCache['f' . $rnk->fencer_id]['w' . $rnk->weapon_id];
+            $settings = [];
+            if (isset($this->fencerWeaponCache['f' . $position['id']]['w' . $weapon->weapon_id])) {
+                $settings = $this->fencerWeaponCache['f' . $position['id']]['w' . $weapon->weapon_id];
             }
-            $rnk->save();
+            $storePositions[] = [
+                'fencer_id' => $position['id'],
+                'ranking_id' => $ranking->getKey(),
+                'category_id' => $category->getKey(),
+                'weapon_id' => $weapon->getKey(),
+                'position' => $position['pos'],
+                'points' => $position['points'],
+                'settings' => json_encode($settings)
+            ];
         }
+        RankingPosition::insert($storePositions);
     }
 
     private function findOrCreateEventRanking(Event $event)
