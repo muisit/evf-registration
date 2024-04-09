@@ -3,13 +3,13 @@
 // once. If calendar lists become too large at some point, we may need to apply some pagination
 // to load it in parts
 
-import 'package:evf/env/calendar_items.dart';
-import 'package:evf/models/calendar.dart';
+import 'package:evf/env/ranking_items.dart';
+import 'package:evf/models/ranking.dart';
 //import 'package:evf/environment.dart';
 //import 'interface.dart';
 
-Future<List<Calendar>> loadCalendar({DateTime? lastDate}) async {
-  return Future.value(calendarItems());
+Future<List<Ranking>> loadRanking({DateTime? lastDate}) async {
+  return Future.value(rankingItems());
   /*
   Environment.instance.debug("calling loadCalendar");
   final api = Interface.create(path: '/device/calendar');
