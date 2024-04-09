@@ -20,21 +20,24 @@ class RankingStoreService
         $categories = Category::where('category_type', 'I')->whereIn('category_value', [1,2,3,4])->get();
 
         $this->buildCache();
-        $event = $this->findMostRecentEvent();
-        $ranking = $this->findOrCreateEventRanking($event);
-        // clear the current ranking
-        RankingPosition::where('ranking_id', $ranking->getKey())->delete();
 
         foreach ($weapons as $weapon) {
             foreach ($categories as $category) {
-                $service = new RankingService($category, $weapon);
-                $positions = $service->generate();
-                $this->storePositionsOnRanking($ranking, $category, $weapon, $positions);
+                $event = $this->findMostRecentEvent($weapon);
+                if (!empty($event)) {
+                    $ranking = $this->findOrCreateEventRanking($event, $category, $weapon);
+                    // clear the current ranking
+                    RankingPosition::where('ranking_id', $ranking->getKey())->delete();
+
+                    $service = new RankingService($category, $weapon);
+                    $positions = $service->generate();
+                    $this->storePositionsOnRanking($ranking, $weapon, $positions);
+                }
             }
         }
     }
 
-    private function storePositionsOnRanking(Ranking $ranking, Category $category, Weapon $weapon, array $positions)
+    private function storePositionsOnRanking(Ranking $ranking, Weapon $weapon, array $positions)
     {
         $storePositions = [];
         foreach ($positions as $position) {
@@ -45,8 +48,6 @@ class RankingStoreService
             $storePositions[] = [
                 'fencer_id' => $position['id'],
                 'ranking_id' => $ranking->getKey(),
-                'category_id' => $category->getKey(),
-                'weapon_id' => $weapon->getKey(),
                 'position' => $position['pos'],
                 'points' => $position['points'],
                 'settings' => json_encode($settings)
@@ -55,28 +56,31 @@ class RankingStoreService
         RankingPosition::insert($storePositions);
     }
 
-    private function findOrCreateEventRanking(Event $event)
+    private function findOrCreateEventRanking(Event $event, Category $category, Weapon $weapon)
     {
-        $ranking = Ranking::where('event_id', $event->getKey())->first();
+        $ranking = Ranking::where('event_id', $event->getKey())->where('category_id', $category->getKey())->where('weapon_id', $weapon->getKey())->first();
         if (empty($ranking)) {
             $ranking = new Ranking();
             $ranking->event_id = $event->getKey();
+            $ranking->category_id = $category->getKey();
+            $ranking->weapon_id = $weapon->getKey();
             $ranking->ranking_date = (new \DateTimeImmutable($event->event_open))->add(new \DateInterval("P" . ($event->event_duration + 1) . "D"))->format('Y-m-d');
             $ranking->save();
         }
         return $ranking;
     }
 
-    private function findMostRecentEvent()
+    private function findMostRecentEvent(Weapon $weapon)
     {
         // get the most recent event with results in the database. Assume this is the event for which we
         // generate a ranking
         $row = DB::table('VW_Ranking')
             ->select(["event_id", "event_open"])
             ->where('result_in_ranking', 'Y')
+            ->where('weapon_id', $weapon->getKey())
             ->orderBy('event_open', 'desc')
             ->first();
-        return Event::find($row->event_id);
+        return Event::find($row->event_id ?? -1);
     }
 
     private function buildCache()

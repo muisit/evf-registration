@@ -20,6 +20,10 @@ return new class extends Migration
             $table->foreign('event_id')->references('event_id')->on('TD_Event');
             $table->timestamp('updated_at')->nullable()->default(null);
             $table->timestamp('created_at')->nullable()->default(null);
+            $table->integer('category_id');
+            $table->foreign('category_id')->references('category_id')->on('TD_Category');
+            $table->integer('weapon_id');
+            $table->foreign('weapon_id')->references('weapon_id')->on('TD_Weapon');
 
             $table->index(['ranking_date']);
             $table->index(['event_id']);
@@ -31,16 +35,12 @@ return new class extends Migration
             $table->foreign('ranking_id')->references('id')->on('rankings');
             $table->integer('fencer_id');
             $table->foreign('fencer_id')->references('fencer_id')->on('TD_Fencer');
-            $table->integer('category_id');
-            $table->foreign('category_id')->references('category_id')->on('TD_Category');
-            $table->integer('weapon_id');
-            $table->foreign('weapon_id')->references('weapon_id')->on('TD_Weapon');
 
             $table->unsignedInteger('position');
             $table->decimal('points', 8, 2);
             $table->text('settings')->nullable();
 
-            $table->index(['ranking_id', 'category_id', 'weapon_id', 'position'], 'ranking_by_cat_wpn_pos');
+            $table->index(['ranking_id', 'position'], 'ranking_by_pos');
             $table->index(['fencer_id']);
         });
 
@@ -67,13 +67,13 @@ return new class extends Migration
         Schema::table('ranking_positions', function (Blueprint $table) {
             $table->dropForeign(['ranking_id']);
             $table->dropForeign(['fencer_id']);
-            $table->dropForeign(['category_id']);
-            $table->dropForeign(['weapon_id']);
         });
         Schema::dropIfExists('ranking_positions');
 
         Schema::table('rankings', function (Blueprint $table) {
             $table->dropForeign(['event_id']);
+            $table->dropForeign(['category_id']);
+            $table->dropForeign(['weapon_id']);
         });
         Schema::dropIfExists('rankings');
     }

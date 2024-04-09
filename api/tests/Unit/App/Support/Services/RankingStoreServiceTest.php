@@ -25,29 +25,28 @@ class RankingStoreServiceTest extends TestCase
         $service->handle();
 
         $rankdate = Carbon::now()->addDays(35)->toDateString();
-        $ranking = Ranking::where('id', '>', 0)->first();
+        $rankings = Ranking::where('id', '>', 0)->orderBy('category_id')->orderBy('weapon_id')->get();
+        $this->assertCount(8, $rankings);
+        $ranking = $rankings[0];
         $this->assertNotEmpty($ranking);
         $this->assertEquals(EventData::EVENT1, $ranking->event_id);
         $this->assertEquals(EventData::EVENT1, $ranking->event->getKey());
         $this->assertEquals($rankdate, (new Carbon($ranking->ranking_date))->toDateString());
-        $this->assertCount(11, $ranking->positions);
+        $this->assertCount(3, $ranking->positions()->get());
 
-        $this->assertCount(6, $ranking->positions()->where('weapon_id', Weapon::MF)->get());
-        $this->assertCount(0, $ranking->positions()->where('weapon_id', Weapon::ME)->get());
-        $this->assertCount(0, $ranking->positions()->where('weapon_id', Weapon::MS)->get());
-        $this->assertCount(0, $ranking->positions()->where('weapon_id', Weapon::WF)->get());
-        $this->assertCount(0, $ranking->positions()->where('weapon_id', Weapon::WE)->get());
-        $this->assertCount(5, $ranking->positions()->where('weapon_id', Weapon::WS)->get());
-
-        $this->assertCount(4, $ranking->positions()->where('category_id', Category::CAT1)->get());
-        $this->assertCount(2, $ranking->positions()->where('category_id', Category::CAT2)->get());
-        $this->assertCount(2, $ranking->positions()->where('category_id', Category::CAT3)->get());
-        $this->assertCount(3, $ranking->positions()->where('category_id', Category::CAT4)->get());
+        $this->assertCount(3, $rankings[0]->positions);
+        $this->assertCount(1, $rankings[1]->positions);
+        $this->assertCount(1, $rankings[2]->positions);
+        $this->assertCount(1, $rankings[3]->positions);
+        $this->assertCount(1, $rankings[4]->positions);
+        $this->assertCount(1, $rankings[5]->positions);
+        $this->assertCount(1, $rankings[6]->positions);
+        $this->assertCount(2, $rankings[7]->positions);
 
         // never any results for the following groups
-        $this->assertCount(0, $ranking->positions()->where('category_id', Category::CAT5)->get());
-        $this->assertCount(0, $ranking->positions()->where('category_id', Category::TEAM)->get());
-        $this->assertCount(0, $ranking->positions()->where('category_id', Category::GVET)->get());
+        $this->assertCount(0, Ranking::where('category_id', Category::CAT5)->get());
+        $this->assertCount(0, Ranking::where('category_id', Category::TEAM)->get());
+        $this->assertCount(0, Ranking::where('category_id', Category::GVET)->get());
     }
 
     public function testRegenerate()
@@ -56,7 +55,7 @@ class RankingStoreServiceTest extends TestCase
         $service->handle();
 
         $rankdate = Carbon::now()->addDays(35)->toDateString();
-        $ranking = Ranking::where('id', '>', 0)->first();
+        $ranking = Ranking::where('id', '>', 0)->orderBy('category_id')->orderBy('weapon_id')->first();
         $this->assertNotEmpty($ranking);
         $this->assertEquals(EventData::EVENT1, $ranking->event_id);
         $this->assertEquals(EventData::EVENT1, $ranking->event->getKey());
@@ -68,8 +67,8 @@ class RankingStoreServiceTest extends TestCase
         $service = new RankingStoreService();
         $service->handle();
 
-        $ranking = Ranking::where('id', '>', 0)->get();
-        $this->assertCount(1, $ranking);
+        $ranking = Ranking::where('id', '>', 0)->orderBy('category_id')->orderBy('weapon_id')->get();
+        $this->assertCount(8, $ranking);
         $this->assertNotEmpty($ranking[0]);
         $this->assertEquals(EventData::EVENT1, $ranking[0]->event_id);
         $this->assertEquals(EventData::EVENT1, $ranking[0]->event->getKey());
@@ -81,8 +80,8 @@ class RankingStoreServiceTest extends TestCase
     {
         $service = new RankingStoreService();
         $service->handle();
-        $ranking = Ranking::where('id', '>', 0)->get();
-        $this->assertCount(1, $ranking);
+        $ranking = Ranking::where('id', '>', 0)->orderBy('category_id')->orderBy('weapon_id')->get();
+        $this->assertCount(8, $ranking);
 
         $event = $this->createEvent(Carbon::now()->subDays(300)->toDateString());
         $comp = $this->createCompetition($event, Category::CAT1, Weapon::MF);
@@ -90,16 +89,16 @@ class RankingStoreServiceTest extends TestCase
         $result2 = $this->createResult($comp->getKey(), FencerData::MCAT2, 2, 100);
 
         $service->handle();
-        $ranking = Ranking::where('id', '>', 0)->get();
-        $this->assertCount(1, $ranking);
+        $ranking = Ranking::where('id', '>', 0)->orderBy('category_id')->orderBy('weapon_id')->get();
+        $this->assertCount(8, $ranking);
     }
 
     public function testTwoEvents2()
     {
         $service = new RankingStoreService();
         $service->handle();
-        $ranking = Ranking::where('id', '>', 0)->get();
-        $this->assertCount(1, $ranking);
+        $ranking = Ranking::where('id', '>', 0)->orderBy('category_id')->orderBy('weapon_id')->get();
+        $this->assertCount(8, $ranking);
 
         $event = $this->createEvent(Carbon::now()->addDays(300)->toDateString());
         $comp = $this->createCompetition($event, Category::CAT1, Weapon::MF);
@@ -108,16 +107,19 @@ class RankingStoreServiceTest extends TestCase
 
         $service->handle();
         $ranking = Ranking::where('id', '>', 0)->orderBy('ranking_date')->get();
-        $this->assertCount(2, $ranking);
-        $this->assertEquals($event->getKey(), $ranking[1]->event_id);
+        $this->assertCount(12, $ranking); // 4 additional mens foil rankings
+        $this->assertEquals($event->getKey(), $ranking[8]->event_id);
+        $this->assertEquals($event->getKey(), $ranking[9]->event_id);
+        $this->assertEquals($event->getKey(), $ranking[10]->event_id);
+        $this->assertEquals($event->getKey(), $ranking[11]->event_id);
     }
 
     public function testRegenerateTwoEvents2()
     {
         $service = new RankingStoreService();
         $service->handle();
-        $ranking = Ranking::where('id', '>', 0)->get();
-        $this->assertCount(1, $ranking);
+        $ranking = Ranking::where('id', '>', 0)->orderBy('category_id')->orderBy('weapon_id')->get();
+        $this->assertCount(8, $ranking);
 
         $event = $this->createEvent(Carbon::now()->addDays(300)->toDateString());
         $comp = $this->createCompetition($event, Category::CAT1, Weapon::MF);
@@ -126,16 +128,22 @@ class RankingStoreServiceTest extends TestCase
 
         $service->handle();
         $ranking = Ranking::where('id', '>', 0)->orderBy('ranking_date')->get();
-        $this->assertCount(2, $ranking);
-        $this->assertEquals($event->getKey(), $ranking[1]->event_id);
+        $this->assertCount(12, $ranking);
+        $this->assertEquals($event->getKey(), $ranking[8]->event_id);
+        $this->assertEquals($event->getKey(), $ranking[9]->event_id);
+        $this->assertEquals($event->getKey(), $ranking[10]->event_id);
+        $this->assertEquals($event->getKey(), $ranking[11]->event_id);
 
         $result2->result_place = 3;
         $result2->save();
         $result3 = $this->createResult($comp->getKey(), FencerData::WCAT1, 5, 80);
         $service->handle();
         $ranking = Ranking::where('id', '>', 0)->orderBy('ranking_date')->get();
-        $this->assertCount(2, $ranking);
-        $this->assertEquals($event->getKey(), $ranking[1]->event_id);
+        $this->assertCount(12, $ranking);
+        $this->assertEquals($event->getKey(), $ranking[8]->event_id);
+        $this->assertEquals($event->getKey(), $ranking[9]->event_id);
+        $this->assertEquals($event->getKey(), $ranking[10]->event_id);
+        $this->assertEquals($event->getKey(), $ranking[11]->event_id);
     }
 
     private function createResult($comp, $fencer, $pos, $points)

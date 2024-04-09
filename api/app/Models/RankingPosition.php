@@ -24,14 +24,4 @@ class RankingPosition extends Model
     {
         return $this->belongsTo(Fencer::class, 'fencer_id', 'fencer_id');
     }
-
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class, 'category_id', 'category_id');
-    }
-
-    public function weapon(): BelongsTo
-    {
-        return $this->belongsTo(Weapon::class, 'weapon_id', 'weapon_id');
-    }
 }

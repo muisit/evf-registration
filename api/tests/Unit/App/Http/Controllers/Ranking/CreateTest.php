@@ -30,9 +30,9 @@ class CreateTest extends TestCase
         $this->assertEmpty($output['message']);
 
         $date = Carbon::now()->addDays(35)->toDateString();
-        $ranking = Ranking::where('id', '>', 0)->get();
-        $this->assertCount(1, $ranking);
-        $this->assertCount(11, $ranking[0]->positions);
+        $ranking = Ranking::where('id', '>', 0)->orderBy('category_id')->orderBy('weapon_id')->get();
+        $this->assertCount(8, $ranking); // mens foil, womens sabre, all categories
+        $this->assertCount(3, $ranking[0]->positions);
         $this->assertEquals(EventData::EVENT1, $ranking[0]->event->getKey());
         $this->assertEquals($date, (new Carbon($ranking[0]->ranking_date))->toDateString());
 

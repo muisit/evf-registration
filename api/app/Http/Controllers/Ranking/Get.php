@@ -40,10 +40,10 @@ class Get extends Controller
             return response()->json(new ReturnStatus('error', 'No such ranking'), 404);
         }
 
-        $ranking = Ranking::orderBy('ranking_date', 'desc')->first();
+        $ranking = Ranking::where('category_id', $category->getKey())->where('weapon_id', $weapon->getKey())->orderBy('ranking_date', 'desc')->first();
         if (empty($ranking)) {
             return response()->json(new ReturnStatus('error', 'No such ranking'), 404);
         }
-        return response()->json(new RankingSchema($ranking, $category, $weapon));
+        return response()->json(new RankingSchema($ranking));
     }
 }

@@ -47,14 +47,14 @@ class Ranking
      * )     */
     public array $positions = [];
 
-    public function __construct(?RankingModel $ranking = null, Category $category, Weapon $weapon)
+    public function __construct(?RankingModel $ranking = null)
     {
         if (!empty($ranking)) {
             $this->date = (new \DateTimeImmutable($ranking->ranking_date))->format('Y-m-d');
-            $this->category = $category->category_name;
-            $this->weapon = $weapon->weapon_name;
+            $this->category = $ranking->category->category_name;
+            $this->weapon = $ranking->weapon->weapon_name;
 
-            $positions = $ranking->positions()->with('fencer')->where('category_id', $category->getKey())->where('weapon_id', $weapon->getKey())->get();
+            $positions = $ranking->positions()->with('fencer')->get();
             foreach ($positions as $position) {
                 $this->positions[] = new RankingPosition($position);
             }
