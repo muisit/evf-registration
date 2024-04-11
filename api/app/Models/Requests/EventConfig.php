@@ -77,7 +77,8 @@ class EventConfig extends Base
             'require_documents',
             'allow_incomplete_checkin',
             'allow_hod_checkout',
-            'mark_process_start'
+            'mark_process_start',
+            'combine_checkin_checkout'
         ];
 
         $keylist = array_keys($obj);

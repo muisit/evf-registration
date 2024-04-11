@@ -67,6 +67,6 @@ class Fencer extends Model
             ->where('registration_country', '<>', null)
             ->pluck('registration_country')
             ->first();
-        return empty($country) ? 0 : $country;
+        return empty($country) ? $this->fencer_country : $country;
     }
 }

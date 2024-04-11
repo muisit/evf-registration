@@ -257,10 +257,15 @@ function onDialogCancel()
     onDialogClose();
 }
 
+function showInterface()
+{
+    return auth.isCheckin(auth.eventId, 'code') && !basic.eventCombinesCheckinCheckout();
+}
+
 import CheckinDialog from './CheckinDialog.vue';
 </script>
 <template>
-    <div class="main-app checkin-interface" v-if="auth.isCheckin(auth.eventId, 'code')">
+    <div class="main-app checkin-interface" v-if="showInterface()">
         <div class="table-wrapper">
             <table class="processed-list">
                 <thead>

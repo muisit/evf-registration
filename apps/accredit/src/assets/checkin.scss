@@ -19,43 +19,42 @@
             }
         }
     }
+}
 
+.el-dialog {
+    .photoid-element {
+        float:right;
+    }
+    
+    .checkin-dialog {
+        .field {
+            font-size: large;
+            padding-bottom: 10px;
 
-    .el-dialog {
-        .photoid-element {
-            float:right;
-        }
-        
-        .checkin-dialog {
-            .field {
-                font-size: large;
-                padding-bottom: 10px;
-
-                b {
-                    display: inline-block;
-                    width: 90px;
-                }
-            }
-
-            .date {
-                width: 75px;
-                font-weight: bold;
+            b {
                 display: inline-block;
-                margin-bottom: 4px;
-            }
-            .title {
-                display: inline-block;
-            }
-
-            .card {
-                font-size: x-large;
-                font-weight: bold;
-                padding-top: 20px;
+                width: 90px;
             }
         }
 
-        .el-dialog__footer {
-            clear: both;
+        .date {
+            width: 75px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 4px;
         }
+        .title {
+            display: inline-block;
+        }
+
+        .card {
+            font-size: x-large;
+            font-weight: bold;
+            padding-top: 20px;
+        }
+    }
+
+    .el-dialog__footer {
+        clear: both;
     }
 }
