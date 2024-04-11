@@ -149,6 +149,6 @@ import { ElButton } from 'element-plus';
         <ParticipantList @on-edit="editFencer" @on-select="selectFencer"/>
         <SearchDialog @onClose="closeSearchDialog" @onSave="saveSearchDialog" :visible="searchDialog" :fencers="allfencers" />
         <FencerDialog @onClose="closeFencerDialog" @onUpdate="updateFencerDialog" @onSave="saveFencerDialog" :visible="fencerDialog" :fencer="selectedFencer" :changeCountry="auth.canSwitchCountry() || false"/>
-        <SelectionDialog @onClose="closeSelectionDialog" :visible="selectionDialog && !fencerDialog" :fencer="selectedFencer" :isadmin="auth.canRegister()"/>
+        <SelectionDialog @onClose="closeSelectionDialog" :visible="selectionDialog && !fencerDialog" :fencer="selectedFencer" :isadmin="showAddButton"/>
     </div>
 </template>
