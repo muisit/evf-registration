@@ -108,6 +108,7 @@ import PhotoId from './special/PhotoId.vue';
           </div>
         </div>
         <div v-if="!isOwnBag()" class="owner">
+          <div class="hodfield field">Note: Bag is checked out by the Head of Delegation!</div>
           <div class="title field"><b>Owner</b></div>
           <div class="field"><b>Name:</b> {{ props.document?.name }}</div>
           <div class="field"><b>Country:</b> {{ basic.countriesById['c' + props.document?.countryId]?.name }}</div>

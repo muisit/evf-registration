@@ -318,7 +318,7 @@ import { ElSelect, ElOption, ElTabs, ElTabPane, ElForm, ElFormItem, ElCheckbox, 
                 <ElFormItem label="Documents" class="config">
                     <ElCheckbox :model-value="configValue('require_documents')" @update:model-value="(e) => setConfig(e, 'require_documents')" label="Require scanning documents during check-in"/>
                 </ElFormItem>
-                <ElFormItem label="Process" class="config">
+                <ElFormItem label="Incomplete" class="config">
                     <ElCheckbox :model-value="configValue('allow_incomplete_checkin')" @update:model-value="(e) => setConfig(e, 'allow_incomplete_checkin')" label="Allow check-in with missing card or document"/>
                 </ElFormItem>
                 <ElFormItem label="HoD" class="config">
