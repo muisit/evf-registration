@@ -80,7 +80,7 @@ class Event extends Model
     public function isOpenForRegistration()
     {
         $dateOpen = new Carbon($this->event_registration_open);
-        $dateClose = new Carbon($this->event_registration_close);
+        $dateClose = (new Carbon($this->event_registration_close))->addDays(1);
         $now = Carbon::now();
         return $now->greaterThanOrEqualTo($dateOpen) && $now->lessThan($dateClose);
     }

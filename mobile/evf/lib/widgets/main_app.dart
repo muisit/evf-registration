@@ -1,10 +1,11 @@
 import 'package:evf/environment.dart';
 import 'package:evf/providers/calendar_provider.dart';
+import 'package:evf/providers/feed_provider.dart';
+import 'package:evf/providers/ranking_provider.dart';
 import 'package:evf/widgets/components/evf_alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:evf/providers/feed_provider.dart';
 import './home_page.dart';
 
 class MainApp extends StatelessWidget {
@@ -19,6 +20,7 @@ class MainApp extends StatelessWidget {
         providers: [
           ChangeNotifierProvider<FeedProvider>(create: (context) => Environment.instance.feedProvider),
           ChangeNotifierProvider<CalendarProvider>(create: (context) => Environment.instance.calendarProvider),
+          ChangeNotifierProvider<RankingProvider>(create: (context) => Environment.instance.rankingProvider),
         ],
         child: MaterialApp(
           navigatorKey: EvfAlertDialog.navigatorKey,

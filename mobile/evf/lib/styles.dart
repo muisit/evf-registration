@@ -31,4 +31,6 @@ class AppStyles {
     fontSize: 14.0,
     fontFamily: 'Eurofurence',
   );
+
+  static const stripes = Color.fromARGB(255, 221, 233, 246);
 }

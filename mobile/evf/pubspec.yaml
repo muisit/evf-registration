@@ -47,6 +47,7 @@ dependencies:
   device_info_plus: ^10.0.1
   restart_app: ^1.2.1
   url_launcher: ^6.2.5
+  flutter_form_builder: ^9.2.1
 
 dev_dependencies:
   flutter_test:

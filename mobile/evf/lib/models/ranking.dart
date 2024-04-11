@@ -7,7 +7,7 @@ class Ranking {
   String weapon;
   List<RankingPosition> positions;
 
-  Ranking(this.date, this.updated, this.category, this.weapon, List<RankingPosition> this.positions);
+  Ranking(this.date, this.updated, this.category, this.weapon, this.positions);
 
   Ranking.fromJson(Map<String, dynamic> doc)
       : date = DateTime.parse(doc['date'] as String),
@@ -23,4 +23,6 @@ class Ranking {
         'weapon': weapon,
         'positions': positions,
       };
+
+  String catWeapon() => "$category/$weapon";
 }

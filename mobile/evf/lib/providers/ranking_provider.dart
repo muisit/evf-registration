@@ -6,59 +6,44 @@ import 'package:evf/models/ranking.dart';
 import 'package:flutter/foundation.dart';
 import 'package:evf/environment.dart';
 
-class CalendarProvider extends ChangeNotifier {
+class RankingProvider extends ChangeNotifier {
   bool _loadedFromCache = false;
   DateTime _lastMutation = DateTime(2000, 1, 1);
-  List<Calendar> _items;
+  List<Ranking> _items;
 
-  CalendarProvider() : _items = [];
+  RankingProvider() : _items = [];
 
-  List<Calendar> get list => _items;
+  List<Ranking> get list => _items;
 
-  void _add(Calendar item, bool doSort) {
-    if (_items.map((e) => e.id).toList().contains(item.id)) {
-      _items = _items.map((e) => e.id == item.id ? item : e).toList();
-      // we may have to resort due to a changed date
-      if (doSort) {
-        _items.sort((a, b) => a.startDate.compareTo(b.startDate));
-      }
+  void _add(Ranking item) {
+    final itemId = item.catWeapon();
+    if (_items.map((e) => e.catWeapon()).toList().contains(itemId)) {
+      _items = _items.map((e) => e.catWeapon() == itemId ? item : e).toList();
     } else {
-      if (_items.isEmpty) {
-        _items.add(item);
-      } else if (_items.first.startDate.isAfter(item.startDate)) {
-        _items.insert(0, item);
-      } else if (_items.last.startDate.isBefore(item.startDate)) {
-        _items.add(item);
-      } else {
-        _items.add(item);
-        // sorting should be quick, as most of the list is already sorted
-        if (doSort) {
-          _items.sort((a, b) => a.startDate.compareTo(b.startDate));
-        }
-      }
+      _items.add(item);
+      // sorting should be quick, list is not that large
+      _items.sort((a, b) => a.catWeapon().compareTo(b.catWeapon()));
     }
-    if (item.mutated.isBefore(_lastMutation)) {
-      _lastMutation = item.mutated;
+    if (item.updated.isBefore(_lastMutation)) {
+      _lastMutation = item.updated;
     }
   }
 
-  void add(Calendar item) {
-    _add(item, true);
+  void add(Ranking item) {
+    _add(item);
     notifyListeners();
   }
 
-  void addList(List<Calendar> items) {
+  void addList(List<Ranking> items) {
     for (final item in items) {
-      _add(item, false);
+      _add(item);
     }
-    // sort to be safe
-    _items.sort((a, b) => a.startDate.compareTo(b.startDate));
     notifyListeners();
   }
 
   // load the feed items from our cached storage, if we haven't loaded them yet
   Future loadItems({bool doForce = false}) async {
-    Environment.debug("loading calendar items");
+    Environment.debug("loading ranking items");
     if (!_loadedFromCache) {
       Environment.debug("loading items from cache first");
       await loadItemsFromCache();
@@ -70,7 +55,7 @@ class CalendarProvider extends ChangeNotifier {
     final status = Environment.instance.statusProvider.status!;
 
     // if we have no date, we have no feeds. Just set a very old date as default
-    final lastDate = status.lastCalendar == '' ? DateTime(2000, 1, 1) : DateTime.parse(status.lastCalendar);
+    final lastDate = status.lastRanking == '' ? DateTime(2000, 1, 1) : DateTime.parse(status.lastRanking);
 
     Environment.debug("testing ${_lastMutation.toIso8601String()} vs ${lastDate.toIso8601String()}");
     if (_lastMutation.isBefore(lastDate)) {
@@ -82,16 +67,16 @@ class CalendarProvider extends ChangeNotifier {
     // data, which should not be too much
     if (doForce) {
       Environment.debug("loading calendar items from network");
-      await loadCalendarItems();
+      await loadRankingItems();
     }
   }
 
   Future loadItemsFromCache() async {
     try {
-      final doc = jsonDecode(await Environment.instance.cache.getCache("calendar.json")) as List<dynamic>;
-      List<Calendar> retval = [];
+      final doc = jsonDecode(await Environment.instance.cache.getCache("ranking.json")) as List<dynamic>;
+      List<Ranking> retval = [];
       for (var content in doc) {
-        retval.add(Calendar.fromJson(content as Map<String, dynamic>));
+        retval.add(Ranking.fromJson(content as Map<String, dynamic>));
       }
       addList(retval);
     } catch (e) {
@@ -99,12 +84,23 @@ class CalendarProvider extends ChangeNotifier {
     }
   }
 
-  Future loadCalendarItems() async {
+  Future loadRankingItems() async {
     final originalMutation = _lastMutation;
-    final networkItems = await loadCalendar(lastDate: _lastMutation);
+    final networkItems = await loadRanking(lastDate: _lastMutation);
     addList(networkItems);
     if (originalMutation.isBefore(_lastMutation)) {
-      await Environment.instance.cache.setCache('calendar.json', jsonEncode(_items));
+      await Environment.instance.cache.setCache('ranking.json', jsonEncode(_items));
     }
+  }
+
+  Ranking getRankingFor(String category, String weapon) {
+    for (var ranking in _items) {
+      if (ranking.category == category && ranking.weapon == weapon) {
+        Environment.debug("found a ranking ${ranking.category} ${ranking.weapon}");
+        return ranking;
+      }
+    }
+    Environment.debug("returning empty ranking for $category $weapon");
+    return Ranking(DateTime(2000, 1, 1), DateTime(2000, 1, 1), category, weapon, []);
   }
 }

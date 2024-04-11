@@ -1,4 +1,5 @@
 {
+    "@@locale": "en",
     "appTitle": "MyEVF",
     "@appTitle": {
       "description": "The main title for this application"
@@ -29,6 +30,28 @@
       "description": "Text on the results feed button"
     },
 
+    "labelCategory": "Category",
+    "@labelCategory": {
+      "description": "Ranking or competition category"
+    },
+    "labelCategoryCat1": "Cat 1",
+    "labelCategoryCat2": "Cat 2",
+    "labelCategoryCat3": "Cat 3",
+    "labelCategoryCat4": "Cat 4",
+    "labelCategoryLongest": "Category",
+
+    "labelWeapon": "Weapon",
+    "@labelWeapon": {
+      "description": "Ranking or competition weapon"
+    },
+    "labelWeaponMF": "Mens Foil",
+    "labelWeaponME": "Mens Epee",
+    "labelWeaponMS": "Mens Sabre",
+    "labelWeaponWF": "Womens Foil",
+    "labelWeaponWE": "Womens Epee",
+    "labelWeaponWS": "Womens Sabre",
+    "labelWeaponLongest": "Womens Sabre",
+
     "calendarDate": "{date}",
     "@calendarDate": {
       "description": "Date format used in the Calendar page",
@@ -40,10 +63,27 @@
       }
     },
 
+    "titleRanking": "Ranking for {weapon} {category} of {date}",
+    "@titleRanking": {
+      "description": "title above the ranking table",
+      "placeholders": {
+        "weapon": {
+          "type": "String"
+        },
+        "category": {
+          "type": "String"
+        },
+        "date": {
+          "type": "DateTime",
+          "format": "yMd"
+        }
+      }
+    },
+
     "errorNoPageWidget": "no widget for {currentPageIndex}",
     "@errorNoPageWidget": {
       "description": "Error thrown if the selected page index falls outside the programmatic boundaries",
-      "placeHolders": {
+      "placeholders": {
         "currentPageIndex": {
           "type": "int",
           "example": "5"

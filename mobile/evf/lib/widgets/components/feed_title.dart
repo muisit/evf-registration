@@ -1,3 +1,4 @@
+import 'package:evf/styles.dart';
 import 'package:flutter/material.dart';
 
 class FeedTitle extends StatelessWidget {
@@ -12,11 +13,7 @@ class FeedTitle extends StatelessWidget {
       Expanded(
           child: RichText(
         text: TextSpan(
-          style: const TextStyle(
-            fontSize: 14.0,
-            color: Colors.black,
-            fontWeight: FontWeight.w700,
-          ),
+          style: AppStyles.headerText,
           text: title,
         ),
         textAlign: TextAlign.left,

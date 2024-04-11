@@ -238,6 +238,8 @@ function configValue(label:string)
             return currentEvent.value.config.allow_hod_checkout || false;
         case "mark_process_start":
             return currentEvent.value.config.mark_process_start || false;
+        case "combine_checkin_checkout":
+            return currentEvent.value.config.combine_checkin_checkout || false;
     }
     return false;
 }
@@ -259,6 +261,9 @@ function setConfig(e:any, label:string)
             break;
         case "mark_process_start":
             currentEvent.value.config.mark_process_start = e ? true : false;
+            break;
+        case "combine_checkin_checkout":
+            currentEvent.value.config.combine_checkin_checkout = e ? true : false;
             break;
     }
 }
@@ -321,6 +326,9 @@ import { ElSelect, ElOption, ElTabs, ElTabPane, ElForm, ElFormItem, ElCheckbox, 
                 </ElFormItem>
                 <ElFormItem label="Process" class="config">
                     <ElCheckbox :model-value="configValue('mark_process_start')" @update:model-value="(e) => setConfig(e, 'mark_process_start')" label="Mark start of the weapons check process"/>
+                </ElFormItem>
+                <ElFormItem label="Checkout" class="config">
+                    <ElCheckbox :model-value="configValue('combine_checkin_checkout')" @update:model-value="(e) => setConfig(e, 'combine_checkin_checkout')" label="Combine Check-In and Check-Out Stations"/>
                 </ElFormItem>
                 <ElFormItem class="buttons">
                     <ElButton @click="saveConfig" type="primary">Save</ElButton>

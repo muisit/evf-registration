@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:evf/providers/calendar_provider.dart';
+import 'package:evf/providers/ranking_provider.dart';
 import 'package:evf/widgets/components/evf_alert_dialog.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +22,7 @@ class Environment {
         authToken = '',
         feedProvider = FeedProvider(),
         calendarProvider = CalendarProvider(),
+        rankingProvider = RankingProvider(),
         statusProvider = StatusProvider() {
     Environment._instance = this;
   }
@@ -42,6 +44,7 @@ class Environment {
   String authToken;
   FeedProvider feedProvider;
   CalendarProvider calendarProvider;
+  RankingProvider rankingProvider;
   StatusProvider statusProvider;
 
   // convenience methods, only callable after initialization
