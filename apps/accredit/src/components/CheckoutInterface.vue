@@ -9,6 +9,7 @@ import { useDataStore } from '../stores/data';
 import { useBasicStore } from '../../../common/stores/basic';
 import { useBroadcasterStore } from '../../../common/stores/broadcaster';
 import { documents } from '../../../common/api/accreditations/documents';
+import { savedocument } from '../../../common/api/accreditations/savedocument';
 import { dayjs } from 'element-plus';
 
 const props = defineProps<{
@@ -21,12 +22,15 @@ const broadcaster = useBroadcasterStore();
 
 const startProcessDialog = ref(false);
 const checkoutDialog = ref(false);
+const checkinDialog = ref(false);
 const pendingDocumentList:Ref<Array<AccreditationDocument>> = ref([]);
 const processedDocumentList:Ref<Array<AccreditationDocument>> = ref([]);
 const checkedOutDocumentList:Ref<Array<AccreditationDocument>> = ref([]);
 const currentDocument:Ref<AccreditationDocument|null> = ref(null);
 const currentFencer:Ref<Fencer|null> = ref(null);
 const currentBadge:Ref<Code|null> = ref(null);
+const currentCard:Ref<Code|null> = ref(null);
+const currentDocumentCode:Ref<Code|null> = ref(null);
 const markedDocumentList:Ref<Array<number>> = ref([]);
 
 watch(() => auth.credentials,
@@ -89,15 +93,24 @@ function badgeDispatcher(code:string, codeObject:Code)
             // alerts. The expected process is that the bag card or document is scanned
             // first, then the badge of the recipient to check that that person is 
             // allowed to receive it.
-            if (!checkoutDialog.value) {
+            // The same goes for the checkin dialog: if it is open, do open another dialog
+            if (!checkoutDialog.value && !checkinDialog.value) {
                 // only open it if we have exactly one document pending
                 if (found != null && markedDocumentList.value.length == 1) {
                     return startCheckout(found)
                 }
                 else if (!found) {
-                    alert("You scanned a badge for which no bag is being processed. Please scan again, or reload the page");
+                    if (basic.eventCombinesCheckinCheckout()) {
+                        return startCheckin();
+                    }
+                    else {
+                        alert("You scanned a badge for which no bag is being processed. Please scan again, or reload the page");
+                    }
                 }
                 // else we have several, pick the right one manually
+            }
+            if (checkinDialog.value) {
+                markedDocumentList.value = []; // do not mark all pending bags when we do check-in
             }
         }
     })
@@ -110,7 +123,9 @@ function badgeDispatcher(code:string, codeObject:Code)
 
 function cardDispatcher(code:string, codeObject:Code)
 {
+    console.log('cardDispatcher', code, codeObject);
     if (basic.eventRequiresCards()) {
+        currentCard.value = codeObject;
         // find the card in either the pending or the processed lists
         let found:AccreditationDocument|null = null;
         pendingDocumentList.value.map((doc:AccreditationDocument) => {
@@ -128,7 +143,13 @@ function cardDispatcher(code:string, codeObject:Code)
             }
         });
         if (found != null) {
+            console.log('card was found, starting checkout');
             return startCheckout(found);
+        }
+        else if(basic.eventCombinesCheckinCheckout())
+        {
+            console.log('card not found, starting checkin');
+            return startCheckin();
         }
         else {
             alert("You scanned a card that is not used currently. Please scan again, or reload the page");
@@ -142,6 +163,7 @@ function cardDispatcher(code:string, codeObject:Code)
 function documentDispatcher(code:string, codeObject:Code)
 {
     if (basic.eventRequiresDocuments()) {
+        currentDocumentCode.value = codeObject;
         // find the card in either the pending or the processed lists
         let found:AccreditationDocument|null = null;
         pendingDocumentList.value.map((doc:AccreditationDocument) => {
@@ -160,6 +182,9 @@ function documentDispatcher(code:string, codeObject:Code)
         });
         if (found != null) {
             return startCheckout(found);
+        }
+        else if(basic.eventCombinesCheckinCheckout()) {
+            return startCheckin();
         }
         else {
             alert("You scanned a document that is not used currently. Please scan again, or reload the page");
@@ -174,7 +199,7 @@ function failDispatcher(code:string, codeObject:Code)
 {
     // prevent the dialog from being submitted when we scan a bad code
     if (isNaN(parseFloat(code))) {
-        if (startProcessDialog.value) {
+        if (startProcessDialog.value || checkinDialog.value) {
             onDialogClose();
         }
     }
@@ -207,6 +232,9 @@ watch(() => props.visible,
 
             data.clearDispatchers();
             data.subtitle = "Weapon Control Check-out";
+            if (basic.eventCombinesCheckinCheckout()) {
+                data.subtitle = 'Weapon Control Check-in/Check-out';
+            }
             data.setDispatcher('badge', badgeDispatcher);
             data.setDispatcher('card', cardDispatcher);
             data.setDispatcher('document', documentDispatcher);
@@ -218,6 +246,7 @@ watch(() => props.visible,
 
 function getCountry(cid:number)
 {
+    console.log('getting country ', cid);
     let key = 'c' + cid;
     if (basic.countriesById[key]) {
         return basic.countriesById[key].abbr;
@@ -230,6 +259,7 @@ function startProcess(document:AccreditationDocument)
     currentDocument.value = document;
     startProcessDialog.value = true;
     checkoutDialog.value = false;
+    checkinDialog.value = false;
 }
 
 function startCheckout(document:AccreditationDocument)
@@ -237,12 +267,21 @@ function startCheckout(document:AccreditationDocument)
     currentDocument.value = document;
     startProcessDialog.value = false;
     checkoutDialog.value = true;
+    checkinDialog.value = false;
+}
+
+function startCheckin()
+{
+    startProcessDialog.value = false;
+    checkoutDialog.value = false;
+    checkinDialog.value = true;
 }
 
 function onDialogClose()
 {
     startProcessDialog.value = false;
     checkoutDialog.value = false;
+    checkinDialog.value = false;
     currentFencer.value = null;
 }
 
@@ -250,6 +289,71 @@ function onDialogSubmit(doc:AccreditationDocument)
 {
     moveDocumentToList(doc);
     onDialogClose();
+}
+
+function onCheckinDialogSubmit()
+{
+    currentDocument.value = {id: 0};
+    if (basic.eventRequiresCards() && !basic.eventAllowsIncompleteCheckin() && !currentCard.value) {
+        alert("Cannot check in without a connected card");
+        return false;
+    }
+    else if (currentCard.value) {
+        currentDocument.value.card = currentCard.value.data;
+    }
+    if (basic.eventRequiresDocuments() && !basic.eventAllowsIncompleteCheckin() && !currentDocumentCode.value) {
+        alert("Cannot check in without a connected document");
+        return false;
+    }
+    else if (currentDocumentCode.value) {
+        currentDocument.value.document = currentDocumentCode.value.data;
+    }
+    if (!currentBadge.value) {
+        alert('Cannot check in without a connected fencer');
+        return false;
+    }
+    else {
+        currentDocument.value.badge = currentBadge.value.original;
+        currentDocument.value.fencerId = currentFencer.value?.id;
+    }
+
+    auth.isLoading('savecheckindocument');
+    savedocument(currentDocument.value).then((dt) => {
+        auth.hasLoaded('savecheckindocument');
+
+        if (!dt || !dt.checkin) {
+            throw new Error("invalid response");
+        }
+        moveDocumentToList(dt);
+        onDialogClose();
+    })
+    .catch((e) => {
+        auth.hasLoaded('savedocument');
+        if (e.status == 422 && e.data) {
+            // validation error
+            let txt='';
+            if (e.data.card) {
+                txt += e.data.card.join('; ') + '\r\n';
+            }
+            if (e.data.document) {
+                txt += e.data.document.join('; ') + '\r\n';
+            }
+            if (e.data.badge) {
+                txt += e.data.badge.join('; ') + '\r\n';
+            }
+            if (txt.length > 0) {
+                alert(txt);
+            }
+            else {
+                console.log(e);
+                alert("There was an error processing the data. Please reload the page and try again.");
+            }
+        }
+        else {
+            console.log(e);
+            alert("There was an error processing the data. Please reload the page and try again.");
+        }
+    })
 }
 
 function moveDocumentToList(doc:AccreditationDocument)
@@ -303,12 +407,18 @@ function moveDocumentToList(doc:AccreditationDocument)
     }
 }
 
+function showInterface()
+{
+    return auth.isCheckout(auth.eventId, 'code') || (auth.isCheckin(auth.eventId, 'code') && basic.eventCombinesCheckinCheckout());
+}
+
 import StartProcessDialog from './StartProcessDialog.vue';
 import CheckoutDialog from './CheckoutDialog.vue';
+import CheckinDialog from './CheckinDialog.vue';
 import { fencerIsHod } from './lib/fencerIsHod';
 </script>
 <template>
-    <div class="main-app checkout-interface" v-if="auth.isCheckout(auth.eventId, 'code')">
+    <div class="main-app checkout-interface" v-if="showInterface()">
         <div class="table-wrapper">
             <table class="processed-list">
                 <thead>
@@ -419,6 +529,14 @@ import { fencerIsHod } from './lib/fencerIsHod';
             :visible="checkoutDialog"
             @on-close="onDialogClose"
             @on-submit="onDialogSubmit"
+        />
+        <CheckinDialog
+            :fencer="currentFencer"
+            :card="currentCard"
+            :document="currentDocumentCode"
+            :visible="checkinDialog"
+            @on-submit="onCheckinDialogSubmit"
+            @on-cancel="onDialogClose"
         />
     </div>
 </template>

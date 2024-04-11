@@ -39,6 +39,9 @@ return [
         'api' => [
             'driver' => 'evf',
         ],
+        'wp' => [
+            'driver' => 'wp'
+        ]
     ],
 
     /*

@@ -4,12 +4,15 @@ namespace App\Providers;
 
 use App\Models\Event;
 use App\Models\WPUser;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use App\Support\SessionGuard;
 use App\Support\UserProvider;
 use App\Support\Contracts\EVFUser;
+use Illuminate\Http\Request;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -67,6 +70,23 @@ class AuthServiceProvider extends ServiceProvider
         });
         Broadcast::channel('dt.{eventId}', function (EVFUser $user, int $eventId) {
             return $user->hasRole('code') && $user->hasRole(["dt:" . $eventId]);
+        });
+
+        Auth::viaRequest('wp', function (Request $request) {
+            $option = DB::table(env('WPDBPREFIX', 'wp_') . "options")
+                ->where("option_name", "evf_internal_key")
+                ->where("option_value", (string) $request->bearerToken())
+                ->first();
+
+            if (!empty($option)) {
+                $userid = DB::table(env('WPDBPREFIX', 'wp_') . "options")
+                    ->where("option_name", "evf_internal_user")
+                    ->first();
+                if (!empty($userid)) {
+                    return WPUser::find($userid->option_value);
+                }
+            }
+            return null;
         });
     }
 }
