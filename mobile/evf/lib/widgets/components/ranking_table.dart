@@ -14,21 +14,23 @@ class RankingTable extends StatelessWidget {
   Widget build(BuildContext context) {
     Environment.debug("getting ranking for $category and $weapon");
     final Ranking ranking = Environment.instance.rankingProvider.getRankingFor(category, weapon);
-
+    Environment.debug("ranking has ${ranking.positions.length} entries");
     return ListenableBuilder(
         listenable: Environment.instance.rankingProvider,
         builder: (BuildContext context, Widget? child) {
           return Padding(
-              padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   RankingTitle(ranking: ranking),
-                  //Expanded(
-                  //    child: ListView.builder(
-                  //        itemBuilder: (BuildContext context, int index) => RankingLine(item: ranking.positions[index]),
-                  //        itemCount: ranking.positions.length))
+                  Expanded(
+                      child: ListView.builder(
+                    itemBuilder: (BuildContext context, int index) => RankingLine(item: ranking.positions[index]),
+                    itemCount: ranking.positions.length,
+                  ))
                 ],
               ));
         });

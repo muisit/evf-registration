@@ -49,7 +49,7 @@ class _RankPageState extends State<RankPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             RankingDropdowns(callback: _setCategoryAndWeapon, category: currentCategory, weapon: currentWeapon),
-            RankingTable(category: currentCategory, weapon: currentWeapon)
+            Expanded(child: RankingTable(category: currentCategory, weapon: currentWeapon))
           ],
         ));
   }

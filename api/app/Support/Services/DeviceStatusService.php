@@ -6,6 +6,7 @@ use App\Models\Competition;
 use App\Models\DeviceUser;
 use App\Models\DeviceFeed;
 use App\Models\Event;
+use App\Models\Ranking;
 use App\Models\Result;
 use App\Models\WPPost;
 use App\Models\Schemas\BlockStatus;
@@ -65,6 +66,10 @@ class DeviceStatusService
 
     private function getRankingStatus(): BlockStatus
     {
+        $ranking = Ranking::where('id', '>', 0)->orderBy('updated_at', 'desc')->first();
+        if (!empty($ranking)) {
+            return new BlockStatus($ranking->positions()->count(), $ranking->updated_at);
+        }
         return new BlockStatus(0, '');
     }
 

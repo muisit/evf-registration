@@ -8,20 +8,19 @@ class RankingLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-        child: Ink(
-            color: ((item.position % 2) == 0) ? AppStyles.stripes : Colors.white,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text("${item.position.toString()}."),
-                const Icon(Icons.favorite_outline),
-                Text(item.lastName),
-                Text(item.firstName),
-                Text(item.country),
-                Text(item.points.toStringAsFixed(2))
-              ],
-            )));
+    return Ink(
+        color: ((item.position % 2) == 0) ? AppStyles.stripes : Colors.white,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text("${item.position.toString()}."),
+            const Icon(Icons.favorite_outline),
+            Text(item.lastName),
+            Text(item.firstName),
+            Text(item.country),
+            Text(item.points.toStringAsFixed(2))
+          ],
+        ));
   }
 }
