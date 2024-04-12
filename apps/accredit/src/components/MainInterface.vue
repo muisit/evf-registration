@@ -1,6 +1,18 @@
 <script lang="ts" setup>
 import { useAuthStore } from '../../../common/stores/auth';
+import { useBasicStore } from '../../../common/stores/basic';
 const auth = useAuthStore();
+const basic = useBasicStore();
+
+function showCheckinInterface()
+{
+    return auth.isCheckin(auth.eventId, 'code') && !basic.eventCombinesCheckinCheckout();
+}
+
+function showCheckoutInterface()
+{
+    return auth.isCheckout(auth.eventId, 'code') || (auth.isCheckin(auth.eventId, 'code') && basic.eventCombinesCheckinCheckout());
+}
 
 import InputComponent from '../components/InputComponent.vue';
 import ScanLogger from './ScanLogger.vue';
@@ -23,8 +35,8 @@ import DTInterface from './DTInterface.vue';
         <ScanLogger/>
         <AdminInterface :visible="auth.isOrganiser(auth.eventId, 'code')"/>
         <AccreditationInterface :visible="auth.isAccreditor(auth.eventId, 'code')"/>
-        <CheckinInterface :visible="auth.isCheckin(auth.eventId, 'code')"/>
-        <CheckoutInterface :visible="auth.isCheckout(auth.eventId, 'code')"/>
+        <CheckinInterface :visible="showCheckinInterface()"/>
+        <CheckoutInterface :visible="showCheckoutInterface()"/>
         <DTInterface :visible="auth.isDT(auth.eventId, 'code')"/>
     </div>
 </template>

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Kirschbaum\PowerJoins\PowerJoins;
+use Illuminate\Support\Str;
 
 class Fencer extends Model
 {
@@ -20,6 +21,13 @@ class Fencer extends Model
     protected $primaryKey = 'fencer_id';
     protected $guarded = [];
     public $timestamps = false;
+
+    public static function booted()
+    {
+        static::creating(function ($model) {
+            $model->uuid = Str::uuid()->toString();
+        });
+    }
 
     public function country(): BelongsTo
     {
@@ -59,6 +67,6 @@ class Fencer extends Model
             ->where('registration_country', '<>', null)
             ->pluck('registration_country')
             ->first();
-        return empty($country) ? 0 : $country;
+        return empty($country) ? $this->fencer_country : $country;
     }
 }

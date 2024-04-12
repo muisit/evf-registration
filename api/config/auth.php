@@ -41,6 +41,9 @@ return [
         ],
         'device' => [
             'driver' => 'device',
+        ],
+        'wp' => [
+            'driver' => 'wp'
         ]
     ],
 

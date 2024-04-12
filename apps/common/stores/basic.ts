@@ -240,6 +240,12 @@ export const useBasicStore = defineStore('basic', () => {
         return false;
     }
 
+    function eventCombinesCheckinCheckout()
+    {
+        if (event.value.config && event.value.config.combine_checkin_checkout) return true;
+        return false;
+    }
+
     return {
         roles, officialRoles, organisationRoles, countryRoles, rolesById, 
         countries, countriesById, categories, categoriesById, weapons, weaponsById,
@@ -248,6 +254,6 @@ export const useBasicStore = defineStore('basic', () => {
         competitionEvents, nonCompetitionEvents, getEvent, setEvent,
         decorateRegistrations,
         eventRequiresCards, eventRequiresDocuments, eventAllowsIncompleteCheckin, eventAllowsCheckoutByHod,
-        eventMarksStartOfProcessing
+        eventMarksStartOfProcessing, eventCombinesCheckinCheckout
     };
 });

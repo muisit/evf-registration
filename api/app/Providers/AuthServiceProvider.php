@@ -5,14 +5,15 @@ namespace App\Providers;
 use App\Models\Device;
 use App\Models\Event;
 use App\Models\WPUser;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use App\Support\SessionGuard;
 use App\Support\DeviceGuard;
 use App\Support\UserProvider;
 use App\Support\Contracts\EVFUser;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class AuthServiceProvider extends ServiceProvider
@@ -76,6 +77,23 @@ class AuthServiceProvider extends ServiceProvider
         Auth::viaRequest('device', function (Request $request) {
             $user = Device::where('uuid', (string) $request->bearerToken())->first()?->user;
             return $user;
+        });
+
+        Auth::viaRequest('wp', function (Request $request) {
+            $option = DB::table(env('WPDBPREFIX', 'wp_') . "options")
+                ->where("option_name", "evf_internal_key")
+                ->where("option_value", (string) $request->bearerToken())
+                ->first();
+
+            if (!empty($option)) {
+                $userid = DB::table(env('WPDBPREFIX', 'wp_') . "options")
+                    ->where("option_name", "evf_internal_user")
+                    ->first();
+                if (!empty($userid)) {
+                    return WPUser::find($userid->option_value);
+                }
+            }
+            return null;
         });
     }
 }

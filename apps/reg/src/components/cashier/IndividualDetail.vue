@@ -58,7 +58,7 @@ function isDisabled(reg:Registration)
 {
     if (auth.isHod() &&  !['G'].includes(reg.payment || '')) return true;
     else if (!['I','G'].includes(reg.payment || '')) return true;
-    return !(reg.state == 'saved' || reg.state == '' || !reg.state);
+    return !(reg.saveState == 'saved' || reg.saveState == '' || !reg.saveState);
 }
 function isVisible()
 {
@@ -98,11 +98,11 @@ import { CloseBold, Select, Upload, CircleCheck } from '@element-plus/icons-vue'
                             <CircleCheck />
                         </ElIcon>
                     </td>
-                    <td :class="{'state-icons':true, 'state-error': reg.state == 'error', 'state-upload': reg.state == 'saving', 'state-ok': reg.state == 'saved'}">
+                    <td :class="{'state-icons':true, 'state-error': reg.saveState == 'error', 'state-upload': reg.saveState == 'saving', 'state-ok': reg.saveState == 'saved'}">
                         <ElIcon>
-                            <CloseBold v-if="reg.state == 'error'" />
-                            <Select v-if="reg.state == 'saved'"/>
-                            <Upload v-if="reg.state == 'saving'"/>
+                            <CloseBold v-if="reg.saveState == 'error'" />
+                            <Select v-if="reg.saveState == 'saved'"/>
+                            <Upload v-if="reg.saveState == 'saving'"/>
                         </ElIcon>
                     </td>
                 </tr>

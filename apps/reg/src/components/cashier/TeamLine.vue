@@ -39,7 +39,7 @@ function expand()
 
 function paymentState()
 {
-    return props.team.registrations[0].state || '';
+    return props.team.registrations[0].saveState || '';
 }
 
 function isDisabled()
@@ -67,7 +67,7 @@ import { Select, CloseBold, Upload, ArrowRight, ArrowDown, CircleCheck } from '@
                 <CircleCheck/>
             </ElIcon>
         </td>
-        <td :class="{'state-icons':true, 'state-error': props.team.registrations[0].state == 'error', 'state-upload': props.team.registrations[0].state == 'saving', 'state-ok': props.team.registrations[0].state == 'saved'}">
+        <td :class="{'state-icons':true, 'state-error': props.team.registrations[0].saveState == 'error', 'state-upload': props.team.registrations[0].saveState == 'saving', 'state-ok': props.team.registrations[0].saveState == 'saved'}">
             <ElIcon>
                 <CloseBold v-if="paymentState() == 'error'" />
                 <Select v-if="paymentState() == 'saved'"/>
