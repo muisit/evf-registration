@@ -9,12 +9,12 @@ class CountryFlag extends BasicImage
     public function generate($el)
     {
         $this->parse($el);
-        $fpath = $this->data?->country_flag ?? null;
+        $fpath = env('WP_ROOT') . '/' . ($this->data?->country_flag ?? null);
         if (empty($fpath)) {
             return;
         }
 
-        $fpath = base_path($fpath);
+        //$fpath = base_path($fpath);
         if (!file_exists($fpath)) return;
 
         if (!isset($this->size)) {
