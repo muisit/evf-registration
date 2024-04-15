@@ -43,7 +43,7 @@ export function isOpenForRegistration(event:Event)
     const now = parse_date();
     const opens = parse_date(event.reg_open);
     const closes = parse_date(event.reg_close);
-    return opens.isBefore(now) && closes.isAfter(now);
+    return opens.isBefore(now) && closes.add(1, 'day').isAfter(now);
 }
 
 export function isOpenForRegistrationView(event:Event)
