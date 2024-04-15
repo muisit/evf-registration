@@ -50,7 +50,7 @@ cat $WD/apps/reg/.env | sed "s/VITE_VERSION=.*/VITE_VERSION=$REGVERSION\.$BUILDN
 cat $WD/apps/accredit/.env | sed "s/VITE_VERSION=.*/VITE_VERSION=$ACCRVERSION\.$BUILDNR/" > tmp; mv tmp $WD/apps/accredit/.env
 
 echo "Patching present working directory in env testing file" >> $LOG
-cat $WD/api/.env.testing | sed "s/{PWD}/$WD" > tmp; mv tmp $WD/api/.env.testing
+cat $WD/api/.env.testing | sed "s#{PWD}#$WD#" > tmp; mv tmp $WD/api/.env.testing
 
 cd api
 
