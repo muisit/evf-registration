@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:evf/providers/calendar_provider.dart';
+import 'package:evf/providers/follower_provider.dart';
 import 'package:evf/providers/ranking_provider.dart';
 import 'package:evf/widgets/components/evf_alert_dialog.dart';
 import 'package:restart_app/restart_app.dart';
@@ -23,7 +24,8 @@ class Environment {
         feedProvider = FeedProvider(),
         calendarProvider = CalendarProvider(),
         rankingProvider = RankingProvider(),
-        statusProvider = StatusProvider() {
+        statusProvider = StatusProvider(),
+        followerProvider = FollowerProvider() {
     Environment._instance = this;
   }
 
@@ -46,6 +48,7 @@ class Environment {
   CalendarProvider calendarProvider;
   RankingProvider rankingProvider;
   StatusProvider statusProvider;
+  FollowerProvider followerProvider;
 
   // convenience methods, only callable after initialization
   static Environment get instance => Environment._instance!;

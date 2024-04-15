@@ -53,7 +53,7 @@ class RankingProvider extends ChangeNotifier {
     // see if we may need to load new items from the back-end
     // status is set immediately during environment initialization, so is never null at this stage
     final status = Environment.instance.statusProvider.status!;
-
+    Environment.debug("status lastRanking ${status.lastRanking}");
     // if we have no date, we have no feeds. Just set a very old date as default
     final lastDate = status.lastRanking == '' ? DateTime(2000, 1, 1) : DateTime.parse(status.lastRanking);
 

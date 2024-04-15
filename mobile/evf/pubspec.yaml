@@ -48,6 +48,7 @@ dependencies:
   restart_app: ^1.2.1
   url_launcher: ^6.2.5
   flutter_form_builder: ^9.2.1
+  auto_size_text: ^3.0.0
 
 dev_dependencies:
   flutter_test:

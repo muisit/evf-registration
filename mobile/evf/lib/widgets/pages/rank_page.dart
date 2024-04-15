@@ -1,6 +1,6 @@
 import 'package:evf/environment.dart';
 import 'package:evf/widgets/components/ranking_dropdowns.dart';
-import 'package:evf/widgets/components/ranking_table.dart';
+import 'package:evf/widgets/components/ranking_display.dart';
 import 'package:flutter/material.dart';
 
 class RankPage extends StatefulWidget {
@@ -49,7 +49,7 @@ class _RankPageState extends State<RankPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             RankingDropdowns(callback: _setCategoryAndWeapon, category: currentCategory, weapon: currentWeapon),
-            Expanded(child: RankingTable(category: currentCategory, weapon: currentWeapon))
+            Expanded(child: RankingDisplay(category: currentCategory, weapon: currentWeapon))
           ],
         ));
   }

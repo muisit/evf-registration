@@ -6,6 +6,7 @@ use App\Models\Competition;
 use App\Models\DeviceUser;
 use App\Models\DeviceFeed;
 use App\Models\Event;
+use App\Models\Follow;
 use App\Models\Ranking;
 use App\Models\Result;
 use App\Models\WPPost;
@@ -28,6 +29,9 @@ class DeviceStatusService
             $retval->calendar = $this->getCalendarStatus();
             $retval->ranking = $this->getRankingStatus();
             $retval->results = $this->getResultStatus();
+
+            $retval->followers = $this->getFollowers();
+            $retval->following = $this->getFollowing();
         }
         // else the log in device is not registered, we return an empty struct
         return $retval;
@@ -89,5 +93,26 @@ class DeviceStatusService
             return new BlockStatus($rows[0]->cnt ?? 0, $rows[0]->last ?? '');
         }
         return new BlockStatus();
+    }
+
+    private function getFollowers(): array
+    {
+        $user = Auth::user();
+        $lst = Follow::with('fencer')->where('fencer_id', $user->fencer_id ?? 0)->get();
+        $retval = [];
+        foreach ($lst as $follower) {
+            if (!$follower->isBlocked()) {
+                \Log::debug("follower preferences " . json_encode($follower->preferences) . " does not include blocked");
+                $retval[] = $follower->fencer->uuid;
+            }
+        }
+        return $retval;
+    }
+
+    private function getFollowing(): array
+    {
+        // we return all blocked users we are following, so we can manage blocks in the application
+        $user = Auth::user();
+        return Follow::with('fencer')->where('device_user_id', $user->getKey())->get()->pluck('uuid')->toArray();
     }
 }

@@ -50,7 +50,8 @@ class Fencer extends Fixture
             'fencer_surname' => 'De La Teste',
             'fencer_gender' => 'M',
             'fencer_dob' => $cat1->toDateString(),
-            'fencer_picture' => Model::PICTURE_NONE
+            'fencer_picture' => Model::PICTURE_NONE,
+            'uuid' => '3bc30db8-a2e4-42c6-8ebd-c8b9eb058da1',
         ])->save();
 
         Model::create([
@@ -60,7 +61,8 @@ class Fencer extends Fixture
             'fencer_surname' => 'Testita',
             'fencer_gender' => 'M',
             'fencer_dob' => $cat2->toDateString(),
-            'fencer_picture' => Model::PICTURE_UPLOADED
+            'fencer_picture' => Model::PICTURE_UPLOADED,
+            'uuid' => '3cc30db8-a2e4-42c6-8ebd-c8b9eb058da1',
         ])->save();
 
         Model::create([
@@ -70,7 +72,8 @@ class Fencer extends Fixture
             'fencer_surname' => 'D\'Teste',
             'fencer_gender' => 'M',
             'fencer_dob' => $cat3->toDateString(),
-            'fencer_picture' => Model::PICTURE_ACCEPTED
+            'fencer_picture' => Model::PICTURE_ACCEPTED,
+            'uuid' => '3b230db8-a2e4-42c6-8ebd-c8b9eb058da1',
         ])->save();
 
         Model::create([
@@ -80,7 +83,8 @@ class Fencer extends Fixture
             'fencer_surname' => 'de Tester',
             'fencer_gender' => 'M',
             'fencer_dob' => $cat4->toDateString(),
-            'fencer_picture' => Model::PICTURE_NONE
+            'fencer_picture' => Model::PICTURE_NONE,
+            'uuid' => '3bc80db8-a2e4-42c6-8ebd-c8b9eb058da1',
         ])->save();
 
         Model::create([
@@ -90,7 +94,8 @@ class Fencer extends Fixture
             'fencer_surname' => 'Versucher',
             'fencer_gender' => 'M',
             'fencer_dob' => $cat5->toDateString(),
-            'fencer_picture' => Model::PICTURE_UPLOADED
+            'fencer_picture' => Model::PICTURE_UPLOADED,
+            'uuid' => '3bc3edb8-a2e4-42c6-8ebd-c8b9eb058da1',
         ])->save();
 
         Model::create([
@@ -100,7 +105,8 @@ class Fencer extends Fixture
             'fencer_surname' => 'De La Teste',
             'fencer_gender' => 'F',
             'fencer_dob' => $cat1->toDateString(),
-            'fencer_picture' => Model::PICTURE_NONE
+            'fencer_picture' => Model::PICTURE_NONE,
+            'uuid' => '3bc30fb8-a2e4-42c6-8ebd-c8b9eb058da1',
         ])->save();
 
         Model::create([
@@ -110,7 +116,8 @@ class Fencer extends Fixture
             'fencer_surname' => 'Testita',
             'fencer_gender' => 'M',
             'fencer_dob' => $cat2->toDateString(),
-            'fencer_picture' => Model::PICTURE_UPLOADED
+            'fencer_picture' => Model::PICTURE_UPLOADED,
+            'uuid' => '3bc30d18-a2e4-42c6-8ebd-c8b9eb058da1',
         ])->save();
 
         Model::create([
@@ -120,7 +127,8 @@ class Fencer extends Fixture
             'fencer_surname' => 'D\'Teste',
             'fencer_gender' => 'M',
             'fencer_dob' => $cat3->toDateString(),
-            'fencer_picture' => Model::PICTURE_ACCEPTED
+            'fencer_picture' => Model::PICTURE_ACCEPTED,
+            'uuid' => '3bc30dba-a2e4-42c6-8ebd-c8b9eb058da1',
         ])->save();
 
         Model::create([
@@ -130,7 +138,8 @@ class Fencer extends Fixture
             'fencer_surname' => 'de Tester',
             'fencer_gender' => 'M',
             'fencer_dob' => $cat4->toDateString(),
-            'fencer_picture' => Model::PICTURE_NONE
+            'fencer_picture' => Model::PICTURE_NONE,
+            'uuid' => '3bc30db8-02e4-42c6-8ebd-c8b9eb058da1',
         ])->save();
 
         Model::create([
@@ -140,7 +149,8 @@ class Fencer extends Fixture
             'fencer_surname' => 'Versucher',
             'fencer_gender' => 'M',
             'fencer_dob' => $cat5->toDateString(),
-            'fencer_picture' => Model::PICTURE_UPLOADED
+            'fencer_picture' => Model::PICTURE_UPLOADED,
+            'uuid' => '3bc30db8-a8e4-42c6-8ebd-c8b9eb058da1',
         ])->save();
 
         Model::create([
@@ -150,7 +160,8 @@ class Fencer extends Fixture
             'fencer_surname' => 'Versucher',
             'fencer_gender' => 'M',
             'fencer_dob' => $cat1->toDateString(),
-            'fencer_picture' => Model::PICTURE_NONE
+            'fencer_picture' => Model::PICTURE_NONE,
+            'uuid' => '3bc30db8-a294-42c6-8ebd-c8b9eb058da1',
         ])->save();
 
         Model::create([
@@ -160,7 +171,8 @@ class Fencer extends Fixture
             'fencer_surname' => 'Versucher',
             'fencer_gender' => 'M',
             'fencer_dob' => $cat1->toDateString(),
-            'fencer_picture' => Model::PICTURE_NONE
+            'fencer_picture' => Model::PICTURE_NONE,
+            'uuid' => '3bc30db8-a2eb-42c6-8ebd-c8b9eb058da1',
         ])->save();
     }
 }

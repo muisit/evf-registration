@@ -148,6 +148,7 @@ class Interface {
       }
     } on NetworkError {
       // non 200 statuscodes
+      Environment.debug("generic network error");
       rethrow;
     } on TimeoutException {
       Environment.debug("encountered timeout");

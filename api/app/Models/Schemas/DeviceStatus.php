@@ -9,4 +9,7 @@ class DeviceStatus
     public BlockStatus $calendar;
     public BlockStatus $results;
     public BlockStatus $ranking;
+
+    public array $followers;
+    public array $following;
 }

@@ -12,5 +12,13 @@ Future<Status> getStatus({int tries = 0}) async {
   Environment.debug("calling getStatus");
   final api = Interface.create(path: '/device/status');
   var content = await api.get();
-  return Status.fromJson(content);
+  Environment.debug("converting status response from Json");
+  try {
+    var retval = Status.fromJson(content);
+    Environment.debug("status converted");
+    return retval;
+  } catch (e) {
+    Environment.debug("caught conversion error $e");
+    return Future.value(Status());
+  }
 }
