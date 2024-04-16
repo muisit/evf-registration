@@ -38,6 +38,7 @@ class RankingProvider extends ChangeNotifier {
     for (final item in items) {
       _add(item);
     }
+    Environment.debug("ranking: notifying listeners after adding ranking");
     notifyListeners();
   }
 
@@ -45,9 +46,10 @@ class RankingProvider extends ChangeNotifier {
   Future loadItems({bool doForce = false}) async {
     Environment.debug("loading ranking items");
     if (!_loadedFromCache) {
-      Environment.debug("loading items from cache first");
+      Environment.debug("loading ranking items from cache first");
       await loadItemsFromCache();
       _loadedFromCache = true;
+      Environment.debug("loaded ranking items");
     }
 
     // see if we may need to load new items from the back-end
@@ -57,16 +59,16 @@ class RankingProvider extends ChangeNotifier {
     // if we have no date, we have no feeds. Just set a very old date as default
     final lastDate = status.lastRanking == '' ? DateTime(2000, 1, 1) : DateTime.parse(status.lastRanking);
 
-    Environment.debug("testing ${_lastMutation.toIso8601String()} vs ${lastDate.toIso8601String()}");
+    Environment.debug("ranking: testing ${_lastMutation.toIso8601String()} vs ${lastDate.toIso8601String()}");
     if (_lastMutation.isBefore(lastDate)) {
-      Environment.debug("setting doForce because last mutation is before last date");
+      Environment.debug("ranking: setting doForce because last mutation is before last date");
       // there are pending feed items on the server with a more recent mutation date
       doForce = true;
     }
-    // we're not going to check the calendar count: if the mutation date has changed, we can reload all of the
+    // we're not going to check the ranking count: if the mutation date has changed, we can reload all of the
     // data, which should not be too much
     if (doForce) {
-      Environment.debug("loading calendar items from network");
+      Environment.debug("loading ranking items from network");
       await loadRankingItems();
     }
   }

@@ -10,10 +10,10 @@ typedef NetworkCall = Future<http.Response> Function();
 typedef ErrorCall = Future<Map<String, dynamic>> Function(int tries);
 
 class Interface {
-  Map<String, String> data = {};
+  Map<String, dynamic> data = {};
   String path = '';
 
-  Interface.create({required this.path, Map<String, String>? data}) {
+  Interface.create({required this.path, Map<String, dynamic>? data}) {
     if (data != null) {
       this.data = data;
     }
@@ -21,7 +21,7 @@ class Interface {
 
   Future<String> getRaw({
     String? path,
-    Map<String, String>? data,
+    Map<String, dynamic>? data,
   }) async {
     if (path != null) {
       this.path = path;
@@ -44,7 +44,7 @@ class Interface {
 
   Future<String> postRaw({
     String? path,
-    Map<String, String>? data,
+    Map<String, dynamic>? data,
   }) async {
     if (path != null) {
       this.path = path;
@@ -53,11 +53,15 @@ class Interface {
       this.data = data;
     }
     final url = Environment.instance.flavor.apiUrl + this.path;
-    Environment.debug("calling POST $url with data ${this.data.toString} using ${Environment.instance.authToken}");
+    Environment.debug("calling POST $url with data ${jsonEncode(this.data)} using ${Environment.instance.authToken}");
     final uri = Uri.parse(url);
+    //for (var key in this.data.keys) {
+    //  this.data[key] = this.data[key].toString();
+    //}
     var response = await http.post(uri,
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer ${Environment.instance.authToken}',
+          HttpHeaders.contentTypeHeader: "application/json"
         },
         body: jsonEncode(this.data));
     Environment.debug("parsing POST response");

@@ -113,6 +113,6 @@ class DeviceStatusService
     {
         // we return all blocked users we are following, so we can manage blocks in the application
         $user = Auth::user();
-        return Follow::with('fencer')->where('device_user_id', $user->getKey())->get()->pluck('uuid')->toArray();
+        return Follow::with('fencer')->where('device_user_id', $user->getKey())->get()->pluck('fencer.uuid')->toArray();
     }
 }

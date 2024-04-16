@@ -16,10 +16,10 @@ class FileCache {
     var content = await Environment.instance.preference('cache');
     try {
       Environment.debug("application cache is $content");
-      _cache = CacheData.fromJson(content);
+      _cache = CacheData.fromJson(jsonDecode(content));
     } catch (e) {
-      Environment.debug("caught error on reading cache, creating empty cache");
-      _cache = CacheData.fromJson('{}');
+      Environment.debug("caught error $e on reading cache, creating empty cache");
+      _cache = CacheData.fromJson({});
     }
   }
 
@@ -49,7 +49,6 @@ class FileCache {
       final directory = await _getDirectory();
 
       var file = File('$directory/$destination');
-      Environment.debug("wrotomg writeAsString $content");
       file.writeAsString(content);
     } catch (e) {
       // caught an error, don't store the new cache data
@@ -60,7 +59,7 @@ class FileCache {
   Future<String> getCache(String path) async {
     if (_cache != null && _cache!.containsKey(path)) {
       var localpath = _cache!.timestamps[path]!.path;
-      return await _loadFile(localpath);
+      return await _loadFile("$localpath.json");
     }
     return Future.value('');
   }
@@ -76,8 +75,11 @@ class FileCache {
     if (_cache != null) {
       final directory = await _getDirectory();
       var destination = _getRandomDestination(directory);
+      if (_cache!.containsKey(path)) {
+        destination = _cache!.timestamps[path]!.path;
+      }
       Environment.debug("storing cached file at $destination");
-      await _storeFile(destination, content);
+      await _storeFile("$destination.json", content);
 
       Environment.debug("cached file stored");
       await _clearCacheForKey(path);
@@ -92,7 +94,7 @@ class FileCache {
   Future<String> getCacheOrLoad(String path, CacheMiss? callback) async {
     if (_cache != null && _cache!.containsKey(path)) {
       var localpath = _cache!.timestamps[path]!.path;
-      return await _loadFile(localpath);
+      return await _loadFile("$localpath.json");
     }
     var content = '';
     Environment.debug("cache miss on getCacheOrLoad for $path");
@@ -133,17 +135,15 @@ class FileCache {
   Future _updateCache() async {
     final doc = jsonEncode(_cache!.timestamps);
     Environment.debug("updating cache to $doc");
-    return await Environment.instance.set('cache.json', doc);
+    return await Environment.instance.set('cache', doc);
   }
 
   String _getRandomDestination(String directory) {
     var filename = getRandomString(24);
     var destination = '$directory/$filename.json';
-    Environment.debug("trying $destination");
     while (File(destination).existsSync()) {
       filename = getRandomString(24);
       destination = '$directory/$filename.json';
-      Environment.debug("trying $destination");
     }
     return filename;
   }

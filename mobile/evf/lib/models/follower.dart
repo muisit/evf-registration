@@ -7,7 +7,8 @@ class Follower {
   bool result = true;
   bool register = true;
   bool blocked = false;
-  bool unfollow = false;
+  bool unfollow = false; // local setting
+  bool synced = false; // local setting
 
   Follower(this.fencer);
 
@@ -31,6 +32,7 @@ class Follower {
     if (result) preferences['result'] = true;
     if (register) preferences['register'] = true;
     if (blocked) preferences['blocked'] = true;
+    if (synced) preferences['synced'] = true;
 
     return {'fencer': fencer, 'preferences': preferences};
   }

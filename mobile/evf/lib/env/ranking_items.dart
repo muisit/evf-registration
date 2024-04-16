@@ -5,10 +5,11 @@ List<Ranking> rankingItems() {
   final List<Ranking> retval = [];
 
   retval.add(Ranking(DateTime(2024, 1, 1), DateTime(2024, 3, 31), 'Cat 1', 'Mens Foil', [
-    RankingPosition('id1', 1, 'TEST', 'Pete', 'FRA', 999.9),
-    RankingPosition('id2', 2, 'D\'TEST', 'John', 'GER', 99.8),
-    RankingPosition('id3', 3, 'MUCHA', 'Test', 'NED', 1),
-    RankingPosition('id4', 3, 'MUCHA ADO ABOUT NOTHING LONG LASTNAME', 'Test with A Very long firstname', 'NED', 1),
+    RankingPosition('ba55570a-09bb-48d8-b519-a7e4d658b45c', 1, 'TEST', 'Pete', 'FRA', 999.9),
+    RankingPosition('39618535-fdc8-4824-9ca7-f770401d1292', 2, 'D\'TEST', 'John', 'GER', 99.8),
+    RankingPosition('95400711-2d35-41aa-81c6-fb551e9dd3df', 3, 'MUCHA', 'Test', 'NED', 1),
+    RankingPosition('e924a123-ae47-4898-b79f-fe1ca108bef6', 3, 'MUCHA ADO ABOUT NOTHING LONG LASTNAME',
+        'Test with A Very long firstname', 'NED', 1),
     RankingPosition('id5', 3, 'DAFIGUIREDODIMUNDI', 'Testmewithaanonbreakablename', 'NED', 1),
     RankingPosition('id6', 3, 'MUCHA', 'Test', 'WWW', 1),
     RankingPosition('id7', 3, 'MUCHA', 'Test', 'NED', 1),

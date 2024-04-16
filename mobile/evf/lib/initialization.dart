@@ -9,6 +9,9 @@ Future initialization() async {
     // load locale files
     await initializeDateFormatting();
 
+    // Preload what we have regarding followers from cache
+    // It will be updated as soon as we get our initial status message
+    await Environment.instance.followerProvider.loadItemsFromCache();
     // do not await this, just let it load
     Environment.instance.statusProvider.loadStatus();
     Environment.debug("end of initialization");

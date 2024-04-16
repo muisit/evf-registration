@@ -45,8 +45,9 @@ class RankingDisplay extends StatelessWidget {
         });
   }
 
-  void _performFavoriteAction(String uuid) {
-    Environment.debug("clicked on favorte $uuid");
+  void _performFavoriteAction(String uuid) async {
+    Environment.debug("clicked on favorite $uuid");
+    await Environment.instance.followerProvider.toggleFollowing(uuid);
   }
 
   void _performZoomAction(String uuid) {

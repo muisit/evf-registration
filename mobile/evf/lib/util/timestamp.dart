@@ -10,12 +10,12 @@ DateTime unmakeTimestamp(String ts) {
     return DateTime.now();
   }
   var year = ts.substring(0, 4);
-  var month = ts.substring(4, 2);
-  var day = ts.substring(6, 2);
-  var hour = ts.substring(8, 2);
-  var mins = ts.substring(10, 2);
-  var secs = ts.substring(12, 2);
-  var mills = ts.substring(14, 3);
+  var month = ts.substring(4, 6);
+  var day = ts.substring(6, 8);
+  var hour = ts.substring(8, 10);
+  var mins = ts.substring(10, 12);
+  var secs = ts.substring(12, 14);
+  var mills = ts.substring(14, 17);
   return DateTime(int.parse(year), int.parse(month), int.parse(day), int.parse(hour), int.parse(mins), int.parse(secs),
       int.parse(mills));
 }

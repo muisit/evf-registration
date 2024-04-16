@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:evf/environment.dart';
 import 'package:evf/models/ranking.dart';
 import 'package:evf/models/ranking_position.dart';
 import 'package:evf/styles.dart';
@@ -35,10 +36,20 @@ class RankingTable extends StatelessWidget {
               Align(alignment: Alignment.centerRight, child: Text("${position.position.toString()}.")),
               Padding(
                 padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
-                child: GestureDetector(
-                  onTap: () => onFavoriteTap(position.id),
-                  child: const Icon(Icons.favorite_outline, size: 16),
-                ),
+                child: ListenableBuilder(
+                    listenable: Environment.instance.followerProvider,
+                    builder: (BuildContext context, Widget? child) {
+                      bool followerIsSet = Environment.instance.followerProvider.following.containsKey(position.id);
+                      Environment.debug("drawing favorite for ${position.id}; $followerIsSet");
+                      return GestureDetector(
+                        onTap: () => onFavoriteTap(position.id),
+                        child: Icon(
+                          followerIsSet ? Icons.favorite : Icons.favorite_outline,
+                          size: 16,
+                          color: followerIsSet ? Colors.red : Colors.black,
+                        ),
+                      );
+                    }),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),

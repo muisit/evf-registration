@@ -11,7 +11,9 @@ Future<List<Follower>> loadFollowers() async {
   var lst = content as List<dynamic>;
   List<Follower> retval = [];
   for (final item in lst) {
-    retval.add(Follower.fromJson(item as Map<String, dynamic>));
+    final follower = Follower.fromJson(item as Map<String, dynamic>);
+    follower.synced = true;
+    retval.add(follower);
   }
   return retval;
 }
@@ -22,7 +24,9 @@ Future<List<Follower>> loadFollowing() async {
   var lst = content as List<dynamic>;
   List<Follower> retval = [];
   for (final item in lst) {
-    retval.add(Follower.fromJson(item as Map<String, dynamic>));
+    final follower = Follower.fromJson(item as Map<String, dynamic>);
+    follower.synced = true;
+    retval.add(follower);
   }
   return retval;
 }

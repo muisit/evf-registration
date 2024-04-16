@@ -1,13 +1,15 @@
 import 'dart:convert';
+import 'package:evf/environment.dart';
+
 import 'cache_line.dart';
 
 class CacheData {
   Map<String, CacheLine> timestamps = {};
 
-  CacheData.fromJson(String json) {
-    final parsed = jsonDecode(json);
-    for (String key in parsed.keys) {
-      timestamps[key] = CacheLine.fromJson(parsed[key] as Map<String, dynamic>);
+  CacheData.fromJson(Map<String, dynamic> doc) {
+    Environment.debug("parsing Json code");
+    for (String key in doc.keys) {
+      timestamps[key] = CacheLine.fromJson(doc[key] as Map<String, dynamic>);
     }
   }
 

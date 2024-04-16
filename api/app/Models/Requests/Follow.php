@@ -20,7 +20,7 @@ class Follow extends Base
     {
         return [
             'follow.fencer' => ['required', 'string', 'exists:TD_Fencer,uuid'],
-            'follow.preferences' => ['required', 'json', function ($a, $v, $f) {
+            'follow.preferences' => ['nullable', function ($a, $v, $f) {
                 return $this->checkPreferences($a, $v, $f);
             }],
         ];
@@ -28,12 +28,14 @@ class Follow extends Base
 
     private function checkPreferences($attribute, $value, $fail)
     {
-        $value = json_decode($value);
+        \Log::debug("value is " . json_encode($value));
+        $value = (array) $value;
         if (!is_array($value)) {
             $fail("Invalid preferences");
         }
         else {
             $diff = array_diff($value, $this->allowedSettings);
+            \Log::debug("diff is " . json_encode($diff));
             if (count($diff) > 0) {
                 $fail("Invalid preferences");
             }
@@ -56,13 +58,16 @@ class Follow extends Base
                 $model = new FollowModel();
                 $model->device_user_id = $request->user()->getKey();
             }
+            \Log::debug("model found");
+            return $model;
         }
-        return $model;
+        return null;
     }
 
     protected function updateModel(array $data): ?Model
     {
         if ($this->model) {
+            \Log::debug("updating model");
             // unneeded, but better be sure: reset the device_user_id
             $this->model->device_user_id = Auth::user()->getKey();
 
@@ -72,7 +77,13 @@ class Follow extends Base
 
             // just copy all the preferences, we already validated that only supported values are inside
             // We run over all supported settings and set/unset them depending on the passed values
-            $prefs = json_decode($data['follow']['preferences']);
+            $prefs = $data['follow']['preferences'] ?? [];
+            if (empty($prefs)) {
+                // this is the case when the user just 'follows' someone, without prior settings
+                // just enable all preferences
+                $prefs = array_diff($this->allowedSettings, ['unfollow']);
+            }
+            \Log::debug("setting preferences based on " . json_encode($prefs));
             foreach ($this->allowedSettings as $setting) {
                 $this->model->setPreference($setting, in_array($setting, $prefs));
             }
@@ -82,12 +93,15 @@ class Follow extends Base
 
     protected function postProcess()
     {
+        \Log::debug("post processing follow request");
         // handle the special 'unfollow' preference
         if (!empty($this->model)) {
             if (in_array('unfollow', array_keys($this->model->preferences))) {
+                \Log::debug("unfollow found, deleting model");
                 $this->model->delete();
             }
             else {
+                \Log::debug("saving model");
                 $this->model->save();
             }
         }
