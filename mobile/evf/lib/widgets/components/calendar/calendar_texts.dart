@@ -1,10 +1,10 @@
 import 'package:evf/environment.dart';
 import 'package:evf/models/calendar.dart';
 import 'package:evf/styles.dart';
-import 'package:evf/widgets/components/calendar_location.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'calendar_feed_link.dart';
+import 'calendar_location.dart';
 
 class CalendarTexts extends StatelessWidget {
   final Calendar item;
