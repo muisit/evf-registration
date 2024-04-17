@@ -7,11 +7,11 @@ class RankDetails
     /**
      * Fencer ID
      *
-     * @var string
+     * @var FencerPublic
      * @OA\Property()
      *
      */
-    public string $fencer;
+    public FencerPublic $fencer;
 
     /**
      * Weapon

@@ -1,6 +1,6 @@
 import 'package:evf/environment.dart';
 import 'package:evf/models/feed_item.dart';
-import 'package:evf/widgets/components/feed_component.dart';
+import 'package:evf/widgets/components/feed/feed_component.dart';
 import 'package:flutter/material.dart';
 
 class FeedPage extends StatelessWidget {

@@ -11,6 +11,8 @@ use App\Models\Ranking;
 use App\Models\Result;
 use App\Models\Schemas\RankDetails;
 use App\Models\Schemas\Result as ResultSchema;
+use App\Models\Schemas\FencerPublic;
+use Carbon\Carbon;
 
 class RankDetailsService
 {
@@ -42,7 +44,7 @@ class RankDetailsService
         $category = Category::find($pos['category_id']);
         
         $schema = new RankDetails();
-        $schema->fencer = $this->fencer->uuid;
+        $schema->fencer = new FencerPublic($this->fencer);
         $schema->weapon = $this->weapon->weapon_abbr;
         $schema->category = $category->category_abbr;
         $schema->date = $pos['ranking_date'];
@@ -61,6 +63,7 @@ class RankDetailsService
             \Log::debug("assigning result " . json_encode($result));
             $resultSchema = new ResultSchema();
             $resultSchema->event = $result->competition->event->event_name;
+            $resultSchema->date = $result->competition->competition_opens;
             $resultSchema->year = intval($result->competition->event->event_year);
             $resultSchema->location = $result->competition->event->event_location;
             $resultSchema->country = $result->competition->event->country->country_name;

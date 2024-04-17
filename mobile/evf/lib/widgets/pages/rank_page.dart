@@ -1,6 +1,6 @@
 import 'package:evf/environment.dart';
-import 'package:evf/widgets/components/ranking_dropdowns.dart';
-import 'package:evf/widgets/components/ranking_display.dart';
+import 'package:evf/widgets/components/ranking/ranking_dropdowns.dart';
+import 'package:evf/widgets/components/ranking/ranking_display.dart';
 import 'package:flutter/material.dart';
 
 class RankPage extends StatefulWidget {

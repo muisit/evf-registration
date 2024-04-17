@@ -30,6 +30,15 @@ GoRouter mainRouter() {
             },
           ),
           GoRoute(
+            path: '/ranking/:weapon/:uuid',
+            builder: (BuildContext context, GoRouterState state) {
+              return RankDetailsPage(
+                weapon: state.pathParameters['weapon']!,
+                uuid: state.pathParameters['uuid']!,
+              );
+            },
+          ),
+          GoRoute(
             path: '/results',
             builder: (BuildContext context, GoRouterState state) {
               return const ResultsPage();

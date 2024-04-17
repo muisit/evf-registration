@@ -1,6 +1,7 @@
 import 'package:evf/environment.dart';
 import 'package:evf/models/ranking.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'ranking_table.dart';
 import 'ranking_title.dart';
@@ -39,7 +40,7 @@ class RankingDisplay extends StatelessWidget {
                           child: RankingTable(
                             ranking: ranking,
                             onFavoriteTap: _performFavoriteAction,
-                            onZoomTap: _performZoomAction,
+                            onZoomTap: (String uuid) => _performZoomAction(uuid, context),
                           )),
                     ),
                   )
@@ -53,7 +54,8 @@ class RankingDisplay extends StatelessWidget {
     await Environment.instance.followerProvider.toggleFollowing(uuid);
   }
 
-  void _performZoomAction(String uuid) {
+  void _performZoomAction(String uuid, BuildContext context) {
     Environment.debug("zooming into $uuid");
+    GoRouter.of(context).push('/ranking/$weapon/$uuid');
   }
 }

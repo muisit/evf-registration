@@ -12,6 +12,13 @@ class Result
     public string $event;
 
     /**
+     * Event date
+     * @var string
+     * @OA\Property()
+     */
+    public string $date;
+
+    /**
      * Event year
      * @var int
      * @OA\Property()

@@ -37,7 +37,7 @@ class RankDetails extends Controller
         if (empty($weaponObject)) {
             return response('Weapon not found', 404);
         }
-        $service = new RankDetailsService($fencer, $weapon);
+        $service = new RankDetailsService($fencer, $weaponObject);
         $result = $service->generate();
         if (empty($result)) {
             return response('Results not found', 404);

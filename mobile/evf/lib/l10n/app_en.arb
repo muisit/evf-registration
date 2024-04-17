@@ -1,9 +1,5 @@
 {
     "@@locale": "en",
-    "appTitle": "MyEVF",
-    "@appTitle": {
-      "description": "The main title for this application"
-    },
 
     "navHome": "Home",
     "@navHome": {
@@ -38,7 +34,10 @@
     "labelCategoryCat2": "Cat 2",
     "labelCategoryCat3": "Cat 3",
     "labelCategoryCat4": "Cat 4",
-    "labelCategoryLongest": "Category",
+    "labelCategoryCat1Short": "1",
+    "labelCategoryCat2Short": "2",
+    "labelCategoryCat3Short": "3",
+    "labelCategoryCat4Short": "4",
 
     "labelWeapon": "Weapon",
     "@labelWeapon": {
@@ -50,7 +49,25 @@
     "labelWeaponWF": "Womens Foil",
     "labelWeaponWE": "Womens Epee",
     "labelWeaponWS": "Womens Sabre",
-    "labelWeaponLongest": "Womens Sabre",
+    "labelWeaponMFShort": "MF",
+    "labelWeaponMEShort": "ME",
+    "labelWeaponMSShort": "MS",
+    "labelWeaponWFShort": "WF",
+    "labelWeaponWEShort": "WE",
+    "labelWeaponWSShort": "WS",
+
+    "labelName": "Name",
+    "labelCountry": "Country",
+    "labelCurrentRank": "Ranking",
+    "headerCountry": "Cnt",
+    "headerEvent": "Event",
+    "headerLocation": "Location",
+    "headerDate": "Date",
+    "headerPosition": "Pos",
+    "headerPoints": "Pnts",
+    "headerDEPoints": "DE",
+    "headerPodiumPoints": "Pod",
+    "headerTotalPoints": "Total",
 
     "calendarDate": "{date}",
     "@calendarDate": {
@@ -61,6 +78,22 @@
           "format": "MMMd"
         }
       }
+    },
+
+    "resultDate": "{date}",
+    "@resultDate": {
+      "description": "Date format used in the Rank Details page for results",
+      "placeholders": {
+        "date": {
+          "type": "DateTime",
+          "format": "yMd"
+        }
+      }
+    },
+
+    "titleRankingDetails": "Ranking Details",
+    "@titleRankingDetails": {
+      "description": "title of the Ranking Details widget"
     },
 
     "titleRanking": "Ranking for {weapon} {category} of {date}",

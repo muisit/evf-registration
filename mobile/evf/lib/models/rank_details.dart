@@ -1,7 +1,8 @@
+import 'fencer.dart';
 import 'result.dart';
 
 class RankDetails {
-  final String fencer;
+  final Fencer fencer;
   final String weapon;
   final String category;
   final DateTime date;
@@ -10,7 +11,7 @@ class RankDetails {
   final List<Result> results;
 
   RankDetails()
-      : fencer = '',
+      : fencer = Fencer(),
         weapon = '',
         category = '',
         date = DateTime.now(),
@@ -19,16 +20,20 @@ class RankDetails {
         results = [];
 
   RankDetails.fromJson(Map<String, dynamic> doc)
-      : fencer = doc['fencer'] as String,
+      : fencer = Fencer.fromJson(doc['fencer']),
         weapon = doc['weapon'] as String,
         category = doc['category'] as String,
         date = DateTime.parse(doc['date'] as String),
         position = doc['position'] as int,
         points = doc['points'] as double,
-        results = doc['results'] as List<Result>;
+        results = [] {
+    for (var el in doc['results']) {
+      results.add(Result.fromJson(el as Map<String, dynamic>));
+    }
+  }
 
   Map<String, dynamic> toJson() => {
-        "fencer": fencer,
+        "fencer": fencer.toJson(),
         "weapon": weapon,
         "category": category,
         "date": date.toIso8601String(),
