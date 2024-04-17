@@ -14,19 +14,19 @@ class RankingDropdowns extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final categoryEntries = [
-      DropdownOption('Cat 1', AppLocalizations.of(context)!.labelCategoryCat1),
-      DropdownOption('Cat 2', AppLocalizations.of(context)!.labelCategoryCat2),
-      DropdownOption('Cat 3', AppLocalizations.of(context)!.labelCategoryCat3),
-      DropdownOption('Cat 4', AppLocalizations.of(context)!.labelCategoryCat4),
+      DropdownOption('1', AppLocalizations.of(context)!.labelCategoryCat1),
+      DropdownOption('2', AppLocalizations.of(context)!.labelCategoryCat2),
+      DropdownOption('3', AppLocalizations.of(context)!.labelCategoryCat3),
+      DropdownOption('4', AppLocalizations.of(context)!.labelCategoryCat4),
     ];
 
     final weaponEntries = [
-      DropdownOption('Mens Foil', AppLocalizations.of(context)!.labelWeaponMF),
-      DropdownOption('Mens Epee', AppLocalizations.of(context)!.labelWeaponME),
-      DropdownOption('Mens Sabre', AppLocalizations.of(context)!.labelWeaponMS),
-      DropdownOption('Womens Foil', AppLocalizations.of(context)!.labelWeaponWF),
-      DropdownOption('Womens Epee', AppLocalizations.of(context)!.labelWeaponWE),
-      DropdownOption('Womens Sabre', AppLocalizations.of(context)!.labelWeaponWS),
+      DropdownOption('MF', AppLocalizations.of(context)!.labelWeaponMF),
+      DropdownOption('ME', AppLocalizations.of(context)!.labelWeaponME),
+      DropdownOption('MS', AppLocalizations.of(context)!.labelWeaponMS),
+      DropdownOption('WF', AppLocalizations.of(context)!.labelWeaponWF),
+      DropdownOption('WE', AppLocalizations.of(context)!.labelWeaponWE),
+      DropdownOption('WS', AppLocalizations.of(context)!.labelWeaponWS),
     ];
 
     /*final catLabel = AppLocalizations.of(context)!.labelCategoryLongest;

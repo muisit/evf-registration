@@ -68,10 +68,10 @@ class FileCache {
     if (_cache != null && _cache!.containsKey(path)) {
       return _cache!.timestamps[path]!;
     }
-    return CacheLine(path: '');
+    return CacheLine(path: '', policy: DateTime.now());
   }
 
-  Future setCache(String path, String content) async {
+  Future setCache(String path, DateTime policy, String content) async {
     if (_cache != null) {
       final directory = await _getDirectory();
       var destination = _getRandomDestination(directory);
@@ -83,7 +83,7 @@ class FileCache {
 
       Environment.debug("cached file stored");
       await _clearCacheForKey(path);
-      _cache!.setCached(key: path, path: destination);
+      _cache!.setCached(key: path, path: destination, policy: policy);
 
       Environment.debug("updating cache");
       await _updateCache();
@@ -91,7 +91,8 @@ class FileCache {
     }
   }
 
-  Future<String> getCacheOrLoad(String path, CacheMiss? callback) async {
+  Future<String> getCacheOrLoad(String path, DateTime policy, CacheMiss? callback) async {
+    await clearCacheIfOlder(path, DateTime(2000, 1, 1));
     if (_cache != null && _cache!.containsKey(path)) {
       var localpath = _cache!.timestamps[path]!.path;
       return await _loadFile("$localpath.json");
@@ -103,7 +104,7 @@ class FileCache {
       content = await callback();
       Environment.debug("content is $content");
       Environment.debug("storing content in cache");
-      await setCache(path, content);
+      await setCache(path, policy, content);
     }
     return content;
   }
@@ -111,10 +112,24 @@ class FileCache {
   Future clearCacheIfOlder(String path, DateTime ts) async {
     if (_cache != null && _cache!.timestamps.containsKey(path)) {
       var currentData = _cache!.timestamps[path];
-      if (currentData!.date.isBefore(ts)) {
+      if (currentData!.date.isBefore(ts) || currentData.policy.isBefore(DateTime.now())) {
         await _clearCacheForKey(path);
         await _updateCache();
       }
+    }
+  }
+
+  Future clearPolicy() async {
+    final now = DateTime.now();
+    bool anyRemoved = false;
+    for (final key in _cache!.timestamps.keys) {
+      if (_cache!.timestamps[key]!.policy.isBefore(now)) {
+        await _clearCacheForKey(key);
+        anyRemoved = true;
+      }
+    }
+    if (anyRemoved) {
+      await _updateCache();
     }
   }
 

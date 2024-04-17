@@ -27,10 +27,12 @@ class RankingTable extends StatelessWidget {
           5: FixedColumnWidth(52),
           6: FixedColumnWidth(25),
         },
-        children: ranking.positions.map<TableRow>((RankingPosition position) {
+        children: ranking.positions.asMap().entries.map<TableRow>((entry) {
+          final int index = entry.key;
+          final RankingPosition position = entry.value;
           return TableRow(
             decoration: BoxDecoration(
-              color: ((position.position % 2) == 0) ? AppStyles.stripes : Colors.white,
+              color: ((index % 2) == 0) ? AppStyles.stripes : Colors.white,
             ),
             children: [
               Align(alignment: Alignment.centerRight, child: Text("${position.position.toString()}.")),
@@ -40,7 +42,6 @@ class RankingTable extends StatelessWidget {
                     listenable: Environment.instance.followerProvider,
                     builder: (BuildContext context, Widget? child) {
                       bool followerIsSet = Environment.instance.followerProvider.following.containsKey(position.id);
-                      Environment.debug("drawing favorite for ${position.id}; $followerIsSet");
                       return GestureDetector(
                         onTap: () => onFavoriteTap(position.id),
                         child: Icon(

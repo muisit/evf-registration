@@ -22,6 +22,14 @@ class Ranking
     public string $date = '';
 
     /**
+     * Last update date of the ranking
+     *
+     * @var string
+     * @OA\Property()
+     */
+    public string $updated = '';
+
+    /**
      * Name of the category
      *
      * @var string
@@ -51,10 +59,11 @@ class Ranking
     {
         if (!empty($ranking)) {
             $this->date = (new \DateTimeImmutable($ranking->ranking_date))->format('Y-m-d');
-            $this->category = $ranking->category->category_name;
-            $this->weapon = $ranking->weapon->weapon_name;
+            $this->updated = (new \DateTimeImmutable($ranking->updated_at))->format('Y-m-d');
+            $this->category = $ranking->category->category_abbr;
+            $this->weapon = $ranking->weapon->weapon_abbr;
 
-            $positions = $ranking->positions()->with('fencer')->get();
+            $positions = $ranking->positions()->with(['fencer', 'fencer.country'])->get();
             foreach ($positions as $position) {
                 $this->positions[] = new RankingPosition($position);
             }

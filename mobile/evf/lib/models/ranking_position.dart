@@ -10,18 +10,18 @@ class RankingPosition {
 
   RankingPosition.fromJson(Map<String, dynamic> doc)
       : id = doc['id'] as String,
-        lastName = doc['lastName'] as String,
+        lastName = doc['name'] as String,
         firstName = doc['firstName'] as String,
         country = doc['country'] as String,
-        position = doc['position'] as int,
-        points = doc['points'] as double;
+        position = doc['pos'] as int,
+        points = (doc['points'] as num).toDouble();
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'lastName': lastName,
+        'name': lastName,
         'firstName': firstName,
         'country': country,
-        'position': position,
-        'points': points
+        'pos': position,
+        'points': points,
       };
 }

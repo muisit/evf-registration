@@ -3,12 +3,11 @@
 import 'dart:convert';
 import 'package:evf/api/load_ranking.dart';
 import 'package:evf/models/ranking.dart';
-import 'package:flutter/foundation.dart';
 import 'package:evf/environment.dart';
+import 'base_provider.dart';
 
-class RankingProvider extends ChangeNotifier {
+class RankingProvider extends BaseProvider {
   bool _loadedFromCache = false;
-  DateTime _lastMutation = DateTime(2000, 1, 1);
   List<Ranking> _items;
 
   RankingProvider() : _items = [];
@@ -17,20 +16,36 @@ class RankingProvider extends ChangeNotifier {
 
   void _add(Ranking item) {
     final itemId = item.catWeapon();
-    if (_items.map((e) => e.catWeapon()).toList().contains(itemId)) {
+    debug("ranking: adding item to list $itemId ${item.isLoading} ${item.stored}");
+    if (_contains(item.weapon, item.category)) {
+      debug("ranking: replacing old entry");
       _items = _items.map((e) => e.catWeapon() == itemId ? item : e).toList();
     } else {
+      debug("ranking: adding entry to list, then sorting $itemId");
       _items.add(item);
       // sorting should be quick, list is not that large
       _items.sort((a, b) => a.catWeapon().compareTo(b.catWeapon()));
     }
-    if (item.updated.isBefore(_lastMutation)) {
-      _lastMutation = item.updated;
+  }
+
+  bool _contains(String weapon, String category) {
+    final catWeapon = "$category/$weapon";
+    return _items.map((e) => e.catWeapon()).toList().contains(catWeapon);
+  }
+
+  Ranking? _find(String weapon, String category) {
+    final catWeapon = "$category/$weapon";
+    for (final r in _items) {
+      if (r.catWeapon() == catWeapon) {
+        return r;
+      }
     }
+    return null;
   }
 
   void add(Ranking item) {
     _add(item);
+    debug("ranking: notifying listeners after adding ranking");
     notifyListeners();
   }
 
@@ -38,39 +53,43 @@ class RankingProvider extends ChangeNotifier {
     for (final item in items) {
       _add(item);
     }
-    Environment.debug("ranking: notifying listeners after adding ranking");
+    debug("ranking: notifying listeners after adding ranking");
     notifyListeners();
   }
 
   // load the feed items from our cached storage, if we haven't loaded them yet
-  Future loadItems({bool doForce = false}) async {
-    Environment.debug("loading ranking items");
+  Future loadItems(String weapon, String category, {bool doForce = false}) async {
+    debug("ranking: loading ranking items");
     if (!_loadedFromCache) {
-      Environment.debug("loading ranking items from cache first");
+      debug("ranking: loading ranking items from cache first");
       await loadItemsFromCache();
       _loadedFromCache = true;
-      Environment.debug("loaded ranking items");
+      debug("ranking: loaded ranking items from cache");
     }
 
     // see if we may need to load new items from the back-end
     // status is set immediately during environment initialization, so is never null at this stage
     final status = Environment.instance.statusProvider.status!;
-    Environment.debug("status lastRanking ${status.lastRanking}");
+    debug("ranking: status lastRanking ${status.lastRanking}");
     // if we have no date, we have no feeds. Just set a very old date as default
     final lastDate = status.lastRanking == '' ? DateTime(2000, 1, 1) : DateTime.parse(status.lastRanking);
+    final ranking = _find(weapon, category);
 
-    Environment.debug("ranking: testing ${_lastMutation.toIso8601String()} vs ${lastDate.toIso8601String()}");
-    if (_lastMutation.isBefore(lastDate)) {
-      Environment.debug("ranking: setting doForce because last mutation is before last date");
-      // there are pending feed items on the server with a more recent mutation date
+    // if there is no ranking, or the mutation date is more recent and we are not currently loading,
+    // force load from the network
+    if (ranking == null || (!ranking.isLoading && ranking.stored.isBefore(lastDate))) {
+      debug("ranking: setting doForce because last retrieved date is before last ranking update");
+      // the server indicates there may be newer ranking data
       doForce = true;
+    } else {
+      debug("ranking: not loading a new ranking ${ranking.isLoading} ${ranking.stored} $lastDate");
     }
-    // we're not going to check the ranking count: if the mutation date has changed, we can reload all of the
-    // data, which should not be too much
+    // we're not going to check the ranking count, it is not given on a per weapon/category basis
     if (doForce) {
-      Environment.debug("loading ranking items from network");
-      await loadRankingItems();
+      debug("ranking: loading ranking items from network");
+      await loadRankingItems(weapon, category);
     }
+    debug("ranking: end of loadItems");
   }
 
   Future loadItemsFromCache() async {
@@ -86,23 +105,59 @@ class RankingProvider extends ChangeNotifier {
     }
   }
 
-  Future loadRankingItems() async {
-    final originalMutation = _lastMutation;
-    final networkItems = await loadRanking(lastDate: _lastMutation);
-    addList(networkItems);
-    if (originalMutation.isBefore(_lastMutation)) {
-      await Environment.instance.cache.setCache('ranking.json', jsonEncode(_items));
+  Future loadRankingItems(String weapon, String category) async {
+    try {
+      debug("ranking: loading items over the network");
+      var ranking = _find(weapon, category);
+
+      // if there is no ranking yet, add a new entry and indicate we are loading it
+      if (ranking == null) {
+        debug("ranking: no entry yet, so storing a plaeholder");
+        ranking = Ranking(DateTime(2000, 1, 1), DateTime(2000, 1, 1), category, weapon, []);
+        ranking.isLoading = true;
+        ranking.stored = DateTime(2000, 1, 1);
+        _add(ranking);
+      }
+
+      // load the latest ranking
+      final networkItems = await loadRanking(weapon: weapon, category: category);
+      networkItems.stored = DateTime.now();
+
+      // add this and notify our listeners
+      debug(
+          "ranking: adding network result ${networkItems.isLoading} ${networkItems.stored} ${networkItems.positions.length}");
+      add(networkItems);
+      debug("ranking: added network result and notified listeners, storing in cache");
+      await Environment.instance.cache.setCache(
+        'ranking.json',
+        DateTime.now().add(const Duration(days: 7)),
+        jsonEncode(_items),
+      );
+      debug("ranking: end of loadRankingItems");
+    } catch (e) {
+      debug("ranking: caught $e");
+      // probably returned a 404 and empty response
     }
   }
 
   Ranking getRankingFor(String category, String weapon) {
+    // get the network call going if we need it
+    loadItems(weapon, category);
+
+    // See if we already have a ranking
+    // The call above should have added an empty ranking with the isLoading state set to true
     for (var ranking in _items) {
       if (ranking.category == category && ranking.weapon == weapon) {
-        Environment.debug("found a ranking ${ranking.category} ${ranking.weapon}");
+        debug(
+            "found a ranking ${ranking.category} ${ranking.weapon} loading:${ranking.isLoading} stored:${ranking.stored}");
         return ranking;
       }
     }
-    Environment.debug("returning empty ranking for $category $weapon");
-    return Ranking(DateTime(2000, 1, 1), DateTime(2000, 1, 1), category, weapon, []);
+    // we should never get here...
+    debug("returning empty ranking for $category $weapon");
+    var retval = Ranking(DateTime(2000, 1, 1), DateTime(2000, 1, 1), category, weapon, []);
+    retval.isLoading = true;
+    retval.stored = DateTime(2000, 1, 1);
+    return retval;
   }
 }

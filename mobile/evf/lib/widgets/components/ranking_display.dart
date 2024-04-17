@@ -12,14 +12,17 @@ class RankingDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Environment.debug("getting ranking for $category and $weapon");
-    final Ranking ranking = Environment.instance.rankingProvider.getRankingFor(category, weapon);
-    Environment.debug("ranking has ${ranking.positions.length} entries");
-
     final controller = ScrollController();
     return ListenableBuilder(
         listenable: Environment.instance.rankingProvider,
         builder: (BuildContext context, Widget? child) {
+          Environment.debug("getting ranking for $category and $weapon");
+          // this returns a ranking, even if there is none yet. But the
+          // listenable will notify us when a new ranking has arrived
+          final Ranking ranking = Environment.instance.rankingProvider.getRankingFor(category, weapon);
+          Environment.debug("ranking has ${ranking.positions.length} entries");
+
+          Environment.debug("rebuilding ranking");
           return Padding(
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
               child: Column(

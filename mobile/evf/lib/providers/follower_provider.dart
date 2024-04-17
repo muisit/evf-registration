@@ -151,7 +151,9 @@ class FollowerProvider extends ChangeNotifier {
   }
 
   Future _storeItemsInCache() async {
-    await Environment.instance.cache.setCache("followers.json", jsonEncode(followers));
-    await Environment.instance.cache.setCache("followers.json", jsonEncode(following));
+    await Environment.instance.cache
+        .setCache("followers.json", DateTime.now().add(const Duration(days: 7)), jsonEncode(followers));
+    await Environment.instance.cache
+        .setCache("followers.json", DateTime.now().add(const Duration(days: 7)), jsonEncode(following));
   }
 }

@@ -18,7 +18,11 @@ class StatusProvider extends ChangeNotifier {
         status = await getStatus();
         Environment.debug("received status");
         Environment.debug("status is ${jsonEncode(status)}");
-        Environment.instance.cache.setCache('status.json', jsonEncode(status!.toJson()));
+        Environment.instance.cache.setCache(
+          'status.json',
+          DateTime.now().add(const Duration(days: 7)),
+          jsonEncode(status!.toJson()),
+        );
       } catch (e) {
         Environment.error("Could not read back end status");
       }

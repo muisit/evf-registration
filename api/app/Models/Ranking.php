@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
-use App\Support\Services\PDFService;
+use Kirschbaum\PowerJoins\PowerJoins;
 
 class Ranking extends Model
 {
+    use PowerJoins;
+
     protected $table = 'rankings';
     public $timestamps = true;
 

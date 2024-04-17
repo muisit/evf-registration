@@ -104,7 +104,11 @@ class CalendarProvider extends ChangeNotifier {
     final networkItems = await loadCalendar(lastDate: _lastMutation);
     addList(networkItems);
     if (originalMutation.isBefore(_lastMutation)) {
-      await Environment.instance.cache.setCache('calendar.json', jsonEncode(_items));
+      await Environment.instance.cache.setCache(
+        'calendar.json',
+        DateTime.now().add(const Duration(days: 7)),
+        jsonEncode(_items),
+      );
     }
   }
 }

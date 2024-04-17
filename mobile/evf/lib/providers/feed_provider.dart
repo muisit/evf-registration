@@ -78,12 +78,20 @@ class FeedProvider extends ChangeNotifier {
 
   Future saveItemBlock(FeedBlock block) async {
     final content = block.export();
-    await Environment.instance.cache.setCache(block.path, jsonEncode(content));
+    await Environment.instance.cache.setCache(
+      block.path,
+      DateTime.now().add(const Duration(days: 7)),
+      jsonEncode(content),
+    );
   }
 
   Future saveItemInventory() async {
     final content = jsonEncode(inventory.toJson());
-    await Environment.instance.cache.setCache("feeds.json", content);
+    await Environment.instance.cache.setCache(
+      "feeds.json",
+      DateTime.now().add(const Duration(days: 7)),
+      content,
+    );
   }
 
   Future loadFeedItems() async {

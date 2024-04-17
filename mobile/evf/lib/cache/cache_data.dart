@@ -1,13 +1,9 @@
-import 'dart:convert';
-import 'package:evf/environment.dart';
-
 import 'cache_line.dart';
 
 class CacheData {
   Map<String, CacheLine> timestamps = {};
 
   CacheData.fromJson(Map<String, dynamic> doc) {
-    Environment.debug("parsing Json code");
     for (String key in doc.keys) {
       timestamps[key] = CacheLine.fromJson(doc[key] as Map<String, dynamic>);
     }
@@ -20,8 +16,8 @@ class CacheData {
     return '';
   }
 
-  void setCached({required String key, required String path}) {
-    timestamps[key] = CacheLine(path: path);
+  void setCached({required String key, required String path, required DateTime policy}) {
+    timestamps[key] = CacheLine(path: path, policy: policy);
   }
 
   bool clearIfOlder(String key, DateTime dt) {

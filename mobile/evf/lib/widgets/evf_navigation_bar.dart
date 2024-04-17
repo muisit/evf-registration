@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 typedef EVFNavigationBarCallback = void Function(int);
 
-class EVFNavigationBar extends StatelessWidget {
-  final EVFNavigationBarCallback callback;
-  final int currentPageIndex;
-  const EVFNavigationBar({
-    super.key,
-    required this.currentPageIndex,
-    required this.callback,
-  });
+class EVFNavigationBar extends StatefulWidget {
+  const EVFNavigationBar({super.key});
+
+  @override
+  State<EVFNavigationBar> createState() => _EVFNavigationBarState();
+}
+
+class _EVFNavigationBarState extends State<EVFNavigationBar> {
+  int currentPageIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return NavigationBar(
-      onDestinationSelected: callback,
+      onDestinationSelected: (int index) => _onSelected(index, context),
       selectedIndex: currentPageIndex,
       destinations: <Widget>[
         NavigationDestination(
@@ -45,5 +47,27 @@ class EVFNavigationBar extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void _onSelected(int index, BuildContext context) {
+    setState(() => currentPageIndex = index);
+    // update the routes
+    switch (index) {
+      case 0:
+        GoRouter.of(context).go('/feed');
+        break;
+      case 1:
+        GoRouter.of(context).go('/ranking');
+        break;
+      case 2:
+        GoRouter.of(context).go('/results');
+        break;
+      case 3:
+        GoRouter.of(context).go('/calendar');
+        break;
+      case 4:
+        GoRouter.of(context).go('/account');
+        break;
+    }
   }
 }

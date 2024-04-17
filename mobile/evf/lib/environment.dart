@@ -3,6 +3,7 @@ import 'package:evf/providers/calendar_provider.dart';
 import 'package:evf/providers/follower_provider.dart';
 import 'package:evf/providers/ranking_provider.dart';
 import 'package:evf/widgets/components/evf_alert_dialog.dart';
+import 'package:flutter/material.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:evf/initialization.dart';
@@ -49,6 +50,8 @@ class Environment {
   RankingProvider rankingProvider;
   StatusProvider statusProvider;
   FollowerProvider followerProvider;
+  GlobalKey<NavigatorState>? rootNavigatorKey;
+  GlobalKey<NavigatorState>? navbarNavigatorKey;
 
   // convenience methods, only callable after initialization
   static Environment get instance => Environment._instance!;
@@ -93,6 +96,9 @@ class Environment {
     debug("calling initialize on cache");
     // cache requires preferences to be initialized
     await cache.initialize();
+
+    rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+    navbarNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'navbar');
     debug("end of environment initialization");
   }
 }

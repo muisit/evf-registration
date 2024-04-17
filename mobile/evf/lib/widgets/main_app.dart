@@ -4,11 +4,10 @@ import 'package:evf/providers/feed_provider.dart';
 import 'package:evf/providers/follower_provider.dart';
 import 'package:evf/providers/ranking_provider.dart';
 import 'package:evf/providers/status_provider.dart';
-import 'package:evf/widgets/components/evf_alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-import './home_page.dart';
+import 'router.dart';
 
 class MainApp extends StatelessWidget {
   final bool doDebug;
@@ -26,8 +25,8 @@ class MainApp extends StatelessWidget {
           ChangeNotifierProvider<RankingProvider>(create: (context) => Environment.instance.rankingProvider),
           ChangeNotifierProvider<FollowerProvider>(create: (context) => Environment.instance.followerProvider),
         ],
-        child: MaterialApp(
-          navigatorKey: EvfAlertDialog.navigatorKey,
+        child: MaterialApp.router(
+          routerConfig: mainRouter(),
           debugShowCheckedModeBanner: doDebug,
           title: "MyEVF",
           theme: ThemeData(
@@ -36,7 +35,6 @@ class MainApp extends StatelessWidget {
           ),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const HomePage(),
         ));
   }
 }

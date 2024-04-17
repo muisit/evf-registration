@@ -11,16 +11,15 @@ class RankPage extends StatefulWidget {
 }
 
 class _RankPageState extends State<RankPage> {
-  String currentCategory = 'Cat 1';
-  String currentWeapon = 'Mens Foil';
+  String currentCategory = '1';
+  String currentWeapon = 'MF';
 
   @override
   initState() {
     super.initState();
-    Environment.instance.rankingProvider.loadItems();
     Environment.instance.preference('category').then((value) {
       if (value == '') {
-        value = 'Cat 1';
+        value = '1';
       }
       Environment.debug("setting currentCategory based on preference $value");
       setState(() {
@@ -29,7 +28,7 @@ class _RankPageState extends State<RankPage> {
     });
     Environment.instance.preference('weapon').then((value) {
       if (value == '') {
-        value = 'Mens Foil';
+        value = 'MF';
       }
       Environment.debug("setting currentWeapon based on preference $value");
       setState(() {
