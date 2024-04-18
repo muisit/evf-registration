@@ -1,13 +1,13 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:evf/l10n/categories.dart';
 import 'package:evf/l10n/weapons.dart';
-import 'package:evf/models/result.dart';
+import 'package:evf/models/rank_result.dart';
 import 'package:evf/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ResultEvent extends StatelessWidget {
-  final Result result;
+  final RankResult result;
   const ResultEvent({super.key, required this.result});
 
   @override

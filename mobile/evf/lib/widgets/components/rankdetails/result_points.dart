@@ -1,9 +1,9 @@
-import 'package:evf/models/result.dart';
+import 'package:evf/models/rank_result.dart';
 import 'package:evf/styles.dart';
 import 'package:flutter/material.dart';
 
 class ResultPoints extends StatelessWidget {
-  final Result result;
+  final RankResult result;
   const ResultPoints({super.key, required this.result});
 
   @override

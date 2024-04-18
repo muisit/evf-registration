@@ -85,7 +85,7 @@ class DuplicateTest extends TestCase
         // CSRF check
         $this->session(['_token' => 'aaa'])
             ->post('/fencers/duplicate', ['fencer' => $fencer], ['X-CSRF-Token' => 'bbb'])
-            ->assertStatus(400);
+            ->assertStatus(419);
 
         // test user 5 has no privileges to view the fencer country
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER5])

@@ -61,7 +61,7 @@ class RankDetailsService
             ->get();
         foreach ($results as $result) {
             \Log::debug("assigning result " . json_encode($result));
-            $resultSchema = new ResultSchema();
+            $resultSchema = new ResultSchema($result);
             $resultSchema->event = $result->competition->event->event_name;
             $resultSchema->date = $result->competition->competition_opens;
             $resultSchema->year = intval($result->competition->event->event_year);
@@ -69,13 +69,7 @@ class RankDetailsService
             $resultSchema->country = $result->competition->event->country->country_name;
             $resultSchema->weapon = $result->competition->weapon->weapon_abbr;
             $resultSchema->category = $result->competition->category->category_abbr;
-            $resultSchema->entries = $result->result_entry;
-            $resultSchema->position = $result->result_place;
-            $resultSchema->points = $result->result_points;
-            $resultSchema->de = $result->result_de_points;
-            $resultSchema->podium = $result->result_podium_points;
             $resultSchema->factor = $result->competition->event->event_factor;
-            $resultSchema->total = $result->result_total_points;
             $resultSchema->status = in_array($result->getKey(), $settings['included']) ? 'Y' : 'N';
             $schema->results[] = $resultSchema;
         }

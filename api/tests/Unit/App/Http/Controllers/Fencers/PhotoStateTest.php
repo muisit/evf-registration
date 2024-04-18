@@ -57,7 +57,7 @@ class PhotoStateTest extends TestCase
         // CSRF check
         $this->session(['_token' => 'aaa'])
             ->post('/fencers/' . $fencer['id'] . '/photostate', ['fencer' => $fencer], ['X-CSRF-Token' => 'bbb'])
-            ->assertStatus(400);
+            ->assertStatus(419);
 
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSERREGISTRAR])
             ->post('/fencers/' . $fencer['id'] . '/photostate', ['fencer' => $fencer], ['X-CSRF-Token' => 'aaa'])

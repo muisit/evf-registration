@@ -84,7 +84,7 @@ class DeleteTest extends TestCase
         // CSRF check
         $this->session(['_token' => 'aaa'])
             ->post('/registrations/delete', ['event' => EventData::EVENT1, 'country' => Country::GER, 'registration' => ['id' => $reg->registration_id]], ['X-CSRF-Token' => 'bbb'])
-            ->assertStatus(400);
+            ->assertStatus(419);
 
         // test user 5 has no privileges to delete the registration
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER5])

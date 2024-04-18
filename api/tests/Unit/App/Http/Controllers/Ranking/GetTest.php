@@ -18,8 +18,8 @@ class GetTest extends TestCase
         $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
-        $this->assertEquals('Cat 1', $output['category']);
-        $this->assertEquals('Mens Foil', $output['weapon']);
+        $this->assertEquals('1', $output['category']);
+        $this->assertEquals('MF', $output['weapon']);
         $this->assertNotEmpty($output['positions']);
         $this->assertCount(3, $output['positions']);
         // do not test the sorting order, we do not guarantee it

@@ -92,7 +92,7 @@ class SaveTest extends TestCase
         // CSRF check
         $this->session(['_token' => 'aaa'])
             ->post('/registrations', ['event' => EventData::EVENT1, 'country' => Country::GER, 'registration' => $data], ['X-CSRF-Token' => 'bbb'])
-            ->assertStatus(400);
+            ->assertStatus(419);
 
         // test user 5 has no privileges to view the registration
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER5])

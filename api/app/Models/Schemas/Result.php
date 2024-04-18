@@ -2,6 +2,8 @@
 
 namespace App\Models\Schemas;
 
+use App\Models\Result as Model;
+
 class Result
 {
     /**
@@ -109,4 +111,17 @@ class Result
      * @OA\Property()
      */
     public string $status;
+
+    public function __construct(?Model $result)
+    {
+        if (!empty($result)) {
+            $this->entries = $result->result_entry;
+            $this->position = $result->result_place;
+            $this->points = $result->result_points;
+            $this->de = $result->result_de_points;
+            $this->podium = $result->result_podium_points;
+            $this->total = $result->result_total_points;
+            $this->status = $result->result_in_ranking == 'Y' ? 'Y' : 'N';
+        }
+    }
 }

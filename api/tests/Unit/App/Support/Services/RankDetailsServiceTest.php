@@ -24,7 +24,8 @@ class RankDetailsServiceTest extends TestCase
         $service2 = new RankDetailsService($fencer, Weapon::find(Weapon::MF));
         $output = $service2->generate();
         $this->assertTrue(is_object($output));
-        $this->assertEquals($fencer->uuid, $output->fencer);
+        $this->assertTrue(is_object($output->fencer));
+        $this->assertEquals($fencer->uuid, $output->fencer->id);
         $this->assertEquals("MF", $output->weapon);
         $this->assertEquals("1", $output->category);
         $this->assertEquals("1", $output->position);

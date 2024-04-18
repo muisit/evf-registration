@@ -71,6 +71,6 @@ class PictureDeleteTest extends TestCase
     {
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER])
             ->post('/templates/' . TemplateData::ATHLETE . '/picture/a928a/remove', [], ['X-CSRF-Token' => 'bbb'])
-            ->assertStatus(400);
+            ->assertStatus(419);
     }
 }

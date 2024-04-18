@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Carbon\Carbon;
 
 class Competition extends Model
@@ -31,6 +32,11 @@ class Competition extends Model
     public function weapon(): BelongsTo
     {
         return $this->belongsTo(Weapon::class, 'competition_weapon', 'weapon_id');
+    }
+
+    public function results(): HasMany
+    {
+        return $this->hasMany(Result::class, 'result_competition', 'competition_id');
     }
 
     public function hasStarted()

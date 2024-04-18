@@ -1,5 +1,5 @@
 import 'fencer.dart';
-import 'result.dart';
+import 'rank_result.dart';
 
 class RankDetails {
   final Fencer fencer;
@@ -8,7 +8,7 @@ class RankDetails {
   final DateTime date;
   final int position;
   final double points;
-  final List<Result> results;
+  final List<RankResult> results;
 
   RankDetails()
       : fencer = Fencer(),
@@ -28,7 +28,7 @@ class RankDetails {
         points = doc['points'] as double,
         results = [] {
     for (var el in doc['results']) {
-      results.add(Result.fromJson(el as Map<String, dynamic>));
+      results.add(RankResult.fromJson(el as Map<String, dynamic>));
     }
   }
 

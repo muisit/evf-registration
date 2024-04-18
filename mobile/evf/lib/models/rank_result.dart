@@ -1,4 +1,4 @@
-class Result {
+class RankResult {
   final String event;
   final int year;
   final DateTime date;
@@ -14,7 +14,7 @@ class Result {
   final double total;
   final String status;
 
-  Result.fromJson(Map<String, dynamic> doc)
+  RankResult.fromJson(Map<String, dynamic> doc)
       : event = doc['event'] as String,
         year = doc['year'] as int,
         date = DateTime.parse(doc['date'] as String),

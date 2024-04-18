@@ -44,11 +44,20 @@ class FencerPublic
      */
     public ?string $country = null;
 
+    /**
+     * Country abbreviation
+     *
+     * @var int
+     * @OA\Property()
+     */
+    public ?string $countryShort = null;
+
     public function __construct(BaseModel $fencer)
     {
         $this->id = $fencer->uuid;
         $this->firstName = $fencer->fencer_firstname;
         $this->lastName = strtoupper($fencer->fencer_surname);
         $this->country = $fencer->country?->country_name ?? 'Other';
+        $this->countryShort = $fencer->country?->country_abbr ?? 'OTH';
     }
 }

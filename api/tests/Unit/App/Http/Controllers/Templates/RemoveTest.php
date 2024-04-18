@@ -40,7 +40,7 @@ class RemoveTest extends TestCase
         // CSRF check
         $this->session(['_token' => 'bbb'])
             ->post('/templates/remove', ['template' => ['id' => TemplateData::ATHLETE]], ['X-CSRF-Token' => 'aaa'])
-            ->assertStatus(400);
+            ->assertStatus(419);
 
         // test user 5 has no privileges
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER5])

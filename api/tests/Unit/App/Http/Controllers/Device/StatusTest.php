@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\App\Http\Controllers\Fencers;
+namespace Tests\Unit\App\Http\Controllers\Device;
 
 use App\Models\Device;
 use App\Models\DeviceUser;

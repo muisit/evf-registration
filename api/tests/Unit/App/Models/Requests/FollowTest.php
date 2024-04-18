@@ -42,7 +42,7 @@ class FollowTest extends TestCase
         $model = $this->baseTest(
             [
                 'fencer' => $wcat5->uuid,
-                'preferences' => json_encode(['handout', 'checkin', 'checkout'])
+                'preferences' => ['handout', 'checkin', 'checkout']
             ]
         );
         $this->assertNotEmpty($model);
@@ -80,7 +80,7 @@ class FollowTest extends TestCase
         $model = $this->baseTest(
             [
                 'fencer' => $wcat5->uuid,
-                'preferences' => json_encode(['handout', 'checkin', 'checkout'])
+                'preferences' => ['handout', 'checkin', 'checkout']
             ]
         );
         $this->assertNotEmpty($model);
@@ -104,33 +104,34 @@ class FollowTest extends TestCase
         $request = new FollowRequest(new Controller());
         $data = [
             'fencer' => $wcat5->uuid,
-            'preferences' => json_encode(['handout', 'checkin', 'checkout'])
+            'preferences' => ['handout', 'checkin', 'checkout']
         ];
         $this->setRequest($data);
         $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        $data['preferences'] = json_encode(['blocked', 'handout', 'checkin', 'checkout', 'ranking', 'result', 'register']);
+        $data['preferences'] = ['blocked', 'handout', 'checkin', 'checkout', 'ranking', 'result', 'register'];
         $this->setRequest($data);
         $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        $data['preferences'] = json_encode(['blacked', 'handout', 'checkin', 'checkout', 'ranking', 'result', 'register']);
+        $data['preferences'] = ['blacked', 'handout', 'checkin', 'checkout', 'ranking', 'result', 'register'];
         $this->setRequest($data);
         $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
 
-        $data['preferences'] = json_encode(['blacked']);
-        $this->setRequest($data);
-        $validator = $request->createValidator(request());
-        $this->assertFalse($validator->passes());
-
-        $data['preferences'] = json_encode("blocked");
+        $data['preferences'] = ['blacked'];
         $this->setRequest($data);
         $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
 
         $data['preferences'] = "blocked";
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
+        // a single string is cast to an array containing that string, and 'blocked' is a valid preference
+        $this->assertTrue($validator->passes());
+
+        $data['preferences'] = "blacked";
         $this->setRequest($data);
         $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
@@ -143,12 +144,14 @@ class FollowTest extends TestCase
         $data['preferences'] = null;
         $this->setRequest($data);
         $validator = $request->createValidator(request());
-        $this->assertFalse($validator->passes());
+        // null is cast to [], which results in 0 differences and is accepted as a generic follow request
+        $this->assertTrue($validator->passes());
 
         unset($data['preferences']);
         $this->setRequest($data);
         $validator = $request->createValidator(request());
-        $this->assertFalse($validator->passes());
+        // leaving out preferences is a generic follow request
+        $this->assertTrue($validator->passes());
     }
 
     public function testValidateFencer()
@@ -160,7 +163,7 @@ class FollowTest extends TestCase
         $request = new FollowRequest(new Controller());
         $data = [
             'fencer' => $wcat5->uuid,
-            'preferences' => json_encode(['handout', 'checkin', 'checkout'])
+            'preferences' => ['handout', 'checkin', 'checkout']
         ];
 
         $this->setRequest($data);
@@ -213,7 +216,7 @@ class FollowTest extends TestCase
         $model = $this->baseTest(
             [
                 'fencer' => $wcat5->uuid,
-                'preferences' => json_encode(['handout', 'checkin', 'checkout'])
+                'preferences' => ['handout', 'checkin', 'checkout']
             ]
         );
         $this->assertNotEmpty($model);
@@ -223,7 +226,7 @@ class FollowTest extends TestCase
         $model = $this->baseTest(
             [
                 'fencer' => $wcat5->uuid,
-                'preferences' => json_encode(['unfollow'])
+                'preferences' => ['unfollow']
             ]
         );
         $this->assertNotEmpty($model);

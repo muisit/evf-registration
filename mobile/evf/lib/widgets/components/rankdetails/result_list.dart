@@ -4,7 +4,7 @@ import 'package:evf/l10n/categories.dart';
 import 'package:evf/models/rank_details.dart';
 import 'package:evf/models/ranking.dart';
 import 'package:evf/models/ranking_position.dart';
-import 'package:evf/models/result.dart';
+import 'package:evf/models/rank_result.dart';
 import 'package:evf/styles.dart';
 import 'package:flutter/material.dart';
 
@@ -21,10 +21,10 @@ class ResultList extends StatelessWidget {
     return ListView(children: _createRows(context, details.results));
   }
 
-  List<Widget> _createRows(BuildContext context, List<Result> results) {
+  List<Widget> _createRows(BuildContext context, List<RankResult> results) {
     List<Widget> retval = [const ResultHeader()];
     for (var i = 0; i < results.length; i++) {
-      final Result result = results[i];
+      final RankResult result = results[i];
 
       retval.add(ResultComponent(result: result));
     }

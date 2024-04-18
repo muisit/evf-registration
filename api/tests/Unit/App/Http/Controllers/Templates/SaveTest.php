@@ -73,7 +73,7 @@ class SaveTest extends TestCase
         $this->session(['_token' => 'bbb'])
             ->withHeaders(['X-CSRF-Token' => 'aaa'])
             ->post('/templates', ['template' => $template])
-            ->assertStatus(400);
+            ->assertStatus(419);
 
         // test user 5 has no privileges
         $this->session(['_token' => 'aaa', 'wpuser' => UserData::TESTUSER5])

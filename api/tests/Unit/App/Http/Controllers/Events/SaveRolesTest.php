@@ -66,6 +66,6 @@ class SaveRolesTest extends TestCase
     {
         $this->session(['_token' => 'bbb', 'wpuser' => UserData::TESTUSER])
             ->post('/events/roles?event=' . EventData::EVENT1, $this->testData(), ['X-CSRF-Token' => 'aaa'])
-            ->assertStatus(400);
+            ->assertStatus(419);
     }
 }
