@@ -3,6 +3,8 @@
 namespace App\Models\Schemas;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Category;
+use App\Models\Weapon;
 use App\Models\Event as BaseModel;
 use Carbon\Carbon;
 
@@ -44,6 +46,14 @@ class EventDevice
      * @OA\Property()
      */
     public ?string $closes = null;
+
+    /**
+     * Date of the last mutation in any of this events results
+     *
+     * @var string
+     * @OA\Property()
+     */
+    public ?string $mutated = null;
 
     /**
      * Year of the event
@@ -93,12 +103,25 @@ class EventDevice
             $this->name = $event->event_name;
             $this->opens = $event->event_open;
             $this->closes = (new Carbon($event->event_open))->addDays($event->event_duration)->toDateString();
+            // we do not (yet) have a results-mutated field, so we act as if we upload everything one day
+            // after the event
+            $this->mutated = (new Carbon($this->closes))->addDays(1)->toDateString();
             $this->year = intval($event->event_year);
             $this->website = $event->event_web;
             $this->location = $event->event_location;
 
             $this->competitions = [];
-            foreach ($event->competitions as $c) {
+            $tc = Category::tableName();
+            $tw = Weapon::tableName();
+            foreach (
+                $event
+                ->competitions()
+                ->joinRelationship('category')
+                ->joinRelationship('weapon')
+                ->orderBy($tw . '.weapon_name')
+                ->orderBy($tc . '.category_name')
+                ->get() as $c
+            ) {
                 $this->competitions[] = new CompetitionDevice($c, false);
             }
         }

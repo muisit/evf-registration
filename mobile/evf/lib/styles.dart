@@ -27,6 +27,13 @@ class AppStyles {
     fontWeight: FontWeight.bold,
   );
 
+  static const largeHeader = TextStyle(
+    fontStyle: FontStyle.normal,
+    color: Colors.black,
+    fontSize: 24.0,
+    fontWeight: FontWeight.bold,
+  );
+
   static const calendarDates = TextStyle(
     fontStyle: FontStyle.normal,
     color: Colors.black,

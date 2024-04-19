@@ -1,29 +1,41 @@
+import 'package:evf/environment.dart';
+
 import 'competition_result.dart';
 
 class Competition {
-  DateTime opens;
+  int id;
+  DateTime starts;
   String category;
   String weapon;
   List<CompetitionResult> results;
 
   Competition()
-      : opens = DateTime.now(),
+      : id = 0,
+        starts = DateTime.now(),
         category = '1',
         weapon = 'MF',
         results = [];
 
   Competition.fromJson(Map<String, dynamic> doc)
-      : opens = DateTime.parse(doc['opens'] as String),
+      : id = doc['id'] as int,
+        starts = DateTime.parse(doc['starts'] as String),
         category = doc['category'] as String,
         weapon = doc['weapon'] as String,
         results = [] {
-    for (var el in doc['results']) {
-      results.add(CompetitionResult.fromJson(el as Map<String, dynamic>));
+    if (doc.containsKey('results')) {
+      try {
+        for (var el in doc['results']) {
+          results.add(CompetitionResult.fromJson(el as Map<String, dynamic>));
+        }
+      } catch (e) {
+        Environment.debug('caught error converting results');
+      }
     }
   }
 
   Map<String, dynamic> toJson() => {
-        'opens': opens.toIso8601String(),
+        'id': id,
+        'starts': starts.toIso8601String(),
         'category': category,
         'weapon': weapon,
         'results': results,

@@ -16,8 +16,8 @@ class CacheData {
     return '';
   }
 
-  void setCached({required String key, required String path, required DateTime policy}) {
-    timestamps[key] = CacheLine(path: path, policy: policy);
+  void setCached({required String key, required String path, required Duration policy}) {
+    timestamps[key] = CacheLine(path: path, policy: DateTime.now().add(policy));
   }
 
   bool clearIfOlder(String key, DateTime dt) {

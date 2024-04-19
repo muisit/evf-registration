@@ -130,7 +130,7 @@ class RankingProvider extends BaseProvider {
       debug("ranking: added network result and notified listeners, storing in cache");
       await Environment.instance.cache.setCache(
         'ranking.json',
-        DateTime.now().add(const Duration(days: 7)),
+        const Duration(days: 21),
         jsonEncode(_items),
       );
       debug("ranking: end of loadRankingItems");

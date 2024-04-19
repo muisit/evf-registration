@@ -80,7 +80,7 @@ class FeedProvider extends ChangeNotifier {
     final content = block.export();
     await Environment.instance.cache.setCache(
       block.path,
-      DateTime.now().add(const Duration(days: 7)),
+      const Duration(days: 7),
       jsonEncode(content),
     );
   }
@@ -89,7 +89,7 @@ class FeedProvider extends ChangeNotifier {
     final content = jsonEncode(inventory.toJson());
     await Environment.instance.cache.setCache(
       "feeds.json",
-      DateTime.now().add(const Duration(days: 7)),
+      const Duration(days: 7),
       content,
     );
   }

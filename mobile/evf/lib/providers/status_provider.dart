@@ -20,7 +20,7 @@ class StatusProvider extends ChangeNotifier {
         Environment.debug("status is ${jsonEncode(status)}");
         Environment.instance.cache.setCache(
           'status.json',
-          DateTime.now().add(const Duration(days: 7)),
+          const Duration(hours: 23), // just shy of a day, to ensure we reload tomorrow
           jsonEncode(status!.toJson()),
         );
       } catch (e) {

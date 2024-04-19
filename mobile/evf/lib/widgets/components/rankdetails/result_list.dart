@@ -1,11 +1,5 @@
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:evf/environment.dart';
-import 'package:evf/l10n/categories.dart';
 import 'package:evf/models/rank_details.dart';
-import 'package:evf/models/ranking.dart';
-import 'package:evf/models/ranking_position.dart';
 import 'package:evf/models/rank_result.dart';
-import 'package:evf/styles.dart';
 import 'package:flutter/material.dart';
 
 import 'result_component.dart';

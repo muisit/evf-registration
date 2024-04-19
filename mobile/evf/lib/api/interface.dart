@@ -68,10 +68,9 @@ class Interface {
     return _parseResponse(response);
   }
 
-  Future<Map<String, dynamic>> get(
-      {String? path, Map<String, String>? data, bool unAuth = false, int tries = 0}) async {
+  Future<dynamic> get({String? path, Map<String, String>? data, bool unAuth = false, int tries = 0}) async {
     try {
-      return jsonDecode(await getRaw(path: path, data: data)) as Map<String, dynamic>;
+      return jsonDecode(await getRaw(path: path, data: data));
     } on NetworkError catch (e) {
       Environment.debug("caught a network error inside the api get interface ${e.code}");
       // catch all unauthorized calls. Unless we specifically indicate we may expect this, the cause
@@ -84,10 +83,9 @@ class Interface {
     }
   }
 
-  Future<Map<String, dynamic>> post(
-      {String? path, Map<String, String>? data, bool unAuth = false, int tries = 0}) async {
+  Future<dynamic> post({String? path, Map<String, String>? data, bool unAuth = false, int tries = 0}) async {
     try {
-      return jsonDecode(await postRaw(path: path, data: data)) as Map<String, dynamic>;
+      return jsonDecode(await postRaw(path: path, data: data));
     } on NetworkError catch (e) {
       Environment.debug("caught a network error inside the api post interface ${e.code}");
       // catch all unauthorized calls. Unless we specifically indicate we may expect this, the cause
@@ -100,8 +98,7 @@ class Interface {
     }
   }
 
-  Future<Map<String, dynamic>> _parseError(
-      NetworkError e, int tries, bool expectUnauthenticated, ErrorCall callback) async {
+  Future<dynamic> _parseError(NetworkError e, int tries, bool expectUnauthenticated, ErrorCall callback) async {
     Environment.debug("parsing a generic network error");
     // Unauthorized problems could be due to our device ID being yanked out from under us on the back-end
     // Reregister and see if this solves the problem. We only try to re-register once (tries == 0): if that

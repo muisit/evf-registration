@@ -106,7 +106,7 @@ class CalendarProvider extends ChangeNotifier {
     if (originalMutation.isBefore(_lastMutation)) {
       await Environment.instance.cache.setCache(
         'calendar.json',
-        DateTime.now().add(const Duration(days: 7)),
+        const Duration(days: 7),
         jsonEncode(_items),
       );
     }

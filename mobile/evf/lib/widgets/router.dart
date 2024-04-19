@@ -1,4 +1,3 @@
-import 'package:evf/environment.dart';
 import 'package:evf/widgets/pages/pages.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -6,13 +5,16 @@ import 'package:go_router/go_router.dart';
 import 'home_page.dart';
 
 GoRouter mainRouter() {
+  final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+  final navbarNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'navbar');
+
   return GoRouter(
-    navigatorKey: Environment.instance.rootNavigatorKey,
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/feed',
     debugLogDiagnostics: true,
     routes: <RouteBase>[
       ShellRoute(
-        navigatorKey: Environment.instance.navbarNavigatorKey,
+        navigatorKey: navbarNavigatorKey,
         builder: (BuildContext context, GoRouterState state, Widget child) {
           return HomePage(child: child);
         },
@@ -42,6 +44,15 @@ GoRouter mainRouter() {
             path: '/results',
             builder: (BuildContext context, GoRouterState state) {
               return const ResultsPage();
+            },
+          ),
+          GoRoute(
+            path: '/results/:event/:competition',
+            builder: (BuildContext context, GoRouterState state) {
+              return ResultsDetailPage(
+                event: int.tryParse(state.pathParameters['event']!) ?? 0,
+                competition: int.tryParse(state.pathParameters['competition']!) ?? 0,
+              );
             },
           ),
           GoRoute(

@@ -95,6 +95,10 @@
     "@titleRankingDetails": {
       "description": "title of the Ranking Details widget"
     },
+    "titleResultsDetails": "Results",
+    "@titleResultsDetails": {
+      "description": "title of the Result Details widget"
+    },
 
     "titleRanking": "Ranking for {weapon} {category} of {date}",
     "@titleRanking": {

@@ -71,7 +71,7 @@ class FileCache {
     return CacheLine(path: '', policy: DateTime.now());
   }
 
-  Future setCache(String path, DateTime policy, String content) async {
+  Future setCache(String path, Duration policy, String content) async {
     if (_cache != null) {
       final directory = await _getDirectory();
       var destination = _getRandomDestination(directory);
@@ -91,7 +91,7 @@ class FileCache {
     }
   }
 
-  Future<String> getCacheOrLoad(String path, DateTime policy, CacheMiss? callback) async {
+  Future<String> getCacheOrLoad(String path, Duration policy, CacheMiss? callback) async {
     await clearCacheIfOlder(path, DateTime(2000, 1, 1));
     if (_cache != null && _cache!.containsKey(path)) {
       var localpath = _cache!.timestamps[path]!.path;

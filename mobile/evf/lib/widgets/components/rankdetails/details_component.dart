@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:evf/environment.dart';
 import 'package:evf/l10n/categories.dart';
 import 'package:evf/l10n/weapons.dart';
 import 'package:evf/models/rank_details.dart';

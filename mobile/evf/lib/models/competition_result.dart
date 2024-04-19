@@ -1,4 +1,7 @@
+import 'fencer.dart';
+
 class CompetitionResult {
+  final Fencer fencer;
   final int entries;
   final int position;
   final double points;
@@ -14,7 +17,8 @@ class CompetitionResult {
         de = (doc['de'] as num).toDouble(),
         podium = (doc['podium'] as num).toDouble(),
         total = (doc['total'] as num).toDouble(),
-        status = doc['status'] as String;
+        status = doc['status'] as String,
+        fencer = Fencer.fromJson(doc['fencer'] as Map<String, dynamic>);
 
   Map<String, dynamic> toJson() => {
         "entries": entries,
@@ -23,6 +27,7 @@ class CompetitionResult {
         "de": de,
         "podium": podium,
         "total": total,
-        "status": status
+        "status": status,
+        "fencer": fencer,
       };
 }
