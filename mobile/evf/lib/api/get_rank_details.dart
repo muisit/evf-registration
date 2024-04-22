@@ -5,15 +5,15 @@ import 'package:evf/environment.dart';
 import 'interface.dart';
 
 Future<RankDetails> getRankDetails(String uuid, String weapon) async {
-  Environment.debug("calling getRankDetails");
-  final api = Interface.create(path: "/device/rankdetails/$weapon/$uuid");
-  var content = await api.get();
-  Environment.debug("converting rank-details from Json");
   try {
+    Environment.debug("calling getRankDetails");
+    final api = Interface.create(path: "/device/rankdetails/$weapon/$uuid");
+    var content = await api.get();
+    Environment.debug("converting rank-details from Json");
     var retval = RankDetails.fromJson(content);
     return retval;
   } catch (e) {
     Environment.debug("caught conversion error $e");
-    return Future.value(RankDetails());
   }
+  return RankDetails();
 }

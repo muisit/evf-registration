@@ -1,10 +1,12 @@
 import 'dart:developer';
+import 'package:evf/api/send_error.dart';
 import 'package:evf/providers/account_provider.dart';
 import 'package:evf/providers/calendar_provider.dart';
 import 'package:evf/providers/follower_provider.dart';
 import 'package:evf/providers/ranking_provider.dart';
 import 'package:evf/providers/result_provider.dart';
-import 'package:evf/widgets/components/evf_alert_dialog.dart';
+import 'package:evf/util/alert.dart';
+import 'package:intl/intl.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:evf/initialization.dart';
@@ -12,7 +14,8 @@ import 'package:evf/providers/status_provider.dart';
 import 'package:evf/providers/feed_provider.dart';
 import 'package:evf/cache/file_cache.dart';
 import 'package:evf/models/flavor.dart';
-import 'package:evf/api/register_device.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
 
 class Environment {
   static Environment? _instance;
@@ -38,8 +41,19 @@ class Environment {
     log(txt);
   }
 
-  static void error(String txt) {
-    EvfAlertDialog.show(txt);
+  static Future<AppLocalizations> getI10N() async {
+    try {
+      return lookupAppLocalizations(Locale(Intl.getCurrentLocale()));
+    } catch (e) {
+      // locale not found, fall back to English
+    }
+    return lookupAppLocalizations(const Locale('en'));
+  }
+
+  static void error(String txt) async {
+    sendError(txt);
+    final msg = (await getI10N()).errorInternalError;
+    alert(msg);
   }
 
   Future restart() async {
@@ -90,8 +104,7 @@ class Environment {
     debug("registering device");
     var deviceId = await preference('deviceid');
     if (deviceId == '') {
-      deviceId = await registerDeviceAndConvert();
-      await set('deviceid', deviceId);
+      deviceId = await statusProvider.registerNewDevice();
     } else {
       debug("found existing device id $deviceId");
     }
@@ -102,11 +115,4 @@ class Environment {
     await cache.initialize();
     debug("end of environment initialization");
   }
-}
-
-Future<String> registerDeviceAndConvert() async {
-  Environment.debug("registerDeviceAndConvert");
-  var device = await registerDevice();
-  Environment.debug("returning json-encoded device");
-  return device.deviceId;
 }

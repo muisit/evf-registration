@@ -1,5 +1,9 @@
+import 'package:evf/environment.dart';
+import 'package:evf/models/fencer.dart';
+
 class Follower {
-  String fencer;
+  Fencer fencer;
+  String user = '';
   bool handout = true;
   bool checkin = true;
   bool checkout = true;
@@ -10,30 +14,40 @@ class Follower {
   bool unfollow = false; // local setting
   bool synced = false; // local setting
 
-  Follower(this.fencer);
+  Follower(String uuid) : fencer = Fencer(uuid);
+  Follower.device(String uuid)
+      : fencer = Fencer(''),
+        user = uuid;
 
-  Follower.fromJson(Map<String, dynamic> doc) : fencer = doc['fencer'] as String {
-    final preferences = doc['preferences'] as Map<String, dynamic>;
-    handout = preferences.containsKey('handout');
-    checkin = preferences.containsKey('checkin');
-    checkout = preferences.containsKey('checkout');
-    ranking = preferences.containsKey('ranking');
-    result = preferences.containsKey('result');
-    register = preferences.containsKey('register');
-    blocked = preferences.containsKey('blocked');
+  Follower.fromJson(Map<String, dynamic> doc)
+      : fencer = Fencer.fromJson(doc['fencer'] ?? {}),
+        user = doc['user'] ?? '' {
+    Environment.debug("converting list of preferences for Follower");
+    final preferences = doc['preferences'] as List<String>;
+    handout = preferences.contains('handout');
+    checkin = preferences.contains('checkin');
+    checkout = preferences.contains('checkout');
+    ranking = preferences.contains('ranking');
+    result = preferences.contains('result');
+    register = preferences.contains('register');
+    blocked = preferences.contains('blocked');
   }
 
   Map<String, dynamic> toJson() {
-    Map<String, bool> preferences = {};
-    if (handout) preferences['handout'] = true;
-    if (checkin) preferences['checkin'] = true;
-    if (checkout) preferences['checkout'] = true;
-    if (ranking) preferences['ranking'] = true;
-    if (result) preferences['result'] = true;
-    if (register) preferences['register'] = true;
-    if (blocked) preferences['blocked'] = true;
-    if (synced) preferences['synced'] = true;
+    List<String> preferences = [];
+    if (handout) preferences.add('handout');
+    if (checkin) preferences.add('checkin');
+    if (checkout) preferences.add('checkout');
+    if (ranking) preferences.add('ranking');
+    if (result) preferences.add('result');
+    if (register) preferences.add('register');
+    if (blocked) preferences.add('blocked');
+    if (synced) preferences.add('synced');
 
-    return {'fencer': fencer, 'preferences': preferences};
+    return {
+      'fencer': fencer,
+      'user': user,
+      'preferences': preferences,
+    };
   }
 }

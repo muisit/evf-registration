@@ -22,11 +22,27 @@ class DeviceUser extends Model implements AuthenticatableContract, AuthorizableC
     protected $table = 'device_users';
     protected $fillable = [];
     protected $guarded = [];
+    protected $casts = [
+        'preferences' => 'array'
+    ];
 
     public static function booted()
     {
         static::creating(function ($model) {
             $model->uuid = Str::uuid()->toString();
+            // create default preferences to apply to followers and following
+            $model->preferences = [
+                'account' => [
+                    'follower' => ['handout', 'ranking', 'result', 'register'],
+                    'following' => ['handout', 'ranking', 'result', 'register']
+                ]
+            ];
+        });
+
+        static::deleting(function ($model) {
+            Follow::where('device_user_id', $model->getKey())->delete();
+            Device::where('device_user_id', $this->getKey())->delete();
+            DeviceFeed::where('device_user_id', $this->getKey())->delete();
         });
     }
     
@@ -72,11 +88,21 @@ class DeviceUser extends Model implements AuthenticatableContract, AuthorizableC
         return $this->hasMany(DeviceFeed::class);
     }
 
-    public function delete()
+    public function mergeWith(DeviceUser $user)
     {
-        // delete all linked Devices and feed entries
-        Device::where('device_user_id', $this->getKey())->delete();
-        DeviceFeed::where('device_user_id', $this->getKey())->delete();
-        return parent::delete();
+        // Get all fencers that we follow from this old user, convert them to this user
+        // Take care not to create duplicates
+        $fids = Follow::where('device_user_id', $this->getKey())->select('fencer_id')->get()->pluck('fencer_id');
+        foreach (Follow::where('device_user_id', $user->getKey())->get() as $follower) {
+            if (!in_array($follower->fencer_id, $fids)) {
+                $follower->device_user_id = $this->getKey();
+                $follower->save();
+            }
+        }
+
+        // Update all devices of the old user to link to the new user
+        Device::where('device_user_id', $user->getKey())->update(['device_user_id' => $this->getKey()]);
+
+        // Feed updates are left for now. The way we handle feed items needs to change
     }
 }

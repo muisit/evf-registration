@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
-import 'package:evf/api/register_device.dart';
 import 'package:http/http.dart' as http;
 import 'package:evf/environment.dart';
 
@@ -104,14 +103,13 @@ class Interface {
     // Reregister and see if this solves the problem. We only try to re-register once (tries == 0): if that
     // does not fix the problem, something else is wrong.
     // If we may expect an unAuth reply, let it go.
-    // 401 = Unauthorized, 403 = Forbidden
-    if ((e.code == 403 || e.code == 401) && tries == 0 && !expectUnauthenticated) {
+    // 401 = Unauthorized
+    if (e.code == 401 && tries == 0 && !expectUnauthenticated) {
       Environment.debug("received an unauthenticated call and we did not expect that. Trying to reregister");
       try {
-        var device = await registerDevice();
-        await Environment.instance.set('deviceId', device.deviceId);
-        Environment.instance.authToken = device.deviceId;
-        Environment.debug("calling callback after failure to authenticate ${device.deviceId}");
+        var deviceId = await Environment.instance.statusProvider.registerNewDevice();
+        Environment.instance.authToken = deviceId;
+        Environment.debug("calling callback after failure to authenticate ${deviceId}");
         return await callback(tries + 1);
       } on Exception {
         Environment.debug('Caught exception while trying to reregister after unauth result');
@@ -121,19 +119,17 @@ class Interface {
     // in case of potential temporary errors, retry after a delay, to see if the
     // server comes back online (could be a deployment problem)
     // 500 = Internal Server Error, 503 = Service Unavailable, 504 = Gateway Timeout
-    else if ((e.code == 500 || e.code == 503 || e.code == 504) && tries < 5) {
-      Environment.debug("received an internal server error, retrying after some time");
-      return await Future.delayed(const Duration(milliseconds: 500), () async {
-        Environment.debug("retrying callback after server failure");
-        try {
+    else if ((e.code == 500 || e.code == 503 || e.code == 504)) {
+      if (tries < 5) {
+        Environment.debug("received an internal server error, retrying after some time");
+        return await Future.delayed(const Duration(milliseconds: 500), () async {
           return await callback(tries + 1);
-        } on Exception {
-          Environment.error('Caught exception while trying rerun after server failure');
-        }
-        return {};
-      });
+        });
+      } else {
+        Environment.error("InternalError: retried call yields ${e.code}: $e");
+      }
     } else {
-      Environment.error("could not manage network error ${e.code}");
+      Environment.error("InternalError: cannot handle ${e.code}: $e ");
     }
     return {};
   }

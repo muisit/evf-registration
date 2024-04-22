@@ -11,7 +11,7 @@ class RankDetails {
   final List<RankResult> results;
 
   RankDetails()
-      : fencer = Fencer(),
+      : fencer = Fencer(''),
         weapon = '',
         category = '',
         date = DateTime.now(),

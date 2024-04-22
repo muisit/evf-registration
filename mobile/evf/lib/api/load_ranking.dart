@@ -7,12 +7,17 @@ import 'package:evf/environment.dart';
 import 'interface.dart';
 
 Future<Ranking> loadRanking({required String weapon, required String category, DateTime? lastDate}) async {
-  Environment.debug("calling loadRanking");
-  final api = Interface.create(path: "/device/ranking/$weapon/$category");
-  if (lastDate != null) {
-    api.data['last'] = lastDate.toIso8601String();
+  try {
+    Environment.debug("calling loadRanking");
+    final api = Interface.create(path: "/device/ranking/$weapon/$category");
+    if (lastDate != null) {
+      api.data['last'] = lastDate.toIso8601String();
+    }
+    var content = await api.get();
+    final retval = Ranking.fromJson(content);
+    return retval;
+  } catch (e) {
+    Environment.debug("caught exception on loading ranking $e");
   }
-  var content = await api.get();
-  final retval = Ranking.fromJson(content);
-  return retval;
+  return Ranking(DateTime(2000, 1, 1), DateTime(2000, 1, 1), weapon, category, []);
 }

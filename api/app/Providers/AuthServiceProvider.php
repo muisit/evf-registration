@@ -76,7 +76,9 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Auth::viaRequest('device', function (Request $request) {
-            $user = Device::where('uuid', (string) $request->bearerToken())->first()?->user;
+            $device = Device::where('uuid', (string) $request->bearerToken())->first();
+            $user = $device?->user;
+            $request->merge(['device' => $device]);
             return $user;
         });
 

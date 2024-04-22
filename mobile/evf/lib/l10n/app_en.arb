@@ -59,6 +59,24 @@
     "labelName": "Name",
     "labelCountry": "Country",
     "labelCurrentRank": "Ranking",
+    "labelChange": "Change",
+    "labelConfirm": "Confirm",
+    "labelVerify": "Verify",
+    "labelResend": "Resend",
+    "labelOk": "Ok",
+    "labelCancel": "Cancel",
+    "labelSurname": "Surname",
+    "labelGivenname": "Given name",
+    "labelGender": "Gender",
+    "labelMale": "Male",
+    "labelFemale": "Female",
+    "labelDateOfBirth": "Date of Birth",
+    "labelNoDatePicked": "none set",
+    "labelNoCountryPicked": "Select",
+    "labelOtherCountry": "Other",
+    "labelLink": "Link",
+    "labelUpdate": "Update",
+
     "headerCountry": "Cnt",
     "headerEvent": "Event",
     "headerLocation": "Location",
@@ -91,6 +109,17 @@
       }
     },
 
+    "birthDate": "{date}",
+    "@birthDate": {
+      "description": "Date format used to display the birth date of a fencer",
+      "placeholders": {
+        "date": {
+          "type": "DateTime",
+          "format": "yMd"
+        }
+      }
+    },
+
     "titleRankingDetails": "Ranking Details",
     "@titleRankingDetails": {
       "description": "title of the Ranking Details widget"
@@ -99,6 +128,41 @@
     "@titleResultsDetails": {
       "description": "title of the Result Details widget"
     },
+    "titleAccount": "Account",
+    "@titleAccount": {
+      "description": "title of the Account widget"
+    },
+    "titleFencer": "Fencer",
+    "@titleFencer": {
+      "description": "title of the Account-Fencer widget"
+    },
+    "titleFriends": "Friends",
+    "@titleFriends": {
+      "description": "title of the Account-Friends widget"
+    },
+    "titleSettings": "Settings",
+    "@titleSettings": {
+      "description": "title of the Account-Settings widget"
+    },
+    "titleConfirmation": "Confirm",
+
+    "descrDevice": "These are your account and device IDs. Please mention these if you have questions about your account:",
+    "descrWebmaster": "If you encounter problems, please contact webmaster@veteransfencing.eu",
+    "descrEmail": "Enter your e-mail address to connect your account",
+    "descrEmailInput": "Enter an e-mail address",
+    "descrVerificationCodeInput": "Enter code",
+    "descrResend": "Resend the verification message",
+    "descrWaitingForCode": "An e-mail with a code was sent. Please enter the verification code below",
+    "descrResendTooSoon": "Please wait a moment before retrying to resend the verification e-mail",
+    "descrEnterVerificationCode": "Please enter the verification code below",    
+    "descrEmailVerified": "The address was verified",
+    "descrReplaceEmail": "The address was already verified. Do you want to replace this address?",
+    "descrEnterDate": "Please enter a valid date",
+
+    "descrFencer": "You can link your account to a specific fencer. If it does not exist yet, it is created.",
+    "descrGivenNameInput": "Enter your given name",
+    "descrSurnameInput": "Enter your surname",
+    "descrReplaceFencer": "The fencer was already linked. Do you want to update the information?",
 
     "titleRanking": "Ranking for {weapon} {category} of {date}",
     "@titleRanking": {
@@ -126,5 +190,19 @@
           "example": "5"
         }
       }
-    }
+    },
+
+    "errorInternalError": "The application encountered an internal error. The developers have been notified. Please restart the application to prevent synchronization issues",
+    "errorInvalidEmail": "Please enter a correct e-mail address",
+    "errorInvalidVerificationCode": "Please enter a valid verification code",
+    "errorNotVerified": "There was an error sending the verification message. Please check your e-mail address and try again",
+    "errorNotChecked": "There was an error checking the verification code. Please check the code and try again",
+    "errorUserMerged": "There was another account using the same e-mail address. The accounts have been merged",
+    "errorEmptySurname": "Please enter a surname of at least 2 characters",
+    "errorEmptyGivenName": "Please enter a given name of at least 2 characters",
+    "errorInvalidDate": "Please enter or pick a valid date",
+    "errorTooOld": "You picked a date of birth that is too long ago",
+    "errorTooYoung": "You picked a date of birth that is too recent",
+    "errorFencerNotFound": "The fencer data was not found. Do you want to create a new entry or go back and adjust the data",
+    "errorLinkError": "There was an error linking the fencer data to the account. Please check the data and try again"
 }

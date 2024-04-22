@@ -4,9 +4,12 @@ import 'package:go_router/go_router.dart';
 
 import 'home_page.dart';
 
+var rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+var navbarNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'navbar');
+
 GoRouter mainRouter() {
-  final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
-  final navbarNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'navbar');
+  rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+  navbarNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'navbar');
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,

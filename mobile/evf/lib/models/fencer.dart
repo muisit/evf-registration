@@ -5,9 +5,8 @@ class Fencer {
   String country;
   String countryShort;
 
-  Fencer()
-      : id = '',
-        lastName = '',
+  Fencer(this.id)
+      : lastName = '',
         firstName = '',
         country = '',
         countryShort = '';

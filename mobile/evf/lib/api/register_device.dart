@@ -7,28 +7,26 @@ import 'package:evf/models/device.dart';
 import 'package:evf/environment.dart';
 
 Future<Device> registerDevice({int tries = 0}) async {
-  Environment.debug("calling registerDevice($tries)");
-  final data = await getDeviceInfo();
-  final api = Interface.create(path: '/device/register', data: data);
   try {
+    Environment.debug("calling registerDevice($tries)");
+    final data = await getDeviceInfo();
+    final api = Interface.create(path: '/device/register', data: data);
     var content = await api.post();
     if (content.containsKey('id')) {
       Environment.debug("registerDevice succeeds ${content.toString()}");
       return Device.fromJson(content);
     }
-    Environment.debug("returned content is $content");
+    Environment.error("RegisterDevice returns status 200 but not an id");
   } on NetworkError {
     if (tries < 3) {
       Environment.debug("retrying registerDevice");
-      await Future.delayed(
+      return await Future.delayed(
         const Duration(microseconds: 500),
         () => registerDevice(tries: tries + 1),
       );
-    } else {
-      Environment.error("registerDevice fails, device id is unknown");
     }
+    Environment.error("RegisterDevice fails after retries, device id could not be set");
   }
-  Environment.error("end of registerDevice, should never happen");
   return Device(id: '');
 }
 

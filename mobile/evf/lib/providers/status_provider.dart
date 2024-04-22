@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:evf/api/get_status.dart';
+import 'package:evf/api/register_device.dart';
 import 'package:evf/environment.dart';
 import 'package:evf/models/status.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,15 @@ class StatusProvider extends ChangeNotifier {
   Status? status;
   bool isLoading = false;
   DateTime wasLoaded = DateTime.now();
+
+  Future<String> registerNewDevice() async {
+    Environment.debug("registerDeviceAndConvert");
+    var device = await registerDevice();
+    Environment.debug("returning json-encoded device");
+    await Environment.instance.set('deviceid', device.deviceId);
+    await loadStatus();
+    return device.deviceId;
+  }
 
   Future<Status> loadStatus() async {
     status ??= Status();
@@ -24,7 +34,7 @@ class StatusProvider extends ChangeNotifier {
           jsonEncode(status!.toJson()),
         );
       } catch (e) {
-        Environment.error("Could not read back end status");
+        Environment.debug("Could not read back end status");
       }
       isLoading = false;
       wasLoaded = DateTime.now();
@@ -33,7 +43,7 @@ class StatusProvider extends ChangeNotifier {
       // see if we need to renew the other providers
       Environment.debug("listeners notified of new status, requesting other providers to reload");
       Environment.debug("lastRanking is ${status!.lastRanking}");
-      Environment.instance.followerProvider.syncItems(status!.followers, status!.following);
+      Environment.instance.followerProvider.syncItems(status!.followers);
     }
     // return the old value while we are not loading, or when we finished loading
     return Future.value(status);

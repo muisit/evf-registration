@@ -3,11 +3,11 @@ import 'package:evf/environment.dart';
 import 'interface.dart';
 
 Future<bool> addFollowing(String id) async {
-  Environment.debug("calling addFollowing for $id");
-  final api = Interface.create(path: '/device/follow', data: {
-    'follow': {'fencer': id}
-  });
   try {
+    Environment.debug("calling addFollowing for $id");
+    final api = Interface.create(path: '/device/follow', data: {
+      'follow': {'fencer': id}
+    });
     var content = await api.post();
     if (content.containsKey('status') && content['status'] == 'ok') {
       return true;

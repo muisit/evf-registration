@@ -22,7 +22,6 @@ class Status extends Base
      */
     public function index(Request $request)
     {
-        \Log::debug("user is " . $request->user()->id . '/' . $request->user()->uuid);
         $retval = (new DeviceStatusService())->handle();
         return response()->json($retval);
     }

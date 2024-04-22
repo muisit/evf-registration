@@ -34,6 +34,11 @@ class Fencer extends Model
         return $this->belongsTo(Country::class, 'fencer_country', 'country_id');
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(DeviceUser::class, 'fencer_id', 'fencer_id');
+    }
+
     public function image()
     {
         if (empty($this->getKey()) || $this->getKey() < 1) {

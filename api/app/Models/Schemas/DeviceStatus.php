@@ -11,5 +11,4 @@ class DeviceStatus
     public BlockStatus $ranking;
 
     public array $followers;
-    public array $following;
 }

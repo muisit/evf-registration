@@ -14,8 +14,6 @@ use DateTimeImmutable;
 
 class Follow extends Base
 {
-    private $allowedSettings = ["blocked", "unfollow", "handout", "checkin", "checkout", "ranking", "result", "register"];
-
     public function rules(): array
     {
         return [
@@ -34,7 +32,7 @@ class Follow extends Base
             $fail("Invalid preferences");
         }
         else {
-            $diff = array_diff($value, $this->allowedSettings);
+            $diff = array_diff($value, FollowModel::$allowedUserSettings);
             \Log::debug("diff is " . json_encode($diff));
             if (count($diff) > 0) {
                 $fail("Invalid preferences");
@@ -80,11 +78,17 @@ class Follow extends Base
             $prefs = $data['follow']['preferences'] ?? [];
             if (empty($prefs)) {
                 // this is the case when the user just 'follows' someone, without prior settings
-                // just enable all preferences
-                $prefs = array_diff($this->allowedSettings, ['unfollow']);
+                $user = Auth::user();
+                if (isset($user->preferences) && isset($user->preferences['account']) && isset($user->preferences['account']['following'])) {
+                    $prefs = Auth::user()->preferences['account']['following'];
+                }
+            }
+            if (empty($prefs)) {
+                // just enable default preferences
+                $prefs = ['handout', 'ranking', 'result', 'register'];
             }
             \Log::debug("setting preferences based on " . json_encode($prefs));
-            foreach ($this->allowedSettings as $setting) {
+            foreach (FollowModel::$allowedUserSettings as $setting) {
                 $this->model->setPreference($setting, in_array($setting, $prefs));
             }
         }

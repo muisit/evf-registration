@@ -31,7 +31,7 @@ class DeviceStatusService
             $retval->results = $this->getResultStatus();
 
             $retval->followers = $this->getFollowers();
-            $retval->following = $this->getFollowing();
+            //$retval->following = $this->getFollowing();
         }
         // else the log in device is not registered, we return an empty struct
         return $retval;
@@ -97,22 +97,26 @@ class DeviceStatusService
 
     private function getFollowers(): array
     {
+        // return all fencer uuids that we are following, regardless of blocked state
         $user = Auth::user();
         $lst = Follow::with('fencer')->where('fencer_id', $user->fencer_id ?? 0)->get();
         $retval = [];
         foreach ($lst as $follower) {
-            if (!$follower->isBlocked()) {
-                \Log::debug("follower preferences " . json_encode($follower->preferences) . " does not include blocked");
-                $retval[] = $follower->fencer->uuid;
-            }
+            $retval[] = $follower->fencer->uuid;
         }
         return $retval;
     }
 
     private function getFollowing(): array
     {
-        // we return all blocked users we are following, so we can manage blocks in the application
         $user = Auth::user();
-        return Follow::with('fencer')->where('device_user_id', $user->getKey())->get()->pluck('fencer.uuid')->toArray();
+        $retval = [];
+        foreach (Follow::with('fencer')->where('device_user_id', $user->getKey())->get() as $follower) {
+            if (!$follower->isBlocked()) {
+                \Log::debug("follower preferences " . json_encode($follower->preferences) . " does not include blocked");
+                $retval[] = $follower->fencer->uuid;
+            }
+        }
+        return $array;
     }
 }

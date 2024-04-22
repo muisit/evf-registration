@@ -124,6 +124,10 @@ class Fencer
             return true;
         }
 
+        // device users can create fencer data, but there is no
+        // easy way to unlink it
+        if ($user->hasRole('device')) return true;
+
         // all other people cannot create fencer data
         return false;
     }
@@ -136,6 +140,7 @@ class Fencer
      */
     public function update(EVFUser $user, Model $model): bool
     {
+        \Log::debug("fencer update policy");
         // organisers with registration rights can update a fencer model
         if ($this->isOrganiserOrRegistrar($user)) {
             return true;
@@ -146,7 +151,13 @@ class Fencer
             return true;
         }
 
-        // all other people cannot create fencer data
+        // device users can update fencer data, but only their own
+        // They can also update a random user, if they are not linked yet
+        // (in which case they are linked afterwards)
+        \Log::debug("testing has role device and model id " . json_encode([$user->hasRole('device'), $user->fencer_id, $model->getKey()]));
+        if ($user->hasRole('device') && ($user->fencer_id == $model->getKey() || $user->fencer_id === null)) return true;
+
+        // all other people cannot update fencer data
         return false;
     }
 

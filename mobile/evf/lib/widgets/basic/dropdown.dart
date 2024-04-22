@@ -12,8 +12,10 @@ class Dropdown extends StatelessWidget {
   final List<DropdownOption> options;
   final String value;
   final DropdownCallback callback;
+  final bool disabled;
 
-  const Dropdown({super.key, required this.options, required this.value, required this.callback});
+  const Dropdown(
+      {super.key, required this.options, required this.value, required this.callback, this.disabled = false});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,7 @@ class Dropdown extends StatelessWidget {
         items: options.map<DropdownMenuItem<String>>((DropdownOption value) {
           return DropdownMenuItem(value: value.value, child: Text(value.label));
         }).toList(),
-        onChanged: _onChanged,
+        onChanged: disabled ? null : _onChanged,
         value: value);
   }
 
