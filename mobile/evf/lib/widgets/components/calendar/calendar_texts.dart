@@ -19,28 +19,31 @@ class CalendarTexts extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Expanded(
-                        child: Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
-                            child: RichText(
-                              text: TextSpan(
-                                style: AppStyles.headerText,
-                                text: item.title,
-                              ),
-                              textAlign: TextAlign.left,
-                            ))),
-                    IconButton(
-                      icon: const Icon(Icons.link_outlined),
-                      onPressed: _pressIcon,
-                    )
-                  ],
-                ),
+                SizedBox(
+                    height: 36,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                            child: Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
+                                child: RichText(
+                                  text: TextSpan(
+                                    style: AppStyles.headerText,
+                                    text: item.title,
+                                  ),
+                                  textAlign: TextAlign.left,
+                                ))),
+                        if (item.url.isNotEmpty)
+                          IconButton(
+                            icon: const Icon(Icons.link_outlined),
+                            onPressed: _pressIcon,
+                          )
+                      ],
+                    )),
                 Container(
-                    transform: Matrix4.translationValues(0.0, -12.0, 0.0),
+                    transform: Matrix4.translationValues(0.0, -8.0, 0.0),
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,

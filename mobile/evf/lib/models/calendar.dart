@@ -16,16 +16,16 @@ class Calendar {
       this.endDate, this.mutated);
 
   Calendar.fromJson(Map<String, dynamic> doc)
-      : id = doc['id'] as String,
-        title = doc['title'] as String,
-        content = doc['content'] as String,
-        location = doc['location'] as String,
-        country = doc['country'] as String,
-        url = doc['url'] as String,
-        feed = doc['feed'] as String,
-        startDate = DateTime.parse(doc['start'] as String),
-        endDate = DateTime.parse(doc['end'] as String),
-        mutated = DateTime.parse(doc['mutated'] as String);
+      : id = doc['id'] ?? '',
+        title = doc['title'] ?? '',
+        content = doc['content'] ?? '',
+        location = doc['location'] ?? '',
+        country = doc['country'] ?? '',
+        url = doc['url'] ?? '',
+        feed = doc['feed'] ?? '',
+        startDate = DateTime.parse(doc['startDate'] ?? '2000-01-01'),
+        endDate = DateTime.parse(doc['endDate'] ?? '2000-01-01'),
+        mutated = DateTime.parse(doc['mutated'] ?? '2000-01-01');
 
   Map<String, dynamic> toJson() => {
         'id': id,

@@ -11,27 +11,29 @@ class CalendarDates extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            RichText(
-              text: TextSpan(
-                style: AppStyles.calendarDates,
-                text: formattedDate(context, item.startDate),
-              ),
-              textAlign: TextAlign.left,
-            ),
-            if (_moreDates())
-              RichText(
-                text: TextSpan(
-                  style: AppStyles.calendarDates,
-                  text: formattedDate(context, item.endDate),
+        child: SizedBox(
+            width: 50,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    style: AppStyles.calendarDates,
+                    text: formattedDate(context, item.startDate),
+                  ),
+                  textAlign: TextAlign.left,
                 ),
-                textAlign: TextAlign.left,
-              )
-          ],
-        ));
+                if (_moreDates())
+                  RichText(
+                    text: TextSpan(
+                      style: AppStyles.calendarDates,
+                      text: formattedDate(context, item.endDate),
+                    ),
+                    textAlign: TextAlign.left,
+                  )
+              ],
+            )));
   }
 
   bool _moreDates() {
