@@ -58,14 +58,36 @@ class Follow
     public function update(EVFUser $user, Model $model): bool
     {
         \Log::debug("testing Follow::update policy");
-        // someone can 'update' a Follower if they are the owner
         // this is only accessible to device-environments
         if ($user->hasRole("device") && ($user instanceof DeviceUser)) {
+            // someone can 'update' a Follower if they are the owner
             if ($model->device_user_id == $user->getKey()) {
                 return true;
             }
         }
+
         // all other people cannot update followers
+        return false;
+    }
+
+    /**
+     * @param User $user
+     * @param Model $model
+     *
+     * @return bool
+     */
+    public function block(EVFUser $user, Model $model): bool
+    {
+        \Log::debug("testing Follow::block policy");
+        // this is only accessible to device-environments
+        if ($user->hasRole("device") && ($user instanceof DeviceUser)) {
+            // someone can 'block' a Follower if they are the subject
+            if ($model->fencer_id == $user->fencer->getKey()) {
+                return true;
+            }
+        }
+
+        // all other people cannot block followers
         return false;
     }
 }

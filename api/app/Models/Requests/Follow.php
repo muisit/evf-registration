@@ -45,7 +45,7 @@ class Follow extends Base
         $data = $request->get('follow');
         $id = '';
         if (!empty($data)) {
-            $id = $data['fencer'] ?? 0;
+            $id = $data['fencer'] ?? '';
         }
 
         $fencer = Fencer::where('uuid', $id)->first();
@@ -65,7 +65,7 @@ class Follow extends Base
     protected function updateModel(array $data): ?Model
     {
         if ($this->model) {
-            \Log::debug("updating model");
+            \Log::debug("updating model " . json_encode($data));
             // unneeded, but better be sure: reset the device_user_id
             $this->model->device_user_id = Auth::user()->getKey();
 
@@ -75,15 +75,15 @@ class Follow extends Base
 
             // just copy all the preferences, we already validated that only supported values are inside
             // We run over all supported settings and set/unset them depending on the passed values
-            $prefs = $data['follow']['preferences'] ?? [];
-            if (empty($prefs)) {
+            $prefs = $data['follow']['preferences'] ?? null;
+            if ($prefs === null) {
                 // this is the case when the user just 'follows' someone, without prior settings
                 $user = Auth::user();
                 if (isset($user->preferences) && isset($user->preferences['account']) && isset($user->preferences['account']['following'])) {
                     $prefs = Auth::user()->preferences['account']['following'];
                 }
             }
-            if (empty($prefs)) {
+            if ($prefs === null) {
                 // just enable default preferences
                 $prefs = ['handout', 'ranking', 'result', 'register'];
             }

@@ -11,6 +11,7 @@ Route::group([
 ], function () {
     Route::get('/status', 'Device\Status@index')->name('device.status');
     Route::post('/follow', 'Device\Follow@index')->name('device.follow');
+    Route::post('/block', 'Device\Block@index')->name('device.block');
     Route::get('/rankdetails/{weapon}/{uuid}', 'Device\RankDetails@index')->name('device.rankdetails');
     Route::get('/ranking/{weapon}/{category}', 'Device\Ranking@index')->name('device.ranking');
     Route::get('/events', 'Device\Events@index')->name('device.events');
@@ -20,4 +21,5 @@ Route::group([
     Route::post('/account/verify', 'Device\Account\Verify@index')->name('device.verify');
     Route::post('/account/check', 'Device\Account\Check@index')->name('device.check');
     Route::post('/account/link', 'Device\Account\Link@index')->name('device.link');
+    Route::post('/account/preferences', 'Device\Account\Preferences@index')->name('device.preferences');
 });

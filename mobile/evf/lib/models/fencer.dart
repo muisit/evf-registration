@@ -12,10 +12,10 @@ class Fencer {
         countryShort = '';
 
   Fencer.fromJson(Map<String, dynamic> doc)
-      : id = doc['id'] as String,
-        lastName = doc['lastName'] as String,
-        firstName = doc['firstName'] as String,
-        country = doc['country'] as String,
+      : id = (doc['id'] ?? '') as String,
+        lastName = (doc['lastName'] ?? '') as String,
+        firstName = (doc['firstName'] ?? '') as String,
+        country = (doc['country'] ?? '') as String,
         countryShort = doc['countryShort'] ?? '';
 
   Map<String, dynamic> toJson() => {

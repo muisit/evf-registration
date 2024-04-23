@@ -30,8 +30,8 @@ class DeviceStatusService
             $retval->ranking = $this->getRankingStatus();
             $retval->results = $this->getResultStatus();
 
-            $retval->followers = $this->getFollowers();
-            //$retval->following = $this->getFollowing();
+            //$retval->followers = $this->getFollowers();
+            $retval->following = $this->getFollowing();
         }
         // else the log in device is not registered, we return an empty struct
         return $retval;
@@ -112,11 +112,9 @@ class DeviceStatusService
         $user = Auth::user();
         $retval = [];
         foreach (Follow::with('fencer')->where('device_user_id', $user->getKey())->get() as $follower) {
-            if (!$follower->isBlocked()) {
-                \Log::debug("follower preferences " . json_encode($follower->preferences) . " does not include blocked");
-                $retval[] = $follower->fencer->uuid;
-            }
+            \Log::debug("follower preferences " . json_encode($follower->preferences) . " does not include blocked");
+            $retval[] = $follower->fencer->uuid;
         }
-        return $array;
+        return $retval;
     }
 }

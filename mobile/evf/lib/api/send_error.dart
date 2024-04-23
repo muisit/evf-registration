@@ -10,7 +10,7 @@ Future sendError(String message) async {
       'message': message,
       'deviceId': Environment.instance.authToken,
     });
-    await api.post();
+    await api.postRaw();
   } catch (e) {
     // do not report on errors in this interface
   }

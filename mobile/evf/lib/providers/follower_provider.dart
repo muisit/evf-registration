@@ -7,7 +7,6 @@ import 'package:evf/models/follower.dart';
 import 'package:flutter/material.dart';
 
 class FollowerProvider extends ChangeNotifier {
-  Map<String, Follower> followers = {};
   Map<String, Follower> following = {};
 
   bool isLoading = false;
@@ -24,8 +23,14 @@ class FollowerProvider extends ChangeNotifier {
     }
   }
 
+  Future unfollow(String uuid) async {
+    if (following.containsKey(uuid)) {
+      return await removeFollowing(uuid);
+    }
+  }
+
+  // toggle us following a fencer uuid
   Future<bool> toggleFollowing(String uuid) async {
-    Environment.debug("toggling following for $uuid");
     if (following.containsKey(uuid)) {
       return await removeFollowing(uuid);
     } else {
@@ -33,10 +38,11 @@ class FollowerProvider extends ChangeNotifier {
     }
   }
 
+  // add us following a fencer uuid
   Future<bool> addFollowing(String uuid) async {
     final network = await api.addFollowing(uuid);
     if (network) {
-      final follower = Follower.device(uuid);
+      final follower = Follower(uuid);
       follower.synced = true;
       following[uuid] = follower;
       await _storeItemsInCache();
@@ -58,21 +64,23 @@ class FollowerProvider extends ChangeNotifier {
     return true;
   }
 
-  void syncItems(List<String> followers) async {
+  void syncItems(List<String> following) async {
     // this is called when the status was updated. We need to synchronize our database of
-    // followers and following with the list of uuids in the status
-    for (var uuid in followers) {
-      if (!this.followers.containsKey(uuid)) {
+    // fencers we are following with the list of uuids in the status
+    for (var uuid in following) {
+      if (!this.following.containsKey(uuid)) {
         final follower = Follower(uuid);
         follower.synced = true;
-        this.followers[uuid] = follower;
+        this.following[uuid] = follower;
       }
     }
-    for (var key in this.followers.keys) {
-      if (!followers.contains(key)) {
-        this.followers.remove(key);
+    for (var key in this.following.keys) {
+      if (!following.contains(key)) {
+        this.following.remove(key);
       }
     }
+
+    // the status update does not give us a list of who is following us
 
     await _storeItemsInCache();
     notifyListeners();
@@ -80,16 +88,11 @@ class FollowerProvider extends ChangeNotifier {
 
   Future loadItemsFromCache() async {
     try {
-      final doc1 = jsonDecode(await Environment.instance.cache.getCache("followers.json")) as List<dynamic>;
-      for (var content in doc1) {
-        var follower = Follower.fromJson(content as Map<String, dynamic>);
-        followers[follower.fencer.id] = follower;
-      }
-
+      // list of fencers we follow, may or may not have a device user
       final doc2 = jsonDecode(await Environment.instance.cache.getCache("following.json")) as List<dynamic>;
       for (var content in doc2) {
         var follower = Follower.fromJson(content as Map<String, dynamic>);
-        following[follower.user] = follower;
+        following[follower.fencer.id] = follower;
       }
       _loadedFromCache = true;
       notifyListeners();
@@ -99,7 +102,42 @@ class FollowerProvider extends ChangeNotifier {
   }
 
   Future _storeItemsInCache() async {
-    await Environment.instance.cache.setCache("followers.json", const Duration(days: 7), jsonEncode(followers));
-    await Environment.instance.cache.setCache("followers.json", const Duration(days: 7), jsonEncode(following));
+    await Environment.instance.cache.setCache("following.json", const Duration(days: 7), jsonEncode(following));
+  }
+
+  void updateFollowing(Follower follower) {
+    Environment.debug("processing update to follower");
+    final dt = DateTime.now();
+    follower.lastUpdate = dt;
+    follower.synced = false;
+    following[follower.fencer.id] = follower;
+    // make sure the widget updates now and shows the new check value
+    notifyListeners();
+
+    Future.delayed(const Duration(seconds: 1), () => _sendAndStoreItems(dt, follower.fencer.id));
+  }
+
+  Future _sendAndStoreItems(DateTime dt, String uuid) async {
+    Environment.debug("sendAndStoreItems");
+    // only sync if the last update is at the same moment as the time passed
+    // That means there has been no further update to this follower since
+    if (following.containsKey(uuid) &&
+        following[uuid]!.lastUpdate != null &&
+        following[uuid]!.lastUpdate!.isAtSameMomentAs(dt)) {
+      try {
+        Environment.debug("sending FollowingObject with preferences");
+        final network = await api.addFollowingObject(following[uuid]!);
+        if (network) {
+          following[uuid]!.synced = true;
+          following[uuid]!.lastUpdate = null;
+          await _storeItemsInCache();
+          notifyListeners();
+        }
+      } catch (e) {
+        // let it go for now...
+      }
+    } else {
+      Environment.debug("skipping due to not same time");
+    }
   }
 }

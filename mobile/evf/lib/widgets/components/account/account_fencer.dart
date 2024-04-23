@@ -242,7 +242,6 @@ class _AccountFencerState extends State<AccountFencer> {
               },
               child: Text(AppLocalizations.of(context)!.labelChange),
             ),
-          Text("isLinking $isLinking canEdit $canEdit"),
         ]));
   }
 

@@ -33,7 +33,7 @@ class DeviceUser extends Model implements AuthenticatableContract, AuthorizableC
             // create default preferences to apply to followers and following
             $model->preferences = [
                 'account' => [
-                    'follower' => ['handout', 'ranking', 'result', 'register'],
+                    'followers' => ['handout', 'ranking', 'result', 'register'],
                     'following' => ['handout', 'ranking', 'result', 'register']
                 ]
             ];

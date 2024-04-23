@@ -29,7 +29,7 @@ class AccountStatusService
             // following feeds for people we follow: handout, ranking, result, register
             // Symmetrically, we also allow followers only those feeds
             $retval->preferences = [
-                'follower' => ['handout', 'ranking', 'result', 'register'],
+                'followers' => ['handout', 'ranking', 'result', 'register'],
                 'following' => ['handout', 'ranking', 'result', 'register']
             ];
             if (isset($user->preferences['account'])) {

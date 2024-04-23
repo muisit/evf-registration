@@ -7,7 +7,7 @@ class Status {
   String lastResult;
   int resultCount;
   String lastRanking;
-  List<String> followers;
+  List<String> following;
 
   Status()
       : deviceId = '',
@@ -18,7 +18,7 @@ class Status {
         lastResult = '',
         resultCount = 0,
         lastRanking = '',
-        followers = [];
+        following = [];
 
   Status.fromJson(Map<String, dynamic> values)
       : deviceId = values['id'] as String,
@@ -29,9 +29,9 @@ class Status {
         lastResult = values['results']['last'] as String,
         resultCount = values['results']['count'] as int,
         lastRanking = values['ranking']['last'] as String,
-        followers = [] {
-    var lst = values['followers'] as List<dynamic>;
-    followers = lst.map<String>((e) => e.toString()).toList();
+        following = [] {
+    var lst = values['following'] as List<dynamic>;
+    following = lst.map<String>((e) => e.toString()).toList();
   }
 
   Map<String, dynamic> toJson() => {
@@ -40,6 +40,6 @@ class Status {
         'calendar': {'last': lastCalendar, 'count': calendarCount},
         'results': {'last': lastResult, 'count': resultCount},
         'ranking': {'last': lastRanking, 'count': 0},
-        'followers': followers,
+        'following': following,
       };
 }

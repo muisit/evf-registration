@@ -1,7 +1,7 @@
 import 'package:evf/environment.dart';
 
 class AccountPreferences {
-  List<String> follower = [];
+  List<String> followers = [];
   List<String> following = [];
 
   AccountPreferences();
@@ -9,8 +9,8 @@ class AccountPreferences {
   AccountPreferences.fromJson(Map<String, dynamic> doc) {
     Environment.debug("Converting account preference sublists");
 
-    if (doc['follower'] != null) {
-      follower = (doc['follower'] as List<dynamic>).map<String>((d) => d.toString()).toList();
+    if (doc['followers'] != null) {
+      followers = (doc['followers'] as List<dynamic>).map<String>((d) => d.toString()).toList();
     }
 
     if (doc['following'] != null) {
@@ -21,7 +21,7 @@ class AccountPreferences {
   }
 
   Map<String, dynamic> toJson() => {
-        'follower': follower,
+        'followers': followers,
         'following': following,
       };
 }

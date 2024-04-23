@@ -14,6 +14,9 @@ class Follower {
   bool unfollow = false; // local setting
   bool synced = false; // local setting
 
+  // locally used fields
+  DateTime? lastUpdate;
+
   Follower(String uuid) : fencer = Fencer(uuid);
   Follower.device(String uuid)
       : fencer = Fencer(''),
@@ -22,18 +25,48 @@ class Follower {
   Follower.fromJson(Map<String, dynamic> doc)
       : fencer = Fencer.fromJson(doc['fencer'] ?? {}),
         user = doc['user'] ?? '' {
-    Environment.debug("converting list of preferences for Follower");
-    final preferences = doc['preferences'] as List<String>;
-    handout = preferences.contains('handout');
-    checkin = preferences.contains('checkin');
-    checkout = preferences.contains('checkout');
-    ranking = preferences.contains('ranking');
-    result = preferences.contains('result');
-    register = preferences.contains('register');
-    blocked = preferences.contains('blocked');
+    try {
+      final preferences = doc['preferences'] as List<dynamic>;
+      handout = false;
+      checkin = false;
+      checkout = false;
+      ranking = false;
+      result = false;
+      register = false;
+      blocked = false;
+
+      for (String p in preferences) {
+        switch (p) {
+          case 'handout':
+            handout = true;
+            break;
+          case 'checkin':
+            checkin = true;
+            break;
+          case 'checkout':
+            checkout = true;
+            break;
+          case 'ranking':
+            ranking = true;
+            break;
+          case 'result':
+            result = true;
+            break;
+          case 'register':
+            register = true;
+            break;
+          case 'block':
+            blocked = true;
+            break;
+        }
+      }
+    } catch (e) {
+      // probably a non-existing or empty list
+      Environment.debug("caught $e on preference conversion");
+    }
   }
 
-  Map<String, dynamic> toJson() {
+  List<String> toPreferences() {
     List<String> preferences = [];
     if (handout) preferences.add('handout');
     if (checkin) preferences.add('checkin');
@@ -41,13 +74,16 @@ class Follower {
     if (ranking) preferences.add('ranking');
     if (result) preferences.add('result');
     if (register) preferences.add('register');
-    if (blocked) preferences.add('blocked');
+    if (blocked) preferences.add('block');
     if (synced) preferences.add('synced');
+    return preferences;
+  }
 
+  Map<String, dynamic> toJson() {
     return {
       'fencer': fencer,
       'user': user,
-      'preferences': preferences,
+      'preferences': toPreferences(),
     };
   }
 }

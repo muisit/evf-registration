@@ -7,7 +7,7 @@ Future<bool?> alert(String descr) async {
       context: router.rootNavigatorKey.currentState!.context,
       builder: (BuildContext context) {
         return SimpleDialog(
-          title: Text(AppLocalizations.of(context)!.titleConfirmation),
+          title: Text(AppLocalizations.of(context)!.titleAlert),
           contentPadding: const EdgeInsets.all(10),
           children: [
             Text(descr),
