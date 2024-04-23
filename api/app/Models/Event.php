@@ -138,7 +138,11 @@ class Event extends Model
 
     public function generateFunctionalCodes()
     {
+        $ids = AccreditationUser::select('id')->where('event_id', $this->getKey())->where('accreditation_id', null)->get()->pluck('id');
+        AccreditationAudit::whereIn('created_by', $ids)->delete();
+        AccreditationDocument::whereIn('created_by', $ids)->delete();
         AccreditationUser::where('event_id', $this->getKey())->where('accreditation_id', null)->delete();
+
         $user = new AccreditationUser();
         $user->code = $this->generateFunctionalCode(0);
         $user->type = "organiser";
@@ -166,6 +170,12 @@ class Event extends Model
         $user = new AccreditationUser();
         $user->code = $this->generateFunctionalCode(4);
         $user->type = "dt";
+        $user->event_id = $this->getKey();
+        $user->save();
+
+        $user = new AccreditationUser();
+        $user->code = $this->generateFunctionalCode(5);
+        $user->type = "overview";
         $user->event_id = $this->getKey();
         $user->save();
     }

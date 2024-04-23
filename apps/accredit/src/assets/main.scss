@@ -183,6 +183,11 @@
     }
 }
 
+#app > div { 
+    height: 100%;
+    width: 100%;
+}
+
 @media (min-width: 1024px) {
     #app {
         .el-container {
@@ -215,4 +220,5 @@
 @import 'checkin.scss';
 @import 'checkout.scss';
 @import 'dt.scss';
+@import "overview.scss";
 

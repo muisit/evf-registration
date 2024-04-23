@@ -66,7 +66,7 @@ class AuthServiceProvider extends ServiceProvider
         });
         Broadcast::channel('checkout.{eventId}', function (EVFUser $user, int $eventId) {
             \Log::debug("checkout, user has roles " . json_encode($user->getAuthRoles()));
-            return $user->hasRole('code') && $user->hasRole(["checkout:" . $eventId]);
+            return $user->hasRole('code') && ($user->hasRole(["checkout:" . $eventId]) || $user->hasRole(["overview:" . $eventId]));
         });
         Broadcast::channel('dt.{eventId}', function (EVFUser $user, int $eventId) {
             return $user->hasRole('code') && $user->hasRole(["dt:" . $eventId]);

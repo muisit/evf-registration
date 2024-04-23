@@ -393,6 +393,9 @@ import { generatecodes } from '../../../common/api/event/generatecodes';
                     <ElFormItem label="DT Code">
                         {{ currentEvent.codes && currentEvent.codes['dt'] }}
                     </ElFormItem>
+                    <ElFormItem label="Overview Code">
+                        {{ currentEvent.codes && currentEvent.codes['overview'] }}
+                    </ElFormItem>
                     <ElFormItem class="buttons">
                         <ElButton @click="generateCodes" type="primary">Generate</ElButton>
                     </ElFormItem>
