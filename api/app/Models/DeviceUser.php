@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use App\Support\Contracts\EVFUser as EVFUserContract;
 use App\Support\Traits\EVFUser;
@@ -83,9 +84,14 @@ class DeviceUser extends Model implements AuthenticatableContract, AuthorizableC
         return $this->hasMany(Device::class);
     }
 
-    public function feed(): HasMany
+    public function originalFeeds(): HasMany
     {
-        return $this->hasMany(DeviceFeed::class);
+        return $this->hasMany(DeviceFeed::class, 'device_user_id');
+    }
+
+    public function feeds(): BelongsToMany
+    {
+        return $this->belongsToMany(DeviceFeed::class, 'device_user_feeds', 'device_user_id', 'device_feed_id');
     }
 
     public function mergeWith(DeviceUser $user)

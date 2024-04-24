@@ -17,6 +17,7 @@ Route::group([
     Route::get('/events', 'Device\Events@index')->name('device.events');
     Route::get('/results/{competitionId}', 'Device\Results@index')->name('device.results');
     Route::get('/calendar', 'Device\Calendar@index')->name('device.calendar');
+    Route::get('/feed', 'Device\Feed@index')->name('device.feed');
 
     Route::get('/account', 'Device\Account\Get@index')->name('device.account');
     Route::post('/account/verify', 'Device\Account\Verify@index')->name('device.verify');

@@ -44,6 +44,7 @@ class StatusProvider extends ChangeNotifier {
       Environment.debug("listeners notified of new status, requesting other providers to reload");
       Environment.debug("lastRanking is ${status!.lastRanking}");
       Environment.instance.followerProvider.syncItems(status!.following);
+      Environment.instance.feedProvider.loadItems();
     }
     // return the old value while we are not loading, or when we finished loading
     return Future.value(status);

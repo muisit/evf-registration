@@ -3,20 +3,22 @@
 // once. If feed lists become too large at some point, we may need to apply some pagination
 // to load it in parts
 
-import 'package:evf/env/feed_items.dart';
+import 'package:evf/models/feed_item.dart';
 import 'package:evf/models/feed_list.dart';
-//import 'package:evf/environment.dart';
-//import 'interface.dart';
+import 'package:evf/environment.dart';
+import 'interface.dart';
 
 Future<FeedList> loadFeed({DateTime? lastDate}) async {
-  return Future.value(feedItems());
-  /*
-  Environment.instance.debug("calling loadFeed");
-  final api = Interface.create(path: '/device/feed');
-  if (lastDate != null) {
-    api.data['last'] = lastDate.toIso8601String();
+  try {
+    Environment.debug("calling loadFeed");
+    final api = Interface.create(path: '/device/feed');
+    if (lastDate != null) {
+      api.data['last'] = lastDate.toIso8601String();
+    }
+    var content = await api.get();
+    return FeedList.fromJson(content as List<dynamic>);
+  } catch (e) {
+    Environment.debug("caught $e while loading feed");
   }
-  var content = await api.get();
-  return FeedList.fromJson(content['list'] as List<dynamic>);
-  */
+  return FeedList();
 }

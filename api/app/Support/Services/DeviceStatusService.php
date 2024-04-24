@@ -39,18 +39,9 @@ class DeviceStatusService
 
     private function getFeedStatus(DeviceUser $user): BlockStatus
     {
-        $rows = DB::table(DeviceFeed::tableName())
-            ->select([DB::Raw("count(*) as cnt"), DB::Raw("max(updated_at) as last")])
-            ->where(function (Builder $query) use ($user) {
-                $query->where("device_user_id", $user->getKey())
-                    ->orWhereNull('device_user_id');
-            })
-            ->where('updated_at', '>', Carbon::now()->subYears(2))
-            ->get();
-        if (count($rows) > 0) {
-            return new BlockStatus($rows[0]->cnt ?? 0, $rows[0]->last ?? '');
-        }
-        return new BlockStatus();
+        $ft = DeviceFeed::tableName();
+        $cnt = $user->loadCount('feeds')->loadMax('feeds', 'updated_at');
+        return new BlockStatus(intval($cnt->feeds_count), $cnt->feeds_max_updated_at);
     }
 
     private function getCalendarStatus(): BlockStatus
@@ -112,7 +103,6 @@ class DeviceStatusService
         $user = Auth::user();
         $retval = [];
         foreach (Follow::with('fencer')->where('device_user_id', $user->getKey())->get() as $follower) {
-            \Log::debug("follower preferences " . json_encode($follower->preferences) . " does not include blocked");
             $retval[] = $follower->fencer->uuid;
         }
         return $retval;

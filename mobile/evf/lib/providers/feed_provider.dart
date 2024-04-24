@@ -28,6 +28,7 @@ class FeedProvider extends ChangeNotifier {
 
   // load the feed items from our cached storage, if we haven't loaded them yet
   Future loadItems({bool doForce = false}) async {
+    Environment.debug("loading feed items $_loadedFromCache $doForce");
     if (!_loadedFromCache) {
       await loadItemInventory();
       await loadItemBlocks();
@@ -41,6 +42,7 @@ class FeedProvider extends ChangeNotifier {
     // if we have no date, we have no feeds. Just set a very old date as default
     final lastDate = status.lastFeed == '' ? DateTime(2000, 1, 1) : DateTime.parse(status.lastFeed);
 
+    Environment.debug("most recent date is ${_items.mostRecentDate} vs $lastDate");
     if (_items.mostRecentDate.isBefore(lastDate)) {
       // there are pending feed items on the server with a more recent mutation date
       doForce = true;
@@ -49,34 +51,41 @@ class FeedProvider extends ChangeNotifier {
     // the back-end (last 2 years) and we might have more feeds stored locally.
 
     if (doForce) {
+      Environment.debug("loading newer feed items from network");
       await loadFeedItems();
     }
   }
 
   Future loadItemInventory() async {
     try {
+      Environment.debug("loading feeds from cache");
       final doc = await Environment.instance.cache.getCache("feeds.json");
       inventory = FeedInventory.fromJson(jsonDecode(doc) as List<dynamic>);
     } catch (e) {
+      Environment.debug("caught $e loading item inventory");
       // if there are problems, start with a clean feed
       inventory = FeedInventory();
     }
   }
 
   Future loadItemBlocks() async {
+    Environment.debug("loading item blocks");
     for (final block in inventory.blocks) {
       try {
+        Environment.debug("loading feed block from cache: ${block.path}");
         final doc = await Environment.instance.cache.getCache(block.path);
         block.load(jsonDecode(doc) as List<dynamic>);
         // add it to our display list
         add(block.items);
       } catch (e) {
+        Environment.debug("caught $e converting item block");
         // if we failed to load the items, just skip the block
       }
     }
   }
 
   Future saveItemBlock(FeedBlock block) async {
+    Environment.debug("saving feed block");
     final content = block.export();
     await Environment.instance.cache.setCache(
       block.path,
@@ -86,6 +95,7 @@ class FeedProvider extends ChangeNotifier {
   }
 
   Future saveItemInventory() async {
+    Environment.debug("saving feed inventory");
     final content = jsonEncode(inventory.toJson());
     await Environment.instance.cache.setCache(
       "feeds.json",
@@ -95,22 +105,32 @@ class FeedProvider extends ChangeNotifier {
   }
 
   Future loadFeedItems() async {
+    Environment.debug("loading feed items over the network");
     final networkItems = await loadFeed(lastDate: _items.mostRecentDate);
+    Environment.debug("adding network items to list");
     add(networkItems.list);
+
+    // adjust the caching block setup
     for (final item in networkItems.list) {
       final block = inventory.findBlockForFeed(item);
       block.add(item);
     }
 
+    Environment.debug("determining if there were any changes");
     var wasChanged = false;
     for (final block in inventory.blocks) {
       if (block.wasChanged) {
+        Environment.debug("found changed block");
         wasChanged = true;
-        saveItemBlock(block);
+        await saveItemBlock(block);
+      } else {
+        Environment.debug("block was not changed");
       }
     }
     if (wasChanged) {
-      saveItemInventory();
+      await saveItemInventory();
+    } else {
+      Environment.debug("no changes detected in blocks");
     }
   }
 }

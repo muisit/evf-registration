@@ -7,6 +7,8 @@
 // item, this will fail. But that should not occur: mutation dates should only increase as new
 // versions of a feed item are inserted.
 
+import 'package:evf/environment.dart';
+
 import './feed_item.dart';
 
 class FeedList {
@@ -22,7 +24,9 @@ class FeedList {
   }
 
   void add(FeedItem item) {
+    Environment.debug("adding item to feedlist");
     if (item.mutated.isAfter(_lastMutation)) {
+      Environment.debug("updating lastMutation to ${item.mutated}");
       _lastMutation = item.mutated;
     }
     if (_list.isEmpty) {

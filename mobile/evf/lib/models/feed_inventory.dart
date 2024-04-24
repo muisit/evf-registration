@@ -6,6 +6,8 @@
 // becomes a problem, we can restrict the number of blocks that are loaded at any
 // given time.
 
+import 'package:evf/environment.dart';
+
 import 'feed_item.dart';
 
 class FeedBlock {
@@ -25,7 +27,7 @@ class FeedBlock {
   FeedBlock.fromJson(Map<String, dynamic> json)
       : start = DateTime.parse(json['start'] as String),
         end = DateTime.parse(json['end'] as String),
-        count = json['count'] as int,
+        count = int.tryParse(json['count'] ?? '0') ?? 0,
         path = json['path'] as String;
 
   Map<String, String> toJson() =>
@@ -37,14 +39,17 @@ class FeedBlock {
   }
 
   void add(FeedItem item) {
+    Environment.debug("adding feed item to block");
     for (final li in items) {
       if (li.id == item.id) {
+        Environment.debug("item already found in block");
         return;
       }
     }
     count += 1;
     items.add(item);
     wasChanged = true;
+    Environment.debug("item added to block, changed flag set");
   }
 
   List<dynamic> export() {
@@ -72,9 +77,12 @@ class FeedInventory {
   FeedInventory();
 
   FeedInventory.fromJson(List<dynamic> json) {
+    Environment.debug("loading inventory from json");
     blocks = [];
     for (Map<String, dynamic> content in json) {
-      blocks.add(FeedBlock.fromJson(content));
+      final block = FeedBlock.fromJson(content);
+      Environment.debug("adding block to inventory list");
+      blocks.add(block);
     }
   }
 
@@ -94,6 +102,8 @@ class FeedInventory {
     }
 
     // create a new block based on the year for this feed
-    return FeedBlock.forItem(item);
+    final block = FeedBlock.forItem(item);
+    blocks.add(block);
+    return block;
   }
 }

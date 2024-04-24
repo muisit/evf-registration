@@ -35,6 +35,8 @@ class FeedItem {
   var type = FeedType.notification;
   var title = '';
   var content = '';
+  var url = '';
+  var user = '';
   DateTime published = DateTime.now();
   DateTime mutated = DateTime.now();
 
@@ -43,24 +45,30 @@ class FeedItem {
       this.type = FeedType.notification,
       this.title = '',
       this.content = '',
+      this.url = '',
+      this.user = '',
       DateTime? published,
       DateTime? mutated})
       : published = published ?? DateTime.now(),
         mutated = mutated ?? DateTime.now();
 
   FeedItem.fromJson(Map<String, dynamic> json)
-      : id = json['id'] as String,
-        type = FeedType.fromValue(json['type'] as int),
-        title = json['title'] as String,
-        content = json['content'] as String,
-        published = DateTime.parse(json['published'] as String),
-        mutated = DateTime.parse(json['mutated'] as String);
+      : id = json['id'] ?? '',
+        type = FeedType.fromValue(int.tryParse(json['type'] ?? '1') ?? 1),
+        title = json['title'] ?? '',
+        content = json['content'] ?? '',
+        url = json['url'] ?? '',
+        user = json['user'] ?? '',
+        published = DateTime.parse(json['published'] ?? '2000-01-01'),
+        mutated = DateTime.parse(json['mutated'] ?? '2000-01-01');
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'type': type.value,
+        'type': type.value.toString(),
         'title': title,
         'content': content,
+        'url': url,
+        'user': user,
         'published': published.toIso8601String(),
         'mutated': mutated.toIso8601String()
       };

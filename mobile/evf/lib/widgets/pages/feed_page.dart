@@ -8,7 +8,7 @@ class FeedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Environment.instance.feedProvider.loadFeedItems();
+    Environment.instance.feedProvider.loadItems();
     return ListenableBuilder(
         listenable: Environment.instance.feedProvider,
         builder: (BuildContext context, Widget? child) {
