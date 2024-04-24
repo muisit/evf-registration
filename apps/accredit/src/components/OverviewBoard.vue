@@ -1,16 +1,12 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
-import type { Ref } from 'vue';
-import type { Code } from '../../../common/api/schemas/codes';
-import type { Fencer } from '../../../common/api/schemas/fencer';
+import { ref, watch, computed } from 'vue';
+import type { Ref, StyleValue } from 'vue';
 import type { AccreditationDocument } from '../../../common/api/schemas/accreditationdocument';
 import { useAuthStore } from '../../../common/stores/auth';
 import { useDataStore } from '../stores/data';
 import { useBasicStore } from '../../../common/stores/basic';
 import { useBroadcasterStore } from '../../../common/stores/broadcaster';
 import { documents } from '../../../common/api/accreditations/documents';
-import { savedocument } from '../../../common/api/accreditations/savedocument';
-import { dayjs } from 'element-plus';
 
 const props = defineProps<{
     visible:boolean;
@@ -135,42 +131,63 @@ function showInterface()
                     </tr>                    
                 </thead>
 */
+
+const pendingObject:Ref<StyleValue> = computed(() => {
+    let baseObject:StyleValue = {
+        fontSize: basic.event.config.overviewstyle?.fontsize || '32pt',
+        color: basic.event.config.overviewstyle?.pendingText || 'white',
+        backgroundColor: basic.event.config.overviewstyle?.pending || 'rgb(4, 40, 199)',
+    };
+    return baseObject;
+});
+const startedObject:Ref<StyleValue> = computed(() => {
+    let baseObject:StyleValue = {
+        fontSize: basic.event.config.overviewstyle?.fontsize || '32pt',
+        color: basic.event.config.overviewstyle?.startedText || 'black',
+        backgroundColor: basic.event.config.overviewstyle?.started || 'rgb(251, 233, 137)',
+    };
+    return baseObject;
+});
+const finishedObject:Ref<StyleValue> = computed(() => {
+    let baseObject:StyleValue = {
+        fontSize: basic.event.config.overviewstyle?.fontsize || '32pt',
+        color: basic.event.config.overviewstyle?.finishedText || 'white',
+        backgroundColor: basic.event.config.overviewstyle?.finished || 'rgb(19, 156, 72)',
+    };
+    return baseObject;
+});
+const errorObject:Ref<StyleValue> = computed(() => {
+    let baseObject:StyleValue = {
+        fontSize: basic.event.config.overviewstyle?.fontsize || '32pt',
+        color: basic.event.config.overviewstyle?.errorText || 'black',
+        backgroundColor: basic.event.config.overviewstyle?.error || 'rgb(253, 108, 108)',
+    };
+    return baseObject;
+});
+
 </script>
 <template>
     <div class="main-app overview-interface" v-if="showInterface()">
         <div class="table-wrapper">
             <table class="processed-list">
                 <tbody>
-                    <tr v-for="entity in processedDocumentList" :key="entity.id"  :class="{
-                            'checkout-row': true,
-                            'processed': true,
-                            'error': entity.status == 'E'
-                        }">
-                        <td class="name">{{ entity.name }}</td>
-                        <td class="country">{{ getCountry(entity.countryId || 0) }}</td>
-                        <td v-if="basic.eventRequiresCards()" class="code">{{ entity.card }}</td>
+                    <tr v-for="entity in processedDocumentList" :key="entity.id"  class="checkout-row" :style="entity.status == 'E' ? errorObject : finishedObject">
                         <td v-if="basic.eventRequiresDocuments()" class="code">{{ entity.document }}</td>
-                        <td>Finished</td>
+                        <td class="small">Finished</td>
+                        <td class="name"><div class='subname'>{{ entity.name }}</div></td>
+                        <td class="country">{{ getCountry(entity.countryId || 0) }}</td>
                     </tr>
-                    <tr v-for="entity in startedDocumentList" :key="entity.id" :class="{
-                            'checkout-row': true,
-                            'started': true
-                        }">
-                        <td class="name">{{ entity.name }}</td>
-                        <td class="country">{{ getCountry(entity.countryId || 0) }}</td>
-                        <td v-if="basic.eventRequiresCards()" class="code">{{ entity.card }}</td>
+                    <tr v-for="entity in startedDocumentList" :key="entity.id" class="checkout-row" :style="startedObject">
                         <td v-if="basic.eventRequiresDocuments()" class="code">{{ entity.document }}</td>
-                        <td>Started</td>
+                        <td class="small">Started</td>
+                        <td class="name"><div class='subname'>{{ entity.name }}</div></td>
+                        <td class="country">{{ getCountry(entity.countryId || 0) }}</td>
                     </tr>
-                    <tr v-for="entity in pendingDocumentList" :key="entity.id" :class="{
-                            'checkout-row': true,
-                            'pending': true
-                        }">
-                        <td class="name">{{ entity.name }}</td>
-                        <td class="country">{{ getCountry(entity.countryId || 0) }}</td>
-                        <td v-if="basic.eventRequiresCards()" class="code">{{ entity.card }}</td>
+                    <tr v-for="entity in pendingDocumentList" :key="entity.id" class="checkout-row" :style="pendingObject">
                         <td v-if="basic.eventRequiresDocuments()" class="code">{{ entity.document }}</td>
-                        <td>Waiting</td>
+                        <td class="small">Waiting</td>
+                        <td class="name"><div class='subname'>{{ entity.name }}</div></td>
+                        <td class="country">{{ getCountry(entity.countryId || 0) }}</td>
                     </tr>
                 </tbody>
             </table>

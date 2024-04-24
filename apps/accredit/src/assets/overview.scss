@@ -7,6 +7,7 @@
         height: 100%;
         width: 100%;
         overflow: scroll;
+        table-layout: fixed;
 
         table {
             width: 100%;
@@ -14,6 +15,7 @@
             padding: 0 20px;
             border-collapse: separate;
 
+            /* the following is no longer used */
             tr.pending {
                 background-color: rgb(4, 40, 199);
                 color: white;
@@ -33,9 +35,26 @@
 
             tr {
                 td {
-                    padding: 10px 5px;
+                    padding: 10px 15px;
                     border: 1px solid black;
                     border-width: 1px 0 1px 0;
+                }
+
+                td.small, td.code, td.country {
+                    width: 1%;
+                }
+                td.name {
+                    overflow: hidden;
+                    white-space: nowrap;
+
+                    .subname {
+                        width: 100%;
+                        position:relative;
+                        margin-right: -1000px;
+                        text-wrap: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
                 }
             }
         }

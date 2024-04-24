@@ -240,12 +240,31 @@ function configValue(label:string)
             return currentEvent.value.config.mark_process_start || false;
         case "combine_checkin_checkout":
             return currentEvent.value.config.combine_checkin_checkout || false;
+        case 'fontsize':
+            return currentEvent.value.config.overviewstyle?.fontsize || '32pt';
+        case 'error':
+            return currentEvent.value.config.overviewstyle?.error || 'rgb(253, 108, 108)';
+        case 'finished':
+            return currentEvent.value.config.overviewstyle?.finished || 'rgb(19, 156, 72)';
+        case 'started':
+            return currentEvent.value.config.overviewstyle?.started || 'rgb(251, 233, 137)';
+        case 'pending':
+            return currentEvent.value.config.overviewstyle?.pending || 'rgb(4, 40, 199)';
+        case 'errorText':
+            return currentEvent.value.config.overviewstyle?.errorText || 'black';
+        case 'finishedText':
+            return currentEvent.value.config.overviewstyle?.finishedText || 'white';
+        case 'startedText':
+            return currentEvent.value.config.overviewstyle?.startedText || 'black';
+        case 'pendingText':
+            return currentEvent.value.config.overviewstyle?.pendingText || 'white';
     }
     return false;
 }
 
 function setConfig(e:any, label:string)
 {
+    if (typeof(currentEvent.value.config.overviewstyle) != 'object') currentEvent.value.config.overviewstyle = {};
     switch(label) {
         case 'require_cards':
             currentEvent.value.config.require_cards = e ? true : false;
@@ -265,11 +284,40 @@ function setConfig(e:any, label:string)
         case "combine_checkin_checkout":
             currentEvent.value.config.combine_checkin_checkout = e ? true : false;
             break;
+        case 'fontsize':
+            currentEvent.value.config.overviewstyle.fontsize = e;
+            break;
+        case 'error':
+            currentEvent.value.config.overviewstyle.error = e;
+            break;
+        case 'finished':
+            currentEvent.value.config.overviewstyle.finished = e;
+            break;
+        case 'started':
+            currentEvent.value.config.overviewstyle.started = e;
+            break;
+        case 'pending':
+            currentEvent.value.config.overviewstyle.pending = e;
+            break;
+        case 'errorText':
+            currentEvent.value.config.overviewstyle.errorText = e;
+            break;
+        case 'finishedText':
+            currentEvent.value.config.overviewstyle.finishedText = e;
+            break;
+        case 'startedText':
+            currentEvent.value.config.overviewstyle.startedText = e;
+            break;
+        case 'pendingText':
+            currentEvent.value.config.overviewstyle.pendingText = e;
+            break;
     }
+    console.log('config is now', currentEvent.value.config);
 }
 
 function saveConfig()
 {
+    console.log('saving ', currentEvent.value.config);
     auth.isLoading('saveconfig');
     saveeventconfig(currentEvent.value.config).then(() => {
         auth.hasLoaded('saveconfig');
@@ -282,7 +330,7 @@ function saveConfig()
     })
 }
 
-import { ElSelect, ElOption, ElTabs, ElTabPane, ElForm, ElFormItem, ElCheckbox, ElButton } from 'element-plus';
+import { ElSelect, ElOption, ElTabs, ElTabPane, ElForm, ElFormItem, ElCheckbox, ElButton, ElInput } from 'element-plus';
 </script>
 <template>
     <div class="main-app admin-interface" v-if="auth.isOrganiser(auth.eventId, 'code')">
@@ -330,6 +378,36 @@ import { ElSelect, ElOption, ElTabs, ElTabPane, ElForm, ElFormItem, ElCheckbox, 
                 <ElFormItem label="Checkout" class="config">
                     <ElCheckbox :model-value="configValue('combine_checkin_checkout')" @update:model-value="(e) => setConfig(e, 'combine_checkin_checkout')" label="Combine Check-In and Check-Out Stations"/>
                 </ElFormItem>
+                <br/>
+                <br/>
+                <ElFormItem label="Fontsize" class="config">
+                    <ElInput :model-value="configValue('fontsize')" @update:model-value="(e) => setConfig(e, 'fontsize')"/>
+                </ElFormItem>
+                <ElFormItem label="Pending colour" class="config">
+                    <ElInput :model-value="configValue('pending')" @update:model-value="(e) => setConfig(e, 'pending')"/>
+                </ElFormItem>
+                <ElFormItem label="Pending text" class="config">
+                    <ElInput :model-value="configValue('pendingText')" @update:model-value="(e) => setConfig(e, 'pendingText')"/>
+                </ElFormItem>
+                <ElFormItem label="Started colour" class="config">
+                    <ElInput :model-value="configValue('started')" @update:model-value="(e) => setConfig(e, 'started')"/>
+                </ElFormItem>
+                <ElFormItem label="Started text" class="config">
+                    <ElInput :model-value="configValue('startedText')" @update:model-value="(e) => setConfig(e, 'startedText')"/>
+                </ElFormItem>
+                <ElFormItem label="Finished colour" class="config">
+                    <ElInput :model-value="configValue('finished')" @update:model-value="(e) => setConfig(e, 'finished')"/>
+                </ElFormItem>
+                <ElFormItem label="Finished text" class="config">
+                    <ElInput :model-value="configValue('finishedText')" @update:model-value="(e) => setConfig(e, 'finishedText')"/>
+                </ElFormItem>
+                <ElFormItem label="Error colour" class="config">
+                    <ElInput :model-value="configValue('error')" @update:model-value="(e) => setConfig(e, 'error')"/>
+                </ElFormItem>
+                <ElFormItem label="Error text" class="config">
+                    <ElInput :model-value="configValue('errorText')" @update:model-value="(e) => setConfig(e, 'errorText')"/>
+                </ElFormItem>
+                
                 <ElFormItem class="buttons">
                     <ElButton @click="saveConfig" type="primary">Save</ElButton>
                 </ElFormItem>
