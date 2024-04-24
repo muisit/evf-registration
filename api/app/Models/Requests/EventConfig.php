@@ -78,7 +78,8 @@ class EventConfig extends Base
             'allow_incomplete_checkin',
             'allow_hod_checkout',
             'mark_process_start',
-            'combine_checkin_checkout'
+            'combine_checkin_checkout',
+            'overviewstyle',
         ];
 
         $keylist = array_keys($obj);
@@ -86,6 +87,9 @@ class EventConfig extends Base
         foreach ($keys as $key) {
             if (in_array($key, $keylist)) {
                 $retval[$key] = $obj[$key] ? true : false;
+                if ($key == 'overviewstyle') {
+                    $retval[$key] = $obj[$key];
+                }
             }
         }
         return $retval;

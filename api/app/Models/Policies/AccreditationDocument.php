@@ -37,7 +37,7 @@ class AccreditationDocument
             }
         }
 
-        if (!empty($eventId) && $user->hasRole(['checkout:' . $eventId])) {
+        if (!empty($eventId) && $user->hasRole(['checkout:' . $eventId, 'overview:' . $eventId])) {
             return true;
         }
         return false;

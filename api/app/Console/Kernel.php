@@ -10,6 +10,7 @@ use App\Jobs\CheckSummaries;
 use App\Console\Commands\QueueCleanAccreditations;
 use App\Console\Commands\QueueCheckDirtyBadges;
 use App\Console\Commands\QueueCheckDirtyDocuments;
+use App\Console\Commands\QueueRecreateDocuments;
 use App\Console\Commands\SendGeneralNotification;
 
 class Kernel extends ConsoleKernel
@@ -23,6 +24,7 @@ class Kernel extends ConsoleKernel
         QueueCleanAccreditations::class,
         QueueCheckDirtyBadges::class,
         QueueCheckDirtyDocuments::class,
+        QueueRecreateDocuments::class,
         SendGeneralNotification::class
     ];
 

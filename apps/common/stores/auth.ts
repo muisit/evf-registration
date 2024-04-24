@@ -136,6 +136,11 @@ export const useAuthStore = defineStore('auth', () => {
         return credentials.value.includes('checkout:' + eid) && credentials.value.includes('code');
     }
 
+    function isOverview(eid?:number|null|undefined, type:string = 'user') {
+        if (!eid) eid = eventId.value;
+        return credentials.value.includes('overview:' + eid) && credentials.value.includes('code');
+    }
+
     function isAccreditor(eid?:number|null|undefined, type:string = 'user') {
         if (!eid) eid = eventId.value;
         return credentials.value.includes('accreditation:' + eid) && credentials.value.includes(type);
@@ -165,7 +170,7 @@ export const useAuthStore = defineStore('auth', () => {
         sendMe, logIn, logOut,
         isRegistrationUser, isCodeUser,
         isSysop, isHod, isSuperHod, isHodFor, isOrganisation, isOrganiser, isRegistrar, isCashier, isAccreditor,
-        isCheckin, isCheckout, isDT,
+        isCheckin, isCheckout, isDT, isOverview,
         canRegister, canCashier, canSwitchCountry
     }
 })

@@ -1,5 +1,21 @@
 <?php
 
+function outputDocumentCode($index, $codeData)
+{
+    $code = $codeData['code'];
+    $nr = intval($codeData['document']);
+
+    echo "template print doc 0 0\r\n";
+
+    echo "fontsize 12\r\n";
+    echo "barcode 15 207.5 50 15 \"$code\" 1d\r\n";
+    echo "text 22 222.5 \"$code\"\r\n";
+    echo "barcode 15 242.5 50 15 \"$code\" 1d\r\n";
+    echo "text 22 257.5 \"$code\"\r\n";
+    echo "fontsize 20\r\n";
+    echo "text 30 60.5 \"$nr\"\r\n";
+}
+
 function documentParameters()
 {
     $pretext = <<< HEREDOC
@@ -155,11 +171,11 @@ text 17 168.5 "BODY WIRE / FIL DE CORPS"
 text 16 178.5 "MASK WIRE / FIL DE MASQUE"
 text 12 188.5 "MASK BIB / BAVETTE DE MASQUE"
 
-text 34 202.5 "CHECK IN"
+text 32 202.5 "CHECK IN"
 text 96 202.5 "DATE, TIME"
 text 141 202.5 "SIGNATURE CONTROL TEAM"
 
-text 34 237.5 "CHECK OUT"
+text 32 237.5 "CHECK OUT"
 text 96 237.5 "DATE, TIME"
 text 141 237.5 "SIGNATURE FENCER"
 
@@ -172,9 +188,5 @@ HEREDOC;
 
     return [
         'template' => $pretext,
-        'code1' => [15, 207.5, 50, 20],
-        'code2' => [15, 242.5, 50, 20],
-        'fontsize' => 16,
-        'text1' => [15, 61.5],
     ];
 }

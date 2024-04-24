@@ -72,10 +72,12 @@ watch(
 
 import DashboardView from './pages/DashboardView.vue';
 import LoadingService from './components/special/LoadingService.vue';
+import Overview from './components/OverviewBoard.vue';
 </script>
 <template>
     <div>
         <LoadingService/>
-        <DashboardView/>
+        <DashboardView v-if="!authStore.isOverview(authStore.eventId, 'code')"/>
+        <Overview v-else :visible="true" />
     </div>
 </template>

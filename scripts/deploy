@@ -17,6 +17,7 @@ USER='michiel'
 GROUP='www-data'
 
 WD=`pwd`
+WD=`realpath $WD`
 LOG="$WD/.release.$EXT"
 WD="$WD/$EXT"
 
@@ -47,6 +48,9 @@ echo "Patching versions in env files" >> $LOG
 cat $WD/api/.env | sed "s/APP_VERSION=.*/APP_VERSION=$APIVERSION\.$BUILDNR/" > tmp; mv tmp $WD/api/.env
 cat $WD/apps/reg/.env | sed "s/VITE_VERSION=.*/VITE_VERSION=$REGVERSION\.$BUILDNR/" > tmp; mv tmp $WD/apps/reg/.env
 cat $WD/apps/accredit/.env | sed "s/VITE_VERSION=.*/VITE_VERSION=$ACCRVERSION\.$BUILDNR/" > tmp; mv tmp $WD/apps/accredit/.env
+
+echo "Patching present working directory in env testing file" >> $LOG
+cat $WD/api/.env.testing | sed "s#{PWD}#$WD#" > tmp; mv tmp $WD/api/.env.testing
 
 cd api
 

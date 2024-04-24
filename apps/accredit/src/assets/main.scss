@@ -175,12 +175,17 @@
 }
 
 #app {
+    padding: 0px !important;
+
     .el-container {
         .el-main {
-            max-width: 1024px;
-            padding: 10px 0vw;
         }
     }
+}
+
+#app > div { 
+    height: 100%;
+    width: 100%;
 }
 
 @media (min-width: 1024px) {
@@ -215,4 +220,5 @@
 @import 'checkin.scss';
 @import 'checkout.scss';
 @import 'dt.scss';
+@import "overview.scss";
 
