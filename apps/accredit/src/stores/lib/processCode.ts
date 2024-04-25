@@ -26,7 +26,7 @@ export function processCode(code:string, dispatcher:CodeDispatcher)
         case 3:
             const basicStore = useBasicStore();
             codeObject.data = (((codeObject.id1 || 0) % 10)*1000) + (codeObject.id2 || 0);
-            if (basicStore.event && (basicStore.event?.id || 0) != (codeObject.payload || 0)) {
+            if (basicStore.event && !(((basicStore.event?.id || 0) == (codeObject.payload || 0)) || (parseInt(codeObject.payload || '0') == 37))) {
                 if (dispatcher.fail) dispatcher.fail(code, codeObject);
             }
             else {
