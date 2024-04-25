@@ -258,6 +258,14 @@ function configValue(label:string)
             return currentEvent.value.config.overviewstyle?.startedText || 'black';
         case 'pendingText':
             return currentEvent.value.config.overviewstyle?.pendingText || 'white';
+        case 'title':
+            return currentEvent.value.config.overviewstyle?.title || 'Bag Control';
+        case 'titleSize':
+            return currentEvent.value.config.overviewstyle?.titleSize || '20pt';
+        case 'height':
+            return currentEvent.value.config.overviewstyle?.titleHeight || '50px';
+        case 'logo':
+            return currentEvent.value.config.overviewstyle?.logo || '';
     }
     return false;
 }
@@ -310,6 +318,18 @@ function setConfig(e:any, label:string)
             break;
         case 'pendingText':
             currentEvent.value.config.overviewstyle.pendingText = e;
+            break;
+        case 'title':
+            currentEvent.value.config.overviewstyle.title = e;
+            break;
+        case 'titleSize':
+            currentEvent.value.config.overviewstyle.titleSize = e;
+            break;
+        case 'height':
+            currentEvent.value.config.overviewstyle.titleHeight = e;
+            break;
+        case 'logo':
+            currentEvent.value.config.overviewstyle.logo = e;
             break;
     }
     console.log('config is now', currentEvent.value.config);
@@ -406,6 +426,18 @@ import { ElSelect, ElOption, ElTabs, ElTabPane, ElForm, ElFormItem, ElCheckbox, 
                 </ElFormItem>
                 <ElFormItem label="Error text" class="config">
                     <ElInput :model-value="configValue('errorText')" @update:model-value="(e) => setConfig(e, 'errorText')"/>
+                </ElFormItem>
+                <ElFormItem label="Overview Title" class="config">
+                    <ElInput :model-value="configValue('title')" @update:model-value="(e) => setConfig(e, 'title')"/>
+                </ElFormItem>
+                <ElFormItem label="Overview Title Font Size" class="config">
+                    <ElInput :model-value="configValue('titleSize')" @update:model-value="(e) => setConfig(e, 'titleSize')"/>
+                </ElFormItem>
+                <ElFormItem label="Overview height" class="config">
+                    <ElInput :model-value="configValue('height')" @update:model-value="(e) => setConfig(e, 'height')"/>
+                </ElFormItem>
+                <ElFormItem label="Overview Logo" class="config">
+                    <ElInput :model-value="configValue('logo')" @update:model-value="(e) => setConfig(e, 'logo')"/>
                 </ElFormItem>
                 
                 <ElFormItem class="buttons">

@@ -3,6 +3,32 @@
     width: 100%;
     background-color: var(--el-color-primary);
 
+    .overview-header {
+        width: 100%;
+        color: white;
+        position: relative;
+
+        div.logo {
+            float: left;
+            height: 100%;
+            max-width: 200px;
+
+            img {
+                height: 100%;
+            }
+        }
+
+        div.title {
+            font-family: Helvetica, Arial, sans-serif;
+            text-align: center;
+            vertical-align: middle;
+            text-wrap: nowrap;
+            width: 100%;
+            position: absolute;
+            bottom: 5px;
+        }
+    }
+
     .table-wrapper {
         height: 100%;
         width: 100%;
@@ -35,7 +61,7 @@
 
             tr {
                 td {
-                    padding: 10px 15px;
+                    padding: 5px 15px;
                     border: 1px solid black;
                     border-width: 1px 0 1px 0;
                 }
@@ -54,6 +80,8 @@
                         text-wrap: nowrap;
                         overflow: hidden;
                         text-overflow: ellipsis;
+                        height: 1.1em;
+                        padding-top: 4px;
                     }
                 }
             }

@@ -164,10 +164,23 @@ const errorObject:Ref<StyleValue> = computed(() => {
     };
     return baseObject;
 });
+const overviewObject:Ref<StyleValue> = computed(() => {
+    let baseObject:StyleValue = {
+        height: basic.event.config.overviewstyle?.height || '50px',
+        fontSize: basic.event.config.overviewstyle?.titleSize || '20pt',
+    };
+    return baseObject;
+});
 
 </script>
 <template>
     <div class="main-app overview-interface" v-if="showInterface()">
+        <div class="overview-header" :style="overviewObject">
+            <div class="logo" v-if="basic.event.config.overviewstyle?.logo">
+                <img :src="basic.event.config.overviewstyle?.logo"/>
+            </div>
+            <div class="title">{{ basic.event.config.overviewstyle?.title }}</div>
+        </div>
         <div class="table-wrapper">
             <table class="processed-list">
                 <tbody>
