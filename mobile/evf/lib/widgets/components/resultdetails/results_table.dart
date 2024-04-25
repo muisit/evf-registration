@@ -66,7 +66,7 @@ class ResultsTable extends StatelessWidget {
                   position.fencer.firstName,
                   maxFontSize: 18,
                   minFontSize: 8,
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

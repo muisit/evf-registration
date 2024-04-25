@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
 class AppStyles {
+  static const logoStyle = TextStyle(
+    color: Color.fromARGB(255, 221, 233, 246),
+    fontSize: 26,
+    fontWeight: FontWeight.bold,
+    fontFamily: "Arial",
+  );
+
   static const plainText = TextStyle(
     fontStyle: FontStyle.normal,
     color: Colors.black,
