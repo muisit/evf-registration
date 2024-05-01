@@ -37,6 +37,7 @@ foreach ($codes as $code) {
         case '2': $type = 'Check-in'; break;
         case '3': $type = 'Check-out'; break;
         case '4': $type = 'DT'; break;
+        case '5': $type = 'Overview'; break;
     }
 
     echo <<< HEREDOC

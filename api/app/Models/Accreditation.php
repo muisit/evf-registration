@@ -14,6 +14,30 @@ class Accreditation extends Model
     public $timestamps = false;
     protected $guarded = [];
 
+    public static function booted()
+    {
+        static::deleting(function ($model) {
+            // deleting an accreditation after the event has started should not happen
+            // However, this may occur in the test phase before
+
+            // remove all entries in the AccreditationAudit table
+            AccreditationAudit::where('accreditation_id', $model->getKey())->delete();
+            // remove all documents linked to this accreditation
+            AccreditationDocument::where('accreditation_id', $model->getKey())->delete();
+            // Remove all users linked to this accreditation
+            // Loop this, because there should only be one or two rows
+            foreach (AccreditationUser::where('accreditation_id', $model->getKey())->get() as $user) {
+                $user->delete(); // invoke method to get additional delete actions
+            };
+
+            // delete the badge
+            $path = $model->path();
+            if (file_exists($path)) {
+                @unlink($path);
+            }
+        });
+    }
+
     public static function makeDirty(Fencer $fencer, ?Event $event)
     {
         $sql = Accreditation::where("fencer_id", $fencer->getKey());
@@ -73,22 +97,6 @@ class Accreditation extends Model
     public function path($makeAbsolute = true)
     {
         return PDFService::pdfPath($this->event, sprintf("badges/badge_%d.pdf", $this->id), $makeAbsolute);
-    }
-
-    public function delete()
-    {
-        // delete all linked audit entries
-        AccreditationAudit::where('accreditation_id', $this->getKey())->delete();
-        // delete all linked AccreditationUsers
-        // Loop this, because there should only be one or two rows
-        foreach (AccreditationUser::where('accreditation_id', $this->getKey())->get() as $user) {
-            $user->delete(); // invoke method to get additional delete actions
-        };
-        $path = $this->path();
-        if (file_exists($path)) {
-            @unlink($path);
-        }
-        return parent::delete();
     }
 
     public static function createControlDigit(string $id)
