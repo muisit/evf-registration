@@ -197,7 +197,8 @@ class RegistrationXMLService
         // skip Arme, used for mixed competitions
         // skip Club
         // skip Dossard... mask number
-        // skip Licence
+        // Licence: FencingTime requires a license field before it can link people to a team... aaarrghh
+        $tireur->setAttribute("Licence", $reg->registration_fencer);
         // skip LicenceNat
         // skip Ligue
         // skip NbMatches
