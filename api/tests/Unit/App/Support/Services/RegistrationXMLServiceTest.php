@@ -31,7 +31,7 @@ class RegistrationXMLServiceTest extends TestCase
         $this->assertCount(1, $child->children());
         $fencer = $child->children()[0];
         $this->assertEquals("Tireur", $fencer->getName());
-        $this->assertCount(9, $fencer->attributes());
+        $this->assertCount(10, $fencer->attributes());
 
         $reg = Registration::find(RegistrationData::REG2);
         $reg->registration_event = EventData::MFCAT1;
@@ -64,7 +64,7 @@ class RegistrationXMLServiceTest extends TestCase
         $this->assertCount(4, $child->children());
         $fencer = $child->children()[0];
         $this->assertEquals("Tireur", $fencer->getName());
-        $this->assertCount(10, $fencer->attributes()); // includes team name
+        $this->assertCount(11, $fencer->attributes()); // includes team name
 
         $child = $xml->children()[1];
         $this->assertEquals("Equipes", $child->getName());
