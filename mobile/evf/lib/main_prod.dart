@@ -9,6 +9,7 @@ Future<void> main() async {
   // this sets the static Environment.instance
   Environment(flavor: Production());
   await initialization();
+  Environment.instance.postInitialize();
   FlutterNativeSplash.remove();
   runApp(const MainApp(doDebug: false));
 }

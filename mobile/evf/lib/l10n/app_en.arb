@@ -230,5 +230,22 @@
     "errorTooOld": "You picked a date of birth that is too long ago",
     "errorTooYoung": "You picked a date of birth that is too recent",
     "errorFencerNotFound": "The fencer data was not found. Do you want to create a new entry or go back and adjust the data",
-    "errorLinkError": "There was an error linking the fencer data to the account. Please check the data and try again"
+    "errorLinkError": "There was an error linking the fencer data to the account. Please check the data and try again",
+
+    "notifyYouResult": "You ended up on place {place} at {location} in {weapon} {category}",
+    "notifyTheyResult": "{name} ended up on place {place} at {location} in {weapon} {category}",
+    "notifyYouRanking": "Your ranking is currently place {place} in {weapon} {category}",
+    "notifyTheyRanking": "{name} currently ranks at place {place} in {weapon} {category}",
+    "notifyYouRegister": "You are registered for {weapon} {category} in {location} on {date}",
+    "notifyTheyRegister": "{name} is registered for {weapon} {category} in {location} on {date}",
+    "notifyYouHandout": "You received your accreditation badge in {location}",
+    "notifyTheyHandout": "{name} has received their accreditation badge in {location}",
+    "notifyYouCheckin": "You checked in your equipment at weapon control in {location}",
+    "notifyTheyCheckin": "{name} checked in their equipment at weapon control in {location}",
+    "notifyYouCheckout": "Your equipment has finished the equipment check; you can retrieve it",
+    "notifyTheyCheckout": "The equipment of {name} has finished the equipment check and is ready for retrieval",
+    "notifyYouCheckoutError": "Your equipment has finished the equipment check, but issues were found; you can retrieve it",
+    "notifyTheyCheckoutError": "The equipment of {name} has finished the equipment check with issues and is ready for retrieval",
+    "notifyYouCheckedOut": "You retrieved your equipment at weapon control in {location}",
+    "notifyTheyCheckedOut": "{name} has retrieved their equipment at weapon control in {location}"
 }

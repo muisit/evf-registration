@@ -18,6 +18,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Environment.instance.localizations = AppLocalizations.of(context);
     return MultiProvider(
         providers: [
           ChangeNotifierProvider<StatusProvider>(create: (context) => Environment.instance.statusProvider),

@@ -1,3 +1,9 @@
+import 'dart:io';
+
+import 'package:evf/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
 import 'environment.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -12,6 +18,14 @@ Future initialization() async {
     // Preload what we have regarding followers from cache
     // It will be updated as soon as we get our initial status message
     await Environment.instance.followerProvider.loadItemsFromCache();
+
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      Environment.instance.notificationProvider.handleMessage(message);
+    });
+
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
     // do not await this, just let it load
     Environment.instance.statusProvider.loadStatus();
     Environment.debug("end of initialization");
@@ -30,4 +44,10 @@ Future scheduledTasks() async {
 
   // call the schedule every minute
   await Future.delayed(Environment.instance.flavor.schedule, scheduledTasks);
+}
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  Environment.instance.notificationProvider.handleMessage(message);
 }
