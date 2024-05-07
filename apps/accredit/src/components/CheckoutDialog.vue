@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { random_hash } from '../../../common/functions';
+import { is_valid, random_hash } from '../../../common/functions';
 import type { Fencer } from '../../../common/api/schemas/fencer';
 import type { AccreditationDocument } from '../../../common/api/schemas/accreditationdocument';
 import type { Code } from '../../../common/api/schemas/codes';
@@ -77,6 +77,11 @@ function isAllowed()
     return false;
 }
 
+function hasValidFencer()
+{
+  return is_valid(props.fencer?.id);
+}
+
 function isOwnBag()
 {
     if (props.fencer && props.document) {
@@ -108,7 +113,7 @@ import PhotoId from './special/PhotoId.vue';
           </div>
         </div>
         <div v-if="!isOwnBag()" class="owner">
-          <div class="hodfield field">Note: Bag is checked out by the Head of Delegation!</div>
+          <div class="hodfield field" v-if="fencerIsHod(props.fencer, props.document?.countryId || 0)">Note: Bag is checked out by the Head of Delegation!</div>
           <div class="title field"><b>Owner</b></div>
           <div class="field"><b>Name:</b> {{ props.document?.name }}</div>
           <div class="field"><b>Country:</b> {{ basic.countriesById['c' + props.document?.countryId]?.name }}</div>
