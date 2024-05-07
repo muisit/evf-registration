@@ -299,7 +299,7 @@ import CheckinDialog from './CheckinDialog.vue';
                         }">
                         <td class="code">{{ doc.badge }}</td>
                         <td class="name">{{ doc.name }}</td>
-                        <td class="country">{{ basic.countriesById['c' + doc.countryId].abbr }}</td>
+                        <td class="country">{{ basic.countriesById['c' + doc.countryId]?.abbr }}</td>
                         <td class="days">{{ doc.dates?.join(', ') }}</td>
                         <td  v-if="basic.eventRequiresCards()" class="code">{{ doc.card}}</td>
                         <td  v-if="basic.eventRequiresDocuments()" class="code">{{ doc.document }}</td>
