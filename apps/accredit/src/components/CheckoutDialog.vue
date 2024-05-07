@@ -77,9 +77,10 @@ function isAllowed()
     return false;
 }
 
-function hasValidFencer()
+function checkForHod()
 {
-  return is_valid(props.fencer?.id);
+  if (!props.fencer) return false;
+  return fencerIsHod(props.fencer, props.document?.countryId || 0);
 }
 
 function isOwnBag()
@@ -102,7 +103,7 @@ import PhotoId from './special/PhotoId.vue';
         <PhotoId v-if="props.fencer != null" :fencer="props.fencer" :reloadHash="reloadHash"/>
         <div v-if="props.fencer != null" :class="{
           recipient: true,
-          checkoutByHod: fencerIsHod(props.fencer, props.document?.countryId || 0) && !isOwnBag()
+          checkoutByHod: checkForHod() && !isOwnBag()
         }">
           <div class="title field"><b>Recipient</b></div>
           <div class="field"><b>Name:</b> {{ props.fencer?.lastName }}, {{ props.fencer?.firstName }}</div>
@@ -113,7 +114,7 @@ import PhotoId from './special/PhotoId.vue';
           </div>
         </div>
         <div v-if="!isOwnBag()" class="owner">
-          <div class="hodfield field" v-if="fencerIsHod(props.fencer, props.document?.countryId || 0)">Note: Bag is checked out by the Head of Delegation!</div>
+          <div class="hodfield field" v-if="checkForHod()">Note: Bag is checked out by the Head of Delegation!</div>
           <div class="title field"><b>Owner</b></div>
           <div class="field"><b>Name:</b> {{ props.document?.name }}</div>
           <div class="field"><b>Country:</b> {{ basic.countriesById['c' + props.document?.countryId]?.name }}</div>
