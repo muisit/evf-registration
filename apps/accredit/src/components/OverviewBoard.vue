@@ -43,13 +43,16 @@ watch(() => props.visible,
                     processedDocumentList.value = [];
                     startedDocumentList.value = [];
                     dt.map((doc:AccreditationDocument) => {
-                        if(doc.processEnd != null && !doc.checkout) {
+                        if (doc.checkout) {
+                            removeFromAllLists(doc);
+                        }
+                        else if(doc.processEnd != null) {
                             processedDocumentList.value.push(doc);
                         }
-                        else if (doc.processStart != null && !doc.checkout) {
+                        else if (doc.processStart != null) {
                             startedDocumentList.value.push(doc);
                         }
-                        else if (!doc.checkout) {
+                        else {
                             pendingDocumentList.value.push(doc);
                         }
                     });
@@ -70,6 +73,13 @@ function getCountry(cid:number)
         return basic.countriesById[key].abbr;
     }
     return '';
+}
+
+function removeFromAllLists(doc:AccreditationDocument)
+{
+    pendingDocumentList.value = pendingDocumentList.value.filter((d:AccreditationDocument) => d.id != doc.id);
+    startedDocumentList.value = startedDocumentList.value.filter((d:AccreditationDocument) => d.id != doc.id);
+    processedDocumentList.value = processedDocumentList.value.filter((d:AccreditationDocument) => d.id != doc.id);
 }
 
 function moveDocumentToList(doc:AccreditationDocument)
@@ -113,6 +123,9 @@ function moveDocumentToList(doc:AccreditationDocument)
         processedDocumentList.value = processedDocumentList.value.filter((d:AccreditationDocument) => d.id != doc.id);
         startedDocumentList.value = startedDocumentList.value.filter((d:AccreditationDocument) => d.id != doc.id);
         pendingDocumentList.value.unshift(doc);
+    }
+    else {
+        removeFromAllLists(doc);
     }
 }
 
