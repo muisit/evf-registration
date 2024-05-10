@@ -50,7 +50,7 @@ class BadgeService
         }
         $fencer = $accreditations[0]->fencer;
 
-        if (Auth::user()->can('view', $fencer)) {
+        if (!empty(Auth::user()) && Auth::user()->can('view', $fencer)) {
             $this->manager->result->setFencer($fencer, $this->manager->event);
             $this->manager->result->setAccreditations($fencer, $this->manager->event);
         }

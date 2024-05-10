@@ -41,9 +41,12 @@ class CheckDirtyBadges extends Job implements ShouldBeUniqueUntilProcessing
      */
     public function handle()
     {
-        $events = Event::where('event_open', '>', Carbon::now()->toDateString())->get();
+        // take all events that started in the last 2 weeks, or in the future. This compensates
+        // for not having an end-date, but only a duration and we need to regenerate badges during
+        // the event.
+        $events = Event::where('event_open', '>', Carbon::now()->subDays(14)->toDateString())->get();
         foreach ($events as $event) {
-            if ($event->allowGenerationOfAccreditations()) {
+            if (!$event->isFinished() && $event->allowGenerationOfAccreditations()) {
                 // make sure all registered fencers have accreditations
                 $this->makeAllRegistrationsDirty($event);
                 $this->checkDirtyAccreditations($event);
