@@ -22,3 +22,10 @@ api/storage/*.key
 
 wordpress
 
+mobile/evf/android/app/src/*/res/mipmap-hdpi
+mobile/evf/android/app/src/*/res/mipmap-mdpi
+mobile/evf/android/app/src/*/res/mipmap-xhdpi
+mobile/evf/android/app/src/*/res/mipmap-xxhdpi
+mobile/evf/android/app/src/*/res/mipmap-xxxhdpi
+mobile/evf/ios/Runner/Assets.xcassets/AppIcon-dev.appiconset
+mobile/evf/ios/Runner/Assets.xcassets/AppIcon-prod.appiconset
