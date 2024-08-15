@@ -3,7 +3,6 @@
 // once. If feed lists become too large at some point, we may need to apply some pagination
 // to load it in parts
 
-import 'package:evf/models/feed_item.dart';
 import 'package:evf/models/feed_list.dart';
 import 'package:evf/environment.dart';
 import 'interface.dart';

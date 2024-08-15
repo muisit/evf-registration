@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 import 'package:evf/api/send_error.dart';
 import 'package:evf/providers/account_provider.dart';
 import 'package:evf/providers/calendar_provider.dart';
@@ -8,8 +7,7 @@ import 'package:evf/providers/notification_provider.dart';
 import 'package:evf/providers/ranking_provider.dart';
 import 'package:evf/providers/result_provider.dart';
 import 'package:evf/util/alert.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:evf/util/fcm.dart';
 import 'package:intl/intl.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,6 +36,7 @@ class Environment {
   NotificationProvider notificationProvider;
   AppLocalizations? localizations;
   String messagingToken;
+  String? apnsToken;
 
   Environment({required this.flavor})
       : cache = FileCache(),
@@ -106,6 +105,7 @@ class Environment {
   }
 
   Future initialize() async {
+    WidgetsFlutterBinding.ensureInitialized();
     debug("Initializing environment");
     _prefs = await SharedPreferences.getInstance();
     // Load the device ID, if any
@@ -121,21 +121,14 @@ class Environment {
     debug("calling initialize on cache");
     // cache requires preferences to be initialized
     await cache.initialize();
+
+    await FCM.initialise();
     debug("end of environment initialization");
   }
 
-  NotificationSettings? notificationSettings;
-  String? apnsToken;
   Future postInitialize() async {
-    if (Platform.isAndroid || Platform.isIOS) {
-      notificationSettings = await FirebaseMessaging.instance.requestPermission(
-        alert: true,
-        provisional: true,
-      );
-      Environment.messagingToken = await FirebaseMessaging.instance.getToken();
-      if (Platform.isIOS) {
-        apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-      }
-    }
+    debug("running postinitialize, initialising FCM");
+    await FCM.postInitialise();
+    debug("end of post initialise");
   }
 }

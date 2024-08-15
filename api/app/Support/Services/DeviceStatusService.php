@@ -41,7 +41,7 @@ class DeviceStatusService
     {
         $ft = DeviceFeed::tableName();
         $cnt = $user->loadCount('feeds')->loadMax('feeds', 'updated_at');
-        return new BlockStatus(intval($cnt->feeds_count), $cnt->feeds_max_updated_at);
+        return new BlockStatus(intval($cnt->feeds_count), $cnt->feeds_max_updated_at ?? '2000-01-01');
     }
 
     private function getCalendarStatus(): BlockStatus

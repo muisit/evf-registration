@@ -10,6 +10,7 @@ Future<void> main() async {
   Environment(flavor: Development());
   Environment.debug("Starting initialization");
   await initialization();
+  Environment.debug("running post-initialization, but not waiting for that");
   Environment.instance.postInitialize();
   Environment.debug("Initialization finished, removing splash");
   FlutterNativeSplash.remove();

@@ -193,6 +193,7 @@ return [
         //SwaggerLume\ServiceProvider::class,
         Kirschbaum\PowerJoins\PowerJoinsServiceProvider::class,
         Illuminate\Mail\MailServiceProvider::class,
+        Kreait\Laravel\Firebase\ServiceProvider::class,
     ],
 
     /*

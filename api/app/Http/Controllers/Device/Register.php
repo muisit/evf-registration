@@ -12,7 +12,7 @@ class Register extends Base
     /**
      * Register a new device
      *
-     * @OA\Get(
+     * @OA\Post(
      *     path = "/device/register",
      *     @OA\Response(
      *         response = "200",

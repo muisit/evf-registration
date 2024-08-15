@@ -3,9 +3,7 @@ import 'package:evf/models/follower.dart';
 import 'package:evf/styles.dart';
 import 'package:evf/widgets/basic/label_button.dart';
 import 'package:evf/widgets/components/account/following_settings.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FollowingComponent extends StatefulWidget {

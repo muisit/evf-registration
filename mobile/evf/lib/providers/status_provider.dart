@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:evf/api/get_status.dart';
 import 'package:evf/api/register_device.dart';
 import 'package:evf/environment.dart';
@@ -15,8 +16,12 @@ class StatusProvider extends ChangeNotifier {
     var device = await registerDevice();
     Environment.debug("returning json-encoded device");
     await Environment.instance.set('deviceid', device.deviceId);
-    await loadStatus();
     return device.deviceId;
+  }
+
+  Future storeStatus() async {
+    Environment.debug('storing new status values');
+    await registerDeviceStatus(Environment.instance.messagingToken, Platform.localeName);
   }
 
   Future<Status> loadStatus() async {

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:evf/environment.dart';
 import 'package:evf/models/account_data.dart';
 import 'package:evf/styles.dart';

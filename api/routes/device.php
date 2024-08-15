@@ -9,7 +9,9 @@ Route::group([
     'prefix' => 'device',
     'middleware' => 'auth:device'
 ], function () {
-    Route::post('/status', 'Device\Status@index')->name('device.status');
+    Route::get('/status', 'Device\Status@index')->name('device.status');
+    Route::post('/register/status', 'Device\RegisterStatus@index')->name('device.registerstatus');
+    Route::post('/token', 'Device\RegisterToken@index')->name('device.token');
     Route::post('/follow', 'Device\Follow@index')->name('device.follow');
     Route::post('/block', 'Device\Block@index')->name('device.block');
     Route::get('/rankdetails/{weapon}/{uuid}', 'Device\RankDetails@index')->name('device.rankdetails');

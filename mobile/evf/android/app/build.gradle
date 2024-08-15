@@ -75,7 +75,7 @@ android {
             signingConfig signingConfigs.debug
         }
         debug {
-            applicationIdSuffix ".dbg"
+            signingConfig signingConfigs.debug
         }
     }
 }

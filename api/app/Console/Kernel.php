@@ -11,6 +11,7 @@ use App\Console\Commands\QueueCleanAccreditations;
 use App\Console\Commands\QueueCheckDirtyBadges;
 use App\Console\Commands\QueueCheckDirtyDocuments;
 use App\Console\Commands\SendGeneralNotification;
+use App\Console\Commands\SendPushNotification;
 
 class Kernel extends ConsoleKernel
 {
@@ -23,7 +24,8 @@ class Kernel extends ConsoleKernel
         QueueCleanAccreditations::class,
         QueueCheckDirtyBadges::class,
         QueueCheckDirtyDocuments::class,
-        SendGeneralNotification::class
+        SendGeneralNotification::class,
+        SendPushNotification::class
     ];
 
     /**

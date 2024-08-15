@@ -5,10 +5,11 @@ namespace App\Console\Commands;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Illuminate\Console\Command;
+use App\Models\DeviceUser;
 
 class SendPushNotification extends Command
 {
-    protected $signature = 'evf:dirty {user: the user id to send to';
+    protected $signature = 'evf:push {user : the user id to send to}';
  
     /**
      * The console command description.
@@ -19,18 +20,24 @@ class SendPushNotification extends Command
 
     public function handle(): void
     {
-        $firebase = (new Factory())
-            ->withServiceAccount(config_path('/firebase_credentials.json'));
- 
-        $messaging = $firebase->createMessaging();
- 
-        $message = CloudMessage::fromArray([
-            'notification' => [
-                'title' => 'Hello from Firebase!',
-                'body' => 'This is a test notification.'
-            ],
-            'topic' => 'global'
-        ]);
+        $uuid = $this->argument('user');
+        $user = DeviceUser::where('uuid', $uuid)->first();
+        if (empty($user)) {
+            exit(1);
+        }
+
+        foreach ($user->devices as $device) {
+            if (isset($device->platform['messagingToken'])) {
+                $messaging = app('firebase.messaging');
+                $message = CloudMessage::fromArray([
+                    'token' => $device->platform['messagingToken'],
+                    'notification' => [
+                        'title' => 'Hello from EVF!',
+                        'body' => 'This is a test notification.'
+                    ]
+                ]);
+            }
+        }
  
         $messaging->send($message);
     }

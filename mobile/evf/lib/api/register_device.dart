@@ -30,6 +30,24 @@ Future<Device> registerDevice({int tries = 0}) async {
   return Device(id: '');
 }
 
+Future registerDeviceStatus(String token, String locale, {int tries = 0}) async {
+  try {
+    final api = Interface.create(path: '/device/register/status', data: {'token': token, 'locale': locale});
+    await api.post();
+    Environment.debug("device status updated");
+  } on NetworkError {
+    if (tries < 3) {
+      Environment.debug("retrying registerDeviceStatus");
+      return await Future.delayed(
+        const Duration(microseconds: 2000),
+        () => registerDeviceStatus(token, locale, tries: tries + 1),
+      );
+    } else {
+      Environment.debug("failed to update device status");
+    }
+  }
+}
+
 Future<Map<String, String>> getDeviceInfo() async {
   final deviceInfo = DeviceInfoPlugin();
   Map<String, String> retval = {

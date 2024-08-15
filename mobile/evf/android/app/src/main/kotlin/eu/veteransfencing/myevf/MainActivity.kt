@@ -1,4 +1,4 @@
-package com.example.evf
+package eu.veteransfencing.myevf
 
 import io.flutter.embedding.android.FlutterActivity
 

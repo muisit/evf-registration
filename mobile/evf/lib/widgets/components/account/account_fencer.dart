@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:evf/api/account_link.dart';
 import 'package:evf/environment.dart';
 import 'package:evf/models/account_data.dart';

@@ -52,7 +52,7 @@ class Interface {
       this.data = data;
     }
     final url = Environment.instance.flavor.apiUrl + this.path;
-    Environment.debug("calling POST $url with data ${jsonEncode(this.data)} using ${Environment.instance.authToken}");
+    Environment.debug("calling POST $url with data ${jsonEncode(this.data)} using '${Environment.instance.authToken}'");
     final uri = Uri.parse(url);
     //for (var key in this.data.keys) {
     //  this.data[key] = this.data[key].toString();
@@ -79,6 +79,10 @@ class Interface {
       return await _parseError(e, tries, unAuth, (int myTries) async {
         return await get(path: path, data: data, unAuth: unAuth, tries: myTries);
       });
+    } catch (e) {
+      return await _parseError(null, tries, unAuth, (int myTries) async {
+        return await get(path: path, data: data, unAuth: unAuth, tries: myTries);
+      });
     }
   }
 
@@ -94,22 +98,27 @@ class Interface {
       return await _parseError(e, tries, unAuth, (int myTries) async {
         return await post(path: path, data: data, unAuth: unAuth, tries: myTries);
       });
+    } catch (e) {
+      return await _parseError(null, tries, unAuth, (int myTries) async {
+        return await get(path: path, data: data, unAuth: unAuth, tries: myTries);
+      });
     }
   }
 
-  Future<dynamic> _parseError(NetworkError e, int tries, bool expectUnauthenticated, ErrorCall callback) async {
+  Future<dynamic> _parseError(NetworkError? e, int tries, bool expectUnauthenticated, ErrorCall callback) async {
     Environment.debug("parsing a generic network error");
     // Unauthorized problems could be due to our device ID being yanked out from under us on the back-end
     // Reregister and see if this solves the problem. We only try to re-register once (tries == 0): if that
     // does not fix the problem, something else is wrong.
     // If we may expect an unAuth reply, let it go.
     // 401 = Unauthorized
-    if (e.code == 401 && tries == 0 && !expectUnauthenticated) {
+    if (e != null && e.code == 401 && tries == 0 && !expectUnauthenticated) {
       Environment.debug("received an unauthenticated call and we did not expect that. Trying to reregister");
       try {
         var deviceId = await Environment.instance.statusProvider.registerNewDevice();
         Environment.instance.authToken = deviceId;
-        Environment.debug("calling callback after failure to authenticate ${deviceId}");
+        await Environment.instance.statusProvider.loadStatus();
+        Environment.debug("calling callback after failure to authenticate $deviceId");
         return await callback(tries + 1);
       } on Exception {
         Environment.debug('Caught exception while trying to reregister after unauth result');
@@ -119,14 +128,16 @@ class Interface {
     // in case of potential temporary errors, retry after a delay, to see if the
     // server comes back online (could be a deployment problem)
     // 500 = Internal Server Error, 503 = Service Unavailable, 504 = Gateway Timeout
-    else if ((e.code == 500 || e.code == 503 || e.code == 504)) {
+    else if (e == null || (e.code == 500 || e.code == 503 || e.code == 504)) {
       if (tries < 5) {
         Environment.debug("received an internal server error, retrying after some time");
-        return await Future.delayed(const Duration(milliseconds: 500), () async {
+        return await Future.delayed(const Duration(milliseconds: 1000), () async {
           return await callback(tries + 1);
         });
-      } else {
+      } else if (e != null) {
         Environment.error("InternalError: retried call yields ${e.code}: $e");
+      } else {
+        Environment.error("InternalError: retried call yields internal exception");
       }
     } else {
       Environment.error("InternalError: cannot handle ${e.code}: $e ");

@@ -7,7 +7,6 @@ import 'package:evf/api/get_account_data.dart';
 import 'package:evf/api/set_preferences.dart';
 import 'package:evf/environment.dart';
 import 'package:evf/models/account_data.dart';
-import 'package:evf/models/follower.dart';
 
 import 'base_provider.dart';
 

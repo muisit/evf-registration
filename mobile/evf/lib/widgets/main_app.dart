@@ -34,7 +34,7 @@ class MainApp extends StatelessWidget {
           debugShowCheckedModeBanner: doDebug,
           title: "MyEVF",
           theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 0, 51, 102)),
+            colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 0, 51, 102)),
             useMaterial3: true,
           ),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
