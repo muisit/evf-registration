@@ -1,11 +1,13 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:evf/api/account_check.dart';
 import 'package:evf/api/account_verify.dart';
+import 'package:evf/api/set_account.dart';
 import 'package:evf/environment.dart';
 import 'package:evf/models/account_data.dart';
 import 'package:evf/styles.dart';
 import 'package:evf/util/alert.dart';
 import 'package:evf/util/confirmation.dart';
+import 'package:evf/widgets/basic/dropdown.dart';
 import 'package:evf/widgets/basic/fitted_text.dart';
 import 'package:evf/widgets/basic/icon_link.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +36,10 @@ class _AccountEmailState extends State<AccountEmail> {
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
+    final languages = [
+      DropdownOption('en_GB', AppLocalizations.of(context)!.labelEnglish),
+      DropdownOption('nl_NL', AppLocalizations.of(context)!.labelDutch),
+    ];
     emailController.text = widget.data.email;
     return Form(
       key: _formKey,
@@ -54,6 +60,24 @@ class _AccountEmailState extends State<AccountEmail> {
         Text.rich(
           TextSpan(text: widget.data.device, style: AppStyles.italicText),
           textAlign: TextAlign.start,
+        ),
+        const SizedBox(height: 10),
+        FittedText(
+          span: TextSpan(text: AppLocalizations.of(context)!.descrLanguage, style: AppStyles.plainText),
+          textAlign: TextAlign.start,
+        ),
+        Row(
+          children: [
+            SizedBox(
+                width: 100,
+                child:
+                    Text.rich(TextSpan(text: AppLocalizations.of(context)!.labelLanguage, style: AppStyles.boldText))),
+            Dropdown(
+              callback: (opt) => _onSelectLanguage(context, opt),
+              options: languages,
+              value: widget.data.language,
+            )
+          ],
         ),
         const SizedBox(height: 10),
         FittedText(
@@ -223,5 +247,12 @@ class _AccountEmailState extends State<AccountEmail> {
 
   Future<bool?> _confirmChange(BuildContext context) async {
     return confirmation(AppLocalizations.of(context)!.descrReplaceEmail);
+  }
+
+  void _onSelectLanguage(BuildContext context, DropdownOption option) {
+    widget.data.language = option.value;
+    Environment.instance.accountProvider.setData(widget.data);
+    Environment.debug("storing language setting ${widget.data}");
+    setAccount(widget.data);
   }
 }

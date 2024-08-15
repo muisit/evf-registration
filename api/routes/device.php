@@ -22,6 +22,7 @@ Route::group([
     Route::get('/feed', 'Device\Feed@index')->name('device.feed');
 
     Route::get('/account', 'Device\Account\Get@index')->name('device.account');
+    Route::post('/account', 'Device\Account\Save@index')->name('device.saveaccount');
     Route::post('/account/verify', 'Device\Account\Verify@index')->name('device.verify');
     Route::post('/account/check', 'Device\Account\Check@index')->name('device.check');
     Route::post('/account/link', 'Device\Account\Link@index')->name('device.link');

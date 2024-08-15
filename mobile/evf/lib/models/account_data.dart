@@ -7,6 +7,7 @@ class AccountData {
   String id = '';
   String device = '';
   String email = '';
+  String language = 'en_GB';
   DateTime verificationSent;
   bool isVerified = false;
   AccountPreferences preferences;
@@ -23,6 +24,7 @@ class AccountData {
       : id = doc['id'] ?? '',
         device = doc['device'] ?? '',
         email = doc['email'] ?? '',
+        language = doc['preferences']['language'] ?? 'en_GB',
         verificationSent = DateTime.parse(doc['verificationSent'] ?? '2000-01-01'),
         isVerified = doc['isVerified'] ?? false,
         preferences = AccountPreferences(),
@@ -50,6 +52,7 @@ class AccountData {
         'id': id,
         'device': device,
         'email': email,
+        'language': language,
         'lastVerified': verificationSent.toIso8601String(),
         "isVerified": isVerified,
         "preferences": preferences.toJson(),

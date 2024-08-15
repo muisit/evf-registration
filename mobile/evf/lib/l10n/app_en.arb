@@ -84,6 +84,9 @@
     "labelFollowRegister": "Registration",
     "labelFollowEvent": "Event actions",
     "labelAnonymous": "Anonymous",
+    "labelLanguage": "Language",
+    "labelEnglish": "English",
+    "labelDutch": "Dutch",
 
     "headerCountry": "Cnt",
     "headerEvent": "Event",
@@ -157,6 +160,7 @@
 
     "descrDevice": "These are your account and device IDs. Please mention these if you have questions about your account:",
     "descrWebmaster": "If you encounter problems, please contact webmaster@veteransfencing.eu",
+    "descrLanguage": "Choose the language used for personalized server messages. This is set by default to your device language setting, but you may want to override it.",
     "descrEmail": "Enter your e-mail address to connect your account",
     "descrEmailInput": "Enter an e-mail address",
     "descrVerificationCodeInput": "Enter code",

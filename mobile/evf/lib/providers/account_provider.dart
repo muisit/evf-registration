@@ -1,6 +1,7 @@
 // RankingProvider can load items from disk or over the network
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:evf/api/block_follower.dart';
 import 'package:evf/api/get_account_data.dart';
@@ -19,6 +20,7 @@ class AccountProvider extends BaseProvider {
   AccountProvider() : data = AccountData();
 
   Future loadItems() async {
+    data.language = Platform.localeName;
     _loadItemsFromCache();
 
     if (!_isLoading) {
