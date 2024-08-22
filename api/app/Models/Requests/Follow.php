@@ -2,6 +2,7 @@
 
 namespace App\Models\Requests;
 
+use App\Events\FollowEvent;
 use App\Models\Fencer;
 use App\Models\Follow as FollowModel;
 use Illuminate\Database\Eloquent\Model;
@@ -102,10 +103,14 @@ class Follow extends Base
         if (!empty($this->model)) {
             if (in_array('unfollow', array_keys($this->model->preferences))) {
                 \Log::debug("unfollow found, deleting model");
+                // no need to dispatch the feed creation in a job, it only concerns two users at the most
+                FollowEvent::dispatch($this->model->fencer, $this->model->user, true);
                 $this->model->delete();
             }
             else {
                 \Log::debug("saving model");
+                // no need to dispatch the feed creation in a job, it only concerns two users at the most
+                FollowEvent::dispatch($this->model->fencer, $this->model->user, false);
                 $this->model->save();
             }
         }

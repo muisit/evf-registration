@@ -26,8 +26,11 @@ return new class extends Migration
         });
 
         Schema::table('device_feeds', function (Blueprint $table) {
+            $table->string('locale', 10);
             $table->string('content_model', 20);
             $table->string('content_url', 1024);
+            $table->integer('fencer_id')->nullable();
+            $table->foreign('fencer_id')->references('fencer_id')->on('TD_Fencer');
         });
 
         // loop over all posts and create new original feeds
@@ -42,6 +45,7 @@ return new class extends Migration
             $feed->type = DeviceFeed::NEWS; // determines icon
             $feed->title = $post->post_title;
             $feed->content = $feed->fromWPContent($post->post_content);
+            $feed->locale = 'en';
             $feed->content_id = $post->getKey();
             $feed->content_model = 'post'; // determines origin
             $feed->content_url = $feed->createPermalink($post);
@@ -69,10 +73,13 @@ return new class extends Migration
             $table->dropForeign(['device_feed_id']);
         });
         Schema::dropIfExists('device_user_feeds');
-        
+
         Schema::table('device_feeds', function (Blueprint $table) {
             $table->dropColumn('content_model');
             $table->dropColumn('content_url');
+            $table->dropColumn('locale');
+            $table->dropForeign(['fencer_id']);
+            $table->dropColumn('fencer_id');
         });
     }
 };

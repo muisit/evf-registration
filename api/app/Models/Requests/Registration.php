@@ -11,6 +11,7 @@ use App\Models\Registration as RegistrationModel;
 use App\Support\Contracts\EVFUser;
 use App\Support\Enums\PaymentOptions;
 use App\Support\Rules\ValidateTrim;
+use App\Jobs\RegistrationFeedEvents;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
@@ -122,7 +123,7 @@ class Registration extends Base
             if (empty($event) || !$event->exists) {
                 return false;
             }
-            else if(!$event->isOpenForRegistration()) {
+            else if (!$event->isOpenForRegistration()) {
                 return false;
             }
         }
@@ -165,6 +166,8 @@ class Registration extends Base
 
             if (!$this->model->exists) {
                 $this->model->registration_date = Carbon::now()->toDateTimeString();
+                // only send out events when a fencer registers for an event for the first time, not when the registration is updated
+                dispatch(new RegistrationFeedEvents($this->model->registration_fencer, $this->model->registration_event, false))->handle();
             }
         }
         return $this->model;

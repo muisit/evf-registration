@@ -39,6 +39,19 @@ class Fencer extends Model
         return $this->belongsTo(DeviceUser::class, 'fencer_id', 'fencer_id');
     }
 
+    public function followers(): HasMany
+    {
+        return $this->hasMany(Follow::class, 'fencer_id', 'fencer_id');
+    }
+
+    public function triggersEvent($eventType)
+    {
+        if ($this->user()->exists()) {
+            return $this->user()->triggersEvent($eventType);
+        }
+        return false;
+    }
+
     public function image()
     {
         if (empty($this->getKey()) || $this->getKey() < 1) {

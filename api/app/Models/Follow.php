@@ -39,52 +39,16 @@ class Follow extends Model
         $this->preferences = $data;
     }
 
+    public function triggersOnEvent($eventType) {
+        if (!$this->isBlocked() && is_array($this->preferences)) {
+            return in_array($eventType, $this->preferences);
+        }
+    }
+
     public function isBlocked(?bool $value = null) {
         if (!is_null($value)) {
             $this->setPreference('blocked', $value);
         }
         return isset($this->preferences['blocked']);
-    }
-
-    public function feedHandout(?bool $value = null) {
-        if (!is_null($value)) {
-            $this->setPreference('handout', $value);
-        }
-        return isset($this->preferences['handout']);
-    }
-
-    public function feedCheckin(?bool $value = null) {
-        if (!is_null($value)) {
-            $this->setPreference('checkin', $value);
-        }
-        return isset($this->preferences['checkin']);
-    }
-
-    public function feedCheckout(?bool $value = null) {
-        if (!is_null($value)) {
-            $this->setPreference('checkout', $value);
-        }
-        return isset($this->preferences['checkout']);
-    }
-
-    public function feedRanking(?bool $value = null) {
-        if (!is_null($value)) {
-            $this->setPreference('ranking', $value);
-        }
-        return isset($this->preferences['ranking']);
-    }
-
-    public function feedResult(?bool $value = null) {
-        if (!is_null($value)) {
-            $this->setPreference('result', $value);
-        }
-        return isset($this->preferences['result']);
-    }
-
-    public function feedRegister(?bool $value = null) {
-        if (!is_null($value)) {
-            $this->setPreference('register', $value);
-        }
-        return isset($this->preferences['register']);
     }
 }

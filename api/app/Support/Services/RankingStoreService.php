@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Ranking;
 use App\Models\RankingPosition;
 use App\Models\Weapon;
+use App\Jobs\RankingFeedEvents;
 use Illuminate\Support\Facades\DB;
 
 class RankingStoreService
@@ -32,6 +33,7 @@ class RankingStoreService
                     $service = new RankingService($category, $weapon);
                     $positions = $service->generate();
                     $this->storePositionsOnRanking($ranking, $weapon, $positions);
+                    dispatch(new RankingFeedEvents($ranking));
                 }
             }
         }

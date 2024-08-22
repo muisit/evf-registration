@@ -46,7 +46,14 @@ class DeviceUser extends Model implements AuthenticatableContract, AuthorizableC
             DeviceFeed::where('device_user_id', $this->getKey())->delete();
         });
     }
-    
+
+    // see if this eventType should trigger an actual event
+    public function triggersEvent($eventType)
+    {
+        $prefs = $this->preferences['account']['followers'];
+        return is_array($prefs) && in_array($eventType, $prefs);
+    }
+
     public function getRememberTokenName()
     {
         return null;

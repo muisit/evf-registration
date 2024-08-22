@@ -62,6 +62,18 @@ class Competition extends Model
             // for Grand Veterans, indicate the subclass
             return $wpn->weapon_abbr . "-GV";
         }
+    }
 
+    public function title()
+    {
+        if (!$this->category->category_type != 'T') {
+            return $this->weapon->weapon_name . ' ' . $this->category->category_name;
+        }
+        else if ($this->category->category_name == 'Team') {
+            return $this->weapon->weapon_name;
+        }
+        else {
+            return $this->weapon->weapon_name . ' ' . $this->category->category_name;
+        }
     }
 }

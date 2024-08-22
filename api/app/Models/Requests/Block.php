@@ -2,6 +2,7 @@
 
 namespace App\Models\Requests;
 
+use App\Events\BlockEvent;
 use App\Models\DeviceUser;
 use App\Models\Follow as FollowModel;
 use Illuminate\Database\Eloquent\Model;
@@ -66,6 +67,8 @@ class Block extends Base
             else {
                 $this->model->setPreference('block', false);
             }
+            // no need to dispatch the feed creation in a job, it only concerns two users at the most
+            BlockEvent::dispatch($this->model->fencer, $this->model->user, $data['block']['block'] == 'Y');
         }
         return $this->model;
     }
