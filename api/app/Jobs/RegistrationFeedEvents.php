@@ -20,11 +20,11 @@ class RegistrationFeedEvents implements ShouldQueue
 
     public Fencer $fencer;
     public Competition $competition;
-    public boolean $isCancelled;
+    public bool $isCancelled;
     /**
      * Create a new job instance.
      */
-    public function __construct(Fencer $fencer, Competition $competition, boolean $isCancelled)
+    public function __construct(Fencer $fencer, Competition $competition, bool $isCancelled)
     {
         $this->fencer = $fencer;
         $this->competition = $competition;

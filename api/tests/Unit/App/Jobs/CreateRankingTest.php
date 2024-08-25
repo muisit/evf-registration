@@ -13,6 +13,7 @@ class CreateRankingTest extends TestCase
 {
     public function testBasicJob()
     {
+        Queue::fake(); // need a fake queue for the feed jobs that are pushed
         $job = new CreateRanking();
         $job->handle();
 

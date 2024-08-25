@@ -4,11 +4,13 @@ namespace Tests\Unit\App\Http\Controllers\Ranking;
 
 use App\Support\Services\RankingStoreService;
 use Tests\Unit\TestCase;
+use Illuminate\Support\Facades\Queue;
 
 class GetTest extends TestCase
 {
     public function testRoute()
     {
+        Queue::fake(); // fake the queue for the feed message storage
         // create a ranking version
         $service = new RankingStoreService();
         $service->handle();

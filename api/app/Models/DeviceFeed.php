@@ -25,12 +25,7 @@ class DeviceFeed extends Model
         });
     }
 
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(DeviceUser::class, 'device_user_id');
-    }
-
-    public function feeds(): BelongsToMany
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(DeviceFeed::class, 'device_user_feeds', 'device_feed_id', 'device_user_id');
     }

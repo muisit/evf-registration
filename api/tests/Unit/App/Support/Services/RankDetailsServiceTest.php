@@ -12,11 +12,13 @@ use App\Support\Services\RankDetailsService;
 use Tests\Support\Data\Competition as CompetitionData;
 use Tests\Support\Data\Fencer as FencerData;
 use Tests\Unit\TestCase;
+use Illuminate\Support\Facades\Queue;
 
 class RankDetailsServiceTest extends TestCase
 {
     public function testGenerate()
     {
+        Queue::fake();
         $service = new RankingStoreService();
         $service->handle();
 

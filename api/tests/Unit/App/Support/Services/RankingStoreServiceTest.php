@@ -16,11 +16,13 @@ use Tests\Support\Data\Event as EventData;
 use Tests\Support\Data\Fencer as FencerData;
 use Tests\Unit\TestCase;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Queue;
 
 class RankingStoreServiceTest extends TestCase
 {
     public function testGenerate()
     {
+        Queue::fake();
         $service = new RankingStoreService();
         $service->handle();
 
@@ -51,6 +53,7 @@ class RankingStoreServiceTest extends TestCase
 
     public function testRegenerate()
     {
+        Queue::fake();
         $service = new RankingStoreService();
         $service->handle();
 
@@ -78,6 +81,7 @@ class RankingStoreServiceTest extends TestCase
 
     public function testTwoEvents()
     {
+        Queue::fake();
         $service = new RankingStoreService();
         $service->handle();
         $ranking = Ranking::where('id', '>', 0)->orderBy('category_id')->orderBy('weapon_id')->get();
@@ -95,6 +99,7 @@ class RankingStoreServiceTest extends TestCase
 
     public function testTwoEvents2()
     {
+        Queue::fake();
         $service = new RankingStoreService();
         $service->handle();
         $ranking = Ranking::where('id', '>', 0)->orderBy('category_id')->orderBy('weapon_id')->get();
@@ -116,6 +121,7 @@ class RankingStoreServiceTest extends TestCase
 
     public function testRegenerateTwoEvents2()
     {
+        Queue::fake();
         $service = new RankingStoreService();
         $service->handle();
         $ranking = Ranking::where('id', '>', 0)->orderBy('category_id')->orderBy('weapon_id')->get();

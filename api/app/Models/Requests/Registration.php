@@ -167,7 +167,10 @@ class Registration extends Base
             if (!$this->model->exists) {
                 $this->model->registration_date = Carbon::now()->toDateTimeString();
                 // only send out events when a fencer registers for an event for the first time, not when the registration is updated
-                dispatch(new RegistrationFeedEvents($this->model->registration_fencer, $this->model->registration_event, false))->handle();
+                $competition = $this->model->sideEvent->competition;
+                if (!empty($competition)) {
+                    dispatch(new RegistrationFeedEvents($this->model->fencer, $this->model->sideEvent->competition, false))->handle();
+                }
             }
         }
         return $this->model;

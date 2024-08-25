@@ -47,7 +47,7 @@ class Fencer extends Model
     public function triggersEvent($eventType)
     {
         if ($this->user()->exists()) {
-            return $this->user()->triggersEvent($eventType);
+            return $this->user->triggersEvent($eventType);
         }
         return false;
     }

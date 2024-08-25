@@ -41,14 +41,20 @@ class Follow extends Model
 
     public function triggersOnEvent($eventType) {
         if (!$this->isBlocked() && is_array($this->preferences)) {
-            return in_array($eventType, $this->preferences);
+            \Log::debug("triggersOnEvent for $eventType testing on " . json_encode($this->preferences));
+            return in_array($eventType, static::$allowedSettings)
+                && isset($this->preferences[$eventType])
+                && $this->preferences[$eventType] === true;
         }
+        \Log::debug("triggersOnEvent for unmatched eventType $eventType");
+        return false;
     }
 
     public function isBlocked(?bool $value = null) {
         if (!is_null($value)) {
             $this->setPreference('blocked', $value);
         }
-        return isset($this->preferences['blocked']);
+        \Log::debug("returning blocked status for " . json_encode($this->preferences));
+        return isset($this->preferences['blocked']) && $this->preferences['blocked'] === true;
     }
 }

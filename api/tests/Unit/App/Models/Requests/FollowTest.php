@@ -52,12 +52,12 @@ class FollowTest extends TestCase
         $this->assertEquals(UserData::DEVICEUSER1, $model->device_user_id);
         $this->assertEquals(FencerData::WCAT5, $model->fencer_id);
         $this->assertFalse($model->isBlocked());
-        $this->assertTrue($model->feedHandout());
-        $this->assertTrue($model->feedCheckin());
-        $this->assertTrue($model->feedCheckout());
-        $this->assertFalse($model->feedRanking());
-        $this->assertFalse($model->feedResult());
-        $this->assertFalse($model->feedRegister());
+        $this->assertTrue($model->triggersOnEvent('handout'));
+        $this->assertTrue($model->triggersOnEvent('checkin'));
+        $this->assertTrue($model->triggersOnEvent('checkout'));
+        $this->assertFalse($model->triggersOnEvent('ranking'));
+        $this->assertFalse($model->triggersOnEvent('result'));
+        $this->assertFalse($model->triggersOnEvent('register'));
     }
 
     public function testUpdate()
@@ -65,13 +65,21 @@ class FollowTest extends TestCase
         $model = new Follow();
         $model->device_user_id = UserData::DEVICEUSER1;
         $model->fencer_id = FencerData::WCAT5;
+
         $model->isBlocked(true);
-        $model->feedRegister(true);
-        $model->feedRanking(true);
+        $model->setPreference('register', true);
+        $model->setPreference('ranking', true);
         $model->save();
+
         $this->assertTrue($model->isBlocked());
-        $this->assertTrue($model->feedRegister());
-        $this->assertTrue($model->feedRanking());
+        $this->assertFalse($model->triggersOnEvent('register'));
+        $this->assertFalse($model->triggersOnEvent('register'));
+
+        // update blocked preference to see if it affects triggersOnEvent
+        // this setting is not saved!
+        $model->isBlocked(false);
+        $this->assertTrue($model->triggersOnEvent('register'));
+        $this->assertTrue($model->triggersOnEvent('register'));
 
         $user = DeviceUser::find(UserData::DEVICEUSER1);
         Auth::login($user);
@@ -86,13 +94,23 @@ class FollowTest extends TestCase
         $this->assertNotEmpty($model);
         $follower = Follow::find($model->getKey());
         $this->assertNotEmpty($follower);
-        $this->assertFalse($model->isBlocked());
-        $this->assertTrue($model->feedHandout());
-        $this->assertTrue($model->feedCheckin());
-        $this->assertTrue($model->feedCheckout());
-        $this->assertFalse($model->feedRanking());
-        $this->assertFalse($model->feedResult());
-        $this->assertFalse($model->feedRegister());
+        $this->assertTrue($model->isBlocked());
+        $this->assertFalse($model->triggersOnEvent('handout'));
+        $this->assertFalse($model->triggersOnEvent('checkin'));
+        $this->assertFalse($model->triggersOnEvent('checkout'));
+        $this->assertFalse($model->triggersOnEvent('ranking'));
+        $this->assertFalse($model->triggersOnEvent('register'));
+        $this->assertFalse($model->triggersOnEvent('result'));
+        $this->assertFalse($model->triggersOnEvent('unsupportedevent'));
+
+        $model->isBlocked(false);
+        $this->assertTrue($model->triggersOnEvent('handout'));
+        $this->assertTrue($model->triggersOnEvent('checkin'));
+        $this->assertTrue($model->triggersOnEvent('checkout'));
+        $this->assertFalse($model->triggersOnEvent('ranking'));
+        $this->assertFalse($model->triggersOnEvent('register'));
+        $this->assertFalse($model->triggersOnEvent('result'));
+        $this->assertFalse($model->triggersOnEvent('unsupportedevent'));
     }
 
     public function testValidatePreferences()
@@ -113,25 +131,30 @@ class FollowTest extends TestCase
         $data['preferences'] = ['blocked', 'handout', 'checkin', 'checkout', 'ranking', 'result', 'register'];
         $this->setRequest($data);
         $validator = $request->createValidator(request());
+        $this->assertFalse($validator->passes()); // blocked is not an allowed thing to set
+
+        $data['preferences'] = ['unfollow', 'handout', 'checkin', 'checkout', 'ranking', 'result', 'register'];
+        $this->setRequest($data);
+        $validator = $request->createValidator(request());
         $this->assertTrue($validator->passes());
 
-        $data['preferences'] = ['blacked', 'handout', 'checkin', 'checkout', 'ranking', 'result', 'register'];
+        $data['preferences'] = ['anfollow', 'handout', 'checkin', 'checkout', 'ranking', 'result', 'register'];
         $this->setRequest($data);
         $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
 
-        $data['preferences'] = ['blacked'];
+        $data['preferences'] = ['blocked'];
         $this->setRequest($data);
         $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
 
-        $data['preferences'] = "blocked";
+        $data['preferences'] = "unfollow";
         $this->setRequest($data);
         $validator = $request->createValidator(request());
-        // a single string is cast to an array containing that string, and 'blocked' is a valid preference
+        // a single string is cast to an array containing that string, and 'unfollow' is a valid preference
         $this->assertTrue($validator->passes());
 
-        $data['preferences'] = "blacked";
+        $data['preferences'] = "somethingelse";
         $this->setRequest($data);
         $validator = $request->createValidator(request());
         $this->assertFalse($validator->passes());
@@ -202,12 +225,12 @@ class FollowTest extends TestCase
         $model->device_user_id = UserData::DEVICEUSER1;
         $model->fencer_id = FencerData::WCAT5;
         $model->isBlocked(true);
-        $model->feedRegister(true);
-        $model->feedRanking(true);
+        $model->setPreference('register', true);
+        $model->setPreference('ranking', true);
         $model->save();
         $this->assertTrue($model->isBlocked());
-        $this->assertTrue($model->feedRegister());
-        $this->assertTrue($model->feedRanking());
+        $this->assertFalse($model->triggersOnEvent('register'));
+        $this->assertFalse($model->triggersOnEvent('ranking'));
 
         $user = DeviceUser::find(UserData::DEVICEUSER1);
         Auth::login($user);

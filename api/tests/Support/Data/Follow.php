@@ -3,15 +3,11 @@
 namespace Tests\Support\Data;
 
 use DB;
-use App\Models\DeviceUser as Model;
+use App\Models\Follow as Model;
 use Carbon\Carbon;
 
-class DeviceUser extends Fixture
+class Follow extends Fixture
 {
-    public const DEVICEUSER1 = 1;
-    public const DEVICEUSER2 = 2;
-    public const NOSUCHID = 9692;
-
     protected static function wasBooted($cls)
     {
         $count = Model::where('id', '>', 0)->count();
@@ -20,7 +16,6 @@ class DeviceUser extends Fixture
 
     protected static function clear()
     {
-        DB::table('device_user_feeds')->delete();
         DB::table(Model::tableName())->delete();
     }
 

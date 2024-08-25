@@ -26,9 +26,9 @@ return new class extends Migration
         });
 
         Schema::table('device_feeds', function (Blueprint $table) {
-            $table->string('locale', 10);
-            $table->string('content_model', 20);
-            $table->string('content_url', 1024);
+            $table->string('locale', 10)->default('en');
+            $table->string('content_model', 20)->nullable();
+            $table->string('content_url', 1024)->nullable();
             $table->integer('fencer_id')->nullable();
             $table->foreign('fencer_id')->references('fencer_id')->on('TD_Fencer');
         });

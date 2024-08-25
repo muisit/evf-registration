@@ -39,40 +39,40 @@ class FollowTest extends TestCase
         $follow->isBlocked(false);
         $this->assertTrue(!isset($follow->preferences['blocked']));
 
-        $follow->feedHandout(true);
+        $follow->setPreference('handout', true);
         $this->assertEquals(true, $follow->preferences['handout']);
-        $this->assertEquals(true, $follow->feedHandout());
-        $follow->feedHandout(false);
+        $this->assertEquals(true, $follow->triggersOnEvent('handout'));
+        $follow->setPreference('handout', false);
         $this->assertTrue(!isset($follow->preferences['handout']));
 
-        $follow->feedCheckin(true);
+        $follow->setPreference('checkin', true);
         $this->assertEquals(true, $follow->preferences['checkin']);
-        $this->assertEquals(true, $follow->feedCheckin());
-        $follow->feedCheckin(false);
+        $this->assertEquals(true, $follow->triggersOnEvent('checkin'));
+        $follow->setPreference('checkin', false);
         $this->assertTrue(!isset($follow->preferences['checkin']));
 
-        $follow->feedCheckout(true);
+        $follow->setPreference('checkout', true);
         $this->assertEquals(true, $follow->preferences['checkout']);
-        $this->assertEquals(true, $follow->feedCheckout());
-        $follow->feedCheckout(false);
+        $this->assertEquals(true, $follow->triggersOnEvent('checkout'));
+        $follow->setPreference('checkout', false);
         $this->assertTrue(!isset($follow->preferences['checkout']));
 
-        $follow->feedRanking(true);
+        $follow->setPreference('ranking', true);
         $this->assertEquals(true, $follow->preferences['ranking']);
-        $this->assertEquals(true, $follow->feedRanking());
-        $follow->feedRanking(false);
+        $this->assertEquals(true, $follow->triggersOnEvent('ranking'));
+        $follow->setPreference('ranking', false);
         $this->assertTrue(!isset($follow->preferences['ranking']));
 
-        $follow->feedResult(true);
+        $follow->setPreference('result', true);
         $this->assertEquals(true, $follow->preferences['result']);
-        $this->assertEquals(true, $follow->feedResult());
-        $follow->feedResult(false);
+        $this->assertEquals(true, $follow->triggersOnEvent('result'));
+        $follow->setPreference('result', false);
         $this->assertTrue(!isset($follow->preferences['result']));
 
-        $follow->feedRegister(true);
+        $follow->setPreference('register', true);
         $this->assertEquals(true, $follow->preferences['register']);
-        $this->assertEquals(true, $follow->feedRegister());
-        $follow->feedRegister(false);
+        $this->assertEquals(true, $follow->triggersOnEvent('register'));
+        $follow->setPreference('register', false);
         $this->assertTrue(!isset($follow->preferences['register']));
     }
 }

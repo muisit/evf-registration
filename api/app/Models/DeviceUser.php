@@ -91,11 +91,6 @@ class DeviceUser extends Model implements AuthenticatableContract, AuthorizableC
         return $this->hasMany(Device::class);
     }
 
-    public function originalFeeds(): HasMany
-    {
-        return $this->hasMany(DeviceFeed::class, 'device_user_id');
-    }
-
     public function feeds(): BelongsToMany
     {
         return $this->belongsToMany(DeviceFeed::class, 'device_user_feeds', 'device_user_id', 'device_feed_id');

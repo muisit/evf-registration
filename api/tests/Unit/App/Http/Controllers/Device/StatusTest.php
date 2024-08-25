@@ -19,7 +19,7 @@ class StatusTest extends TestCase
         $output = (array) $response->json();
         $this->assertNotEmpty($output);
         $this->assertStatus(200);
-        $this->assertEquals(0, $output['feed']['count']);
+        $this->assertEquals(5, $output['feed']['count']);
         $this->assertEquals($device->uuid, $output['id']);
     }
 

@@ -68,7 +68,7 @@ class RegistrationDelete extends Base
         $model = parent::validate($request);
 
         if (!empty($model) && $model->exists) {
-            dispatch(new RegistrationFeedEvents($this->model->registration_fencer, $this->model->registration_event, true))->handle();
+            dispatch(new RegistrationFeedEvents($this->model->fencer, $this->model->sideEvent->competition, true))->handle();
             $model->delete();
         }
         return $model;

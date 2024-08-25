@@ -35,9 +35,11 @@ class FeedMessageService
     private $isPersonalMessage = false;
     private $userList = [];
     private ?Fencer $fencer = null;
+    private string $type;
 
     public function generate(Fencer $fencer, Model $object, string $type, ?DeviceUser $user)
     {
+        $this->type = $type;
         $this->fencer = $fencer;
         $this->localisedTexts = [];
         // if user is passed along, this message should be personalised for the fencer
@@ -93,7 +95,7 @@ class FeedMessageService
                 break;
             case 'blocked':
                 return $this->createBlockFeed(true);
-            case 'unblocked':
+            case 'unblock':
                 return $this->createBlockFeed(false);
             case 'follow':
                 return $this->createFollowFeed(true);
@@ -382,6 +384,29 @@ class FeedMessageService
         return md5($feed->locale . $feed->content_type . '_' . $feed->content_id);
     }
 
+    private function stringTypeToFeedType()
+    {
+        switch ($this->type) {
+            case 'handout':
+            case 'checkin':
+            case 'bagstart':
+            case 'bagend':
+            case 'checkout':
+            case 'register':
+            case 'unregister':
+            case 'follow':
+            case 'unfollow':
+            case 'block':
+            case 'unblock':
+                return DeviceFeed::NOTIFICATION;
+            case 'ranking':
+                return DeviceFeed::RANKING;
+            case 'result':
+                return DeviceFeed::RESULT;
+        }
+        return DeviceFeed::NOTIFICATION;
+    }
+
     private function createFeedForContent($doctype, $docid, $existingFeeds = [])
     {
         // existingFeeds are passed for the ranking, register, unregister and result feed types
@@ -396,6 +421,7 @@ class FeedMessageService
 
         foreach ($this->localisedTexts as $locale => $settings) {
             $feed = new DeviceFeed();
+            $feed->type = $this->stringTypeToFeedType();
             $feed->fencer_id = $this->fencer->getKey();
             $feed->title = $settings->title;
             $feed->content = $settings->content;
