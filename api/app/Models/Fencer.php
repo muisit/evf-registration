@@ -71,6 +71,11 @@ class Fencer extends Model
         return strtoupper($this->fencer_surname) . ", " . $this->fencer_firstname;
     }
 
+    public function getDisplayName()
+    {
+        return $this->fencer_firstname . ' ' . $this->fencer_surname;
+    }
+
     public function save(array $options = [])
     {
         if (parent::save($options)) {

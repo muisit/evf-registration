@@ -44,11 +44,13 @@ class Fixture
 
     public static function loadAll()
     {
+        Follow::clear();
         DeviceFeed::clear();
         Device::clear();
         DeviceUser::clear();
         WPPost::clear();
         Result::clear();
+        AccreditationDocument::clear();
         AccreditationUser::clear();
         Accreditation::clear();
         Registration::clear();
@@ -73,10 +75,12 @@ class Fixture
         Accreditation::clear();
         Accreditation::create();
         AccreditationUser::create();
+        AccreditationDocument::create();
         Result::create();
         WPPost::create();
         DeviceUser::create();
         Device::create();
         DeviceFeed::create();
+        Follow::create();
     }
 }

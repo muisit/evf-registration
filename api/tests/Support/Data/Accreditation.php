@@ -8,16 +8,16 @@ use Illuminate\Support\Facades\DB;
 
 class Accreditation extends Fixture
 {
-    public const MFCAT1 = 1;
-    public const MFCAT2 = 2;
-    public const WFCAT1 = 3;
-    public const TEAM2 = 6;
-    public const TEAM3 = 7;
-    public const COACH = 11;
-    public const HOD = 11;
-    public const REFEREE = 20;
-    public const VOLUNTEER = 21;
-    public const DIRECTOR = 30;
+    public const MFCAT1 = 1311;
+    public const MFCAT2 = 2231;
+    public const WFCAT1 = 3331;
+    public const TEAM2 = 6341;
+    public const TEAM3 = 7344;
+    public const COACH = 11113;
+    public const HOD = 114432;
+    public const REFEREE = 202133;
+    public const VOLUNTEER = 213111;
+    public const DIRECTOR = 303112;
 
     protected static function wasBooted($cls)
     {

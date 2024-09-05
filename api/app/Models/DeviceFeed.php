@@ -5,10 +5,13 @@ namespace App\Models;
 use App\Models\Schemas\BlockStatus;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Kirschbaum\PowerJoins\PowerJoins;
 use Illuminate\Support\Str;
 
 class DeviceFeed extends Model
 {
+    use PowerJoins;
+
     public const NOTIFICATION = 1;
     public const NEWS = 2;
     public const MESSAGE = 3;
@@ -27,7 +30,7 @@ class DeviceFeed extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(DeviceFeed::class, 'device_user_feeds', 'device_feed_id', 'device_user_id');
+        return $this->belongsToMany(DeviceUser::class, 'device_user_feeds', 'device_feed_id', 'device_user_id');
     }
 
     public function fromWPContent($txt)

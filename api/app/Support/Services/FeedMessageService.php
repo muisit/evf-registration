@@ -37,15 +37,18 @@ class FeedMessageService
     private ?Fencer $fencer = null;
     private string $type;
 
-    public function generate(Fencer $fencer, Model $object, string $type, ?DeviceUser $user)
+    public function generate(Fencer $fencer, Model $object, string $type, ?DeviceUser $user = null)
     {
+        \Log::debug("generate feed messages for $type");
         $this->type = $type;
         $this->fencer = $fencer;
         $this->localisedTexts = [];
         // if user is passed along, this message should be personalised for the fencer
         $this->isPersonalMessage = !empty($user) ? true : false;
         $this->userList = $this->getUserList($fencer, $user);
+        \Log::debug("user list is " . json_encode($this->userList->map(fn ($o) => $o->getKey())));
         $this->createLocalisedTexts($object, $type);
+        \Log::debug("texts are " . json_encode($this->localisedTexts));
 
         switch ($type) {
             case 'checkin':
@@ -94,23 +97,31 @@ class FeedMessageService
                 }
                 break;
             case 'blocked':
-                return $this->createBlockFeed(true);
-            case 'unblock':
-                return $this->createBlockFeed(false);
+                // override the userlist to be only between fencer and blocked user
+                $this->userList = $this->isPersonalMessage ? [$user] : [$object];
+                return $this->createBlockFeed($object, true);
+            case 'unblocked':
+                // override the userlist to be only between fencer and unblocked user
+                $this->userList = $this->isPersonalMessage ? [$user] : [$object];
+                return $this->createBlockFeed($object, false);
             case 'follow':
-                return $this->createFollowFeed(true);
+                // override the userlist to be only between fencer and following user
+                $this->userList = $this->isPersonalMessage ? [$user] : [$object];
+                return $this->createFollowFeed($object, true);
             case 'unfollow':
-                return $this->createFollowFeed(false);
+                // override the userlist to be only between fencer and unfollowing user
+                $this->userList = $this->isPersonalMessage ? [$user] : [$object];
+                return $this->createFollowFeed($object, false);
         }
     }
 
     private function getUserList(Fencer $fencer, ?DeviceUser $user)
     {
         if (!empty($user)) {
-            return [$user];
+            return collect([$user]);
         }
         else {
-            return $fencer->followers()->with('user')->get();
+            return $fencer->followers()->with('user')->get()->map(fn($fw) => $fw->user);
         }
     }
 
@@ -133,7 +144,7 @@ class FeedMessageService
                 $content = $this->isPersonalMessage
                     ? 'You have submitted your material for weapon control at :event'
                     : ':name has submitted their material weapon control at :event';
-                $parameters = ['event' => $event->event_title];
+                $parameters = ['event' => $event->event_name];
                 break;
             case 'checkout':
                 $event = $object->accreditation->event;
@@ -143,7 +154,7 @@ class FeedMessageService
                 $content = $this->isPersonalMessage
                     ? 'You have retrieved your material from weapon control at :event'
                     : ':name has retrieved their material from weapon control at :event';
-                $parameters = ['event' => $event->event_title];
+                $parameters = ['event' => $event->event_name];
                 break;
             case 'bagstart':
                 $event = $object->accreditation->event;
@@ -153,7 +164,7 @@ class FeedMessageService
                 $content = $this->isPersonalMessage
                     ? 'Your material is currently being processed by weapon control at :event'
                     : 'The material of :name is currently being processed by weapon control at :event';
-                $parameters = ['event' => $event->event_title];
+                $parameters = ['event' => $event->event_name];
                 break;
             case 'bagend':
                 $event = $object->accreditation->event;
@@ -163,22 +174,22 @@ class FeedMessageService
                 $content = $this->isPersonalMessage
                     ? 'Your material has finished processing and can be retrieved from weapon control at :event'
                     : 'The material of :name has finished processing and can be retrieved from weapon control at :event';
-                $parameters = ['event' => $event->event_title];
+                $parameters = ['event' => $event->event_name];
                 break;
             case 'handout':
-                $event = $object->accreditation->event;
+                $event = $object->event;
                 $title = $this->isPersonalMessage
                     ? 'You collected your badge'
                     : ':name has collected their badge';
                 $content = $this->isPersonalMessage
                     ? 'You have collected your accreditation badge at :event'
                     : ':name has collected their accreditation badge at :event';
-                $parameters = ['event' => $event->event_title];
+                $parameters = ['event' => $event->event_name];
                 break;
             case 'result':
-                $position = $result->result_place;
-                $points = $result->result_total_points;
-                $competition = $result->competition;
+                $position = $object->result_place;
+                $points = $object->result_total_points;
+                $competition = $object->competition;
                 $event = $competition->event;
                 switch ($position) {
                     case 1:
@@ -191,38 +202,38 @@ class FeedMessageService
                         break;
                     case 2:
                         $title = $this->isPersonalMessage
-                            ? 'You received silver in :cat'
-                            : ':name received silver in :cat';
+                            ? 'You received silver at :event'
+                            : ':name received silver at :event';
                         $content = $this->isPersonalMessage
                             ? 'At :event, you received the silver medal in :competition'
                             : 'At :event, :name received the silver medal in :competition';
                         break;
                     case 3:
                         $title = $this->isPersonalMessage
-                            ? 'You received bronze in :cat'
-                            : ':name received bronze in :cat';
+                            ? 'You received bronze at :event'
+                            : ':name received bronze at :event';
                         $content = $this->isPersonalMessage
                             ? 'At :event, you received the bronze medal in :competition'
                             : 'At :event, :name received the bronze medal in :competition';
                         break;
                     default:
                         $title = $this->isPersonalMessage
-                            ? 'You ended up at place :place in :cat'
-                            : ':name ended up at place :place in :cat';
+                            ? 'You ended up at place :place at :event'
+                            : ':name ended up at place :place at :event';
                         $content = $this->isPersonalMessage
                             ? 'At :event, you ended up at position :place in :competition'
                             : 'At :event, :name ended up at position :place in :competition';
                         break;
                 }
-                $parameters = ['event' => $event->event_title];
+                $parameters = ['event' => $event->event_name, 'place' => $position];
                 $translatableParameters = [
                     'competition' => $competition->title(),
                     'cat' => $competition->weapon->weapon_abbr
                 ];
                 break;
             case 'ranking':
-                $date = Carbon::createFromFormat('Y-m-d', $object->ranking->ranking_date);
-                $event = $object->accreditation->event;
+                $date = Carbon::createFromFormat('Y-m-d', substr($object->ranking->ranking_date, 0, 10));
+                $event = $object->ranking->event;
                 $title = $this->isPersonalMessage
                     ? 'Your ranking position is :position'
                     : ':name holds :position in the ranking';
@@ -230,19 +241,19 @@ class FeedMessageService
                     ? 'Your ranking position in :weapon is :position as of :day :month :year'
                     : ':name holds position :position in :weapon as of :day :month :year';
                 $parameters = [
-                    'place' => $object->position,
+                    'position' => $object->position,
                     'year' => $date->year,
                     'day' => $date->day
                 ];
                 $translatableParameters = [
-                    'weapon' => $object->weapon->weapon_name,
+                    'weapon' => $object->ranking->weapon->weapon_name,
                     'month' => $date->format('F')
                 ];
                 break;
             case 'register':
                 $event = $object->event;
-                $weapon = $object->competition->weapon;
-                $date = Carbon::createFromFormat("Y-m-d", $object->competition->competition_opens);
+                $weapon = $object->weapon;
+                $date = Carbon::createFromFormat("Y-m-d", $object->competition_opens);
                 $title = $this->isPersonalMessage
                     ? 'You have registered for :event'
                     : ':name registered for :event';
@@ -250,19 +261,19 @@ class FeedMessageService
                     ? 'You have registered for :weapon at :event on :day :month :year'
                     : ':name has registered for :weapon at :event on :day :month :year';
                 $parameters = [
-                    'event' => $event->event_title,
+                    'event' => $event->event_name,
                     'year' => $date->year,
                     'day' => $date->day
                 ];
                 $translatableParameters = [
-                    'weapon' => $object->weapon->weapon_name,
+                    'weapon' => $weapon->weapon_name,
                     'month' => $date->format('F')
                 ];
                 break;
             case 'unregister':
                 $event = $object->event;
-                $weapon = $object->competition->weapon;
-                $date = Carbon::createFromFormat("Y-m-d", $object->competition->competition_opens);
+                $weapon = $object->weapon;
+                $date = Carbon::createFromFormat("Y-m-d", $object->competition_opens);
                 $title = $this->isPersonalMessage
                     ? 'You have unregistered for :event'
                     : ':name unregistered for :event';
@@ -270,12 +281,12 @@ class FeedMessageService
                     ? 'You have unregistered for :weapon at :event on :day :month :year'
                     : ':name has unregistered for :weapon at :event on :day :month :year';
                 $parameters = [
-                    'event' => $event->event_title,
+                    'event' => $event->event_name,
                     'year' => $date->year,
                     'day' => $date->day
                 ];
                 $translatableParameters = [
-                    'weapon' => $object->weapon->weapon_name,
+                    'weapon' => $weapon->weapon_name,
                     'month' => $date->format('F')
                 ];
                 break;
@@ -285,16 +296,15 @@ class FeedMessageService
                 // contact flows in a different direction.
                 // Because the device-user may not be linked to a fencer,
                 // the default is Anonymous
-                $name = 'Anonymous';
                 if ($this->isPersonalMessage) {
+                    $name = 'User' . $object->uuid;
                     if (!empty($object->fencer)) {
-                        $name = $object->fencer->getFullName();
+                        $name = $object->fencer->getDisplayName();
                     }
-                    // else keep Anonymous
                 }
                 else if (!$this->isPersonalMessage) {
                     // the user is following a specific fencer, who has a full name
-                    $name = $this->fencer->getFullName();
+                    $name = $this->fencer->getDisplayName();
                 }
                 // notice the 'other-way-around' flow here
                 $title = $this->isPersonalMessage
@@ -302,34 +312,65 @@ class FeedMessageService
                     : 'You are following :name';
                 $content = '';
                 $parameters = ["name" => $name];
+
                 break;
             case 'unfollow':
-                $name = 'Anonymous';
-                if (!empty($object->fencer)) {
-                    $name = $object->fencer->getFullName();
+                if ($this->isPersonalMessage) {
+                    $name = 'User' . $object->uuid;
+                    if (!empty($object->fencer)) {
+                        $name = $object->fencer->getDisplayName();
+                    }
                 }
+                else if (!$this->isPersonalMessage) {
+                    // the user is following a specific fencer, who has a full name
+                    $name = $this->fencer->getDisplayName();
+                }
+                // again the other-way-around-flow
                 $title = $this->isPersonalMessage
-                    ? 'You stopped following :name'
-                    : ':name is no longer following you';
+                    ? ':name is no longer following you'
+                    : 'You stopped following :name';
                 $content = '';
                 $parameters = ["name" => $name];
+
                 break;
-            case 'block':
+            case 'blocked':
+                if ($this->isPersonalMessage) {
+                    $name = 'User' . $object->uuid;
+                    if (!empty($object->fencer)) {
+                        $name = $object->fencer->getDisplayName();
+                    }
+                }
+                else if (!$this->isPersonalMessage) {
+                    // the user is following a specific fencer, who has a full name
+                    $name = $this->fencer->getDisplayName() ?? 'Anonymous';
+                }
                 $title = $this->isPersonalMessage
                     ? 'You blocked :name'
                     : ':name blocked you';
                 $content = '';
+                $parameters = ["name" => $name];
                 break;
-            case 'unblock':
+            case 'unblocked':
+                if ($this->isPersonalMessage) {
+                    $name = 'User' . $object->uuid;
+                    if (!empty($object->fencer)) {
+                        $name = $object->fencer->getDisplayName();
+                    }
+                }
+                else if (!$this->isPersonalMessage) {
+                    // the user is following a specific fencer, who has a full name
+                    $name = $this->fencer->getDisplayName();
+                }
                 $title = $this->isPersonalMessage
                     ? 'You unblocked :name'
                     : ':name unblocked you';
                 $content = '';
+                $parameters = ["name" => $name];
                 break;
         }
 
         if (!isset($parameters['name'])) {
-            $parameters['name'] = $this->fencer->getFullName();
+            $parameters['name'] = $this->fencer->getDisplayName();
         }
 
         foreach ($this->userList as $user) {
@@ -340,7 +381,7 @@ class FeedMessageService
                 $locale = $parts[0];
             }
             if (empty($this->localisedTexts[$locale])) {
-                App::setLocale($locale);
+                \App::setLocale($locale);
                 // translate the non-parameterised parameters
                 $translated = [];
                 foreach ($translatableParameters as $k => $v) {
@@ -353,10 +394,11 @@ class FeedMessageService
                 // translate title and content using the parameters
                 $translatedTitle = __($title, $parameters);
                 $translatedContent = __($content, $parameters);
-                $this->localisedTexts = (object)[
+                $this->localisedTexts[$locale] = (object)[
                     'title' => $translatedTitle,
                     'content' => $translatedContent,
-                    'users' => []
+                    'users' => [],
+                    'locale' => $locale
                 ];
             }
             $this->localisedTexts[$locale]->users[] = $user;
@@ -367,10 +409,10 @@ class FeedMessageService
     {
         // get a list of feeds with users in the userList for this document type and id
         return DeviceFeed::where('content_id', $docid)
+            ->joinRelationship('users')
+            ->whereIn(DeviceUser::tableName() . '.id', $this->userList->map(fn ($usr) => $usr->getKey()))
             ->where('content_model', $doctype)
-            ->where('fencer_id', $this->fencer->getKey())
-            ->users()
-            ->where_in('id', $this->userList->map(fn ($usr) => $usr->getKey()))
+            ->where(DeviceFeed::tableName() . '.fencer_id', $this->fencer->getKey())
             ->get();
     }
 
@@ -409,6 +451,7 @@ class FeedMessageService
 
     private function createFeedForContent($doctype, $docid, $existingFeeds = [])
     {
+        \Log::debug("creating feed for content $doctype, $docid");
         // existingFeeds are passed for the ranking, register, unregister and result feed types
         // In those cases, we may have to overwrite or reuse a given feed
         $feedByType = [];
@@ -420,6 +463,7 @@ class FeedMessageService
         // then use that feed instead of creating a new one
 
         foreach ($this->localisedTexts as $locale => $settings) {
+            \Log::debug("creating localised feed for $locale " . json_encode($settings));
             $feed = new DeviceFeed();
             $feed->type = $this->stringTypeToFeedType();
             $feed->fencer_id = $this->fencer->getKey();
@@ -431,13 +475,14 @@ class FeedMessageService
             $feed->created_at = (new Carbon())->toDateTimeString();
             $feed->updated_at = (new Carbon())->toDateTimeString();
 
-            $hashType = $this->hashFeedType($feed);
+            $hash = $this->hashFeedType($feed);
             // If we already have a feed for this exact type combination, reuse it
             // The content must be overwritten though. It may have changed in
             // one of the parameters (result place, ranking position)
             // For reused register/unregister events, the content probably did not
             // change.
             if (isset($feedByType[$hash])) {
+                \Log::debug("overwriting existing feed");
                 $newFeed = $feedByType[$hash];
                 $newFeed->title = $feed->title;
                 $newFeed->content = $feed->content;
@@ -448,13 +493,12 @@ class FeedMessageService
                 $newFeed->updated_at = $feed->updated_at;
                 $feed = $newFeed;
             }
-            else {
-                $feed->save();
-            }
+            $feed->save();
 
             // reassign users, even if we are reusing a feed
             // Users that were attached to the feed before but are no longer following the
             // user will be removed from the feed automatically
+            \Log::debug("assigning users to feed:" . json_encode(collect($settings->users)->map(fn ($user) => $user->getKey())));
             $feed->users()->sync(collect($settings->users)->map(fn ($user) => $user->getKey()));
         }
     }
@@ -462,7 +506,7 @@ class FeedMessageService
     private function createCheckinFeed(AccreditationDocument $document)
     {
         $existingFeeds = $this->findFeedForContent('checkin', $document->getKey());
-        if (!empty($existingFeeds)) {
+        if (!empty($existingFeeds) && $existingFeeds->count() > 0) {
             // only create one feed for a checkin event, to prevent accidental double clicks or recheckins
             return;
         }
@@ -473,7 +517,7 @@ class FeedMessageService
     private function createBagStartFeed(AccreditationDocument $document)
     {
         $existingFeeds = $this->findFeedForContent('bagstart', $document->getKey());
-        if (!empty($existingFeeds)) {
+        if (!empty($existingFeeds) && $existingFeeds->count() > 0) {
             // if a bag was started, but then returned to the queue, we are not sending a cancel message
             // or removing the feed. Just ignore the new event
             return;
@@ -485,7 +529,7 @@ class FeedMessageService
     private function createBagEndFeed(AccreditationDocument $document)
     {
         $existingFeeds = $this->findFeedForContent('bagend', $document->getKey());
-        if (!empty($existingFeeds)) {
+        if (!empty($existingFeeds) && $existingFeeds->count() > 0) {
             // if a bag was finished, but then taken back for renewed processing, we do not cancel the feed
             // messages. Instead, just ignore later events
             return;
@@ -497,7 +541,7 @@ class FeedMessageService
     private function createCheckoutFeed(AccreditationDocument $document)
     {
         $existingFeeds = $this->findFeedForContent('checkout', $document->getKey());
-        if (!empty($existingFeeds)) {
+        if (!empty($existingFeeds) && $existingFeeds->count() > 0) {
             // A bag can only ever be checked out once, there is logically no option to have this event more than once
             return;
         }
@@ -507,12 +551,15 @@ class FeedMessageService
 
     private function createHandoutFeed(Accreditation $document)
     {
+        \Log::debug("creating handout feed");
         // we have no direct option to register that a fencer has already received a handout event for
         // a badge in case they receive two or three badges. Just ignore that user unfriendly aspect
         // and only look at the accreditation
         $existingFeeds = $this->findFeedForContent('handout', $document->getKey());
-        if (!empty($existingFeeds)) {
+        \Log::debug("found " . $existingFeeds->count() . ' feeds');
+        if (!empty($existingFeeds) && $existingFeeds->count() > 0) {
             // a given badge can only ever be handed out once, so don't send out additional messages
+            \Log::debug("handout feed is not empty, not recreating");
             return;
         }
         // send a notification that the accreditation badge was handed out
@@ -535,10 +582,10 @@ class FeedMessageService
         // - check to see if this feed was already generated
         // - if it was generated, only update the feed message, do not send a notification
         $existingFeeds = $this->findFeedForContent('ranking', $position->ranking_id);
-        $this->createFeedForContent('position', $position->ranking_id, $existingFeeds);
+        $this->createFeedForContent('ranking', $position->ranking_id, $existingFeeds);
     }
 
-    private function createRegisterFeed(Competition $competition, boolean $wasCancelled)
+    private function createRegisterFeed(Competition $competition, bool $wasCancelled)
     {
         // send a notification that someone registered for a competition
         // - check to see if this feed was already registered (in case of a register/cancel/register cycle)
@@ -546,31 +593,40 @@ class FeedMessageService
         //
         // We can use the competition key as model id, because the feed is linked to this specific fencer anyway.
         $existingFeeds = $this->findFeedForContent($wasCancelled ? 'register' : 'unregister', $competition->getKey());
-        if ($existingFeeds) {
-            $existingFeeds->map(fn($fd) => $fd->delete());
+        if ($existingFeeds && $existingFeeds->count() > 0) {
+            $existingFeeds->map(function ($fd) {
+                $fd->users()->sync([]);
+                $fd->delete();
+            });
+            return;
         }
-        else {
-            $this->createFeedForContent($wasCancelled ? 'register' : 'unregister', $competition->getKey());
+
+        $existingFeeds = $this->findFeedForContent($wasCancelled ? 'unregister' : 'register', $competition->getKey());
+        if ($existingFeeds && $existingFeeds->count() > 0) {
+            // case where we invoke the register call twice, we may have missed the unregister
+            // do nothing.
+            return;
         }
+        $this->createFeedForContent($wasCancelled ? 'unregister' : 'register', $competition->getKey());
     }
 
-    private function createBlockFeed(boolean $wasBlocked)
+    private function createBlockFeed(DeviceUser $user, bool $wasBlocked)
     {
         // send a notification that someone has blocked a user. This is a very personal action
         // between a specific fencer (that was followed) and a DeviceUser (the follower, who is blocked)
-        // Currently, just create new notifications if follow/unfollow messages repeat
+        // Currently, just create new notifications if block/unblock messages repeat
         // - check that the block situation actually changed (in case someone repeatedly blocks before processing)
         //
         // localisedTitles should only contain one entry
-        $this->createFeedForContent('blocked', $this->fencer->getKey());
+        $this->createFeedForContent('blocked', $user->getKey());
     }
 
-    private function createFollowFeed(boolean $isFollowing)
+    private function createFollowFeed(DeviceUser $user, bool $isFollowing)
     {
         // send a notification that someone started following a fencer
         // - check that the follow situation actually changed (in case someone repeatedly follows before processing)
         //
         // localisedTitles should only contain one entry
-        $this->createFeedForContent('follow', $this->fencer->getKey());
+        $this->createFeedForContent('follow', $user->getKey());
     }
 }

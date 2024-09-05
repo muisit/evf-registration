@@ -75,4 +75,34 @@ class FollowTest extends TestCase
         $follow->setPreference('register', false);
         $this->assertTrue(!isset($follow->preferences['register']));
     }
+
+    public function testEffectOfBlock()
+    {
+        $follow = new Follow();
+        $follow->setPreference('handout', true);
+        $follow->setPreference('checkin', true);
+        $follow->setPreference('checkout', true);
+        $follow->setPreference('register', true);
+        $follow->setPreference('ranking', true);
+        $follow->setPreference('result', true);
+
+        $this->assertEquals(false, $follow->isBlocked());
+        $this->assertEquals(true, $follow->triggersOnEvent('handout'));
+        $this->assertEquals(true, $follow->triggersOnEvent('checkin'));
+        $this->assertEquals(true, $follow->triggersOnEvent('checkout'));
+        $this->assertEquals(true, $follow->triggersOnEvent('register'));
+        $this->assertEquals(true, $follow->triggersOnEvent('ranking'));
+        $this->assertEquals(true, $follow->triggersOnEvent('result'));
+        $this->assertEquals(false, $follow->triggersOnEvent('nosuchitem'));
+
+        $follow->isBlocked(true);
+        $this->assertEquals(true, $follow->isBlocked());
+        $this->assertEquals(false, $follow->triggersOnEvent('handout'));
+        $this->assertEquals(false, $follow->triggersOnEvent('checkin'));
+        $this->assertEquals(false, $follow->triggersOnEvent('checkout'));
+        $this->assertEquals(false, $follow->triggersOnEvent('register'));
+        $this->assertEquals(false, $follow->triggersOnEvent('ranking'));
+        $this->assertEquals(false, $follow->triggersOnEvent('result'));
+        $this->assertEquals(false, $follow->triggersOnEvent('nosuchitem'));
+    }
 }

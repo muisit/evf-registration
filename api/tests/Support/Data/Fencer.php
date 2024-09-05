@@ -9,19 +9,19 @@ use Carbon\Carbon;
 
 class Fencer extends Fixture
 {
-    public const MCAT1 = 1;
-    public const MCAT2 = 2;
-    public const MCAT3 = 3;
-    public const MCAT4 = 4;
-    public const MCAT5 = 5;
-    public const WCAT1 = 6;
-    public const WCAT2 = 7;
-    public const WCAT3 = 8;
-    public const WCAT4 = 9;
-    public const WCAT5 = 10;
-    public const MCAT1B = 11;
-    public const MCAT1C = 12;
-    public const NOSUCHFENCER = 2882;
+    public const MCAT1 = 13931;
+    public const MCAT2 = 23931;
+    public const MCAT3 = 33931;
+    public const MCAT4 = 43931;
+    public const MCAT5 = 53931;
+    public const WCAT1 = 63931;
+    public const WCAT2 = 73931;
+    public const WCAT3 = 83931;
+    public const WCAT4 = 93931;
+    public const WCAT5 = 103931;
+    public const MCAT1B = 113931;
+    public const MCAT1C = 123931;
+    public const NOSUCHFENCER = 2882211;
 
     protected static function wasBooted($cls)
     {

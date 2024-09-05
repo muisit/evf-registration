@@ -8,14 +8,14 @@ use Illuminate\Support\Facades\DB;
 
 class AccreditationUser extends Fixture
 {
-    public const ADMIN = 1;
-    public const ACCREDITATION = 2;
-    public const CHECKIN = 3;
-    public const CHECKOUT = 6;
-    public const DT = 7;
-    public const MFCAT1 = 11;
-    public const VOLUNTEER = 21;
-    public const NOSUCHID = 40;
+    public const ADMIN = 16612;
+    public const ACCREDITATION = 26612;
+    public const CHECKIN = 36612;
+    public const CHECKOUT = 66612;
+    public const DT = 76612;
+    public const MFCAT1 = 116612;
+    public const VOLUNTEER = 216612;
+    public const NOSUCHID = 996612;
 
     protected static function wasBooted($cls)
     {

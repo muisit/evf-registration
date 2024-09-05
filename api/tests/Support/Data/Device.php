@@ -8,10 +8,10 @@ use Carbon\Carbon;
 
 class Device extends Fixture
 {
-    public const DEVICE1 = 1;
-    public const DEVICE2 = 2;
-    public const DEVICE3 = 3;
-    public const NOSUCHID = 992;
+    public const DEVICE1 = 17881;
+    public const DEVICE2 = 27881;
+    public const DEVICE3 = 37881;
+    public const NOSUCHID = 997881;
 
     protected static function wasBooted($cls)
     {

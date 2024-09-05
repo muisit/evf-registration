@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\App\Support;
+namespace Tests\Unit\App\Support\Services;
 
 use App\Models\Country;
 use App\Models\Fencer;

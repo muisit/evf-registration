@@ -8,6 +8,9 @@ use Carbon\Carbon;
 
 class Follow extends Fixture
 {
+    public const DEVICEFOLLOWER2 = 29821;
+    public const DEVICEFOLLOWER3 = 39821;
+
     protected static function wasBooted($cls)
     {
         $count = Model::where('id', '>', 0)->count();
@@ -23,25 +26,17 @@ class Follow extends Fixture
     {
         self::booted();
         Model::create([
-            'id' => self::DEVICEUSER1,
-            'uuid' => 'this-is-a-uuid',
-            'email' => 'user@example.org',
-            'preferences' => '{}',
-            'fencer_id' => Fencer::MCAT1,
-            'created_at' => '2020-01-01 12:34:56',
-            'updated_at' => '2020-01-01 12:34:56',
-            'email_verified_at' => '2020-01-01 12:34:56',
+            'id' => self::DEVICEFOLLOWER2,
+            'preferences' => '{"handout":true,"register":true,"ranking":true,"result":true,"checkin":true,"checkout":true}',
+            'device_user_id' => DeviceUser::DEVICEUSER2,
+            'fencer_id' => Fencer::MCAT1
         ])->save();
 
         Model::create([
-            'id' => self::DEVICEUSER2,
-            'uuid' => 'this-is-also-a-uuid',
-            'email' => null,
-            'preferences' => null,
-            'fencer_id' => null,
-            'created_at' => '2020-01-01 12:34:56',
-            'updated_at' => '2020-01-01 12:34:56',
-            'email_verified_at' => null,
+            'id' => self::DEVICEFOLLOWER3,
+            'preferences' => '{"handout":true,"register":true,"ranking":true,"result":true,"checkin":true,"checkout":true}',
+            'device_user_id' => DeviceUser::DEVICEUSER3,
+            'fencer_id' => Fencer::MCAT1
         ])->save();
     }
 }
