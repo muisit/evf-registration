@@ -28,7 +28,7 @@ class RegisterForEvent
     {
         $this->fencer = $fencer;
         $this->competition = $competition;
-        $this->isCancelled = $cancelled;
+        $this->isCancelled = $isCancelled;
     }
 
     /**

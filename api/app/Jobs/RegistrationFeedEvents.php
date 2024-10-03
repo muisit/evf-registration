@@ -10,8 +10,9 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\Fencer;
 use App\Models\Competition;
 use App\Events\RegisterForEvent;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 
-class RegistrationFeedEvents implements ShouldQueue
+class RegistrationFeedEvents extends Job implements ShouldQueue, ShouldBeUniqueUntilProcessing
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -31,12 +32,17 @@ class RegistrationFeedEvents implements ShouldQueue
         $this->isCancelled = $isCancelled;
     }
 
+    public function uniqueId(): string
+    {
+        return ($this->fencer->getKey() ?? '') . '_' . ($this->competition->getKey() ?? '') . '_' . ($this->isCancelled ? 'true' : 'false');
+    }
+
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-        if ($this->fencer->triggersEvent('registration')) {
+        if ($this->fencer->triggersEvent('register')) {
             RegisterForEvent::dispatch($this->fencer, $this->competition, $this->isCancelled);
         }
     }

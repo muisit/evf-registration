@@ -32,7 +32,7 @@ class DeviceUser extends Fixture
             'id' => self::DEVICEUSER1,
             'uuid' => 'this-is-a-uuid',
             'email' => 'user@example.org',
-            'preferences' => '{}',
+            'preferences' => '{"account":{"followers":["result","register","checkin","checkout"],"following":["register","result"]}}',
             'fencer_id' => Fencer::MCAT1,
             'created_at' => '2020-01-01 12:34:56',
             'updated_at' => '2020-01-01 12:34:56',

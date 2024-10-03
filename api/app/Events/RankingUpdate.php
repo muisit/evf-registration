@@ -24,7 +24,6 @@ class RankingUpdate
      */
     public function __construct(RankingPosition $ranking)
     {
-        $this->fencer = fencer;
         $this->ranking = $ranking;
     }
 

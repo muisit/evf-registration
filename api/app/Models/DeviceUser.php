@@ -51,6 +51,7 @@ class DeviceUser extends Model implements AuthenticatableContract, AuthorizableC
     public function triggersEvent($eventType)
     {
         $prefs = $this->preferences['account']['followers'];
+        \Log::debug("checking for $eventType in " . json_encode($prefs));
         return is_array($prefs) && in_array($eventType, $prefs);
     }
 

@@ -9,8 +9,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Competition;
 use App\Events\ResultUpdate;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 
-class ResultFeedEvents implements ShouldQueue
+class ResultFeedEvents extends Job implements ShouldQueue, ShouldBeUniqueUntilProcessing
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -26,6 +27,11 @@ class ResultFeedEvents implements ShouldQueue
         $this->competition = $competition;
     }
 
+    public function uniqueId(): string
+    {
+        return $this->competition->getKey() ?? '';
+    }
+
     /**
      * Execute the job.
      */
@@ -33,7 +39,7 @@ class ResultFeedEvents implements ShouldQueue
     {
         foreach ($this->competition->results as $result) {
             if ($result->fencer->triggersEvent('result')) {
-                ResultUpdate::dispatch($position);
+                ResultUpdate::dispatch($result);
             }
         }
     }

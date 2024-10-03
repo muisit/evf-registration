@@ -9,8 +9,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Ranking;
 use App\Events\RankingUpdate;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 
-class RankingFeedEvents implements ShouldQueue
+class RankingFeedEvents extends Job implements ShouldQueue, ShouldBeUniqueUntilProcessing
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -25,6 +26,11 @@ class RankingFeedEvents implements ShouldQueue
     public function __construct(Ranking $ranking)
     {
         $this->ranking = $ranking;
+    }
+
+    public function uniqueId(): string
+    {
+        return $this->ranking->getKey() ?? '';
     }
 
     /**
