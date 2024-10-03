@@ -22,7 +22,7 @@ class Accreditation extends Fixture
     protected static function wasBooted($cls)
     {
         $count = Model::where('id', '>', 0)->count();
-        return $count == 9;
+        return $count == 10;
     }
 
     protected static function clear()
@@ -125,6 +125,20 @@ class Accreditation extends Fixture
             'generated' => '2020-01-01',
             'is_dirty' => null,
             'fe_id' => null
+        ])->save();
+
+        Model::create([
+            'id' => self::HOD,
+            'fencer_id' => Fencer::WCAT5,
+            'event_id' => Event::EVENT1,
+            'template_id' => AccreditationTemplate::COUNTRY,
+            'data' => '{}',
+            'hash' => null,
+            'file_hash' => null,
+            'file_id' => null,
+            'generated' => '2020-01-01',
+            'is_dirty' => null,
+            'fe_id' => '1954492'
         ])->save();
 
         Model::create([

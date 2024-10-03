@@ -25,7 +25,7 @@ class Category extends Model
         if ($wrt !== false) {
             $wrtM = intval($wrt->format('m'));
             $wrtY = intval($wrt->format('Y'));
-    
+
             $diff = $wrtY - $year;
             if($wrtM > 6) {
                 $diff += 1; // people start fencing in the older category as of July

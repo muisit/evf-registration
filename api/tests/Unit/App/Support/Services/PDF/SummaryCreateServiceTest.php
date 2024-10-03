@@ -33,7 +33,7 @@ class SummaryCreateServiceTest extends TestCase
         ];
         $pdf = $this->createMock(\setasign\Fpdi\Tcpdf\Fpdi::class);
         $pdf->expects($this->exactly(3))->method('AddPage');
-        $pdf->expects($this->exactly(5))->method('useImportedPage');
+        $pdf->expects($this->exactly(6))->method('useImportedPage');
         $pdf->expects($this->exactly(3))->method('getTemplateSize')->willReturn($a6template);
         $pdf->expects($this->once())->method('Output')->with($this->equalTo(storage_path('app/pdfs/event1/documents/summary_doc.pdf')), $this->equalTo('F'));
         return $pdf;

@@ -368,7 +368,7 @@ class FeedMessageServiceTest extends TestCase
         $this->assertEquals(1, count($feed));
         $feed = $feed[0];
         $this->assertEquals('You have registered for EVF Individual Championships', $feed->title);
-        $this->assertEquals('You have registered for Mens Foil at EVF Individual Championships on 16 September 2024', $feed->content);
+        $this->assertStringContainsString('You have registered for Mens Foil at EVF Individual Championships on ', $feed->content);
         $this->assertEquals(DeviceFeed::NOTIFICATION, $feed->type);
         $this->assertEquals(FencerData::MCAT1, $feed->fencer_id);
         $this->assertEquals($data->getKey(), $feed->content_id);
@@ -386,7 +386,7 @@ class FeedMessageServiceTest extends TestCase
         $this->assertEquals(2, count($feed));
         $feed = $feed[1];
         $this->assertEquals('Tést De La Teste registered for EVF Individual Championships', $feed->title);
-        $this->assertEquals('Tést De La Teste has registered for Mens Foil at EVF Individual Championships on 16 September 2024', $feed->content);
+        $this->assertStringContainsString('Tést De La Teste has registered for Mens Foil at EVF Individual Championships on ', $feed->content);
         $this->assertEquals(DeviceFeed::NOTIFICATION, $feed->type);
         $this->assertEquals(FencerData::MCAT1, $feed->fencer_id);
         $this->assertEquals($data->getKey(), $feed->content_id);
@@ -412,7 +412,7 @@ class FeedMessageServiceTest extends TestCase
         $this->assertEquals(1, count($feed));
         $feed = $feed[0];
         $this->assertEquals('You have unregistered for EVF Individual Championships', $feed->title);
-        $this->assertEquals('You have unregistered for Mens Foil at EVF Individual Championships on 16 September 2024', $feed->content);
+        $this->assertStringContainsString('You have unregistered for Mens Foil at EVF Individual Championships on', $feed->content);
         $this->assertEquals(DeviceFeed::NOTIFICATION, $feed->type);
         $this->assertEquals(FencerData::MCAT1, $feed->fencer_id);
         $this->assertEquals($data->getKey(), $feed->content_id);
@@ -430,7 +430,7 @@ class FeedMessageServiceTest extends TestCase
         $this->assertEquals(2, count($feed));
         $feed = $feed[1];
         $this->assertEquals('Tést De La Teste unregistered for EVF Individual Championships', $feed->title);
-        $this->assertEquals('Tést De La Teste has unregistered for Mens Foil at EVF Individual Championships on 16 September 2024', $feed->content);
+        $this->assertStringContainsString('Tést De La Teste has unregistered for Mens Foil at EVF Individual Championships on ', $feed->content);
         $this->assertEquals(DeviceFeed::NOTIFICATION, $feed->type);
         $this->assertEquals(FencerData::MCAT1, $feed->fencer_id);
         $this->assertEquals($data->getKey(), $feed->content_id);

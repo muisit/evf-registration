@@ -3,6 +3,7 @@
 namespace Tests\Unit\App\Support;
 
 use App\Models\Accreditation;
+use App\Models\AccreditationDocument;
 use App\Models\AccreditationUser;
 use App\Models\AccreditationTemplate;
 use App\Models\Event;
@@ -28,9 +29,9 @@ use Tests\Unit\TestCase;
 // 4 registrations for MFTEAM (id 4)
 // 3 registrations for the cocktail dinatoire (id 5, MCAT1, MCAT5, WCAT4)
 // 2 registrations for the gala (id 6, WCAT3, MCAT3)
-// 5 registrations for support roles (3x MCAT5, 2x MCAT4)
+// 6 registrations for support roles (3x MCAT5, 2x MCAT4, 1x WCAT5)
 //
-// there are 8 accreditations
+// there are 9 accreditations
 // 1 for MCAT1, with 2 registrations (MFCAT1, MFTEAM1)
 // 1 for MCAT1B, with 1 registration (MFTEAM2)
 // 1 for MCAT1C, with 1 registration (MFTEAM3)
@@ -38,6 +39,7 @@ use Tests\Unit\TestCase;
 // 1 for WCAT1, with 1 registration (WSCAT1)
 // 2 for MCAT5, with 2 country support roles and 1 organisation support role
 // 1 for MCAT4, with 2 support roles (organisation)
+// 1 for WCAT5, with 1 country support role
 
 class AccreditationOverviewServiceTest extends TestCase
 {
@@ -147,9 +149,9 @@ class AccreditationOverviewServiceTest extends TestCase
         $service->initialise();
         // the fencers are from GER (12) and ITA (2)
         // MCAT2 is from ITA and has 2 registrations (MCAT2, MFTEAM) and 1 accreditation (athlete)
-        // MCAT1 (2/1), WCAT1 (1/1), MCAT1B (1/1), MCAT1C (1/1), MCAT5 (2/1 -> Coach/HoD) => (7/5)
+        // MCAT1 (2/1), WCAT1 (1/1), MCAT1B (1/1), MCAT1C (1/1), MCAT5 (2/1 -> Coach), WCAT5 (1/1 -> HoD) => (7/6)
         $this->assertEquals(
-            '[["C",2,[2,1,0,1],[]],["C",12,[7,5,0,5],[]]]',
+            '[["C",2,[2,1,0,1],[]],["C",12,[7,6,0,6],[]]]',
             json_encode($service->createOverviewForCountries())
         );
     }
@@ -182,16 +184,16 @@ class AccreditationOverviewServiceTest extends TestCase
         // there are 18 registrations
         // 7 are for athlete, competition events (template 1), with 5 different accreditations, filtered out
         // 5 for non-accreditation events (not visible)
-        // 2 for country support roles (template 3), with 1 accreditation (MCAT5)
+        // 2 for country support roles (template 3), with 2 accreditations (MCAT5, WCAT5)
         // 3 for organisation support roles (template 2), with 2 accreditations (MCAT5, MCAT4)
         // 1 for organisation referee role (template 4), with 1 accreditation (MCAT5)
         //
         // Because we cannot just link the registrations to accreditations at the moment,
         // we get double registrations for the support roles, which make the numbers meaningless
         // template 2 also includes the 2 template 3 registrations of MCAT5
-        // template 3 also includes the template 2 registration of MCAT5
+        // template 3 also includes the template 2 registration of MCAT5 and WCAT5
         $this->assertEquals(
-            '[["T",2,[6,2,0,2],[]],["T",3,[4,1,0,1],[]],["T",4,[4,1,0,1],[]]]',
+            '[["T",2,[6,2,0,2],[]],["T",3,[4,2,0,2],[]],["T",4,[4,1,0,1],[]]]',
             json_encode($service->createOverviewForTemplates())
         );
     }
@@ -204,6 +206,7 @@ class AccreditationOverviewServiceTest extends TestCase
         // and do not throw an error
         Registration::where('registration_id', '>', 0)->delete();
         AccreditationUser::where('id', '>', 0)->delete();
+        AccreditationDocument::where('id', '>', 0)->delete();
         Accreditation::where('id', '>', 0)->delete();
         $event = Event::find(EventData::EVENT1);
         $this->assertNotEmpty($event);

@@ -88,6 +88,10 @@ class Accreditation extends Model
         if (file_exists($path)) {
             @unlink($path);
         }
+
+        // remove any AccreditationDocument related to this accreditation
+        AccreditationDocument::where('accreditation_id', $this->getKey())->delete();
+
         return parent::delete();
     }
 

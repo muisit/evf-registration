@@ -48,10 +48,10 @@ class CheckDirtyBadgesTest extends TestCase
 
         // now all accreditations are dirty, so we'll push jobs
         $job->handle();
-        // there are 11 unique fencers registered for this event
+        // there are 12 unique fencers registered for this event
         // However, for 4 cases accreditations are missing in the dataset
-        // and we only have 7 active combinations
-        Queue::assertPushed(CheckBadge::class, 7);
+        // and we only have 8 active combinations
+        Queue::assertPushed(CheckBadge::class, 8);
     }
 
     public function testUnique()

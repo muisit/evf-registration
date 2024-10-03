@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Event;
 use App\Models\AccreditationUser;
+use App\Models\AccreditationDocument;
 use App\Models\Accreditation;
 use App\Support\Services\PDFService;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
@@ -44,6 +45,7 @@ class CleanAccreditations extends Job implements ShouldBeUniqueUntilProcessing
         ) {
             $this->cleanEventPath();
             AccreditationUser::whereIn('accreditation_id', Accreditation::where('event_id', $this->event->getKey())->get()->pluck('id'))->delete();
+            AccreditationDocument::whereIn('accreditation_id', Accreditation::where('event_id', $this->event->getKey())->get()->pluck('id'))->delete();
             Accreditation::where('event_id', $this->event->getKey())->delete();
         }
     }

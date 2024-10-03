@@ -27,6 +27,6 @@ class CountryTest extends TestCase
         $event = Event::find(EventData::EVENT1);
         $country = Country::find(Country::GER);
         $accreditations = $country->selectAccreditations($event);
-        $this->assertCount(5, $accreditations);
+        $this->assertCount(6, $accreditations);
     }
 }

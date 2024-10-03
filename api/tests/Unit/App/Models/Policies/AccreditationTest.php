@@ -45,7 +45,7 @@ class AccreditationTest extends TestCase
         $this->assertTrue($policy->before($editor, 'view'));
         $this->assertTrue($policy->before($admin, 'viewAny'));
         $this->assertTrue($policy->before($editor, 'viewAny'));
-        
+
         // admin has any imaginable policy
         $this->assertTrue($policy->before($admin, 'nosuchpolicy'));
 
@@ -114,6 +114,7 @@ class AccreditationTest extends TestCase
         ]);
 
         $accr = Accreditation::where("id", AccreditationData::HOD)->first();
+        $this->assertNotEmpty($accr);
 
         $policy = new Policy();
         $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
@@ -208,6 +209,7 @@ class AccreditationTest extends TestCase
         ]);
 
         $accr = Accreditation::where("id", AccreditationData::HOD)->first();
+        $this->assertNotEmpty($accr);
 
         $policy = new Policy();
         $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();
@@ -256,6 +258,7 @@ class AccreditationTest extends TestCase
         ]);
 
         $accr = Accreditation::where("id", AccreditationData::HOD)->first();
+        $this->assertNotEmpty($accr);
 
         $policy = new Policy();
         $superhod = WPUser::where("ID", UserData::TESTUSERGENHOD)->first();

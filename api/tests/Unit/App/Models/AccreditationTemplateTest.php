@@ -85,7 +85,7 @@ class AccreditationTemplateTest extends TestCase
 
         $template = AccreditationTemplate::find(TemplateData::COUNTRY);
         $accreditations = $template->selectAccreditations($event);
-        $this->assertCount(1, $accreditations);
+        $this->assertCount(2, $accreditations);
 
         $template = AccreditationTemplate::find(TemplateData::REFEREE);
         $accreditations = $template->selectAccreditations($event);

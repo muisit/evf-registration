@@ -38,7 +38,7 @@ class RegenerateBadgesTest extends TestCase
     {
         $event = Event::find(EventData::EVENT1);
         $count = Accreditation::where('is_dirty', null)->count();
-        $this->assertEquals(9, $count);
+        $this->assertEquals(10, $count);
         $job = new RegenerateBadges($event);
         $job->handle();
         $count = Accreditation::where('is_dirty', null)->count();

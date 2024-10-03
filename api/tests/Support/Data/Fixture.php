@@ -72,7 +72,7 @@ class Fixture
         EventRole::create();
         AccreditationTemplate::create();
         Registration::create();
-        Accreditation::clear();
+        Accreditation::clear(); // clear out any accreditations made due to registration
         Accreditation::create();
         AccreditationUser::create();
         AccreditationDocument::create();

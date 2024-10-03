@@ -19,7 +19,7 @@ class AccreditationTest extends TestCase
 {
     public function testRelations()
     {
-        $this->assertCount(9, Accreditation::get());
+        $this->assertCount(10, Accreditation::get());
         $accreditation = Accreditation::find(AccreditationData::MFCAT1);
 
         $this->assertEquals(EventData::EVENT1, $accreditation->event_id);
@@ -41,7 +41,7 @@ class AccreditationTest extends TestCase
     public function testPath()
     {
         $accreditation = Accreditation::find(AccreditationData::MFCAT1);
-        $this->assertEquals("pdfs/event1/badges/badge_1.pdf", $accreditation->path(false));
+        $this->assertEquals("pdfs/event1/badges/badge_1311.pdf", $accreditation->path(false));
         $abspath = $accreditation->path(true);
         $this->assertTrue(strlen($abspath) > strlen($accreditation->path(false)));
         $this->assertTrue($abspath[0] == '/');
@@ -52,6 +52,7 @@ class AccreditationTest extends TestCase
         $accreditation = Accreditation::find(AccreditationData::MFCAT1);
         $users = AccreditationUser::where('accreditation_id', $accreditation->getKey())->get();
         $path = $accreditation->path(true);
+        @mkdir(dirname($path));
         file_put_contents($path, "test");
         $this->assertTrue(file_exists($path));
         $this->assertCount(1, $users);

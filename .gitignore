@@ -29,3 +29,5 @@ mobile/evf/android/app/src/*/res/mipmap-xxhdpi
 mobile/evf/android/app/src/*/res/mipmap-xxxhdpi
 mobile/evf/ios/Runner/Assets.xcassets/AppIcon-dev.appiconset
 mobile/evf/ios/Runner/Assets.xcassets/AppIcon-prod.appiconset
+
+apps/*/vite.config.*.mjs
