@@ -493,6 +493,7 @@ class FeedMessageService
                 $newFeed->updated_at = $feed->updated_at;
                 $feed = $newFeed;
             }
+            \Log::debug("saving new feed message " .  $feed->title);
             $feed->save();
 
             // reassign users, even if we are reusing a feed
@@ -507,6 +508,7 @@ class FeedMessageService
     {
         $existingFeeds = $this->findFeedForContent('checkin', $document->getKey());
         if (!empty($existingFeeds) && $existingFeeds->count() > 0) {
+            \Log::debug("found existing feed for content checkin and this document");
             // only create one feed for a checkin event, to prevent accidental double clicks or recheckins
             return;
         }

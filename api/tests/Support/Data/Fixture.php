@@ -49,6 +49,7 @@ class Fixture
         Device::clear();
         DeviceUser::clear();
         WPPost::clear();
+        WPOption::clear();
         Result::clear();
         AccreditationDocument::clear();
         AccreditationUser::clear();
@@ -77,6 +78,7 @@ class Fixture
         AccreditationUser::create();
         AccreditationDocument::create();
         Result::create();
+        WPOption::create();
         WPPost::create();
         DeviceUser::create();
         Device::create();

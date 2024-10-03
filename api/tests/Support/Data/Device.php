@@ -27,31 +27,34 @@ class Device extends Fixture
     protected static function boot()
     {
         self::booted();
-        Model::create(
-            [
-                'id' => self::DEVICE1,
-                'uuid' => 'this-is-a-uuid',
-                'platform' => '{"model":"random model"}',
-                'device_user_id' => DeviceUser::DEVICEUSER1,
-                'created_at' => '2020-01-01 12:34:56',
-                'updated_at' => '2020-01-01 12:34:56',
-            ],
-            [
-                'id' => self::DEVICE2,
-                'uuid' => 'this-is-a-uuid-2',
-                'platform' => '{"model":"random model"}',
-                'device_user_id' => DeviceUser::DEVICEUSER1,
-                'created_at' => '2020-01-01 12:34:56',
-                'updated_at' => '2020-01-01 12:34:56',
-            ],
-            [
-                'id' => self::DEVICE3,
-                'uuid' => 'this-is-another-uuid',
-                'platform' => '{"model":"random model2"}',
-                'device_user_id' => DeviceUser::DEVICEUSER2,
-                'created_at' => '2020-01-01 12:34:56',
-                'updated_at' => '2020-01-01 12:34:56',
-            ]
-        )->save();
+        $device = Model::create([
+            'id' => self::DEVICE1,
+            'uuid' => 'this-is-a-uuid',
+            'platform' => '{"model":"random model"}',
+            'device_user_id' => DeviceUser::DEVICEUSER1,
+            'created_at' => '2020-01-01 12:34:56',
+            'updated_at' => '2020-01-01 12:34:56',
+        ]);
+        $device->save();
+
+        $device = Model::create([
+            'id' => self::DEVICE2,
+            'uuid' => 'this-is-a-uuid-2',
+            'platform' => '{"model":"random model"}',
+            'device_user_id' => DeviceUser::DEVICEUSER1,
+            'created_at' => '2020-01-01 12:34:56',
+            'updated_at' => '2020-01-01 12:34:56',
+        ]);
+        $device->save();
+
+        $device = Model::create([
+            'id' => self::DEVICE3,
+            'uuid' => 'this-is-another-uuid',
+            'platform' => '{"model":"random model2"}',
+            'device_user_id' => DeviceUser::DEVICEUSER2,
+            'created_at' => '2020-01-01 12:34:56',
+            'updated_at' => '2020-01-01 12:34:56',
+        ]);
+        $device->save();
     }
 }

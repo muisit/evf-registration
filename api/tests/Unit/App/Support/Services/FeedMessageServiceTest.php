@@ -260,7 +260,7 @@ class FeedMessageServiceTest extends TestCase
         $feeds = DeviceFeed::where('id', '>', 0)->count();
         $this->assertEquals(6, $feeds);
 
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->where('created_at', '>', '2024-01-01')->get();
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->whereNot('content_id', null)->where('created_at', '>', '2024-01-01')->get();
         $this->assertEquals(1, count($feed));
         $feed = $feed[0];
         $this->assertEquals('You won EVF Individual Championships Mens Foil', $feed->title);
@@ -271,14 +271,14 @@ class FeedMessageServiceTest extends TestCase
 
         // no new message is generated if one was available
         $service->generate($fencer, $data, 'result', $fencer->user);
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->where('created_at', '>', '2024-01-01')->get();
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->whereNot('content_id', null)->where('created_at', '>', '2024-01-01')->get();
         $this->assertEquals(1, count($feed));
 
         // generate for the followers
         $service->generate($fencer, $data, 'result');
         $feeds = DeviceFeed::where('id', '>', 0)->count();
         $this->assertEquals(7, $feeds); // one entry for the new locale
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->where('created_at', '>', '2024-01-01')->orderBy('id')->get();
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->whereNot('content_id', null)->where('created_at', '>', '2024-01-01')->orderBy('id')->get();
         $this->assertEquals(2, count($feed));
         $feed = $feed[1];
         $this->assertEquals('Tést De La Teste won EVF Individual Championships Mens Foil', $feed->title);
@@ -288,7 +288,7 @@ class FeedMessageServiceTest extends TestCase
         $this->assertEquals($data->result_competition, $feed->content_id);
 
         $service->generate($fencer, $data, 'result');
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->where('created_at', '>', '2024-01-01')->get();
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->whereNot('content_id', null)->where('created_at', '>', '2024-01-01')->get();
         $this->assertEquals(2, count($feed));
     }
 
@@ -320,8 +320,8 @@ class FeedMessageServiceTest extends TestCase
         $feeds = DeviceFeed::where('id', '>', 0)->count();
         $this->assertEquals(6, $feeds);
 
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'ranking')->where('created_at', '>', '2024-01-01')->get();
-        $this->assertEquals(1, count($feed));
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'ranking')->where('created_at', '>', '2024-01-01')->orderBy('id', 'desc')->get();
+        $this->assertEquals(2, count($feed));
         $feed = $feed[0];
         $this->assertEquals('Your ranking position is 2', $feed->title);
         $this->assertEquals('Your ranking position in Mens Foil is 2 as of 1 January 2020', $feed->content);
@@ -331,16 +331,16 @@ class FeedMessageServiceTest extends TestCase
 
         // no new message is generated if one was available
         $service->generate($fencer, $data, 'ranking', $fencer->user);
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'ranking')->where('created_at', '>', '2024-01-01')->get();
-        $this->assertEquals(1, count($feed));
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'ranking')->where('created_at', '>', '2024-01-01')->orderBy('id', 'desc')->get();
+        $this->assertEquals(2, count($feed));
 
         // generate for the followers
         $service->generate($fencer, $data, 'ranking');
         $feeds = DeviceFeed::where('id', '>', 0)->count();
         $this->assertEquals(7, $feeds); // one entry for the new locale
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'ranking')->where('created_at', '>', '2024-01-01')->orderBy('id')->get();
-        $this->assertEquals(2, count($feed));
-        $feed = $feed[1];
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'ranking')->where('created_at', '>', '2024-01-01')->orderBy('id', 'desc')->get();
+        $this->assertEquals(3, count($feed));
+        $feed = $feed[0];
         $this->assertEquals('Tést De La Teste holds 2 in the ranking', $feed->title);
         $this->assertEquals('Tést De La Teste holds position 2 in Mens Foil as of 1 January 2020', $feed->content);
         $this->assertEquals(DeviceFeed::RANKING, $feed->type);
@@ -348,8 +348,8 @@ class FeedMessageServiceTest extends TestCase
         $this->assertEquals($data->ranking->getKey(), $feed->content_id);
 
         $service->generate($fencer, $data, 'ranking');
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'ranking')->where('created_at', '>', '2024-01-01')->get();
-        $this->assertEquals(2, count($feed));
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'ranking')->where('created_at', '>', '2024-01-01')->orderBy('id', 'desc')->get();
+        $this->assertEquals(3, count($feed));
     }
 
     public function testRegisterFeed()
@@ -716,23 +716,23 @@ class FeedMessageServiceTest extends TestCase
 
         $service = new FeedMessageService();
         $service->generate($fencer, $data, 'ranking', $fencer->user);
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'ranking')->where('created_at', '>', '2024-01-01')->get();
-        $this->assertEquals(1, count($feed));
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'ranking')->where('created_at', '>', '2024-01-01')->orderBy('id','desc')->get();
+        $this->assertEquals(2, count($feed));
         $feed = $feed[0];
         $this->assertEquals('Your ranking position is 2', $feed->title);
 
         // no new message is generated if one was available and is exactly the same
         $service->generate($fencer, $data, 'ranking', $fencer->user);
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'ranking')->where('created_at', '>', '2024-01-01')->get();
-        $this->assertEquals(1, count($feed));
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'ranking')->where('created_at', '>', '2024-01-01')->orderBy('id','desc')->get();
+        $this->assertEquals(2, count($feed));
         $this->assertEquals('Your ranking position is 2', $feed[0]->title);
 
         $data->position = 3;
         $data->save();
         // it is overriden if the text changed
         $service->generate($fencer, $data, 'ranking', $fencer->user);
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'ranking')->where('created_at', '>', '2024-01-01')->get();
-        $this->assertEquals(1, count($feed));
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'ranking')->where('created_at', '>', '2024-01-01')->orderBy('id','desc')->get();
+        $this->assertEquals(2, count($feed));
         $this->assertEquals('Your ranking position is 3', $feed[0]->title);
     }
 
@@ -743,13 +743,13 @@ class FeedMessageServiceTest extends TestCase
 
         $service = new FeedMessageService();
         $service->generate($fencer, $data, 'result', $fencer->user);
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->where('created_at', '>', '2024-01-01')->get();
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->whereNot('content_id', null)->where('created_at', '>', '2024-01-01')->get();
         $this->assertEquals(1, count($feed));
         $this->assertEquals('You won EVF Individual Championships Mens Foil', $feed[0]->title);
 
         // no new message is generated if one was available
         $service->generate($fencer, $data, 'result', $fencer->user);
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->where('created_at', '>', '2024-01-01')->get();
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->whereNot('content_id', null)->where('created_at', '>', '2024-01-01')->get();
         $this->assertEquals(1, count($feed));
         $this->assertEquals('You won EVF Individual Championships Mens Foil', $feed[0]->title);
 
@@ -757,14 +757,14 @@ class FeedMessageServiceTest extends TestCase
         $data->result_place = 2;
         $data->save();
         $service->generate($fencer, $data, 'result', $fencer->user);
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->where('created_at', '>', '2024-01-01')->get();
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->whereNot('content_id', null)->where('created_at', '>', '2024-01-01')->get();
         $this->assertEquals(1, count($feed));
         $this->assertEquals('You received silver at EVF Individual Championships', $feed[0]->title);
 
         $data->result_place = 3;
         $data->save();
         $service->generate($fencer, $data, 'result', $fencer->user);
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->where('created_at', '>', '2024-01-01')->get();
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->whereNot('content_id', null)->where('created_at', '>', '2024-01-01')->get();
         $this->assertEquals(1, count($feed));
         $this->assertEquals('You received bronze at EVF Individual Championships', $feed[0]->title);
         $this->assertEquals('At EVF Individual Championships, you received the bronze medal in Mens Foil Cat 1', $feed[0]->content);
@@ -772,14 +772,14 @@ class FeedMessageServiceTest extends TestCase
         $data->result_place = 4;
         $data->save();
         $service->generate($fencer, $data, 'result', $fencer->user);
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->where('created_at', '>', '2024-01-01')->get();
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->whereNot('content_id', null)->where('created_at', '>', '2024-01-01')->get();
         $this->assertEquals(1, count($feed));
         $this->assertEquals('You ended up at place 4 at EVF Individual Championships', $feed[0]->title);
 
         $data->result_place = 5;
         $data->save();
         $service->generate($fencer, $data, 'result', $fencer->user);
-        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->where('created_at', '>', '2024-01-01')->get();
+        $feed = DeviceFeed::where('locale', 'en')->where('content_model', 'result')->whereNot('content_id', null)->where('created_at', '>', '2024-01-01')->get();
         $this->assertEquals(1, count($feed));
         $this->assertEquals('You ended up at place 5 at EVF Individual Championships', $feed[0]->title);
     }

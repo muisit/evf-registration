@@ -8,12 +8,12 @@ use Carbon\Carbon;
 
 class DeviceFeed extends Fixture
 {
-    public const FEED1 = 1;
-    public const NEWS1 = 2;
-    public const RESULT1 = 3;
-    public const RANKING1 = 4;
-    public const FEED2 = 5;
-    public const NOSUCHID = 892;
+    public const FEED1 = 66711;
+    public const NEWS1 = 66712;
+    public const RESULT1 = 66713;
+    public const RANKING1 = 66714;
+    public const FEED2 = 66715;
+    public const NOSUCHID = 66892;
 
     protected static function wasBooted($cls)
     {

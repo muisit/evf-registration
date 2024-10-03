@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Kirschbaum\PowerJoins\PowerJoins;
 use Illuminate\Support\Str;
+use DateTimeImmutable;
 
 class DeviceFeed extends Model
 {
@@ -25,6 +26,10 @@ class DeviceFeed extends Model
     {
         static::creating(function ($model) {
             $model->uuid = Str::uuid()->toString();
+            $model->created_at = (new DateTimeImmutable())->format('Y-m-d H:i:s');
+        });
+        static::saving(function ($model) {
+            $model->updated_at = (new DateTimeImmutable())->format('Y-m-d H:i:s');
         });
     }
 
@@ -42,7 +47,7 @@ class DeviceFeed extends Model
             [
                 'br', 'a', 'b', 'i', 'em', 'u', 'ul', 'ol', 'li',
                 'table', 'tr', 'td', 'th', 'thead', 'tbody', 'tfooter',
-                'div', 'p', 'span',
+                'div', 'p', 'span', 'strong',
                 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
                 'style', 'header', 'footer', 'nav',
             ]
