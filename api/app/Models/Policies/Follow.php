@@ -16,7 +16,6 @@ class Follow
      */
     public function view(EVFUser $user, Model $model): bool | null
     {
-        \Log::debug("testing Follow::view policy");
         // someone can 'see' a Follower if they are following, or if they are followed
         // this is only accessible to device-environments
         if ($user->hasRole("device") && ($user instanceof DeviceUser)) {
@@ -40,7 +39,6 @@ class Follow
      */
     public function create(EVFUser $user): bool
     {
-        \Log::debug("testing Follow::create policy");
         // someone can 'create' a Follower if they are a device user
         if ($user->hasRole("device") && ($user instanceof DeviceUser)) {
             return true;
@@ -57,7 +55,6 @@ class Follow
      */
     public function update(EVFUser $user, Model $model): bool
     {
-        \Log::debug("testing Follow::update policy");
         // this is only accessible to device-environments
         if ($user->hasRole("device") && ($user instanceof DeviceUser)) {
             // someone can 'update' a Follower if they are the owner
@@ -78,7 +75,6 @@ class Follow
      */
     public function block(EVFUser $user, Model $model): bool
     {
-        \Log::debug("testing Follow::block policy");
         // this is only accessible to device-environments
         if ($user->hasRole("device") && ($user instanceof DeviceUser)) {
             // someone can 'block' a Follower if they are the subject

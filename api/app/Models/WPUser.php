@@ -75,7 +75,7 @@ class WPUser extends Model implements AuthenticatableContract, AuthorizableContr
         else {
             $roles = EventRole::where('user_id', $this->getKey())->get();
         }
-            
+
         if (!emptyResult($roles)) {
             foreach ($roles as $row) {
                 $retval[] = 'organisation:' . $row->event_id;

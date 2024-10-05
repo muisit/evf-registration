@@ -7,7 +7,7 @@ use DB;
 
 class WPUser extends Fixture
 {
-    public const TESTUSER = 1045;
+    public const TESTUSER = 1045; // administrator, so sysop
     public const TESTUSER2 = 2879; // organiser
     public const TESTUSER3 = 65535; // cashier
     public const TESTUSER4 = 123126; // accreditation
