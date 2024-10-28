@@ -82,7 +82,7 @@ class EventConfig extends Base
         ];
 
         $keylist = array_keys($obj);
-
+        $retval = [];
         foreach ($keys as $key) {
             if (in_array($key, $keylist)) {
                 $retval[$key] = $obj[$key] ? true : false;

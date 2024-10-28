@@ -17,7 +17,7 @@ class AccountSave extends Base
     public function rules(): array
     {
         return [
-            'language' => ['string'],
+            'language' => ['string', 'nullable', 'max:20'],
         ];
     }
 
@@ -29,13 +29,12 @@ class AccountSave extends Base
     protected function authorize(EVFUser $user, array $data): bool
     {
         // every user is allowed to set their own preferences
-        return true;
+        return $user instanceof DeviceUser;
     }
     
     protected function updateModel(array $data): ?Model
     {
         if ($this->model) {
-            \Log::debug("updating account data from " . json_encode($this->model->preferences) . ' with ' . json_encode($data));
             $this->model->preferences = array_merge($this->model->preferences, [
                 'account' => [
                     'language' => $data['language'] ?? 'en_GB',

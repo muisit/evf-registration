@@ -111,6 +111,7 @@ class AccreditationDocument extends Base
 
     private function checkBadge($data)
     {
+        \Log::debug('checking badge');
         $badge = $data['doc']['badge'] ?? '';
         if (strlen($badge) != 14) {
             return false;
@@ -138,7 +139,7 @@ class AccreditationDocument extends Base
     private function checkFencer($data)
     {
         $fencerId = $data['doc']['fencerId'] ?? 0;
-        if ($this->model->accreditation->fencer_id != $fencerId) {
+        if (!isset($this->model) || empty($this->model->accreditation) || $this->model->accreditation->fencer_id != $fencerId) {
             return false;
         }
         return true;
@@ -150,7 +151,7 @@ class AccreditationDocument extends Base
         $id = 0;
         if (!empty($doc)) $id = $doc['id'] ?? 0;
         $id = intval($id);
-
+        \Log::debug("creating model using $id");
         $model = DocumentModel::find($id);
         if (empty($model)) {
             $model = new DocumentModel();
@@ -170,7 +171,9 @@ class AccreditationDocument extends Base
 
             if (isset($data['doc']['payload'])) {
                 $payload = (array)$data['doc']['payload'];
-                $this->model->payload = array_merge($this->model->payload ?? [], $payload);
+                if (is_array($payload)) {
+                    $this->model->payload = array_merge(is_array($this->model->payload) ? $this->model->payload : [], $payload);
+                }
             }
 
             if (isset($data['doc']['status'])) {

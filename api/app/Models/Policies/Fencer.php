@@ -12,6 +12,7 @@ class Fencer
      */
     public function before(EVFUser $user, string $ability): bool | null
     {
+        \Log::debug('fencer policy before call');
         if ($user->hasRole("sysop")) return true;
         return null;
     }

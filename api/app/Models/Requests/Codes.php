@@ -7,6 +7,7 @@ use App\Models\Schemas\Code;
 use Illuminate\Database\Eloquent\Model;
 use App\Support\Contracts\EVFUser;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 
@@ -19,7 +20,7 @@ class Codes extends Base
     {
         return [
             'codes.*' => ['required', 'string', 'size:14'],
-            'action' => ['required','max:50'],
+            'action' => ['required','string','max:50'],
         ];
     }
 

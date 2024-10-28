@@ -18,9 +18,9 @@ class BlockEvent extends BaseBroadcastEvent implements ShouldBroadcast
 
     private Fencer $fencer;
     private DeviceUser $user;
-    private boolean $wasCancelled;
+    private bool $wasCancelled;
 
-    public function __construct(Fencer $f, DeviceUser $u, boolean $wasCancelled)
+    public function __construct(Fencer $f, DeviceUser $u, bool $wasCancelled)
     {
         $this->fencer = $f;
         $this->user = $u;

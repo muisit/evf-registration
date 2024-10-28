@@ -14,10 +14,10 @@ class Follow extends Model
     protected $casts = [
         'preferences' => 'array'
     ];
- 
+
     public static $allowedSettings = ["blocked", "unfollow", "handout", "checkin", "checkout", "ranking", "result", "register"];
     public static $allowedUserSettings = ["unfollow", "handout", "checkin", "checkout", "ranking", "result", "register"];
-    
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(DeviceUser::class, 'device_user_id', 'id');

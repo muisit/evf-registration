@@ -35,7 +35,7 @@ class AccreditationUser extends Base
             return false;
         }
 
-        if (isset($data['user']) && !in_array(($data['user']['type'] ?? 'none'), ['organiser', 'accreditation', 'checkin', 'checkout', 'dt'])) {
+        if (isset($data['user']) && $data['user']['type'] == 'none') {
             $this->controller->authorize('delete', $this->model);
         }
 

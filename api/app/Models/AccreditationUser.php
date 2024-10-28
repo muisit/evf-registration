@@ -20,7 +20,7 @@ class AccreditationUser extends Model implements AuthenticatableContract, Author
     protected $table = 'accreditation_codes';
     protected $fillable = [];
     protected $guarded = [];
-    
+
     public function getRememberTokenName()
     {
         return null;

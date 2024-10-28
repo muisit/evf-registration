@@ -28,6 +28,7 @@ class AccountPreferences extends Base
 
     private function checkPreferences($attribute, $value, $fail)
     {
+        \Log::debug("checking preferences " . json_encode($value));
         $value = (array) $value;
         if (!is_array($value)) {
             $fail("Invalid preferences");
@@ -48,9 +49,9 @@ class AccountPreferences extends Base
     protected function authorize(EVFUser $user, array $data): bool
     {
         // every user is allowed to set their own preferences
-        return true;
+        return $user instanceof DeviceUser;
     }
-    
+
     protected function updateModel(array $data): ?Model
     {
         if ($this->model) {

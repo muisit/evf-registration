@@ -57,7 +57,7 @@ class Block extends Base
         }
         return false;
     }
-    
+
     protected function updateModel(array $data): ?Model
     {
         if ($this->model) {

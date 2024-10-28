@@ -32,6 +32,14 @@ class AccountLink extends Base
         ];
     }
 
+    protected function authorize(EVFUser $user, array $data): bool
+    {
+        if (!$user->hasRole('device')) {
+            return false;
+        }
+        return parent::authorize($user, $data);
+    }
+
     protected function createModel(Request $request): ?Model
     {
         // if there is already a linked fencer, use that model
