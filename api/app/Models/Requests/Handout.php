@@ -25,13 +25,14 @@ class Handout extends Base
 
     protected function authorize(EVFUser $user, array $data): bool
     {
-        if (!empty($this->model)) {
-            // handout is a status update allowed for organiser and accreditors
-            $this->controller->authorize('update', $this->model);
-        }
-        else {
+        if (empty($this->model)) {
             return false;
         }
+
+        \Log::debug("testing authorize on handout for model" . $this->model->getKey());
+        // handout is a status update allowed for organiser and accreditors
+        $this->controller->authorize('handout', $this->model);
+        \Log::debug("handout succeeds");
 
         // the interface should both pass the event id as query parameter and in the form
         $event = request()->get('eventObject');

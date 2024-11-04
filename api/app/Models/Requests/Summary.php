@@ -48,8 +48,8 @@ class Summary extends Base
             && isset($data['summary']['typeId'])
             && isset($data['summary']['type'])
         ) {
-            $model = PDFService::modelFactory($data['summary']['type'], intval($data['summary']['typeId']));
-            if (!empty($model)) {
+            $this->model = PDFService::modelFactory($data['summary']['type'], intval($data['summary']['typeId']));
+            if (!empty($this->model)) {
                 return true;
             }
         }
@@ -68,9 +68,8 @@ class Summary extends Base
 
     protected function createModel(Request $request): ?Model
     {
-        return new Role();
+        return $this->model;
     }
-
 
     protected function updateModel(array $data): ?Model
     {

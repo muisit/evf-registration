@@ -12,12 +12,17 @@ class Accreditation
      */
     public function before(EVFUser $user, string $ability): bool | null
     {
-        if ($user->hasRole("sysop")) return true;
+        if ($user->hasRole("sysop")) {
+            \Log::debug("user is sysop");
+            return true;
+        }
+        \Log::debug("policy accreditation::before returns null");
         return null;
     }
 
     private function isOrganiser(EVFUser $user)
     {
+        \Log::debug("policy accreditation::isOrganiser");
         // see if we have a global request object for the event
         $event = request()->get('eventObject');
         $eventId = (!empty($event) && $event->exists) ? $event->getKey() : null;
@@ -83,9 +88,29 @@ class Accreditation
      */
     public function update(EVFUser $user, Model $model): bool
     {
+        \Log::debug("accreditation policy test update");
         if ($this->isOrganiser($user)) {
             return true;
         }
+
+        return false;
+    }
+
+    /**
+     * @param User $user
+     * @param Model $model
+     *
+     * Handout can only be done by accreditation code users (ie: the accreditation desk)
+     *
+     * @return bool
+     */
+    public function handout(EVFUser $user, Model $model): bool
+    {
+        if ($this->isOrganiser($user) && $user->hasRole('code')) {
+            \Log::debug("policy accreditation handout returns true");
+            return true;
+        }
+        \Log::debug("policy accreditation handout returns false");
 
         return false;
     }

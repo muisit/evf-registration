@@ -26,6 +26,7 @@ class PDFService
         $model = null;
         switch ($type) {
             case 'Country':
+                \Log::debug("finding model for country $typeId");
                 $model = Country::find($typeId);
                 break;
             case 'Role':

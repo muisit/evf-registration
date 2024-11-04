@@ -24,7 +24,7 @@ class IndexTest extends TestCase
         $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
-        $this->assertCount(1, $output);
+        $this->assertCount(2, $output);
 
         // test user 2 is sysop
         $this->session(['wpuser' => UserData::TESTUSER2])
@@ -70,7 +70,7 @@ class IndexTest extends TestCase
         $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
-        $this->assertCount(1, $output);
+        $this->assertCount(2, $output);
 
         $event->event_config = json_encode(['use_registration' => false]);
         $event->save();
@@ -78,7 +78,15 @@ class IndexTest extends TestCase
         $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
-        $this->assertCount(0, $output);
+        $this->assertCount(1, $output);
+
+        $event->event_config = json_encode(['use_registration' => true]);
+        $event->save();
+        $response = $this->session(['wpuser' => UserData::TESTUSER])->get('/events');
+        $output = $response->json();
+        $this->assertTrue($output !== false);
+        $this->assertTrue(is_array($output));
+        $this->assertCount(2, $output);
 
         $event->event_config = json_encode(['use_registrations' => true]);
         $event->save();
@@ -86,7 +94,7 @@ class IndexTest extends TestCase
         $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
-        $this->assertCount(0, $output);
+        $this->assertCount(1, $output);
 
         $event->event_config = '';
         $event->save();
@@ -94,6 +102,6 @@ class IndexTest extends TestCase
         $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
-        $this->assertCount(0, $output);
+        $this->assertCount(1, $output);
     }
 }

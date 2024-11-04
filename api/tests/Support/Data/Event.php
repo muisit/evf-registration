@@ -11,6 +11,8 @@ use Carbon\Carbon;
 class Event extends Fixture
 {
     public const EVENT1 = 1;
+    public const EVENTPAST = 2;
+    public const EVENTFUT = 3;
     public const NOSUCHEVENT = 992;
 
     protected static function wasBooted($cls)
@@ -60,6 +62,76 @@ class Event extends Fixture
             'event_payments' => 'group',
             'event_feed' => null,
             'event_config' => '{"use_registration":true,"use_accreditation":true}'
+        ])->save();
+
+        $regopens = Carbon::now()->subDays(100)->toDateString();
+        $regcloses = Carbon::now()->subDays(90)->toDateString();
+        $opens = Carbon::now()->subDays(60)->toDateString();
+        $year = intval(Carbon::now()->subDays(60)->format('Y'));
+        Model::create([
+            'event_id' => self::EVENTPAST,
+            'event_name' => 'Past Event',
+            'event_open' => $opens,
+            'event_year' => $year,
+            'event_duration' => 4,
+            'event_email' => 'test@example.com',
+            'event_web' => null,
+            'event_location' => 'Anywhere',
+            'event_country' => Country::ITA,
+            'event_type' => EventType::INDIVIDUAL,
+            'event_currency_symbol' => '€',
+            'event_currency_name' => 'EUR',
+            'event_bank' => 'ING',
+            'event_account_name' => 'My Name',
+            'event_organisers_address' => '',
+            'event_iban' => 'DE09DEU0223 0022 0221 02',
+            'event_swift' => 'ING/DEUT',
+            'event_reference' => 'my holiday in Italy',
+            'event_in_ranking' => 'Y',
+            'event_frontend' => null,
+            'event_factor' => 1.2,
+            'event_registration_open' => $regopens,
+            'event_registration_close' => $regcloses,
+            'event_base_fee' => 100,
+            'event_competition_fee' => 10,
+            'event_payments' => 'group',
+            'event_feed' => null,
+            'event_config' => '{"use_registration":false,"use_accreditation":false}'
+        ])->save();
+
+        $regopens = Carbon::now()->addDays(100)->toDateString();
+        $regcloses = Carbon::now()->addDays(120)->toDateString();
+        $opens = Carbon::now()->addDays(160)->toDateString();
+        $year = intval(Carbon::now()->addDays(160)->format('Y'));
+        Model::create([
+            'event_id' => self::EVENTFUT,
+            'event_name' => 'Future Event',
+            'event_open' => $opens,
+            'event_year' => $year,
+            'event_duration' => 4,
+            'event_email' => 'test@example.com',
+            'event_web' => null,
+            'event_location' => 'Anywhere',
+            'event_country' => Country::FRA,
+            'event_type' => EventType::INDIVIDUAL,
+            'event_currency_symbol' => '€',
+            'event_currency_name' => 'EUR',
+            'event_bank' => 'ING',
+            'event_account_name' => 'My Name',
+            'event_organisers_address' => '',
+            'event_iban' => 'DE09DEU0223 0022 0221 02',
+            'event_swift' => 'ING/DEUT',
+            'event_reference' => 'my holiday in France',
+            'event_in_ranking' => 'Y',
+            'event_frontend' => null,
+            'event_factor' => 1.2,
+            'event_registration_open' => $regopens,
+            'event_registration_close' => $regcloses,
+            'event_base_fee' => 100,
+            'event_competition_fee' => 10,
+            'event_payments' => 'group',
+            'event_feed' => null,
+            'event_config' => '{"use_registration":true,"use_accreditation":false}'
         ])->save();
     }
 }
