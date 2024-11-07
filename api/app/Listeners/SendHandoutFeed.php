@@ -24,10 +24,11 @@ class SendHandoutFeed extends BasicFeedListener
     {
         $service = new FeedMessageService();
         if ($this->eventAppliesToFencer($event->accreditation->fencer, "handout")) {
-            $service->generate($event->accreditation->fencer, $event->accreditation, "handout", $event->accreditation->fencer->user);
-        }
-        if ($this->eventAppliesToFollowers($event->accreditation->fencer, "handout")) {
             $service->generate($event->accreditation->fencer, $event->accreditation, "handout");
+        }
+        $followers = $this->eventAppliesToFollowers($event->accreditation->fencer, "handout");
+        if (count($followers)) {
+            $service->generate($event->accreditation->fencer, $event->accreditation, "handout", $followers);
         }
     }
 }

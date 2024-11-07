@@ -19,8 +19,8 @@ class AccreditationHandoutEvent extends BaseBroadcastEvent implements ShouldBroa
 {
     use Dispatchable;
 
-    private Accreditation $accreditation;
-    private string $datetime;
+    public Accreditation $accreditation;
+    public string $datetime;
 
     public function __construct(Accreditation $accreditation)
     {

@@ -25,10 +25,11 @@ class SendRankingFeed extends BasicFeedListener
         $service = new FeedMessageService();
         // There was a rankingupdate for a specific fencer
         if ($this->eventAppliesToFencer($event->ranking->fencer, "ranking")) {
-            $service->generate($event->ranking->fencer, $event->ranking, "ranking", $event->ranking->fencer->user);
-        }
-        if ($this->eventAppliesToFollowers($event->ranking->fencer, "ranking")) {
             $service->generate($event->ranking->fencer, $event->ranking, "ranking");
+        }
+        $followers = $this->eventAppliesToFollowers($event->ranking->fencer, "ranking");
+        if (count($followers) > 0) {
+            $service->generate($event->ranking->fencer, $event->ranking, "ranking", $followers);
         }
     }
 }

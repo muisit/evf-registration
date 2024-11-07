@@ -22,12 +22,17 @@ class SendBagStartFeed extends BasicFeedListener
      */
     public function handle(ProcessStartEvent $event): void
     {
+        // we check on the not-used bagstart event for followers. That currently means there
+        // is no way for followers to get the message that someones bag has started processing
+        // It is only sent to the user itself. This is a different logic than for the bag-end
+        // event.
         $service = new FeedMessageService();
-        if ($this->eventAppliesToFencer($event->content->fencer, "checkin")) {
-            $service->generate($event->content->fencer, $event->content, "bagstart", $event->content->fencer->user);
+        if ($this->eventAppliesToFencer($event->content->accreditation->fencer, "bagstart")) {
+            $service->generate($event->content->accreditation->fencer, $event->content, "bagstart");
         }
-        if ($this->eventAppliesToFollowers($event->content->fencer, "checkin")) {
-            $service->generate($event->content->fencer, $event->content, "bagstart");
+        $followers = $this->eventAppliesToFollowers($event->content->accreditation->fencer, "bagstart");
+        if (count($followers) > 0) {
+            $service->generate($event->content->accreditation->fencer, $event->content, "bagstart", $followers);
         }
     }
 }

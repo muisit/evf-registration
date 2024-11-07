@@ -28,12 +28,13 @@ class Follow extends Model
         return $this->belongsTo(Fencer::class, 'fencer_id', 'fencer_id');
     }
 
-    public function setPreference($key, $value) {
+    public function setPreference($key, $value)
+    {
         $data = $this->preferences;
         if ($value === true) {
             $data[$key] = true;
         }
-        else if(isset($data[$key])) {
+        else if (isset($data[$key])) {
             unset($data[$key]);
         }
         $this->preferences = $data;
@@ -46,7 +47,7 @@ class Follow extends Model
                 && isset($this->preferences[$eventType])
                 && $this->preferences[$eventType] === true;
         }
-        \Log::debug("triggersOnEvent for unmatched eventType $eventType");
+        \Log::debug("triggersOnEvent for unmatched eventType $eventType or event is blocked");
         return false;
     }
 

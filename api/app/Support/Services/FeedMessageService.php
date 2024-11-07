@@ -37,15 +37,15 @@ class FeedMessageService
     private ?Fencer $fencer = null;
     private string $type;
 
-    public function generate(Fencer $fencer, Model $object, string $type, ?DeviceUser $user = null)
+    public function generate(Fencer $fencer, Model $object, string $type, $followers = null)
     {
         \Log::debug("generate feed messages for $type");
         $this->type = $type;
         $this->fencer = $fencer;
         $this->localisedTexts = [];
         // if user is passed along, this message should be personalised for the fencer
-        $this->isPersonalMessage = !empty($user) ? true : false;
-        $this->userList = $this->getUserList($fencer, $user);
+        $this->isPersonalMessage = empty($followers) ? true : false;
+        $this->userList = $this->getUserList($fencer, $followers);
         \Log::debug("user list is " . json_encode($this->userList->map(fn ($o) => $o->getKey())));
         $this->createLocalisedTexts($object, $type);
         \Log::debug("texts are " . json_encode($this->localisedTexts));
@@ -98,30 +98,40 @@ class FeedMessageService
                 break;
             case 'blocked':
                 // override the userlist to be only between fencer and blocked user
-                $this->userList = $this->isPersonalMessage ? [$user] : [$object];
+                $this->userList = $this->isPersonalMessage ? [$fencer->user] : [$object];
                 return $this->createBlockFeed($object, true);
             case 'unblocked':
                 // override the userlist to be only between fencer and unblocked user
-                $this->userList = $this->isPersonalMessage ? [$user] : [$object];
+                $this->userList = $this->isPersonalMessage ? [$fencer->user] : [$object];
                 return $this->createBlockFeed($object, false);
             case 'follow':
                 // override the userlist to be only between fencer and following user
-                $this->userList = $this->isPersonalMessage ? [$user] : [$object];
+                $this->userList = $this->isPersonalMessage ? [$fencer->user] : [$object];
                 return $this->createFollowFeed($object, true);
             case 'unfollow':
                 // override the userlist to be only between fencer and unfollowing user
-                $this->userList = $this->isPersonalMessage ? [$user] : [$object];
+                $this->userList = $this->isPersonalMessage ? [$fencer->user] : [$object];
                 return $this->createFollowFeed($object, false);
         }
     }
 
-    private function getUserList(Fencer $fencer, ?DeviceUser $user)
+    private function getUserList(Fencer $fencer, $followers)
     {
-        if (!empty($user)) {
-            return collect([$user]);
+        if (empty($followers)) {
+            // should not be null
+            return collect([$fencer->user]);
         }
         else {
-            return $fencer->followers()->with('user')->get()->map(fn($fw) => $fw->user);
+            // The regular use case is that the feed-message-service is called for a list
+            // of followers, so we get a list of Follow models.
+            // The block/unblock feed provides a list of device users instead of follow-models,
+            // because it is directed at exactly one follower
+            return collect($followers)->map(function ($fw) {
+                if (get_class($fw) == DeviceUser::class) {
+                    return $fw;
+                }
+                return $fw->user;
+            });
         }
     }
 

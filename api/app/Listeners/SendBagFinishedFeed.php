@@ -22,12 +22,16 @@ class SendBagFinishedFeed extends BasicFeedListener
      */
     public function handle(ProcessEndEvent $event): void
     {
+        // the bag-end event is linked to the checkout-capability here, so people that are allowed
+        // to see the checkout event (bag was checked out) also see the bagend (bag is available for checkout)
+        // event
         $service = new FeedMessageService();
-        if ($this->eventAppliesToFencer($event->content->fencer, "checkout")) {
-            $service->generate($event->content->fencer, $event->content, "bagend", $event->content->fencer->user);
+        if ($this->eventAppliesToFencer($event->content->accreditation->fencer, "checkout")) {
+            $service->generate($event->content->accreditation->fencer, $event->content, "bagend");
         }
-        if ($this->eventAppliesToFollowers($event->content->fencer, "checkout")) {
-            $service->generate($event->content->fencer, $event->content, "bagend");
+        $followers = $this->eventAppliesToFollowers($event->content->accreditation->fencer, "checkout");
+        if (count($followers) > 0) {
+            $service->generate($event->content->accreditation->fencer, $event->content, "bagend", $followers);
         }
     }
 }

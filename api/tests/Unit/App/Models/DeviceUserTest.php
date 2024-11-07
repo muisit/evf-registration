@@ -114,4 +114,24 @@ class DeviceUserTest extends TestCase
         // and is now also following MCAT3. MCAT2 was removed from the list
         $this->assertCount(2, $data2->following()->get());
     }
+
+    public function testTriggersEvent()
+    {
+        $data1 = DeviceUser::find(Data::DEVICEUSER1);
+        // these are the default settings on create, not the ones in the fixture
+        $this->assertTrue($data1->triggersEvent('result'));
+        $this->assertTrue($data1->triggersEvent('register'));
+        $this->assertTrue($data1->triggersEvent('handout'));
+        $this->assertTrue($data1->triggersEvent('ranking'));
+        $this->assertFalse($data1->triggersEvent('checkin'));
+
+        $data1->preferences = array_merge($data1->preferences, ['account' => ['followers' => ['checkin', 'somethingelse', 'newitem']]]);
+        $this->assertFalse($data1->triggersEvent('result'));
+        $this->assertFalse($data1->triggersEvent('register'));
+        $this->assertFalse($data1->triggersEvent('handout'));
+        $this->assertFalse($data1->triggersEvent('ranking'));
+        $this->assertTrue($data1->triggersEvent('checkin'));
+        $this->assertTrue($data1->triggersEvent('somethingelse'));
+        $this->assertTrue($data1->triggersEvent('newitem'));
+    }
 }

@@ -25,10 +25,11 @@ class SendResultFeed extends BasicFeedListener
         $service = new FeedMessageService();
         // There was a result update for a specific fencer
         if ($this->eventAppliesToFencer($event->result->fencer, "result")) {
-            $service->generate($event->result->fencer, $event->result, "result", $event->result->fencer->user);
-        }
-        if ($this->eventAppliesToFollowers($event->result->fencer, "result")) {
             $service->generate($event->result->fencer, $event->result, "result");
+        }
+        $followers = $this->eventAppliesToFollowers($event->result->fencer, "result");
+        if (count($followers) > 0) {
+            $service->generate($event->result->fencer, $event->result, "result", $followers);
         }
     }
 }

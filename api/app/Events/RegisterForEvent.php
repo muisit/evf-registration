@@ -20,15 +20,15 @@ class RegisterForEvent
 
     public Fencer $fencer;
     public Competition $competition;
-    public bool $isCancelled;
+    public bool $wasCancelled;
     /**
      * Create a new event instance.
      */
-    public function __construct(Fencer $fencer, Competition $competition, bool $isCancelled)
+    public function __construct(Fencer $fencer, Competition $competition, bool $wasCancelled)
     {
         $this->fencer = $fencer;
         $this->competition = $competition;
-        $this->isCancelled = $isCancelled;
+        $this->wasCancelled = $wasCancelled;
     }
 
     /**

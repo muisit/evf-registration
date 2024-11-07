@@ -25,9 +25,9 @@ class SendFollowFeed extends BasicFeedListener
         $service = new FeedMessageService();
         // only send the 'you are followed' feed if there is a device-user attached to the fencer
         if ($this->eventAppliesToFencer($event->fencer, "follow")) {
-            $service->generate($event->fencer, $event->user, $event->wasCancelled ? "unfollow" : "follow", $event->fencer->user);
+            $service->generate($event->fencer, $event->user, $event->wasCancelled ? "unfollow" : "follow");
         }
         // always send the follow event for the follower
-        $service->generate($event->fencer, $event->user, $event->wasCancelled ? "unfollow" : "follow");
+        $service->generate($event->fencer, $event->user, $event->wasCancelled ? "unfollow" : "follow", [$event->user]);
     }
 }

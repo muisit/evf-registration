@@ -23,11 +23,12 @@ class SendCheckoutFeed extends BasicFeedListener
     public function handle(CheckoutEvent $event): void
     {
         $service = new FeedMessageService();
-        if ($this->eventAppliesToFencer($event->content->fencer, "checkout")) {
-            $service->generate($event->content->fencer, $event->content, "checkout", $event->content->fencer->user);
+        if ($this->eventAppliesToFencer($event->content->accreditation->fencer, "checkout")) {
+            $service->generate($event->content->accreditation->fencer, $event->content, "checkout");
         }
-        if ($this->eventAppliesToFollowers($event->content->fencer, "checkout")) {
-            $service->generate($event->content->fencer, $event->content, "checkout");
+        $followers = $this->eventAppliesToFollowers($event->content->accreditation->fencer, "checkout");
+        if (count($followers) > 0) {
+            $service->generate($event->content->accreditation->fencer, $event->content, "checkout", $followers);
         }
     }
 }

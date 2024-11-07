@@ -18,8 +18,8 @@ class CheckoutEvent extends BaseBroadcastEvent implements ShouldBroadcast
 {
     use Dispatchable;
 
-    private Event $event;
-    private AccreditationDocument $content;
+    public Event $event;
+    public AccreditationDocument $content;
 
     public function __construct(Event $e, AccreditationDocument $c)
     {

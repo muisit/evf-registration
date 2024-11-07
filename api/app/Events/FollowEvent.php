@@ -16,9 +16,9 @@ class FollowEvent extends BaseBroadcastEvent implements ShouldBroadcast
 {
     use Dispatchable;
 
-    private Fencer $fencer;
-    private DeviceUser $user;
-    private bool $wasCancelled;
+    public Fencer $fencer;
+    public DeviceUser $user;
+    public bool $wasCancelled;
 
     public function __construct(Fencer $f, DeviceUser $u, bool $wasCancelled)
     {

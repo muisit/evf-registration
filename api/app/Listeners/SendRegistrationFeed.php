@@ -25,10 +25,11 @@ class SendRegistrationFeed extends BasicFeedListener
         $service = new FeedMessageService();
         // Fencer registered for a specific competition
         if ($this->eventAppliesToFencer($event->fencer, "register")) {
-            $service->generate($event->fencer, $event->competition, $event->wasCancelled ? "unregister" : "register", $event->ranking->fencer->user);
-        }
-        if ($this->eventAppliesToFollowers($event->fencer, "register")) {
             $service->generate($event->fencer, $event->competition, $event->wasCancelled ? "unregister" : "register");
+        }
+        $followers = $this->eventAppliesToFollowers($event->fencer, "register");
+        if (count($followers) > 0) {
+            $service->generate($event->fencer, $event->competition, $event->wasCancelled ? "unregister" : "register", $followers);
         }
     }
 }

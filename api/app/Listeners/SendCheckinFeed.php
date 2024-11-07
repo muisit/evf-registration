@@ -23,11 +23,12 @@ class SendCheckinFeed extends BasicFeedListener
     public function handle(CheckinEvent $event): void
     {
         $service = new FeedMessageService();
-        if ($this->eventAppliesToFencer($event->content->fencer, "checkin")) {
-            $service->generate($event->content->fencer, $event->content, "checkin", $event->content->fencer->user);
+        if ($this->eventAppliesToFencer($event->content->accreditation->fencer, "checkin")) {
+            $service->generate($event->content->accreditation->fencer, $event->content, "checkin");
         }
-        if ($this->eventAppliesToFollowers($event->content->fencer, "checkin")) {
-            $service->generate($event->content->fencer, $event->content, "checkin");
+        $followers = $this->eventAppliesToFollowers($event->content->accreditation->fencer, "checkin");
+        if (count($followers) > 0) {
+            $service->generate($event->content->accreditation->fencer, $event->content, "checkin", $followers);
         }
     }
 }

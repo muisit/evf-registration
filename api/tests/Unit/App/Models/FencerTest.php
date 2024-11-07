@@ -24,4 +24,15 @@ class FencerTest extends TestCase
         $this->assertInstanceOf(Country::class, $fencer->country()->first());
         $this->assertInstanceOf(Country::class, $fencer->country);
     }
+
+    public function testTriggersEvent()
+    {
+        $fencer = Fencer::find(FencerData::MCAT1);
+        $this->assertTrue($fencer->triggersEvent("result"));
+        $this->assertFalse($fencer->triggersEvent("nosuchevent"));
+
+        $fencer = Fencer::find(FencerData::MCAT5);
+        $this->assertFalse($fencer->triggersEvent("result"));
+        $this->assertFalse($fencer->triggersEvent("nosuchevent"));
+    }
 }
