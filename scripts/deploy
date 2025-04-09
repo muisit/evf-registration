@@ -77,7 +77,7 @@ sudo find ./storage -type d -exec chmod 2775 {} \; >> $LOG
 #chmod u+x artisan >> $LOG
 
 echo "Installing composer modules" >> $LOG
-php8.1 /usr/bin/composer install >> $LOG 2>&1
+php8.2 /usr/bin/composer install >> $LOG 2>&1
 
 echo "Running tests"
 echo "Running tests" >> $LOG
@@ -92,7 +92,7 @@ do
     sleep 1
     STATE=`docker inspect unittests | jq -r '.[0].State.Health.Status'`
 done
-php8.1 vendor/bin/codecept -c tests/codeception.yml run Unit >> $LOG 2>&1
+php8.2 vendor/bin/codecept -c tests/codeception.yml run Unit >> $LOG 2>&1
 EC="$?"
 
 echo "Cleaning up docker container" >> $LOG
@@ -111,10 +111,10 @@ fi
 # recreate the autoloader files for production
 rm -rf vendor >>$LOG
 echo "Re-installing composer modules"  >> $LOG
-php8.1 /usr/bin/composer install --optimize-autoloader --no-dev  >> $LOG 2>&1
+php8.2 /usr/bin/composer install --optimize-autoloader --no-dev  >> $LOG 2>&1
 
 echo "Clearing caches"  >> $LOG
-php8.1 artisan cache:clear  >> $LOG
+php8.2 artisan cache:clear  >> $LOG
 
 echo "Removing unrequired files" >> $LOG
 rm -rf tests phpunit.xml README.md .styleci.yml .editorconfig .gitignore storage/app

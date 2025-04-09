@@ -19,7 +19,7 @@ class Plovdiv2025 extends Controller
     public function index(Request $request)
     {
         $eventId = 67;
-        $token = "flkocmebWWJTwlj6YGSklfW5rG8ifsQy";
+        $token = env('PLOVDIV_API');
         $apitoken = $request->get('token') ?? '';
         if ($apitoken != $token) {
             return response()->json(["error" => "Unauthorized"], 403);
