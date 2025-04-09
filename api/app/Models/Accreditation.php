@@ -137,7 +137,7 @@ class Accreditation extends Model
 
     public function getFullAccreditationId()
     {
-        return sprintf('11%s%1d%04d', $this->fe_id, self::createControlDigit($this->fe_id), 0);
+        return sprintf('11%s%1d%04d', $this->fe_id, self::createControlDigit($this->fe_id ?? ''), 0);
     }
 
     public function getDatesOfAccreditation()

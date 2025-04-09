@@ -21,6 +21,7 @@ use Tests\Support\Data\Accreditation as AccreditationData;
 use Tests\Support\Data\AccreditationTemplate as TemplateData;
 use Tests\Unit\TestCase;
 use Illuminate\Support\Facades\Queue;
+use Carbon\Carbon;
 
 class CheckDirtyBadgesTest extends TestCase
 {
@@ -69,4 +70,56 @@ class CheckDirtyBadgesTest extends TestCase
         // only one job actually pushed
         Queue::assertPushed(CheckDirtyBadges::class, 1);
     }
+
+    public function testRunForOldEvent()
+    {
+        Queue::fake();
+        $job = new CheckDirtyBadges();
+        $job->handle();
+        // nothing was dirty, so nothing is pushed
+        Queue::assertNothingPushed();
+
+        $event = Event::find(EventData::EVENT1);
+        $event->event_open = '2000-01-01';
+        $event->save();
+        Accreditation::where('is_dirty', null)->update(['is_dirty' => '2000-01-01']);
+        $job->handle();
+        // nothing pushed, event is too old
+        Queue::assertNothingPushed();
+    }
+
+    public function testRunForJustClosedEvent()
+    {
+        Queue::fake();
+        $job = new CheckDirtyBadges();
+        $job->handle();
+        // nothing was dirty, so nothing is pushed
+        Queue::assertNothingPushed();
+
+        $event = Event::find(EventData::EVENT1);
+        $event->event_open = Carbon::now()->subDays($event->event_duration)->toDateString();
+        $event->save();
+        Accreditation::where('is_dirty', null)->update(['is_dirty' => '2000-01-01']);
+        $job->handle();
+        // nothing pushed, event is closed
+        Queue::assertNothingPushed();
+    }
+
+    public function testRunForStillOpenEvent()
+    {
+        Queue::fake();
+        $job = new CheckDirtyBadges();
+        $job->handle();
+        // nothing was dirty, so nothing is pushed
+        Queue::assertNothingPushed();
+
+        $event = Event::find(EventData::EVENT1);
+        $event->event_open = Carbon::now()->subDays($event->event_duration - 1)->toDateString();
+        $event->save();
+        Accreditation::where('is_dirty', null)->update(['is_dirty' => '2000-01-01']);
+        $job->handle();
+        // nothing pushed, event is closed
+        Queue::assertPushed(CheckBadge::class, 7);
+    }
+
 }
