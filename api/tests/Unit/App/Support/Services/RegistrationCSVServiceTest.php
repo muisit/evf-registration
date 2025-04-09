@@ -11,6 +11,7 @@ use Tests\Support\Data\Event as MainEventData;
 use Tests\Support\Data\SideEvent as EventData;
 use Tests\Support\Data\Registration as RegistrationData;
 use Tests\Unit\TestCase;
+use Carbon\Carbon;
 
 class RegistrationCSVServiceTest extends TestCase
 {
@@ -29,6 +30,7 @@ class RegistrationCSVServiceTest extends TestCase
             "name", "firstname", "country", "country_abbr", "year-of-birth", "date", "event",
             "role", "organisation", "organisation_abbr", "type", "cat", "gender", "team", "picture"];
 
+        $byear = Carbon::now()->subYears(41)->format('Y');
         $output = $service->generate($registrations, $headers);
         $this->assertCount(3, $output);
         $this->assertCount(15, $output[0]);
@@ -39,7 +41,7 @@ class RegistrationCSVServiceTest extends TestCase
         $this->assertEquals("Tést", $output[1][1]);
         $this->assertEquals("Germany", $output[1][2]);
         $this->assertEquals("GER", $output[1][3]);
-        $this->assertEquals("1983", $output[1][4]);
+        $this->assertEquals($byear, $output[1][4]);
         //$this->assertEquals("", $output[1][5]); // competition date changes each test
         $this->assertEquals("Men's Foil Category 1", $output[1][6]);
         $this->assertEquals("Participant", $output[1][7]);

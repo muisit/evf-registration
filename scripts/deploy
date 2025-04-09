@@ -62,11 +62,11 @@ find ./ -iname \*~ -delete -print >> $LOG
 
 # adjust all permissions
 echo "Adjusting file permissions" >> $LOG
-sudo find ./ -type f -exec chown $USER.$GROUP {} \; >> $LOG
+sudo find ./ -type f -exec chown $USER:$GROUP {} \; >> $LOG
 sudo find ./ -type f -exec chmod 664 {} \; >> $LOG
 
 echo "Adjusting directory permissions" >> $LOG
-sudo find ./ -type d -exec chown $USER.$GROUP {} \; >> $LOG
+sudo find ./ -type d -exec chown $USER:$GROUP {} \; >> $LOG
 sudo find ./ -type d -exec chmod 775 {} \; >> $LOG
 
 echo "Setting sticky bit" >> $LOG
