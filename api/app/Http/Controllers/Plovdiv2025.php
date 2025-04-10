@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Competition;
 use App\Models\Country;
 use App\Models\Event;
+use App\Models\Fencer;
 use App\Models\Registration;
 use App\Models\SideEvent;
 use App\Models\Weapon;
@@ -26,6 +27,36 @@ class Plovdiv2025 extends Controller
         $this->token = env('PLOVDIV_API');
     }
 
+    public function photoId(Request $request, $fid)
+    {
+        $apitoken = $request->get('token') ?? '';
+        if ($apitoken != $this->token) {
+            return response()->json(["error" => "Unauthorized"], 403);
+        }
+        $event = Event::find($this->eventId);
+        if (empty($event)) {
+            return response()->json(["error" => "no such event"], 404);
+        }
+        $fencer = Fencer::find($fid);
+        if (empty($fencer)) {
+            return response()->json(["error" => "no such fencer"], 404);
+        }
+        $regs = $event->registrations()->where('registration_fencer', $fid)->get();
+        if (empty($regs)) {
+            return response()->json(["error" => "no such fencer"], 404);
+        }
+
+        $img = $this->generateFencerImage($fencer);
+        if (!empty($img)) {
+            header('Content-Type: image/jpeg');
+            imagejpeg($img, null, 90); // 90 is JPEG quality (0-100)
+            imagedestroy($img);
+        }
+        else {
+            return response('File not found', 404);
+        }
+    }
+
     public function competition(Request $request, $comp)
     {
         $apitoken = $request->get('token') ?? '';
@@ -41,7 +72,7 @@ class Plovdiv2025 extends Controller
             return response()->json(["error" => "no such competition"], 404);
         }
         $service = new ParticipantListService(SideEvent::find($comps[0]));
-        return $service->asXML("plovdiv_2025_" . $comp . ".xml");
+        return $service->asXML("plovdiv_2025_" . $comp . ".xml", route('plovdiv2025.photourl', ['fid' => '%d']) . '?token=' . $this->token);
     }
 
     public function index(Request $request)
@@ -109,6 +140,21 @@ class Plovdiv2025 extends Controller
         ];
     }
 
+    private function generateFencerImage($fencer)
+    {
+        if ($fencer->fencer_picture != 'N') {
+            $path = $fencer->image();
+        }
+        else {
+            return null;
+        }
+
+        if (file_exists($path)) {
+            return $this->createWatermark($path);
+        }
+        return null;
+    }
+
     private function generateFencerPhoto($fencer)
     {
         if ($fencer->fencer_picture != 'N') {
@@ -127,6 +173,7 @@ class Plovdiv2025 extends Controller
                 return 'data:image/jpeg;base64,' . base64_encode($data);
             }
         }
+        return null;
     }
 
     private function createWatermark($path)

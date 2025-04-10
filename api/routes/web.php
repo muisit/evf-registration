@@ -31,3 +31,4 @@ Route::get('/basic', '\App\Http\Controllers\Basic@index');
 
 Route::get('/plovdiv2025', '\App\Http\Controllers\Plovdiv2025@index');
 Route::get('/plovdiv2025/xml/{comp}', '\App\Http\Controllers\Plovdiv2025@competition');
+Route::get('/plovdiv2025/photo/{fid}', '\App\Http\Controllers\Plovdiv2025@photoId')->name('plovdiv2025.photourl');
