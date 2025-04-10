@@ -37,11 +37,11 @@ class ParticipantListService
         fclose($f);
     }
 
-    public function asXML($filename)
+    public function asXML($filename, $basePhotoUrl = null)
     {
         $registrations = $this->sortRegistrations($this->createListOfParticipants());
         $xmlservice = app()->make(RegistrationXMLService::class);
-        $doc = $xmlservice->generate($this->event, $registrations);
+        $doc = $xmlservice->generate($this->event, $registrations, $basePhotoUrl);
 
         header('Content-Disposition: attachment; filename="' . $filename . '";');
         header('Content-Type: text/xml; charset=UTF-8');

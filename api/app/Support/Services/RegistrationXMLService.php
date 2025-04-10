@@ -20,8 +20,12 @@ class RegistrationXMLService
     private $doc;
     private $dom;
 
-    public function generate(SideEvent $event, $registrations)
+    private $basePhotoUrl;
+
+    public function generate(SideEvent $event, $registrations, $basePhotoUrl)
     {
+        $this->basePhotoUrl = $basePhotoUrl;
+
         $this->sideEvent = $event;
         $this->registrations = $registrations;
 
@@ -205,6 +209,9 @@ class RegistrationXMLService
         // skip NbVictoires
         // skip NoDansLaPoule
         // skip PhotoURL, privacy issue
+        if (!empty($this->basePhotoUrl)) {
+            $tireur->setAttribute('PhotoURL', sprintf($this->basePhotoUrl, $reg->registration_fencer));
+        }
         // skip RangFinal
         // skip RangInitial
         // skip RangPoule
