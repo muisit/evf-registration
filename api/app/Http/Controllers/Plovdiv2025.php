@@ -7,25 +7,51 @@ use App\Models\Competition;
 use App\Models\Country;
 use App\Models\Event;
 use App\Models\Registration;
+use App\Models\SideEvent;
 use App\Models\Weapon;
 use App\Http\Controllers\Controller;
 use App\Support\Services\PDFGenerator;
+use App\Support\Services\ParticipantListService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class Plovdiv2025 extends Controller
 {
+    private $eventId = 37;
+    private $token;
+
+    public function __construct()
+    {
+        $this->token = env('PLOVDIV_API');
+    }
+
+    public function competition(Request $request, $comp)
+    {
+        $apitoken = $request->get('token') ?? '';
+        if ($apitoken != $this->token) {
+            return response()->json(["error" => "Unauthorized"], 403);
+        }
+        $event = Event::find($this->eventId);
+        if (empty($event)) {
+            return response()->json(["error" => "no such event"], 404);
+        }
+        $comps = $this->findCompetitionByName([$comp], $event);
+        if (empty($comps)) {
+            return response()->json(["error" => "no such competition"], 404);
+        }
+        $service = new ParticipantListService(SideEvent::find($comps[0]));
+        return $service->asXML("plovdiv_2025_" . $comp . ".xml");
+    }
+
     public function index(Request $request)
     {
-        $eventId = 37;
-        $token = env('PLOVDIV_API');
         $apitoken = $request->get('token') ?? '';
-        if ($apitoken != $token) {
+        if ($apitoken != $this->token) {
             return response()->json(["error" => "Unauthorized"], 403);
         }
 
-        $event = Event::find($eventId);
+        $event = Event::find($this->eventId);
         if (empty($event)) {
             return response()->json(["error" => "no such event"], 404);
         }
@@ -258,11 +284,12 @@ class Plovdiv2025 extends Controller
         if (!empty($countries)) {
             $registrations = $registrations->whereIn('registration_country', $countries);
         }
-        else if (empty($comps)) {
+
+        if (empty($comps)) {
             // for no country or competition, so org roles
-            $registrations = $registrations->where('registration_country', '=', null);
+            $registrations = $registrations->where('registration_role', '<>', 0);
         }
-        if (!empty($comps)) {
+        else {
             // must be country specific
             $registrations = $registrations->where('registration_country', '<>', null);
             // and for a specific competition/side-event

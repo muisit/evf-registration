@@ -30,3 +30,4 @@ Route::get('/', function () {
 Route::get('/basic', '\App\Http\Controllers\Basic@index');
 
 Route::get('/plovdiv2025', '\App\Http\Controllers\Plovdiv2025@index');
+Route::get('/plovdiv2025/xml/{comp}', '\App\Http\Controllers\Plovdiv2025@competition');

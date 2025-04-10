@@ -5,9 +5,9 @@ HOME=`pwd`
 ARCHIVE="$HOME/$WD.zip"
 VERSION=`php --version | grep '^PHP' | sed 's/PHP \([0-9]*\.[0-9]*\).*/\1/'`
 
-if [[ ! "x$VERSION" = "x8.1" ]]
+if [[ ! "x$VERSION" = "x8.2" ]]
 then
-    echo "Expecting PHP version 8.1, received $VERSION"
+    echo "Expecting PHP version 8.2, received $VERSION"
     exit 1
 fi
 

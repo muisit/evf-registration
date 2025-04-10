@@ -222,8 +222,8 @@ class RegistrationXMLService
         $this->doc->setAttribute("Organisateur", $this->event->country->country_name);
 
         // Sonja Lange requested: 'title should not contain weapon/sex/etc' and suggested a generic short title
-        $this->doc->setAttribute("TitreCourt", "EVC" . $this->category->category_type);
-        $this->doc->setAttribute("TitreLong", $this->event->event_name);
+        $this->doc->setAttribute("TitreCourt", "EVFC" . $this->event->event_year . $this->competition->abbreviation());
+        $this->doc->setAttribute("TitreLong", $this->event->event_name . ' ' . $this->sideEvent->title);
         if(!empty($this->event->event_web)) $this->doc->setAttribute("URLOrganisateur", $this->event->event_web);
         $this->doc->setAttribute("Championnat", 'EVF');
         $this->doc->setAttribute("Domaine", 'Z'); // EVF is concerned only with the European Zone 
