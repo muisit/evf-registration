@@ -22,7 +22,7 @@ class RegistrationXMLService
 
     private $basePhotoUrl;
 
-    public function generate(SideEvent $event, $registrations, $basePhotoUrl)
+    public function generate(SideEvent $event, $registrations, $basePhotoUrl = null)
     {
         $this->basePhotoUrl = $basePhotoUrl;
 
