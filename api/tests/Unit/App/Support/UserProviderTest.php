@@ -103,5 +103,11 @@ class UserProviderTest extends TestCase
         $this->assertNotEmpty($user);
         $this->assertEquals(Data::TESTUSER2, $user->getKey());
         $this->assertTrue($provider->validateCredentials($user, ['password' => 'SuperSecretPassword']));
+
+        // test $wp$2y... bcrypt encrypted passwords
+        $user = $provider->retrieveByCredentials(['user_email' => 'testuserpw1']);
+        $this->assertNotEmpty($user);
+        $this->assertEquals(Data::TESTUSERPASSWORD1, $user->getKey());
+        $this->assertTrue($provider->validateCredentials($user, ['password' => 'SuperSecretPassword']));
     }
 }

@@ -15,6 +15,6 @@ class EventRolesTest extends TestCase
         $event = Event::find(EventData::EVENT1);
         $schema = new Schema($event);
         $this->assertEquals(5, count($schema->roles));
-        $this->assertEquals(9, count($schema->users));
+        $this->assertEquals(10, count($schema->users));
     }
 }
