@@ -16,6 +16,7 @@ class WPUser extends Fixture
     public const TESTUSERORGANISER = 89124; // organiser
     public const TESTUSERHOD = 3883;
     public const TESTUSERGENHOD = 3886;
+    public const TESTUSERPASSWORD1 = 31111;
     public const NOSUCHID = 894772;
 
     protected static function wasBooted($cls)
@@ -104,6 +105,14 @@ class WPUser extends Fixture
                 'user_nicename' => 'Test9',
                 'display_name' => 'Test User9',
                 'user_pass' => '$P$BhcAyppZbEsO8p93h4kPSbYd1wVbMO1' // SuperSecretPassword
+            ],
+            [
+                'ID' => self::TESTUSERPASSWORD1,
+                'user_login' => 'testuserpw1',
+                'user_email' => 'test10@example.com',
+                'user_nicename' => 'Test10',
+                'display_name' => 'Test User10',
+                'user_pass' => '$wp$2y$10$bFLY7BG02.moYlIHmZlmoOmgaD56Aak6xvthHOqLeuxRWSrmttcI.' // SuperSecretPassword
             ]
         ]);
 

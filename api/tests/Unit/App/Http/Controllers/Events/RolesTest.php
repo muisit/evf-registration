@@ -21,7 +21,7 @@ class RolesTest extends TestCase
         $this->assertTrue(isset($output['roles']));
         $this->assertCount(5, $output['roles']);
         $this->assertTrue(isset($output['users']));
-        $this->assertCount(9, $output['users']);
+        $this->assertCount(10, $output['users']);
     }
 
     public function testUnAuthorised()
