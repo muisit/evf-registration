@@ -89,11 +89,12 @@ class Plovdiv2025 extends Controller
 
         $pagesize = intval($request->get('ps') ?? 200);
         $offset = intval($request->get('offset') ?? 0);
+        $noathletes = intval($request->get('na') ?? 0);
         \Log::debug("pagesize $pagesize, offset $offset");
         $countries = $this->findCountryByName(explode(",", $request->get('countries') ?? ''));
         $comps = $this->findCompetitionByName(explode(",", $request->get('competitions') ?? ''), $event);
 
-        $result = $this->selectRegistrations($event, $countries, $comps)->get();
+        $result = $this->selectRegistrations($event, $countries, $comps, $noathletes)->get();
         $fencers = $this->aggregateByFencer($result);
         $slice = $this->slicePart($fencers, $pagesize, $offset);
 
@@ -325,18 +326,19 @@ class Plovdiv2025 extends Controller
         return $retval;
     }
 
-    private function selectRegistrations($event, $countries, $comps)
+    private function selectRegistrations($event, $countries, $comps, $noAthletes)
     {
         $registrations = Registration::where('registration_mainevent', $event->getKey());
         if (!empty($countries)) {
             $registrations = $registrations->whereIn('registration_country', $countries);
         }
 
-        if (empty($comps)) {
+        if (empty($comps) || $noAthletes != 0) {
             // for no country or competition, so org roles
             $registrations = $registrations->where('registration_role', '<>', 0);
         }
-        else {
+
+        if (!empty($comps)) {
             // must be country specific
             $registrations = $registrations->where('registration_country', '<>', null);
             // and for a specific competition/side-event
@@ -348,12 +350,8 @@ class Plovdiv2025 extends Controller
 
     private function rolesToFunctions($regs)
     {
-        $roles = [];
-        foreach ($regs as $r) {
-            $roles[] = $this->roleToCategory($r->role);
-        }
-        $roles = array_values(array_unique($roles));
-        sort($roles);
+        $roles = collect($regs)->map(fn ($reg) => $reg->registration_role ?? 0)->toArray();
+        $roles = array_unique($roles);
         return $roles;
     }
 
