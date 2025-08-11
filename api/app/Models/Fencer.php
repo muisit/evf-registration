@@ -43,6 +43,11 @@ class Fencer extends Model
         return $path;
     }
 
+    public function labels(): HasMany
+    {
+        return $this->hasMany(FencerLabel::class, 'fencer_id', 'fencer_id');
+    }
+
     public function accreditations(): HasMany
     {
         return $this->hasMany(Accreditation::class, 'fencer_id', 'fencer_id');

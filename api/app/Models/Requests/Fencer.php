@@ -6,6 +6,7 @@ use App\Models\Country;
 use App\Models\Fencer as FencerModel;
 use Illuminate\Database\Eloquent\Model;
 use App\Support\Contracts\EVFUser;
+use App\Support\Services\FencerLabelService;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -73,6 +74,10 @@ class Fencer extends Base
     protected function updateModel(array $data): ?Model
     {
         if ($this->model) {
+            // make sure the labels update along with the model
+            $service = new FencerLabelService();
+            $service->updateFencer($this->model, $data['fencer']['firstName'], $data['fencer']['lastName']);
+
             $this->model->fencer_firstname = $data['fencer']['firstName'];
             $this->model->fencer_surname = $data['fencer']['lastName'];
             $this->model->fencer_gender = $data['fencer']['gender'];

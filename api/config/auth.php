@@ -38,7 +38,9 @@ return [
     'guards' => [
         'api' => [
             'driver' => 'evf',
+            'provider' => 'evf'
         ],
+        // this ensures that if we do Route::auth:wp, it turns to the 'wp' driver definition
         'wp' => [
             'driver' => 'wp'
         ]

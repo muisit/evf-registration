@@ -8,7 +8,7 @@ Route::group(["namespace" => "App\Http\Controllers"], function () {
     require('accreditations.php');
     require('templates.php');
     require('codes.php');
-    require('ranking.php');
+    require('feapi.php');
 });
 //require('pollcast.php');
 

@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Ranking;
+namespace App\Http\Controllers\FE;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Schemas\ReturnStatus;
-use App\Jobs\CreateRanking;
+use App\Models\Schemas\FE\Response;
+use App\Jobs\CreateRanking as Job;
 
-class Create extends Controller
+class CreateRanking extends Controller
 {
     /**
      * Generate the ranking based on the current data
      *
-     * @OA\Get(
+     * @OA\Post(
      *     path = "/ranking/create",
      *     @OA\Response(
      *         response = "200",
@@ -29,9 +29,9 @@ class Create extends Controller
     public function index(Request $request)
     {
         \Log::debug("creating ranking store service");
-        $job = new CreateRanking();
+        $job = new Job();
         $job->handle();
         \Log::debug("returning all ok");
-        return response()->json(new ReturnStatus('ok'));
+        return response()->json(new Response('ok'));
     }
 }

@@ -38,6 +38,8 @@ class Authenticate
         if ($this->auth->guard($guard)->guest()) {
             return response('Unauthorized.', 401);
         }
+        $this->auth->shouldUse($guard);
+        \Log::debug("authenticated: " . json_encode($request->user()));
 
         return $next($request);
     }

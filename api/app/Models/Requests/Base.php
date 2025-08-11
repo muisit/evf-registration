@@ -26,6 +26,7 @@ class Base
         $this->model = $this->createModel($request);
         $validator = $this->createValidator($request);
         if ($validator->fails()) {
+            \Log::debug("form validator fails");
             throw new ValidationException(
                 $validator,
                 new JsonResponse($validator->errors()->getMessages(), 422)
@@ -35,10 +36,12 @@ class Base
         $data = $this->extractInputFromRules($request);
 
         if (empty($request->user())) {
+            \Log::debug("no user in request");
             throw new AuthorizationException(); // should never occur, all routes guarded by authenticator
         }
 
         if (!$request->user() || !$this->authorize($request->user(), $data)) {
+            \Log::debug("no user or not authorized");
             $this->model = null;
         }
         else {

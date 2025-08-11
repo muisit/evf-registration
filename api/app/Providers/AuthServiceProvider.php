@@ -30,7 +30,7 @@ class AuthServiceProvider extends ServiceProvider
             $guard->setCookieJar($this->app['cookie']);
             $guard->setDispatcher($this->app['events']);
             $guard->setRequest($this->app->refresh('request', $guard, 'setRequest'));
-    
+
             return $guard;
         });
     }
@@ -73,12 +73,14 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Auth::viaRequest('wp', function (Request $request) {
+            \Log::debug("Auth via request wp version " . $request->bearerToken());
             $option = DB::table(env('WPDBPREFIX', 'wp_') . "options")
                 ->where("option_name", "evf_internal_key")
                 ->where("option_value", (string) $request->bearerToken())
                 ->first();
 
             if (!empty($option)) {
+                \Log::debug("key found, setting user");
                 $userid = DB::table(env('WPDBPREFIX', 'wp_') . "options")
                     ->where("option_name", "evf_internal_user")
                     ->first();
@@ -86,6 +88,7 @@ class AuthServiceProvider extends ServiceProvider
                     return WPUser::find($userid->option_value);
                 }
             }
+            \Log::debug("option not found");
             return null;
         });
     }

@@ -12,19 +12,37 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 class CSRFCheck
 {
+    private $except = ['/fe/*'];
+
     public function handle(Request $request, \Closure $next): mixed
     {
         $method = $request->getRealMethod();
 
-        if ($method === 'POST') {
+        if ($method === 'POST' && !$this->inExceptArray($request)) {
             $csrfToken = $request->header('X-CSRF-Token');
 
             if (empty($csrfToken) || $csrfToken != csrf_token()) {
-                \Log::debug("testing $csrfToken vs " . csrf_token() . ' fails');
+                \Log::debug("CSRF testing $csrfToken vs " . csrf_token() . ' fails');
                 throw new BadRequestHttpException('X-CSRF-Token header must be set');
             }
         }
 
         return $next($request);
     }
+
+    protected function inExceptArray($request)
+    {
+        foreach ($this->except as $except) {
+            if ($except !== '/') {
+                $except = trim($except, '/');
+            }
+
+            if ($request->fullUrlIs($except) || $request->is($except)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }
