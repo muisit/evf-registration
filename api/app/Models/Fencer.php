@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Kirschbaum\PowerJoins\PowerJoins;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class Fencer extends Model
 {
@@ -27,6 +29,19 @@ class Fencer extends Model
         static::creating(function ($model) {
             $model->uuid = Str::uuid()->toString();
         });
+    }
+
+    public static function rules()
+    {
+        return [
+            'fencer_id' => ['required', 'int', 'min:0'],
+            'fencer_firstname' => ['required','max:45','min:2'],
+            'fencer_surname' => ['required','max:45','min:2'],
+            'fencer_country' => ['required','exists:TD_Country,country_id'],
+            'fencer_gender' => ['required', Rule::in(['M', 'F'])],
+            'fencer_dob' => ['nullable', 'date_format:Y-m-d', 'before:' . Carbon::now()->subMinutes(1)->toDateString()],
+            'fencer_picture' => ['nullable', Rule::in(['N','Y','A','R'])]
+        ];
     }
 
     public function country(): BelongsTo

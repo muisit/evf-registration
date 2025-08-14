@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Fencer;
 use App\Models\Requests\FERequest;
+use App\Models\Schemas\FE\WPResponse;
 use App\Models\Schemas\FE\Fencer as FencerSchema;
 use Auth;
 use Carbon\Carbon;
@@ -19,15 +20,12 @@ class View extends Controller
     {
         $form = new FERequest($this);
         $form->validate($request);
-        \Log::debug('form validated');
         if ($request->get('path') != '/fencers/view') {
-            \Log::debug("path incorrect");
             $this->authorize('not/ever');
         }
 
         $model = (object)$request->get('model');
         if (empty($model)) {
-            \Log::debug("model not set");
             $this->authorize('not/ever');
         }
         \Log::debug("model is " . json_encode($model));
@@ -36,6 +34,6 @@ class View extends Controller
         if (empty($fencer)) {
             return response(404);
         }
-        return response()->json(new FencerSchema($fencer, true));
+        return response()->json(new WPResponse(["item" => new FencerSchema($fencer, true)]));
     }
 }

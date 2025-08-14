@@ -10,16 +10,13 @@ use App\Models\Ranking;
 use App\Models\Registration;
 use DateTimeImmutable;
 
-class DataList
+class WPResponse
 {
     public $success = true;
     public $data = null;
 
-    public function __construct($data, $total)
+    public function __construct($data)
     {
-        $this->data = [
-            "total" => $total,
-            "list" => $data
-        ];
+        $this->data = $data;
     }
 }

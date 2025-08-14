@@ -17,14 +17,15 @@ class Fencer extends Base
 
     public function rules(): array
     {
+        $rules = FencerModel::rules();
         return [
-            'fencer.id' => ['required', 'int', 'min:0'],
-            'fencer.firstName' => ['required','max:45','min:2'],
-            'fencer.lastName' => ['required','max:45','min:2'],
-            'fencer.countryId' => ['required','exists:TD_Country,country_id'],
-            'fencer.gender' => ['required', Rule::in(['M', 'F'])],
-            'fencer.dateOfBirth' => ['nullable', 'date_format:Y-m-d', 'before:' . Carbon::now()->subMinutes(1)->toDateString()],
-            'fencer.photoStatus' => ['nullable', Rule::in(['N','Y','A','R'])]
+            'fencer.id' => $rules['fencer_id'],
+            'fencer.firstName' => $rules['fencer_firstname'],
+            'fencer.lastName' => $rules['fencer_surname'],
+            'fencer.countryId' => $rules['fencer_country'],
+            'fencer.gender' => $rules['fencer_gender'],
+            'fencer.dateOfBirth' => $rules['fencer_dob'],
+            'fencer.photoStatus' => $rules['fencer_picture']
         ];
     }
 

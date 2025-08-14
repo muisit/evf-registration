@@ -8,7 +8,7 @@ use App\Models\Country;
 use App\Models\Fencer;
 use App\Models\Requests\FERequest;
 use App\Models\Schemas\FE\Fencer as FencerSchema;
-use App\Models\Schemas\FE\DataList;
+use App\Models\Schemas\FE\WPResponse;
 use Auth;
 use Carbon\Carbon;
 
@@ -39,8 +39,8 @@ class INdex extends Controller
             ->select(Fencer::tableName() . ".*", "c.country_name");
 
         $total = $qry->count();
-        $fencers = $qry->limit($limit)->offset($offset)->get()->map(fn ($item) => new FencerSchema($item, false))->map(fn ($item) => $item->data["item"]);
-        return response()->json(new DataList($fencers, $total));
+        $fencers = $qry->limit($limit)->offset($offset)->get()->map(fn ($item) => new FencerSchema($item, false));
+        return response()->json(new WPResponse(["list" => $fencers, "total" => $total]));
     }
 
     private function sortQuery($qry, $model)

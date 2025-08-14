@@ -21,9 +21,15 @@ Route::group(
         'middleware' => 'auth:wp'
     ],
     function () {
+        Route::post('/upload', 'FE\Upload@index')->name('fe.upload');
+
         Route::post('/ranking/create', 'FE\CreateRanking@index')->name('fe.ranking.create');
 
         Route::post('/fencers/view', 'FE\Fencers\View@index')->name('fe.fencers.view');
+        Route::post('/fencers/save', 'FE\Fencers\Save@index')->name('fe.fencers.save');
+        Route::post('/fencers/presavecheck', 'FE\Fencers\Presave@index')->name('fe.fencers.presave');
+        Route::post('/fencers/delete', 'FE\Fencers\Delete@index')->name('fe.fencers.delete');
+        Route::post('/fencers/merge', 'FE\Fencers\Merge@index')->name('fe.fencers.merge');
         Route::post('/fencers', 'FE\Fencers\Index@index')->name('fe.fencers.index');
     }
 );

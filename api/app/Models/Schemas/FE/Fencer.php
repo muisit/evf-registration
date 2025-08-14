@@ -12,28 +12,31 @@ use DateTimeImmutable;
 
 class Fencer
 {
-    public $success = true;
-    public $data = null;
+    public $id;
+    public $firstname;
+    public $name;
+    public $country;
+    public $country_name;
+    public $birthday;
+    public $gender;
+    public $picture;
+    public $basic = null;
 
     public function __construct(Model $data, $extensive = false)
     {
-        $this->data = [
-            "item" => [
-                "id" => $data->getKey(),
-                "firstname" => $data->fencer_firstname,
-                "name" => $data->fencer_surname,
-                "country" => $data->fencer_country,
-                "country_name" => $data->country_name ?? $data->country->country_name,
-                "birthday" => $data->fencer_dob,
-                "gender" => $data->fencer_gender,
-                "picture" => $data->fencer_picture
-            ]
-        ];
+        $this->id = $data->getKey();
+        $this->firstname = $data->fencer_firstname;
+        $this->name = $data->fencer_surname;
+        $this->country = $data->fencer_country;
+        $this->country_name = $data->country_name ?? $data->country->country_name;
+        $this->birthday = $data->fencer_dob;
+        $this->gender = $data->fencer_gender;
+        $this->picture = $data->fencer_picture;
 
         if ($extensive) {
-            $this->data['item']['basic'] = [];
-            $this->data["item"]["basic"]["rankings"] = $this->getRankings($data);
-            $this->data["item"]["basic"]["registrations"] = $this->getRegistrations($data);
+            $this->basic = [];
+            $this->basic["rankings"] = $this->getRankings($data);
+            $this->basic["registrations"] = $this->getRegistrations($data);
         }
     }
 
