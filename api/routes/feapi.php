@@ -24,5 +24,6 @@ Route::group(
         Route::post('/ranking/create', 'FE\CreateRanking@index')->name('fe.ranking.create');
 
         Route::post('/fencers/view', 'FE\Fencers\View@index')->name('fe.fencers.view');
+        Route::post('/fencers', 'FE\Fencers\Index@index')->name('fe.fencers.index');
     }
 );

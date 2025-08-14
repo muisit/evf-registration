@@ -32,10 +32,10 @@ class View extends Controller
         }
         \Log::debug("model is " . json_encode($model));
 
-        $fencer = Fencer::where('fencer_id', $model->id)->first();
+        $fencer = Fencer::where('fencer_id', $model->id)->with('country')->first();
         if (empty($fencer)) {
             return response(404);
         }
-        return response()->json(new FencerSchema($fencer));
+        return response()->json(new FencerSchema($fencer, true));
     }
 }

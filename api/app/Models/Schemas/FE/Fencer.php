@@ -15,7 +15,7 @@ class Fencer
     public $success = true;
     public $data = null;
 
-    public function __construct(Model $data)
+    public function __construct(Model $data, $extensive = false)
     {
         $this->data = [
             "item" => [
@@ -23,15 +23,18 @@ class Fencer
                 "firstname" => $data->fencer_firstname,
                 "name" => $data->fencer_surname,
                 "country" => $data->fencer_country,
+                "country_name" => $data->country_name ?? $data->country->country_name,
                 "birthday" => $data->fencer_dob,
                 "gender" => $data->fencer_gender,
-                "picture" => $data->fencer_picture,
-                "basic" => []
+                "picture" => $data->fencer_picture
             ]
         ];
 
-        $this->data["item"]["basic"]["rankings"] = $this->getRankings($data);
-        $this->data["item"]["basic"]["registrations"] = $this->getRegistrations($data);
+        if ($extensive) {
+            $this->data['item']['basic'] = [];
+            $this->data["item"]["basic"]["rankings"] = $this->getRankings($data);
+            $this->data["item"]["basic"]["registrations"] = $this->getRegistrations($data);
+        }
     }
 
     private function getRankings(Model $data)
