@@ -12,7 +12,7 @@ use App\Models\Schemas\FE\WPResponse;
 use Auth;
 use Carbon\Carbon;
 
-class INdex extends Controller
+class Index extends Controller
 {
     /**
      * List fencers using sorting and filtering

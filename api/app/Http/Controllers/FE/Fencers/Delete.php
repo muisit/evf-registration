@@ -33,8 +33,8 @@ class Delete extends Controller
             $this->authorize('not/ever');
         }
 
-        $this->authorize('update', $fencer);
         $fencer = $this->populateFencer($model);
+        $this->authorize('update', $fencer);
         $results = Result::where('result_fencer', $fencer->getKey())->count();
         if ($results == 0) {
             Accreditation::where('fencer_id', $fencer->getKey())->delete();

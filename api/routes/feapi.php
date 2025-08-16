@@ -28,5 +28,9 @@ Route::group(
         Route::post('/fencers/upload', 'FE\Fencers\Upload@index')->name('fe.fencers.upload');
         Route::get('/fencers/{fencerId}/photo', 'Fencers\Photo@index')->name('fe.fencers.photo');
         Route::post('/fencers', 'FE\Fencers\Index@index')->name('fe.fencers.index');
+
+        Route::post('/roletypes', 'FE\RoleTypes\Index@index')->name('fe.roletypes.index');
+        Route::post('/roletypes/save', 'FE\RoleTypes\Save@index')->name('fe.roletypes.save');
+        Route::post('/roletypes/delete', 'FE\RoleTypes\Delete@index')->name('fe.roletypes.delete');
     }
 );
