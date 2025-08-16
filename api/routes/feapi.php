@@ -7,11 +7,7 @@ Route::group(
         'prefix' => '/fe',
     ],
     function () {
-        Route::get(
-            '/{weapon}/{category}',
-            'Ranking\Get@index'
-        )
-        ->name('ranking.get');
+        Route::get('/{weapon}/{category}', 'Ranking\Get@index')->name('ranking.get');
     }
 );
 
@@ -21,7 +17,6 @@ Route::group(
         'middleware' => 'auth:wp'
     ],
     function () {
-        Route::post('/upload', 'FE\Upload@index')->name('fe.upload');
 
         Route::post('/ranking/create', 'FE\CreateRanking@index')->name('fe.ranking.create');
 
@@ -30,6 +25,8 @@ Route::group(
         Route::post('/fencers/presavecheck', 'FE\Fencers\Presave@index')->name('fe.fencers.presave');
         Route::post('/fencers/delete', 'FE\Fencers\Delete@index')->name('fe.fencers.delete');
         Route::post('/fencers/merge', 'FE\Fencers\Merge@index')->name('fe.fencers.merge');
+        Route::post('/fencers/upload', 'FE\Fencers\Upload@index')->name('fe.fencers.upload');
+        Route::get('/fencers/{fencerId}/photo', 'Fencers\Photo@index')->name('fe.fencers.photo');
         Route::post('/fencers', 'FE\Fencers\Index@index')->name('fe.fencers.index');
     }
 );

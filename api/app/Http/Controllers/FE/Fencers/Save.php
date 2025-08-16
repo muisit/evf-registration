@@ -29,7 +29,9 @@ class Save extends Controller
         if (empty($model)) {
             $this->authorize('not/ever');
         }
+
         $fencer = $this->populateFencer($model);
+        $this->authorize('update', $fencer);
         if ($fencer->validate()) {
             $this->process($fencer);
             return response()->json(new WPResponse(["item" => new FencerSchema($fencer)]));
@@ -42,7 +44,7 @@ class Save extends Controller
         $service = new FencerLabelService();
         $oldData = $fencer;
         if ($fencer->exists) {
-            $oldData = Fencer::find($fencer->getKey())->with('labels');
+            $oldData = Fencer::find($fencer->getKey())->with('labels')->first();
         }
         $fencer->save();
         $service->updateFencer($oldData, $fencer->fencer_firstname, $fencer->fencer_surname);
@@ -51,7 +53,7 @@ class Save extends Controller
 
     private function populateFencer($model)
     {
-        Fencer::find($model->id);
+        $fencer = Fencer::find($model->id);
         if (empty($fencer)) {
             $fencer = new Fencer();
         }

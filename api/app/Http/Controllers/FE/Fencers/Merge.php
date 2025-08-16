@@ -33,6 +33,7 @@ class Merge extends Controller
             $this->authorize('not/ever');
         }
 
+        $this->authorize('update', $fencer);
         $fencer1 = Fencer::find($model->id1);
         $fencer2 = Fencer::find($model->id2);
 

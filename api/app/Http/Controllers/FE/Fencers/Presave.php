@@ -31,7 +31,9 @@ class Presave extends Controller
         if (empty($model)) {
             $this->authorize('not/ever');
         }
+
         $fencer = $this->populateFencer($model);
+        $this->authorize('update', $fencer);
         $suggestions = $this->check($fencer);
 
         return response()->json(new WPResponse(["suggestions" => $suggestions]));
@@ -54,7 +56,8 @@ class Presave extends Controller
                         ->where('fn.type', '=', 'first');
                 })
                 ->where(DB::Raw("SOUNDEX('" . addslashes($fencer->fencer_firstname) . "')"), DB::Raw("SOUNDEX(fn.label)"))
-                ->where(DB::Raw("SOUNDEX('" . addslashes($fencer->fencer_surname) . "')"), DB::Raw("SOUNDEX(ln.label)"));
+                ->where(DB::Raw("SOUNDEX('" . addslashes($fencer->fencer_surname) . "')"), DB::Raw("SOUNDEX(ln.label)"))
+                ->where(Fencer::tableName() . '.fencer_id', '<>', $fencer->getKey());
             $qry = $qry->join(Country::tableName() . ' AS c', 'c.country_id', '=', Fencer::tableName() . '.fencer_country')
                 ->select(Fencer::tableName() . ".*", "c.country_name");
 
@@ -66,7 +69,7 @@ class Presave extends Controller
 
     private function populateFencer($model)
     {
-        Fencer::find($model->id);
+        $fencer = Fencer::find($model->id);
         if (empty($fencer)) {
             $fencer = new Fencer();
         }

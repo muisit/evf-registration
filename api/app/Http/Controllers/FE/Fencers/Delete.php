@@ -32,6 +32,8 @@ class Delete extends Controller
         if (empty($model)) {
             $this->authorize('not/ever');
         }
+
+        $this->authorize('update', $fencer);
         $fencer = $this->populateFencer($model);
         $results = Result::where('result_fencer', $fencer->getKey())->count();
         if ($results == 0) {

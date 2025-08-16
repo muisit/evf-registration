@@ -28,8 +28,8 @@ class View extends Controller
         if (empty($model)) {
             $this->authorize('not/ever');
         }
-        \Log::debug("model is " . json_encode($model));
 
+        $this->authorize('view', $fencer);
         $fencer = Fencer::where('fencer_id', $model->id)->with('country')->first();
         if (empty($fencer)) {
             return response(404);

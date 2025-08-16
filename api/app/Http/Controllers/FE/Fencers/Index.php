@@ -29,7 +29,8 @@ class INdex extends Controller
         if (empty($model)) {
             $this->authorize('not/ever');
         }
-        \Log::debug("model is " . json_encode($model));
+
+        $this->authorize('viewAny', Fencer::class);
         $limit = $model->pagesize ?? 20;
         $offset = $model->offset ?? 0;
         $qry = $this->filterQuery($model);
