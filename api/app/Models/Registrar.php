@@ -14,4 +14,9 @@ class Registrar extends Model
     {
         return $this->belongsTo(Country::class, 'country_id', 'country_id');
     }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(WPUser::class, 'user_id', 'ID');
+    }
 }

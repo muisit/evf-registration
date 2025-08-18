@@ -2,17 +2,16 @@
 
 namespace App\Models\Policies;
 
-use App\Models\WPUser as Model;
+use App\Models\Role as Model;
 use App\Support\Contracts\EVFUser;
 
-class WPUser
+class Registrar
 {
-    // Wordpress Users are only ever available to sysop, and only in the viewAny ability
+    // Registrar can only ever be editted by sysop
     public function before(EVFUser $user, string $ability): bool | null
     {
-        if ($ability == 'viewAny' && $user->hasRole("sysop")) return true;
-        \Log::debug("not allowing before policy to user " . $user->getKey());
-        return false;
+        if ($user->hasRole("sysop")) return true;
+        return null;
     }
 
     public function viewAny(EVFUser $user): bool | null

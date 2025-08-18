@@ -16,6 +16,12 @@ class Country
         return null;
     }
 
+    // lisiting all countries always allowed
+    public function viewAny(EVFUser $user): bool | null
+    {
+        return true;
+    }
+
     /**
      * @param User $user
      * @param Model $model
@@ -51,6 +57,22 @@ class Country
         if ($user->hasRole(['hod:' . $model->getKey()])) {
             return true;
         }
+        return false;
+    }
+
+    // these abilities are only allowed for sysop
+    public function update(EVFUser $user): bool | null
+    {
+        return false;
+    }
+
+    public function delete(EVFUser $user): bool | null
+    {
+        return false;
+    }
+
+    public function forceDelete(EVFUser $user): bool | null
+    {
         return false;
     }
 }

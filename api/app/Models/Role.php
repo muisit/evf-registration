@@ -24,6 +24,15 @@ class Role extends Model implements AccreditationRelation
     public const DIRECTOR = 14;
     public const DT = 18;
 
+    public static function rules()
+    {
+        return [
+            'role_id' => ['required', 'int', 'min:0'],
+            'role_name' => ['required','max:45','min:2'],
+            'role_type' => ['required', 'exists:TD_RoleType,role_type_id']
+        ];
+    }
+
     public function type(): BelongsTo
     {
         return $this->belongsTo(RoleType::class, 'role_type', 'role_type_id');
