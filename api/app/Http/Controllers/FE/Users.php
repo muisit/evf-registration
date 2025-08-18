@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\FE\Users;
+namespace App\Http\Controllers\FE;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -9,7 +9,7 @@ use App\Models\Requests\FERequest;
 use App\Models\Schemas\FE\WPUser as Schema;
 use App\Models\Schemas\FE\WPResponse;
 
-class Index extends Controller
+class Users extends Controller
 {
     /**
      * List using sorting and filtering

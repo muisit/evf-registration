@@ -45,6 +45,9 @@ Route::group(
         Route::post('/registrars/save', 'FE\Registrars\Save@index')->name('fe.registrars.save');
         Route::post('/registrars/delete', 'FE\Registrars\Delete@index')->name('fe.registrars.delete');
 
-        Route::post('/users', 'FE\Users\Index@index')->name('fe.users.index');
+        Route::post('/categories', 'FE\Categories@index')->name('fe.categories.index');
+        Route::post('/weapons', 'FE\Weapons@index')->name('fe.weapons.index');
+        Route::post('/types', 'FE\EventTypes@index')->name('fe.types.index');
+        Route::post('/users', 'FE\Users@index')->name('fe.users.index');
     }
 );

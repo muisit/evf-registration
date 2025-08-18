@@ -187,7 +187,7 @@ class Event
     public function __construct(?BaseModel $event = null)
     {
         if (!empty($event)) {
-            $this->type = new EventType($event);
+            $this->type = new EventType($event->type);
             $this->bank = new Bank($event);
             $this->countryId = $event->event_country;
 

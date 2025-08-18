@@ -42,6 +42,9 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Gate::policy(\App\Models\Category::class, \App\Models\Policies\Category::class);
+        Gate::policy(\App\Models\Weapon::class, \App\Models\Policies\Weapon::class);
+        Gate::policy(\App\Models\EventType::class, \App\Models\Policies\EventType::class);
         Gate::policy(\App\Models\Registrar::class, \App\Models\Policies\Registrar::class);
         Gate::policy(\App\Models\Role::class, \App\Models\Policies\Role::class);
         Gate::policy(\App\Models\RoleType::class, \App\Models\Policies\RoleType::class);

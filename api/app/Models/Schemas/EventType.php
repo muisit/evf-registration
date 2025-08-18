@@ -2,8 +2,7 @@
 
 namespace App\Models\Schemas;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Models\Event;
+use App\Models\EventType as Model;
 
 /**
  * EventType model
@@ -20,10 +19,10 @@ class EventType
      */
     public ?string $name = null;
 
-    public function __construct(?Event $event = null)
+    public function __construct(Model $data = null)
     {
-        if (!empty($event)) {
-            $this->name = $event->type?->event_type_name;
+        if (!empty($data)) {
+            $this->name = $data->event_type_name;
         }
     }
 }
