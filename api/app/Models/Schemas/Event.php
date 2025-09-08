@@ -133,6 +133,22 @@ class Event
     public ?string $feed = null;
 
     /**
+     * Available for Ranking
+     *
+     * @var string
+     * @OA\Property()
+     */
+    public string $inRanking = 'N';
+
+    /**
+     * Ranking factor
+     *
+     * @var double
+     * @OA\Property()
+     */
+    public float $factor = 1.0;
+
+    /**
      * JSON configuration settings
      *
      * @var string
@@ -202,6 +218,8 @@ class Event
             $this->web = $event->event_web;
             $this->location = $event->event_location;
             $this->payments = $event->event_payments;
+            $this->inRanking = $event->event_in_ranking ?? 'N';
+            $this->factor = $event->event_factor;
             $this->feed = $event->event_feed;
             $this->config = json_decode($event->event_config);
 

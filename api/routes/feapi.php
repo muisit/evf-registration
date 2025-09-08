@@ -1,16 +1,5 @@
 <?php
 
-// Special unauthenticated routes
-// These will probably disappear at some point
-Route::group(
-    [
-        'prefix' => '/fe',
-    ],
-    function () {
-        Route::get('/{weapon}/{category}', 'Ranking\Get@index')->name('ranking.get');
-    }
-);
-
 Route::group(
     [
         'prefix' => '/fe',
@@ -23,6 +12,19 @@ Route::group(
         Route::post('/countries', 'FE\Countries\Index@index')->name('fe.countries.index');
         Route::post('/countries/save', 'FE\Countries\Save@index')->name('fe.countries.save');
         Route::post('/countries/delete', 'FE\Countries\Delete@index')->name('fe.countries.delete');
+
+        Route::post('/events', 'FE\Events\Index@index')->name('fe.events.index');
+        Route::post('/events/save', 'FE\Events\Save@index')->name('fe.events.save');
+        Route::post('/events/delete', 'FE\Events\Delete@index')->name('fe.events.delete');
+        //Route::post('/events/rankings', 'FE\Events\Ranking@index')->name('fe.events.ranking');
+        Route::post('/events/competitions', 'FE\Events\Competitions@index')->name('fe.events.competitions');
+
+        Route::post('/results/{competitionId}', 'FE\Results\Index@index')->name('fe.results.index')->where('competitionId', '[0-9]+');
+        Route::post('/results/{competitionId}/save', 'FE\Results\Save@index')->name('fe.results.save')->where('competitionId', '[0-9]+');
+        Route::post('/results/{competitionId}/clear', 'FE\Results\Clear@index')->name('fe.results.clear')->where('competitionId', '[0-9]+');
+        Route::post('/results/{competitionId}/recalculate', 'FE\Results\Recalculate@index')->name('fe.results.recalculate')->where('competitionId', '[0-9]+');
+        //Route::post('/results/{competitionId}/import', 'FE\Results\Import@index')->name('fe.results.import')->where('competitionId', '[0-9]+');
+        Route::post('/results/{competitionId}/check', 'FE\Results\Check@index')->name('fe.results.check')->where('competitionId', '[0-9]+');
 
         Route::post('/fencers/view', 'FE\Fencers\View@index')->name('fe.fencers.view');
         Route::post('/fencers/save', 'FE\Fencers\Save@index')->name('fe.fencers.save');
@@ -49,5 +51,16 @@ Route::group(
         Route::post('/weapons', 'FE\Weapons@index')->name('fe.weapons.index');
         Route::post('/types', 'FE\EventTypes@index')->name('fe.types.index');
         Route::post('/users', 'FE\Users@index')->name('fe.users.index');
+    }
+);
+
+// Special unauthenticated routes
+// These will probably disappear at some point
+Route::group(
+    [
+        'prefix' => '/fe',
+    ],
+    function () {
+        Route::get('/ranking/{weapon}/{category}', 'Ranking\Get@index')->name('ranking.get');
     }
 );

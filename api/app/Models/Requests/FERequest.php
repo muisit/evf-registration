@@ -19,7 +19,7 @@ class FERequest extends Base
     {
         \LOg::debug("authorizing FE request");
         if (!parent::authorize($user, $data)) {
-            \Log::debug("parent auth fails");
+            \Log::debug("parent auth fails for " . json_encode($user) . " and " . json_encode($data));
             return false;
         }
         // only allowed for FE users (sysops)

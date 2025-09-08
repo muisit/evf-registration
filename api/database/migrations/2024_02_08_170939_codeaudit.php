@@ -10,7 +10,7 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {/*
+    {
         Schema::create('accreditation_audits', function (Blueprint $table) {
             $table->id();
             $table->integer('accreditation_id')->nullable();
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamp('created_at');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->foreign('created_by')->references('id')->on('accreditation_codes');
-        });*/
+        });
     }
 
     /**

@@ -58,7 +58,9 @@ class Document extends Model
         $this->config = array_merge($this->config ?? [], $vals);
     }
 
-    public function validate()
+    // this was an older implementation of a validate method, before we implemented model-based rules
+    // and automatic validator creation
+    public function validate($rules = null)
     {
         return !empty($this->hash) && $this->hash == $this->createHash();
     }

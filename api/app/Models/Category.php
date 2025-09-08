@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use DateTimeImmutable;
+use Carbon\Carbon;
 
 class Category extends Model
 {
@@ -21,13 +21,13 @@ class Category extends Model
     public static function categoryFromYear($year, $wrt)
     {
         $year = intval($year);
-        $wrt = DateTimeImmutable::createFromFormat('Y-m-d', $wrt);
+        $wrt = Carbon::createFromFormat('Y-m-d', $wrt);
         if ($wrt !== false) {
             $wrtM = intval($wrt->format('m'));
             $wrtY = intval($wrt->format('Y'));
-    
+
             $diff = $wrtY - $year;
-            if($wrtM > 6) {
+            if ($wrtM > 6) {
                 $diff += 1; // people start fencing in the older category as of July
             }
             //if ($diff >= 80) return 5;
@@ -37,5 +37,69 @@ class Category extends Model
             if ($diff >= 40) return 1;
         }
         return -1;
+    }
+
+    public function getMaximalDate($wrt = null)
+    {
+        $catval = intval($this->category_value);
+        if (empty($wrt)) {
+            $wrt = Carbon::now();
+        }
+        $year = intval($wrt->format('Y'));
+        $month = intval($wrt->format('m'));
+        // category switch is start of july
+        if ($month > 6) $year = intval($year) + 1;
+
+        switch ($catval) {
+            default:
+            case 1:
+                $year -= 39;
+                break;
+            case 2:
+                $year -= 49;
+                break;
+            case 3:
+                $year -= 59;
+                break;
+            case 4:
+                $year -= 69;
+                break;
+            case 5:
+                $year -= 79;
+                break;
+        }
+        return new Carbon('' . $year . '-01-01');
+    }
+
+    public function getMinimalDate($wrt = null)
+    {
+        $catval = intval($this->category_value);
+        if (empty($wrt)) {
+            $wrt = Carbon::now();
+        }
+        $year = intval($wrt->format('Y'));
+        $month = intval($wrt->format('m'));
+        // category switch is start of july
+        if ($month > 6) $year = intval($year) + 1;
+
+        switch ($catval) {
+            default:
+            case 1:
+                $year -= 50;
+                break;
+            case 2:
+                $year -= 60;
+                break;
+            case 3:
+                $year -= 70;
+                break;
+            case 4:
+                $year -= 199;
+                break; // no max for cat 4 since we stopped cat 5
+            case 5:
+                $year -= 199;
+                break;
+        }
+        return new Carbon('' . $year . '-01-01');
     }
 }

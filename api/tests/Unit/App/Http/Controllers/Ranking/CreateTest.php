@@ -21,7 +21,7 @@ class CreateTest extends TestCase
         DB::table(env('WPDBPREFIX', 'wp_') . 'options')
             ->insert(['option_id' => 3, 'option_name' => 'evf_internal_key', 'option_value' => 'aaaa']);
 
-        $response = $this->get('/ranking/create', ['Authorization' => 'Bearer aaaa'])->assertStatus(200);
+        $response = $this->post('/fe/ranking/create', [], ['Authorization' => 'Bearer aaaa'])->assertStatus(200);
         $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
@@ -47,6 +47,6 @@ class CreateTest extends TestCase
         DB::table(env('WPDBPREFIX', 'wp_') . 'options')
             ->insert(['option_id' => 3, 'option_name' => 'evf_internal_key', 'option_value' => 'bbbb']);
 
-        $this->get('/ranking/create', ['Authorization' => 'Bearer aaaa'])->assertStatus(401);
+        $this->post('/fe/ranking/create', [], ['Authorization' => 'Bearer aaaa'])->assertStatus(401);
     }
 }

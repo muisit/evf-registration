@@ -23,6 +23,7 @@ class Base
 
     public function validate(Request $request): ?Model
     {
+        \Log::debug("validating form request");
         $this->model = $this->createModel($request);
         $validator = $this->createValidator($request);
         if ($validator->fails()) {
@@ -61,7 +62,12 @@ class Base
 
     public function createValidator(Request $request)
     {
-        return app('validator')->make($request->all(), $this->rules(), $this->messages(), $this->customAttributes());
+        $all = $request->all();
+        $rules = $this->rules();
+        $msgs = $this->messages();
+        $attrs = $this->customAttributes();
+        $validator = app('validator')->make($all, $rules, $msgs, $attrs);
+        return $validator;
     }
 
     protected function extractInputFromRules(Request $request)

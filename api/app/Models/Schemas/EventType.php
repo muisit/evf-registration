@@ -12,6 +12,14 @@ use App\Models\EventType as Model;
 class EventType
 {
     /**
+     * Id of the event-type
+     *
+     * @var integer
+     * @OA\Property()
+     */
+    public int $id = -1;
+
+    /**
      * Name of the event-type
      *
      * @var string
@@ -22,6 +30,7 @@ class EventType
     public function __construct(Model $data = null)
     {
         if (!empty($data)) {
+            $this->id = $data->event_type_id;
             $this->name = $data->event_type_name;
         }
     }

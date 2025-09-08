@@ -5,6 +5,7 @@ namespace Tests\Support\Data;
 use DB;
 use App\Models\Country;
 use App\Models\Fencer as Model;
+use App\Models\FencerLabel;
 use Carbon\Carbon;
 
 class Fencer extends Fixture
@@ -31,6 +32,7 @@ class Fencer extends Fixture
 
     protected static function clear()
     {
+        DB::table(FencerLabel::tableName())->delete();
         DB::table(Model::tableName())->delete();
     }
 
@@ -43,7 +45,7 @@ class Fencer extends Fixture
         $cat4 = Carbon::now()->subYears(71);
         $cat5 = Carbon::now()->subYears(81);
 
-        Model::create([
+        $m = Model::create([
             'fencer_id' => self::MCAT1,
             'fencer_country' => Country::GER,
             'fencer_firstname' => 'Tést',
@@ -51,9 +53,12 @@ class Fencer extends Fixture
             'fencer_gender' => 'M',
             'fencer_dob' => $cat1->toDateString(),
             'fencer_picture' => Model::PICTURE_NONE
-        ])->save();
+        ]);
+        $m->save();
+        $m->addLabel($m->fencer_firstname, 'first');
+        $m->addLabel($m->fencer_surname, 'last');
 
-        Model::create([
+        $m = Model::create([
             'fencer_id' => self::MCAT2,
             'fencer_country' => Country::ITA,
             'fencer_firstname' => 'John',
@@ -61,9 +66,12 @@ class Fencer extends Fixture
             'fencer_gender' => 'M',
             'fencer_dob' => $cat2->toDateString(),
             'fencer_picture' => Model::PICTURE_UPLOADED
-        ])->save();
+        ]);
+        $m->save();
+        $m->addLabel($m->fencer_firstname, 'first');
+        $m->addLabel($m->fencer_surname, 'last');
 
-        Model::create([
+        $m = Model::create([
             'fencer_id' => self::MCAT3,
             'fencer_country' => Country::FRA,
             'fencer_firstname' => 'Testi',
@@ -71,9 +79,12 @@ class Fencer extends Fixture
             'fencer_gender' => 'M',
             'fencer_dob' => $cat3->toDateString(),
             'fencer_picture' => Model::PICTURE_ACCEPTED
-        ])->save();
+        ]);
+        $m->save();
+        $m->addLabel($m->fencer_firstname, 'first');
+        $m->addLabel($m->fencer_surname, 'last');
 
-        Model::create([
+        $m = Model::create([
             'fencer_id' => self::MCAT4,
             'fencer_country' => Country::NED,
             'fencer_firstname' => 'Kees',
@@ -81,9 +92,12 @@ class Fencer extends Fixture
             'fencer_gender' => 'M',
             'fencer_dob' => $cat4->toDateString(),
             'fencer_picture' => Model::PICTURE_NONE
-        ])->save();
+        ]);
+        $m->save();
+        $m->addLabel($m->fencer_firstname, 'first');
+        $m->addLabel($m->fencer_surname, 'last');
 
-        Model::create([
+        $m = Model::create([
             'fencer_id' => self::MCAT5,
             'fencer_country' => Country::GER,
             'fencer_firstname' => 'Hans',
@@ -91,9 +105,12 @@ class Fencer extends Fixture
             'fencer_gender' => 'M',
             'fencer_dob' => $cat5->toDateString(),
             'fencer_picture' => Model::PICTURE_UPLOADED
-        ])->save();
+        ]);
+        $m->save();
+        $m->addLabel($m->fencer_firstname, 'first');
+        $m->addLabel($m->fencer_surname, 'last');
 
-        Model::create([
+        $m = Model::create([
             'fencer_id' => self::WCAT1,
             'fencer_country' => Country::GER,
             'fencer_firstname' => 'Christina',
@@ -101,9 +118,12 @@ class Fencer extends Fixture
             'fencer_gender' => 'F',
             'fencer_dob' => $cat1->toDateString(),
             'fencer_picture' => Model::PICTURE_NONE
-        ])->save();
+        ]);
+        $m->save();
+        $m->addLabel($m->fencer_firstname, 'first');
+        $m->addLabel($m->fencer_surname, 'last');
 
-        Model::create([
+        $m = Model::create([
             'fencer_id' => self::WCAT2,
             'fencer_country' => Country::ITA,
             'fencer_firstname' => 'Joanna',
@@ -111,9 +131,12 @@ class Fencer extends Fixture
             'fencer_gender' => 'M',
             'fencer_dob' => $cat2->toDateString(),
             'fencer_picture' => Model::PICTURE_UPLOADED
-        ])->save();
+        ]);
+        $m->save();
+        $m->addLabel($m->fencer_firstname, 'first');
+        $m->addLabel($m->fencer_surname, 'last');
 
-        Model::create([
+        $m = Model::create([
             'fencer_id' => self::WCAT3,
             'fencer_country' => Country::FRA,
             'fencer_firstname' => 'Emilie',
@@ -121,9 +144,12 @@ class Fencer extends Fixture
             'fencer_gender' => 'M',
             'fencer_dob' => $cat3->toDateString(),
             'fencer_picture' => Model::PICTURE_ACCEPTED
-        ])->save();
+        ]);
+        $m->save();
+        $m->addLabel($m->fencer_firstname, 'first');
+        $m->addLabel($m->fencer_surname, 'last');
 
-        Model::create([
+        $m = Model::create([
             'fencer_id' => self::WCAT4,
             'fencer_country' => Country::NED,
             'fencer_firstname' => 'Anne',
@@ -131,9 +157,12 @@ class Fencer extends Fixture
             'fencer_gender' => 'M',
             'fencer_dob' => $cat4->toDateString(),
             'fencer_picture' => Model::PICTURE_NONE
-        ])->save();
+        ]);
+        $m->save();
+        $m->addLabel($m->fencer_firstname, 'first');
+        $m->addLabel($m->fencer_surname, 'last');
 
-        Model::create([
+        $m = Model::create([
             'fencer_id' => self::WCAT5,
             'fencer_country' => Country::GER,
             'fencer_firstname' => 'Kathi',
@@ -141,9 +170,12 @@ class Fencer extends Fixture
             'fencer_gender' => 'M',
             'fencer_dob' => $cat5->toDateString(),
             'fencer_picture' => Model::PICTURE_UPLOADED
-        ])->save();
+        ]);
+        $m->save();
+        $m->addLabel($m->fencer_firstname, 'first');
+        $m->addLabel($m->fencer_surname, 'last');
 
-        Model::create([
+        $m = Model::create([
             'fencer_id' => self::MCAT1B,
             'fencer_country' => Country::GER,
             'fencer_firstname' => 'Peter',
@@ -151,9 +183,12 @@ class Fencer extends Fixture
             'fencer_gender' => 'M',
             'fencer_dob' => $cat1->toDateString(),
             'fencer_picture' => Model::PICTURE_NONE
-        ])->save();
+        ]);
+        $m->save();
+        $m->addLabel($m->fencer_firstname, 'first');
+        $m->addLabel($m->fencer_surname, 'last');
 
-        Model::create([
+        $m = Model::create([
             'fencer_id' => self::MCAT1C,
             'fencer_country' => Country::GER,
             'fencer_firstname' => 'Karl',
@@ -161,6 +196,9 @@ class Fencer extends Fixture
             'fencer_gender' => 'M',
             'fencer_dob' => $cat1->toDateString(),
             'fencer_picture' => Model::PICTURE_NONE
-        ])->save();
+        ]);
+        $m->save();
+        $m->addLabel($m->fencer_firstname, 'first');
+        $m->addLabel($m->fencer_surname, 'last');
     }
 }

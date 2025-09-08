@@ -62,6 +62,14 @@ class Fencer extends Model
     {
         return $this->hasMany(FencerLabel::class, 'fencer_id', 'fencer_id');
     }
+    public function addLabel($label, $type)
+    {
+        $fl = new FencerLabel();
+        $fl->label = $label;
+        $fl->type = in_array($type, ['first', 'last']) ? $type : 'first';
+        $fl->fencer_id = $this->getKey();
+        $fl->save();
+    }
 
     public function accreditations(): HasMany
     {

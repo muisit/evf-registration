@@ -16,6 +16,11 @@ class Event
         return null;
     }
 
+    public function viewAny(EVFUser $user): bool | null
+    {
+        return false;
+    }
+
     /**
      * @param User $user
      * @param Model $model

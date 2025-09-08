@@ -24,7 +24,7 @@ class Weapons extends Controller
 
         $qry = Model::where('weapon_id', '>', 0)->orderBy('weapon_name', 'asc');
         $total = $qry->count();
-        $data = $qry->get();
+        $data = $qry->get()->map(fn ($i) => new Schema($i))->toArray();
         return response()->json(new WPResponse(["list" => $data, "total" => $total]));
     }
 }

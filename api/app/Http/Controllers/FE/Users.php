@@ -34,7 +34,7 @@ class Users extends Controller
         $qry = $this->sortQuery($qry, $model);
 
         $total = $qry->count();
-        $data = $qry->limit($limit)->offset($offset)->get()->map(fn ($item) => new Schema($item, false));
+        $data = $qry->limit($limit)->offset($offset)->get()->map(fn ($item) => new Schema($item, false))->toArray();
         return response()->json(new WPResponse(["list" => $data, "total" => $total]));
     }
 

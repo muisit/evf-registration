@@ -19,6 +19,7 @@ class GlobalParameters
      */
     public function handle(Request $request, \Closure $next)
     {
+        \Log::debug("setting global parameters for " . $request->path);
         $this->determineEvent($request);
         $this->determineCountry($request);
         return $next($request);
