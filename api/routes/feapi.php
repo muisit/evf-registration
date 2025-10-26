@@ -1,21 +1,26 @@
 <?php
 
+// unauthenticated routes
+Route::post('/fe/ranking/list', 'FE\Ranking\Index@index')->name('fe.ranking.index');
+Route::post('/fe/ranking/detail', 'FE\Ranking\Detail@index')->name('fe.detail.index');
+Route::post('/fe/events', 'FE\Events\Index@index')->name('fe.events.index');
+
 Route::group(
     [
         'prefix' => '/fe',
         'middleware' => 'auth:wp'
     ],
     function () {
+        Route::post('/apidata', 'FE\ApiData@index')->name('fe.apidata');
         Route::post('/ranking/reset', 'FE\Ranking\Reset@index')->name('fe.ranking.reset');
 
         Route::post('/countries', 'FE\Countries\Index@index')->name('fe.countries.index');
         Route::post('/countries/save', 'FE\Countries\Save@index')->name('fe.countries.save');
         Route::post('/countries/delete', 'FE\Countries\Delete@index')->name('fe.countries.delete');
 
-        Route::post('/events', 'FE\Events\Index@index')->name('fe.events.index');
         Route::post('/events/save', 'FE\Events\Save@index')->name('fe.events.save');
         Route::post('/events/delete', 'FE\Events\Delete@index')->name('fe.events.delete');
-        //Route::post('/events/rankings', 'FE\Events\Ranking@index')->name('fe.events.ranking');
+        Route::post('/events/ranking', 'FE\Events\Ranking@index')->name('fe.events.ranking');
         Route::post('/events/competitions', 'FE\Events\Competitions@index')->name('fe.events.competitions');
 
         Route::post('/results/{competitionId}', 'FE\Results\Index@index')->name('fe.results.index')->where('competitionId', '[0-9]+');

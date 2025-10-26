@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\Event as Model;
 use App\Models\Competition;
 use App\Models\Result;
-use App\Models\Requests\FERequest;
 use App\Models\Schemas\Event as Schema;
 use App\Models\Schemas\FE\WPResponse;
 use DB;
@@ -19,8 +18,6 @@ class Index extends Controller
      */
     public function index(Request $request)
     {
-        $form = new FERequest($this);
-        $form->validate($request);
         if ($request->get('path') != '/events') {
             $this->authorize('not/ever');
         }
@@ -30,8 +27,8 @@ class Index extends Controller
             $this->authorize('not/ever');
         }
 
-        $this->authorize('viewAny', Model::class);
         $limit = $model->pagesize ?? 20;
+        if ($limit == 0) $limit = 100000;
         $offset = $model->offset ?? 0;
         $qry = $this->filterQuery($model);
         $qry = $this->sortQuery($qry, $model);
@@ -92,7 +89,7 @@ class Index extends Controller
                     ->join(Result::tableName() . " as r", "result_competition", "=", "competition_id")
                     ->whereColumn("competition_event", "event_id");
                 });
-                $qry->where(DB::Raw("exists(select * from " . Competition::tableName() . " c, " . Result::tableName() . " r where c.competition_event=" . Model::tableName() . ".event_id and r.result_competition=c.competition_id)"));
+                $qry->whereRaw("exists(select * from " . Competition::tableName() . " c, " . Result::tableName() . " r where c.competition_event=" . Model::tableName() . ".event_id and r.result_competition=c.competition_id)");
             }
         }
 

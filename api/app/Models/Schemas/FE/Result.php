@@ -32,7 +32,7 @@ class Result
     {
         $this->id = $data->getKey();
         $this->competition_id = $data->result_competition;
-        $this->fencer_id = $data->result_fencer;
+        $this->fencer_id = $data->fencer->uuid;
         $this->place = $data->result_place;
         $this->points = $data->result_points;
         $this->entry = $data->result_entry;

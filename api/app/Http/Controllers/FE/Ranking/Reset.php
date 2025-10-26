@@ -34,7 +34,7 @@ class Reset extends Controller
         $service = new AssessResultsService();
         $total = $service->handle();
 
-        CreateRanking::dispatch();
+        dispatch(new CreateRanking());
 
         return response()->json(new Response('ok', null, ['total' => $total]));
     }

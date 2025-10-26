@@ -11,20 +11,7 @@ class AssessResultsService
 
     public function __construct()
     {
-        $this->cutoff = $this->getCutOff();
-    }
-
-    private function getCutOff()
-    {
-        $result = DB::table(env('WPDBPREFIX', 'wp_') . 'options')
-            ->select('option_value')
-            ->where('option_name', 'evfranking_ranking_count_included')
-            ->first();
-        $result = intval($result);
-        if ($result < 2) {
-            $result = 5;
-        }
-        return $result;
+        $this->cutoff = BasicDataService::getCutOff();
     }
 
     public function handle()
