@@ -3,13 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Kirschbaum\PowerJoins\PowerJoins;
 use DateTimeImmutable;
 
 class AccreditationDocument extends Model
 {
-    use PowerJoins;
-
     public const STATUS_CREATED = 'C';
     public const STATUS_PROCESSING = 'P';
     public const STATUS_PROCESSED_GOOD = 'G';

@@ -4,12 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Kirschbaum\PowerJoins\PowerJoins;
 
 class Registration extends Model
 {
-    use PowerJoins;
-
     public const STATE_PRESENT = 'P';
     public const STATE_CANCELLED = 'A';
     public const STATE_REGISTERED = 'R';

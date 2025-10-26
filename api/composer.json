@@ -8,16 +8,16 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "bepsvpt/secure-headers": "^7.4",
-        "kirschbaum-development/eloquent-power-joins": "^3.3",
-        "laravel/framework": "^11.0",
-        "nunomaduro/collision": "^8.1",
+        "kirschbaum-development/eloquent-power-joins": "^4.2",
+        "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "league/flysystem": "^3.21",
+        "nunomaduro/collision": "^8.1",
         "setasign/fpdi": "^2.6",
-        "supportpal/pollcast": "^1.2",
+        "supportpal/pollcast": "^2.0",
         "tecnickcom/tcpdf": "^6.6",
         "zircote/swagger-php": "^4.8"
     },
@@ -29,7 +29,8 @@
         "codeception/module-rest": "^3.3",
         "fakerphp/faker": "^1.9.1",
         "mockery/mockery": "^1.4.4",
-        "phpunit/phpunit": "^10.0"
+        "phpunit/phpunit": "^11.0",
+        "pestphp/pest": "^3.0"
     },
     "autoload": {
         "psr-4": {
@@ -55,7 +56,10 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     },
     "minimum-stability": "stable",
     "prefer-stable": true

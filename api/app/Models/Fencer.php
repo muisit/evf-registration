@@ -5,15 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Kirschbaum\PowerJoins\PowerJoins;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 
 class Fencer extends Model
 {
-    use PowerJoins;
-
     public const PICTURE_NONE = 'N';
     public const PICTURE_UPLOADED = 'Y';
     public const PICTURE_ACCEPTED = 'A';

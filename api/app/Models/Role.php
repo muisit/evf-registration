@@ -5,13 +5,10 @@ namespace App\Models;
 use App\Support\Contracts\AccreditationRelation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Kirschbaum\PowerJoins\PowerJoins;
 use Illuminate\Database\Query\Builder;
 
 class Role extends Model implements AccreditationRelation
 {
-    use PowerJoins;
-
     protected $table = 'TD_Role';
     protected $primaryKey = 'role_id';
     public $timestamps = false;

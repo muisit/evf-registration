@@ -1,4 +1,4 @@
-FROM php:8.2-apache-buster
+FROM php:8.4-apache
 
 RUN apt update
 
@@ -18,7 +18,10 @@ RUN apt install -y git mariadb-client libonig-dev
 RUN apt install -y --allow-downgrades libzip-dev 
 RUN docker-php-ext-install mbstring pdo pdo_mysql zip mysqli
 RUN apt install -y libxml2-dev
-RUN docker-php-ext-install intl
+RUN apt-get -y update \
+    && apt-get install -y libicu-dev \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install intl
 
 # enable the rewrite engine
 RUN a2enmod rewrite
