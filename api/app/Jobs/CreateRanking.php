@@ -3,16 +3,10 @@
 namespace App\Jobs;
 
 use App\Support\Services\RankingStoreService;
-use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 
-// This job checks to see if all available accreditations for a fencer are still
-// matching as far as data is concerned. It will remove accreditations that are
-// no longer required, add new accreditations if required and create appropiate
-// CreateBadge jobs for accreditations that have changed or have been added.
-//
-// When accreditations are removed, the accompanying files are removed as well
-//
-class CreateRanking extends Job implements ShouldBeUniqueUntilProcessing
+// This job recreates the most recent ranking based on the most recent events
+class CreateRanking extends Job implements ShouldBeUnique
 {
     /**
      * Create a new job instance.
@@ -25,7 +19,7 @@ class CreateRanking extends Job implements ShouldBeUniqueUntilProcessing
 
     public function uniqueId(): string
     {
-        return "ranking";
+        return self::class;
     }
 
     /**

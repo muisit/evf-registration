@@ -48,10 +48,10 @@ class Save extends Controller
         if (empty($data)) {
             $data = new Model();
         }
-        $country = Country::find($model->country);
+        $country = Country::find($model->country_id);
         $data->country_id = empty($country) ? null : $country->getKey();
 
-        $user = WPUser::find($model->user);
+        $user = WPUser::find($model->user_id);
         $data->user_id = empty($user) ? null : $user->getKey();
         return $data;
     }

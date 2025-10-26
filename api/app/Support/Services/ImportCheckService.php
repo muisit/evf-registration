@@ -6,6 +6,7 @@ use App\Models\Competition;
 use App\Models\Country;
 use App\Models\Fencer;
 use App\Models\FencerLabel;
+use App\Models\Schemas\FE\Fencer as FencerSchema;
 use Carbon\Carbon;
 use DB;
 
@@ -27,10 +28,10 @@ class ImportCheckService
         $retval = array("ranking" => array());
 
         $this->weapon = $competition->weapon;
-        $this->gender = $weapon->weapon_gender;
+        $this->gender = $this->weapon->weapon_gender;
         $this->category = $competition->category;
-        $this->minDate = $category->getMinimalDate($competition->event->event_opens);
-        $this->maxDate = $category->getMaximalDate($competition->event->event_opens);
+        $this->minDate = $this->category->getMinimalDate($competition->event->event_opens);
+        $this->maxDate = $this->category->getMaximalDate($competition->event->event_opens);
         $this->createCountryCache();
 
         $retval = [];
@@ -101,7 +102,7 @@ class ImportCheckService
                     \Log::debug("correct match, but the date is off. See if the fencer is too old perhaps");
                     if ($this->matchDates($f->fencer_dob, null, $this->minDate)) {
                         \Log::debug("fencer is too old for this category, but that is okay");
-                        $results[] = ["fencer" => $f, "checks" => [["type" => "age", "message" => "Person is too old for this category"]]];
+                        $results[] = ["fencer" => new FencerSchema($f), "checks" => [["type" => "age", "message" => "Person is too old for this category"]]];
                     }
                     else {
                         \Log::debug("fencer is too young, skipping this entry");
@@ -109,7 +110,7 @@ class ImportCheckService
                 }
                 else {
                     \Log::debug("found a name, country, age, gender match");
-                    $results = [["fencer" => $f]];
+                    $results = [["fencer" => new FencerSchema($f)]];
                     break;
                 }
             }
@@ -124,10 +125,10 @@ class ImportCheckService
                 if ($fc->getKey() !== $country->getKey()) {
                     \Log::debug("checking to see if Neo is from a different country");
                     if ($this->matchDates($f->fencer_dob, $this->minDate, $this->maxDate)) {
-                        $results[] = ["fencer" => $f, "checks" => [["type" => "country", "message" => "Incorrect country"]]];
+                        $results[] = ["fencer" => new FencerSchema($f), "checks" => [["type" => "country", "message" => "Incorrect country"]]];
                     }
                     else if ($this->matchDates($f->fencer_dob, null, $this->minDate)) {
-                        $results[] = ["fencer" => $f, "checks" => [
+                        $results[] = ["fencer" => new FencerSchema($f), "checks" => [
                             ["type" => "country", "message" => "Incorrect country"],
                             ["type" => "age", "message" => "Person is too old for this category"]
                         ]];
@@ -145,16 +146,25 @@ class ImportCheckService
                 ->where("type", $type)
                 ->whereColumn(FencerLabel::tableName() . '.fencer_id', Fencer::tableName() . '.fencer_id')
                 ->where(DB::Raw("SOUNDEX(label)"), '=', DB::Raw("SOUNDEX('$label')"));
-        })->where('fencer_gender', $this->gender)->get();
+        })
+            ->where('fencer_gender', $this->gender)
+            ->orderBy('fencer_surname', 'asc')
+            ->orderBy('fencer_firstname', 'asc')
+            ->get();
     }
 
     public function findSuggestions($firstname, $lastname, $country)
     {
+        \Log::debug("finding suggestions based on gender, age, name and country");
         $matchLastName = $this->findAllByLabelSound('last', $lastname);
         $matchLastNameAge = $matchLastName->filter(fn ($item) => $this->matchDates($item->fencer_dob, null, $this->maxDate));
         $matchFirstName = $this->findAllByLabelSound('first', $firstname);
         $matchFirstNameAge = $matchFirstName->filter(fn ($item) => $this->matchDates($item->fencer_dob, null, $this->maxDate));
-        $matchCountry = Fencer::where('fencer_country', $country->getKey())->get();
+        $matchCountry = Fencer::where('fencer_country', $country->getKey())
+                        ->where('fencer_gender', $this->gender)
+                        ->orderBy('fencer_surname', 'asc')
+                        ->orderBy('fencer_firstname', 'asc')
+                        ->get();
         $matchCountryAge = $matchCountry->filter(fn ($item) => $this->matchDates($item->fencer_dob, null, $this->maxDate));
 
         $lnIds = $matchLastNameAge->pluck('fencer_id')->toArray();
@@ -175,43 +185,55 @@ class ImportCheckService
         $m2b = array_diff($m2, array_intersect($lnIdsAll, $cnIdsAll));
         $m3b = array_diff($m3, array_intersect($fnIdsAll, $cnIdsAll));
 
+        \Log::debug(count($m) . '/' . count($m1) . '/' . count($m2) . '/' . count($m3));
+        \Log::debug(count($mb) . '/' . count($m1b) . '/' . count($m2b) . '/' . count($m3b));
         // add to the keys until we have enough suggestions (at least 10)
         $keys = $m;
+        \Log::debug("all suggestions that match all 3: " . count($keys));
         if (count($keys) < 10) {
             // add all suggestions that match 2 out of 3 fields
             $keys = array_unique(array_merge($keys, $m1, $m2, $m3));
+            \Log::debug("adding all suggestions that match 2 out of 3: " . count($keys));
         }
         if (count($keys) < 10) {
             // add all lastname matches
             $keys = array_unique(array_merge($keys, $lnIds));
+            \Log::debug("adding all suggestions that match lastname: " . count($keys));
         }
         if (count($keys) < 10) {
             // add all firstname matches
             $keys = array_unique(array_merge($keys, $fnIds));
+            \Log::debug("adding all suggestions that match first name: " . count($keys));
         }
         if (count($keys) < 10) {
             // add all suggestions that match all 3 fields, but are too young
             $keys = array_unique(array_merge($keys, $mb));
+            \Log::debug("adding all suggestions that are too young, but match: " . count($keys));
         }
         if (count($keys) < 10) {
-            // add all suggestions that match 2 out of 3 fields, but are too yong
+            // add all suggestions that match 2 out of 3 fields, but are too young
             $keys = array_unique(array_merge($keys, $m1b, $m2b, $m3b));
+            \Log::debug("adding all suggestions that are too young, but match 2 out of 3: " . count($keys));
         }
         if (count($keys) < 10) {
             // add all lastname matches
             $keys = array_unique(array_merge($keys, $lnIdsAll));
+            \Log::debug("adding all suggestions that are too young, but last name: " . count($keys));
         }
         if (count($keys) < 10) {
             // add all firstname matches
             $keys = array_unique(array_merge($keys, $fnIdsAll));
+            \Log::debug("adding all suggestions that are too young, but first name: " . count($keys));
         }
         if (count($keys) < 10) {
             // add all people from the country that are old enough
             $keys = array_unique(array_merge($keys, $cnIds));
+            \Log::debug("adding all suggestions that match country: " . count($keys));
         }
         if (count($keys) < 10) {
             // add all other people from this country
             $keys = array_unique(array_merge($keys, $cnIdsAll));
+            \Log::debug("adding all suggestions that are too young but match country: " . count($keys));
         }
         // the next step would be to add all people... which is useless
 
@@ -223,7 +245,7 @@ class ImportCheckService
         $allIdsOfAge = array_unique(array_merge($lnIds, $fnIds, $cnIds));
         foreach ($keys as $id) {
             $fencer = $allFencers['f' . $id];
-            $value = ["fencer" => $fencer, 'checks' => []];
+            $value = ["fencer" => new FencerSchema($fencer), 'checks' => []];
             if (!in_array($id, $lnIdsAll)) {
                 $value['checks'][] = ["type" => "lastname", "message" => "Incorrect last name"];
             }
@@ -243,10 +265,9 @@ class ImportCheckService
 
     public function handleEntry($entry)
     {
-        // we leave 'position' as it is: an integer front-end check can be done there without problem
-        $lastname = $this->sanitize($entry["lastname"]);
-        $firstname = $this->sanitize($entry["firstname"]);
-        $country = $this->findCountry($this->sanitize($entry["country"]));
+        $lastname = $this->sanitizeName($entry["name"]);
+        $firstname = $this->sanitizeName($entry["firstname"]);
+        $country = $this->findCountry($this->sanitizeName($entry["country"]));
 
         $results = $this->findEntryForName($firstname, $lastname, $country);
         if (count($results) == 0) {
@@ -254,8 +275,8 @@ class ImportCheckService
         }
 
         $values = array(
-            "index" => $entry["index"],
-            "fencer_id" => count($results) == 1 ? $results[0]['fencer']->getKey() : -1,
+            "index" => intval($entry["index"]),
+            "fencer_id" => count($results) == 1 ? $results[0]['fencer']->id : -1,
             "suggestions" => $results
         );
         return $values;
@@ -263,7 +284,9 @@ class ImportCheckService
 
     private function matchDates($dt, $min, $max)
     {
-        \Log::debug("matching date $dt against " . $min?->format('Y-m-d') . ' and ' . $max?->format('Y-m-d'));
+        if ($dt === null || !$dt) {
+            return false;
+        }
         $tm1 = Carbon::createFromFormat('Y-m-d', $dt);
         return ($min === null || $tm1 >= $min) && ($max === null || $tm1 < $max);
     }

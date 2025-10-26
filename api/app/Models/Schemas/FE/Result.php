@@ -19,7 +19,7 @@ class Result
     public $fencer_firstname;
     public $fencer_surname;
     public $fencer_dob;
-    public $country;
+    public $country_abr;
     public $country_id;
     public $event_name;
     public $event_country;
@@ -41,16 +41,16 @@ class Result
         $this->total_points = $data->result_total_points;
         $this->ranked = $data->result_in_ranking;
 
-        $this->fencer_firstname = $data->fencer_firstname ?? $data->fencer->fencer_firstname;
-        $this->fencer_surname = $data->fencer_surname ?? $data->fencer->fencer_surname;
-        $this->fencer_dob = $data->fencer_dob ?? $data->fencer->fencer_dob;
-        $this->country = $data->country_abbr ?? $data->fencer->country->country_abbr;
-        $this->country_id = $data->country_id ?? $data->fencer->fencer_country;
-        $this->event_name = $data->event_name ?? $data->competition->event->event_name;
-        $this->event_country = $data->event_country ?? $data->competition->event->event_country;
-        $this->event_date = $data->event_open ?? $data->competition->event->event_open;
-        $this->category_name = $data->category_name ?? $data->competition->category->category_name;
-        $this->category_value = $data->category_value ?? $data->competition->category->category_value;
-        $this->weapon_abbr = $data->weapon_abbr ?? $data->competition->weapon->weapon_abbr;
+        $this->fencer_firstname = $data->fencer->fencer_firstname;
+        $this->fencer_surname = $data->fencer->fencer_surname;
+        $this->fencer_dob = $data->fencer->fencer_dob;
+        $this->country_abbr = $data->fencer->country->country_abbr;
+        $this->country_id = $data->fencer->fencer_country;
+        $this->event_name = $data->competition->event?->event_name ?? '';
+        $this->event_country = $data->competition->event?->event_country ?? '';
+        $this->event_date = $data->competition->event?->event_open ?? '';
+        $this->category_name = $data->competition->category?->category_name ?? '';
+        $this->category_value = $data->competition->category?->category_value ?? '';
+        $this->weapon_abbr = $data->competition->weapon?->weapon_abbr ?? '';
     }
 }

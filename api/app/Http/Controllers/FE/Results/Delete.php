@@ -1,22 +1,22 @@
 <?php
 
-namespace App\Http\Controllers\FE\Roles;
+namespace App\Http\Controllers\FE\Results;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Role as Model;
-use App\Models\Schemas\FE\Role as Schema;
-use App\Models\Schemas\FE\WPResponse;
+use App\Models\Result as Model;
+use App\Models\Schemas\FE\Result as Schema;
+use App\Models\Schemas\FE\Response;
 use App\Models\Requests\FERequest;
 use Carbon\Carbon;
 
-class Save extends Controller
+class Delete extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, $competitionId)
     {
         $form = new FERequest($this);
         $form->validate($request);
-        if ($request->get('path') != '/roles/save') {
+        if ($request->get('path') != '/results/' . $competitionId . '/delete') {
             $this->authorize('not/ever');
         }
 
@@ -26,17 +26,21 @@ class Save extends Controller
         }
 
         $data = $this->populateModel($model);
+        if ($data->result_competition != intval($competitionId)) {
+            $this->authorize('not/ever');
+        }
+
         $this->authorize('update', $data);
         if ($data->validate()) {
             $this->process($data);
-            return response()->json(new WPResponse(["item" => new Schema($data)]));
+            return response()->json(new Response("ok"));
         }
-        return response()->json(["success" => false]);
+        return response()->json(new Response('error', "could not find result"));
     }
 
     private function process(Model $data)
     {
-        $data->save();
+        $data->delete();
         return $data;
     }
 
@@ -46,8 +50,6 @@ class Save extends Controller
         if (empty($data)) {
             $data = new Model();
         }
-        $data->role_name = $model->name;
-        $data->role_type = $model->type_id;
         return $data;
     }
 }

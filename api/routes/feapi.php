@@ -6,8 +6,7 @@ Route::group(
         'middleware' => 'auth:wp'
     ],
     function () {
-
-        Route::post('/ranking/create', 'FE\CreateRanking@index')->name('fe.ranking.create');
+        Route::post('/ranking/reset', 'FE\Ranking\Reset@index')->name('fe.ranking.reset');
 
         Route::post('/countries', 'FE\Countries\Index@index')->name('fe.countries.index');
         Route::post('/countries/save', 'FE\Countries\Save@index')->name('fe.countries.save');
@@ -21,9 +20,10 @@ Route::group(
 
         Route::post('/results/{competitionId}', 'FE\Results\Index@index')->name('fe.results.index')->where('competitionId', '[0-9]+');
         Route::post('/results/{competitionId}/save', 'FE\Results\Save@index')->name('fe.results.save')->where('competitionId', '[0-9]+');
+        Route::post('/results/{competitionId}/delete', 'FE\Results\Delete@index')->name('fe.results.delete')->where('competitionId', '[0-9]+');
         Route::post('/results/{competitionId}/clear', 'FE\Results\Clear@index')->name('fe.results.clear')->where('competitionId', '[0-9]+');
         Route::post('/results/{competitionId}/recalculate', 'FE\Results\Recalculate@index')->name('fe.results.recalculate')->where('competitionId', '[0-9]+');
-        //Route::post('/results/{competitionId}/import', 'FE\Results\Import@index')->name('fe.results.import')->where('competitionId', '[0-9]+');
+        Route::post('/results/{competitionId}/import', 'FE\Results\Import@index')->name('fe.results.import')->where('competitionId', '[0-9]+');
         Route::post('/results/{competitionId}/check', 'FE\Results\Check@index')->name('fe.results.check')->where('competitionId', '[0-9]+');
 
         Route::post('/fencers/view', 'FE\Fencers\View@index')->name('fe.fencers.view');

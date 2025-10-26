@@ -49,6 +49,11 @@ class Fencer extends Model
         return $this->belongsTo(Country::class, 'fencer_country', 'country_id');
     }
 
+    public function results(): HasMany
+    {
+        return $this->hasMany(Result::class, 'result_fencer', 'fencer_id');
+    }
+
     public function image()
     {
         if (empty($this->getKey()) || $this->getKey() < 1) {

@@ -65,11 +65,11 @@ class Save extends Controller
         $data->event_name = $model->name;
         $data->event_location = $model->location ?? null;
         $data->event_country = $model->countryId ?? null;
-        $data->event_type = $model->typeId ?? null;
-
+        $data->event_type = $model->type_id ?? null;
         $data->event_open = $this->safeDate($model->opens);
         $data->event_year = intval($model->year);
         $data->event_duration = intval($model->duration);
+
         if ($data->event_duration <= 0) {
             $data->event_duration = 2;
         }
@@ -83,7 +83,7 @@ class Save extends Controller
         }
         $data->event_config = json_encode($cfg);
 
-        $data->event_in_ranking = $model->inRanking == 'Y' ? 'Y' : 'N';
+        $data->event_in_ranking = (isset($model->inRanking) && $model->inRanking == 'Y') ? 'Y' : 'N';
         $data->event_factor = $model->factor ?? 1.0;
         return $data;
     }

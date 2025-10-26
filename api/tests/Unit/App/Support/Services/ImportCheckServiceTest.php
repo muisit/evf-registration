@@ -164,7 +164,6 @@ class ImportCheckServiceTest extends TestCase
         $this->assertCount(3, $suggestions[7]["checks"]); // incorrect country, first name, too young
         $this->assertCount(3, $suggestions[8]["checks"]); // incorrect last name, country, too young
         $this->assertCount(2, $suggestions[9]["checks"]); // incorrect last name, too young
-
     }
 
     private function createFencers($cases)

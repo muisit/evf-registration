@@ -15,7 +15,7 @@ class Fencer
     public $id;
     public $firstname;
     public $name;
-    public $country;
+    public $country_id;
     public $country_name;
     public $birthday;
     public $gender;
@@ -27,7 +27,7 @@ class Fencer
         $this->id = $data->getKey();
         $this->firstname = $data->fencer_firstname;
         $this->name = $data->fencer_surname;
-        $this->country = $data->fencer_country;
+        $this->country_id = $data->fencer_country;
         $this->country_name = $data->country_name ?? $data->country->country_name;
         $this->birthday = $data->fencer_dob;
         $this->gender = $data->fencer_gender;

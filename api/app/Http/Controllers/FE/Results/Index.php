@@ -35,16 +35,24 @@ class Index extends Controller
         }
 
         $this->authorize('viewAny', Model::class);
-        $competition = Competition::find($competitionId);
-        if (empty($competition)) {
+        $filter = $model->filter;
+        $obj = null;
+        if ($filter && isset($filter["fencer"]) && $filter["fencer"] === true) {
+            $obj = Fencer::find($competitionId);
+        }
+        else {
+            $obj = Competition::find($competitionId);
+        }
+
+        if (empty($obj)) {
             $this->authorize('not/ever');
         }
-        $this->authorize('view', $competition);
+        $this->authorize('view', $obj);
 
         $limit = $model->pagesize ?? 20;
         $offset = $model->offset ?? 0;
-        $qry = $this->filterQuery($competition);
-        $qry = $this->sortQuery($qry, $competition);
+        $qry = $this->filterQuery($model, $obj);
+        $qry = $this->sortQuery($qry, $model);
 
         $total = $qry->count();
         $data = $qry->limit($limit)->offset($offset)->get()->map(fn ($item) => new Schema($item, false));
@@ -75,8 +83,6 @@ class Index extends Controller
                 case 'F': $qry->orderBy("f.fencer_firstname", "desc"); break;
                 case 'c': $qry->orderBy("c.country_name", "asc"); break;
                 case 'C': $qry->orderBy("c.country_name", "desc"); break;
-                case 'd': $qry->orderBy("cm.competition_opens", "asc"); break;
-                case 'D': $qry->orderBy("cm.competition_opens", "desc"); break;
                 case 'e': $qry->orderBy("e.event_year", "asc")->orderBy("e.event_open", "asc"); break;
                 case 'E': $qry->orderBy("e.event_year", "desc")->orderBy("e.event_open", "desc"); break;
             }
@@ -84,16 +90,19 @@ class Index extends Controller
         return $qry;
     }
 
-    private function filterQuery($model)
+    private function filterQuery($model, $obj)
     {
-        $qry = $model->results()
-            ->join(Competition::tableName() . " as cm", "cm.competition_id", "=", Model::tableName() . ".result_competition")
-            ->join(Event::tableName() . " as e", "e.event_id", "=", "cm.competition_event")
-            ->join(Fencer::tableName() . " as f", "f.fencer_id", "=", Model::tableName() . ".result_fencer")
-            ->join(Country::tableName() . " as c", "c.country_id", "=", "f.fencer_country")
-            ->join(Category::tableName() . " as cat", "cat.category_id", "=", "cm.competition_category")
-            ->join(Weapon::tableName() . " as w", "w.weapon_id", "=", "cm.competition_weapon")
-            ->select(Model::tableName() . ".*", "e.*", "f.*", "cm.*", "c.*", "cat.*", "w.*");
+        // obj can be fencer or competition, which have a polymorphic results() relation
+        $qry = $obj->results()
+            // ad joins needed for sorting
+            ->leftJoin(Competition::tableName() . " as cm", "cm.competition_id", "=", "result_competition")
+            ->leftJoin(Event::tableName() . " as e", "e.event_id", "=", "cm.competition_event")
+            ->leftJoin(Fencer::tableName() . " as f", "f.fencer_id", "=", "result_fencer")
+            ->leftJoin(Country::tableName() . " as c", "c.country_id", "=", "fencer_country")
+            // select the sortable fields
+            ->select(Model::tableName() . ".*", "e.*", "f.*", "c.*")
+            // add the relations to allow the schema to fill without additional subqueries
+            ->with('competition', 'competition.event', 'competition.weapon', 'competition.category', 'fencer', 'fencer.country');
         return $qry;
     }
 }

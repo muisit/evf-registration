@@ -75,7 +75,7 @@ class Presave extends Controller
         }
         $fencer->fencer_firstname = $model->firstname;
         $fencer->fencer_surname = $model->name;
-        $fencer->fencer_country = $model->country;
+        $fencer->fencer_country = $model->country_id;
         $fencer->fencer_gender = $model->gender;
         $fencer->fencer_picture = $model?->picture ?? 'N';
         $fencer->fencer_dob = $model->birthday;

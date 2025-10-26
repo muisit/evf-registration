@@ -28,10 +28,23 @@ class Response
      */
     public ?string $message;
 
-    public function __construct($status, ?string $message = null)
+    /**
+     * Additional data relevant for the request
+     *
+     * @var object
+     * @OA\Property()
+     */
+    public $data;
+
+    public function __construct($status, ?string $message = null, $data = null)
     {
         $this->success = $status == 'ok';
         $this->status = $status;
-        $this->message = $message;
+        if (!empty($message)) {
+            $this->message = $message;
+        }
+        if (!empty($data)) {
+            $this->data = $data;
+        }
     }
 }
