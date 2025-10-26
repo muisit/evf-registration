@@ -7,12 +7,33 @@ use App\Models\FencerLabel;
 
 class FencerLabelService
 {
+    public function extendFencer(Fencer $fencer, $newfirstname, $newlastname)
+    {
+        $existing = $fencer->labels()->where('type', 'first')->where('label', $newfirstname)->first();
+        if (!$existing) {
+            $label = new FencerLabel();
+            $label->fencer_id = $fencer->getKey();
+            $label->type = 'first';
+            $label->label = $newfirstname;
+            $label->save();
+        }
+
+        $existing = $fencer->labels()->where('type', 'last')->where('label', $newlastname)->first();
+        if (!$existing) {
+            $label = new FencerLabel();
+            $label->fencer_id = $fencer->getKey();
+            $label->type = 'last';
+            $label->label = $newlastname;
+            $label->save();
+        }
+    }
+
     public function updateFencer(Fencer $fencer, $newfirstname, $newlastname)
     {
-        if (!strcmp($fencer->fencer_firstname, $newfirstname)) {
+        if (strcmp($fencer->fencer_firstname, $newfirstname)) {
             $this->updateLabel($fencer, $fencer->fencer_firstname, $newfirstname, 'first');
         }
-        if (!strcmp($fencer->fencer_firstname, $newfirstname)) {
+        if (strcmp($fencer->fencer_firstname, $newfirstname)) {
             $this->updateLabel($fencer, $fencer->fencer_surname, $newlastname, 'last');
         }
     }
