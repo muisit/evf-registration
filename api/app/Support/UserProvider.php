@@ -231,4 +231,11 @@ class UserProvider implements UserProviderBase
 
         return $this;
     }
+
+    public function rehashPasswordIfRequired(UserContract $user, array $credentials, bool $force = false)
+    {
+        // This user provider supports WordPress users and AccreditationUsers. The first has a password interface
+        // at the EVF Wordpress installation, the second does not use passwords.
+        return;
+    }
 }

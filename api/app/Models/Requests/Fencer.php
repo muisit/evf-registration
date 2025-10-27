@@ -6,6 +6,7 @@ use App\Models\Country;
 use App\Models\Fencer as FencerModel;
 use Illuminate\Database\Eloquent\Model;
 use App\Support\Contracts\EVFUser;
+use App\Support\Services\FencerLabelService;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -16,14 +17,15 @@ class Fencer extends Base
 
     public function rules(): array
     {
+        $rules = FencerModel::rules();
         return [
-            'fencer.id' => ['required', 'int', 'min:0'],
-            'fencer.firstName' => ['required','max:45','min:2'],
-            'fencer.lastName' => ['required','max:45','min:2'],
-            'fencer.countryId' => ['required','exists:TD_Country,country_id'],
-            'fencer.gender' => ['required', Rule::in(['M', 'F'])],
-            'fencer.dateOfBirth' => ['nullable', 'date_format:Y-m-d', 'before:' . Carbon::now()->subMinutes(1)->toDateString()],
-            'fencer.photoStatus' => ['nullable', Rule::in(['N','Y','A','R'])]
+            'fencer.id' => $rules['fencer_id'],
+            'fencer.firstName' => $rules['fencer_firstname'],
+            'fencer.lastName' => $rules['fencer_surname'],
+            'fencer.countryId' => $rules['fencer_country'],
+            'fencer.gender' => $rules['fencer_gender'],
+            'fencer.dateOfBirth' => $rules['fencer_dob'],
+            'fencer.photoStatus' => $rules['fencer_picture']
         ];
     }
 
@@ -84,5 +86,26 @@ class Fencer extends Base
             }
         }
         return $this->model;
+    }
+
+    protected function postProcess()
+    {
+        if (!empty($this->model)) {
+            $service = new FencerLabelService();
+            if (!$this->model->exists) {
+                $this->model->save();
+
+                // create labels, but only after we saved the model, so we have an ID
+                $service->updateFencer($this->model, $this->model->fencer_firstname, $this->model->fencer_surname);
+            }
+            else {
+                // get the old model, so we can change the old labels to the right new labels
+                $fencer = FencerModel::find($this->model->getKey());
+                $service->updateFencer($fencer, $this->model->fencer_firstname, $this->model->fencer_surname);
+
+                // now save the model, so we persist the new preferred first/last name
+                $this->model->save();
+            }
+        }
     }
 }

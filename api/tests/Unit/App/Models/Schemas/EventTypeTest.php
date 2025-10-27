@@ -19,7 +19,7 @@ class EventTypeTest extends TestCase
     {
         $event = new Event();
         $event->event_type = EventType::INDIVIDUAL;
-        $schema = new Schema($event);
+        $schema = new Schema($event->type);
         $this->assertEquals("European Individual", $schema->name);
     }
 }

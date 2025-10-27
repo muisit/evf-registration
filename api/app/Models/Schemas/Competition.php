@@ -52,6 +52,15 @@ class Competition
      */
     public string $weaponsCheck;
 
+    /**
+     * Entries
+     * 
+     * @var integer
+     * @OA\Property()
+     */
+    public ?int $total = null;
+
+
     public function __construct(BaseModel $model)
     {
         $this->id = $model->getKey();
@@ -59,5 +68,9 @@ class Competition
         $this->weaponId = $model->competition_weapon;
         $this->starts = $model->competition_opens;
         $this->weaponsCheck = $model->competition_weapon_check;
+
+        if (isset($model->result_total)) {
+            $this->total = intval($model->result_total);
+        }
     }
 }

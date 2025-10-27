@@ -16,7 +16,7 @@ class Get extends Controller
     /**
      * Single ranking
      *
-     * https://.../ranking/ws/1
+     * https://.../fe/ranking/ws/1
      *
      * @OA\Get(
      *     path = "/ranking/{weapon}/{category}",
@@ -34,6 +34,7 @@ class Get extends Controller
      */
     public function index(Request $request, string $weapon, string $category)
     {
+        \Log::debug("getting ranking of $weapon / $category");
         $category = Category::where('category_abbr', $category)->first();
         $weapon = Weapon::where('weapon_abbr', strtoupper($weapon))->first();
         if (empty($weapon) || empty($category) || $category->category_type != 'I' || !in_array(intval($category->category_value), [1,2,3,4])) {

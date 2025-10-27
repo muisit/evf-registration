@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Validation\Rule;
+
 class RoleType extends Model
 {
     protected $table = 'TD_Role_Type';
@@ -12,4 +15,18 @@ class RoleType extends Model
     public const ORG = 2;
     public const EVF = 3;
     public const FIE = 4;
+
+    public static function rules()
+    {
+        return [
+            'role_type_id' => ['required', 'int', 'min:0'],
+            'role_type_name' => ['required','max:45','min:2'],
+            'org_declaration' => ['required', Rule::in([self::COUNTRY, self::ORG, self::EVF, self::FIE])]
+        ];
+    }
+
+    public function roles(): HasMany
+    {
+        return $this->hasMany(Role::class, 'role_type', 'role_type_id');
+    }
 }

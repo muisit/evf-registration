@@ -133,12 +133,12 @@ class PDFGeneratorElementTest extends TestCase
         $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testText"));
 
-        $path = tempnam(null, "pdftest");
-        //$path = base_path('testtext.pdf');
+        //$path = tempnam(null, "pdftest");
+        $path = base_path('tests/_output/pdfs/PDFGeneratorElementTest_Text.pdf');
         $generator->save($path);
         $hash = hash_file("md5", $path);
+        $this->assertEquals("069dd788d87743da7f2a7c7dd2b7825f", $hash);
         @unlink($path);
-        $this->assertEquals("bfcac244c5a04868581131ce6490a743", $hash);
     }
 
     public function testText2()
@@ -181,12 +181,12 @@ class PDFGeneratorElementTest extends TestCase
         $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testText2"));
 
-        $path = tempnam(null, "pdftest");
-        //$path = base_path('testtext2.pdf');
+        //$path = tempnam(null, "pdftest");
+        $path = base_path('tests/_output/pdfs/PDFGeneratorElementTest_Text2.pdf');
         $generator->save($path);
         $hash = hash_file("md5", $path);
+        $this->assertEquals("19006a053f55164e980d5bc48c61d088", $hash);
         @unlink($path);
-        $this->assertEquals("bbdcf81b7d12974b2be40c9596897268", $hash);
     }
 
     public function testFonts()
@@ -236,12 +236,12 @@ class PDFGeneratorElementTest extends TestCase
         $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testFonts"));
 
-        $path = tempnam(null, "pdftest");
-        //$path = base_path('testfonts.pdf');
+        //$path = tempnam(null, "pdftest");
+        $path = base_path('tests/_output/pdfs/PDFGeneratorElementTest_Fonts.pdf');
         $generator->save($path);
         $hash = hash_file("md5", $path);
+        $this->assertEquals("8efab829fc58cb9fd801d678a9eb4812", $hash);
         @unlink($path);
-        $this->assertEquals("29ee2ea4ddc1419420c3cce1b1877e48", $hash);
     }
 
     public function testFonts2()
@@ -291,12 +291,12 @@ class PDFGeneratorElementTest extends TestCase
         $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testFonts2"));
 
-        $path = tempnam(null, "pdftest");
-        //$path = base_path('testfonts2.pdf');
+        //$path = tempnam(null, "pdftest");
+        $path = base_path('tests/_output/pdfs/PDFGeneratorElementTest_Fonts2.pdf');
         $generator->save($path);
         $hash = hash_file("md5", $path);
+        $this->assertEquals("9bf480f73289985f8ebca86dfe9b60a0", $hash);
         @unlink($path);
-        $this->assertEquals("22cca01707a152019596d041c66298c9", $hash);
     }
 
     public function testFonts3()
@@ -345,11 +345,11 @@ class PDFGeneratorElementTest extends TestCase
         $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testFonts3"));
 
-        $path = tempnam(null, "pdftest");
-        //$path = base_path('testfonts3.pdf');
+        //$path = tempnam(null, "pdftest");
+        $path = base_path('tests/_output/pdfs/PDFGeneratorElementTest_Fonts3.pdf');
         $generator->save($path);
         $hash = hash_file("md5", $path);
+        $this->assertEquals("33af21cc8182c091f768ac554411f67e", $hash);
         @unlink($path);
-        $this->assertEquals("92a1dccb627bdd1061833a7ff42571e6", $hash);
     }
 }

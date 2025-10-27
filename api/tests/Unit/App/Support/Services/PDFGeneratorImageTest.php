@@ -128,12 +128,12 @@ class PDFGeneratorImageTest extends TestCase
         $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testbasicelements"));
 
-        $path = tempnam(null, "pdftest");
-        //$path = base_path('testpdfphoto.pdf');
+        //$path = tempnam(null, "pdftest");
+        $path = base_path('tests/_output/pdfs/PDFGeneratorImageTest_PhotoId.pdf');
         $generator->save($path);
         $hash = hash_file("md5", $path);
-        @unlink($path);
         $this->assertEquals("4c34414c0bf3b9d1526ad4cf8938027d", $hash);
+        @unlink($path);
     }
 
     public function testImages()
@@ -165,12 +165,12 @@ class PDFGeneratorImageTest extends TestCase
         $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testimages"));
 
-        $path = tempnam(null, "pdftest");
-        //$path = base_path('testimages.pdf');
+        //$path = tempnam(null, "pdftest");
+        $path = base_path('tests/_output/pdfs/PDFGeneratorImageTest_Images.pdf');
         $generator->save($path);
         $hash = hash_file("md5", $path);
+        $this->assertEquals("05ef7501765fe259fcfa467071126776", $hash);
         @unlink($path);
-        $this->assertEquals("c8de221f55e8a4851d36496223544dea", $hash);
     }
 
     public function testImages2()
@@ -216,12 +216,12 @@ class PDFGeneratorImageTest extends TestCase
         $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testimages2"));
 
-        $path = tempnam(null, "pdftest");
-        //$path = base_path('testimages2.pdf');
+        //$path = tempnam(null, "pdftest");
+        $path = base_path('tests/_output/pdfs/PDFGeneratorImageTest_Images2.pdf');
         $generator->save($path);
         $hash = hash_file("md5", $path);
+        $this->assertEquals("cf42275f6651d177dc69008d8b6ae9bf", $hash);
         @unlink($path);
-        $this->assertEquals("cf9b50b509b3702b8f1c0f1f88d38f3c", $hash);
     }
 
     public function testImages3()
@@ -267,11 +267,11 @@ class PDFGeneratorImageTest extends TestCase
         $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testimages3"));
 
-        $path = tempnam(null, "pdftest");
-        //$path = base_path('testimages3.pdf');
+        //$path = tempnam(null, "pdftest");
+        $path = base_path('tests/_output/pdfs/PDFGeneratorImageTest_Images3.pdf');
         $generator->save($path);
         $hash = hash_file("md5", $path);
+        $this->assertEquals("d68691b619ff286027d1ef36cadc6d4f", $hash);
         @unlink($path);
-        $this->assertEquals("4a80e55a3c5ecedda3acd78a08d45266", $hash);
     }
 }

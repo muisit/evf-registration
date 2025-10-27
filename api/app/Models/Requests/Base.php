@@ -23,9 +23,11 @@ class Base
 
     public function validate(Request $request): ?Model
     {
+        \Log::debug("validating form request");
         $this->model = $this->createModel($request);
         $validator = $this->createValidator($request);
         if ($validator->fails()) {
+            \Log::debug("form validator fails");
             throw new ValidationException(
                 $validator,
                 new JsonResponse($validator->errors()->getMessages(), 422)
@@ -35,10 +37,12 @@ class Base
         $data = $this->extractInputFromRules($request);
 
         if (empty($request->user())) {
+            \Log::debug("no user in request");
             throw new AuthorizationException(); // should never occur, all routes guarded by authenticator
         }
 
         if (!$request->user() || !$this->authorize($request->user(), $data)) {
+            \Log::debug("no user or not authorized");
             $this->model = null;
         }
         else {
@@ -58,7 +62,12 @@ class Base
 
     public function createValidator(Request $request)
     {
-        return app('validator')->make($request->all(), $this->rules(), $this->messages(), $this->customAttributes());
+        $all = $request->all();
+        $rules = $this->rules();
+        $msgs = $this->messages();
+        $attrs = $this->customAttributes();
+        $validator = app('validator')->make($all, $rules, $msgs, $attrs);
+        return $validator;
     }
 
     protected function extractInputFromRules(Request $request)

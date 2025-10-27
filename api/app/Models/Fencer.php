@@ -5,13 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Kirschbaum\PowerJoins\PowerJoins;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class Fencer extends Model
 {
-    use PowerJoins;
-
     public const PICTURE_NONE = 'N';
     public const PICTURE_UPLOADED = 'Y';
     public const PICTURE_ACCEPTED = 'A';
@@ -29,9 +28,27 @@ class Fencer extends Model
         });
     }
 
+    public static function rules()
+    {
+        return [
+            'fencer_id' => ['required', 'int', 'min:0'],
+            'fencer_firstname' => ['required','max:45','min:2'],
+            'fencer_surname' => ['required','max:45','min:2'],
+            'fencer_country' => ['required','exists:TD_Country,country_id'],
+            'fencer_gender' => ['required', Rule::in(['M', 'F'])],
+            'fencer_dob' => ['nullable', 'date_format:Y-m-d', 'before:' . Carbon::now()->subMinutes(1)->toDateString()],
+            'fencer_picture' => ['nullable', Rule::in(['N','Y','A','R'])]
+        ];
+    }
+
     public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class, 'fencer_country', 'country_id');
+    }
+
+    public function results(): HasMany
+    {
+        return $this->hasMany(Result::class, 'result_fencer', 'fencer_id');
     }
 
     public function image()
@@ -41,6 +58,19 @@ class Fencer extends Model
         }
         $path = storage_path('app/fencers/fencer_' . $this->getKey() . '.dat');
         return $path;
+    }
+
+    public function labels(): HasMany
+    {
+        return $this->hasMany(FencerLabel::class, 'fencer_id', 'fencer_id');
+    }
+    public function addLabel($label, $type)
+    {
+        $fl = new FencerLabel();
+        $fl->label = $label;
+        $fl->type = in_array($type, ['first', 'last']) ? $type : 'first';
+        $fl->fencer_id = $this->getKey();
+        $fl->save();
     }
 
     public function accreditations(): HasMany

@@ -61,4 +61,22 @@ class Category
             $this->value = $data->category_value;
         }
     }
+
+    public static function categoryFromYear($year, $wrt)
+    {
+        $year = intval($year);
+        $wrtM = intval(date('m', strtotime($wrt)));
+        $wrtY = intval(date('Y', strtotime($wrt)));
+
+        $diff = $wrtY - $year;
+        if ($wrtM > 6) {
+            $diff += 1; // people start fencing in the older category as of July
+        }
+        //if ($diff >= 80) return 5;
+        if ($diff >= 70) return 4;
+        if ($diff >= 60) return 3;
+        if ($diff >= 50) return 2;
+        if ($diff >= 40) return 1;
+        return -1;
+    }
 }

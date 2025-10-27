@@ -30,7 +30,7 @@ class Index extends Controller
     public function index(Request $request)
     {
         $allowedWithCountry = $request->has('countryObject') && $request->user()->can('view', $request->get('countryObject'));
-        $allowedAll = $request->user()->can('viewAny', Fencer::class);
+        $allowedAll = $request->user()->can('viewAll', Fencer::class);
 
         if ((!$allowedWithCountry && !$allowedAll) || !$request->has('countryObject')) {
             $this->authorize('not/ever');

@@ -42,6 +42,7 @@ class Photo extends Controller
             header('Cache-Control: must-revalidate');
             header('Pragma: public');
             header('Content-Length: ' . filesize($imageLocation));
+            header('Access-Control-Allow-Origin: ' . $this->getOrigin());
             readfile($imageLocation);
         }
         else {

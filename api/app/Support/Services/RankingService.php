@@ -3,6 +3,10 @@
 namespace App\Support\Services;
 
 use App\Models\Category;
+use App\Models\Event;
+use App\Models\Fencer;
+use App\Models\Ranking;
+use App\Models\Result;
 use App\Models\Weapon;
 use Illuminate\Support\Facades\DB;
 
@@ -96,5 +100,52 @@ class RankingService
                 break;
         }
         return [$minyear, $maxyear];
+    }
+
+    public static function latest(Category $cat, Weapon $wpn)
+    {
+        return Ranking::where('category_id', $cat->getKey())->where('weapon_id', $wpn->getKey())->orderBy('ranking_date', 'desc')->first();
+    }
+
+    public static function details(Fencer $fencer, Category $cat, Weapon $wpn)
+    {
+        $ranking = self::latest($cat, $wpn);
+        if (empty($ranking)) {
+            return null;
+        }
+        $position = $ranking->positions()->where('fencer_id', $fencer->getKey())->first();
+        if (empty($position)) {
+            return null;
+        }
+        $included = $position->settings['included'];
+        $excluded = $position->settings['excluded'];
+        $resultIds = array_merge($included, $excluded);
+        $results = Result::whereIn('result_id', $resultIds)
+            ->joinRelationship('competition.event')
+            ->with('competition')
+            ->with('competition.event')
+            ->with('competition.event.country')
+            ->with('fencer')
+            ->with('fencer.country')
+            ->orderBy('result_total_points', 'desc')
+            ->orderBy(Event::tableName() . '.event_open', 'desc')
+            ->orderBy(Event::tableName() . '.event_name', 'asc')
+            ->get()
+            ->map(function ($r) use ($included, $excluded) {
+                if (!in_array($r->result_in_ranking, ['Y','N'])) {
+                    // pass, keep excluded
+                }
+                else if (in_array($r->getKey(), $included)) {
+                    $r->result_in_ranking = 'Y';
+                }
+                else //if (in_array($r->getKey(), $excluded))
+                {
+                    // by default, exclude
+                    $r->result_in_ranking = 'N';
+                }
+                return $r;
+            });
+
+        return $results;
     }
 }

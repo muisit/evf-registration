@@ -1,18 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\Ranking;
+namespace App\Http\Controllers\FE\Ranking;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Schemas\ReturnStatus;
+use App\Models\Result;
+use App\Models\Schemas\FE\Response;
 use App\Jobs\CreateRanking;
+use App\Support\Services\AssessResultsService;
+use Illuminate\Http\Request;
 
-class Create extends Controller
+class Reset extends Controller
 {
     /**
-     * Generate the ranking based on the current data
+     * Recalculate all the currently included results that make up the ranking
      *
-     * @OA\Get(
+     * @OA\Post(
      *     path = "/ranking/create",
      *     @OA\Response(
      *         response = "200",
@@ -28,10 +30,12 @@ class Create extends Controller
      */
     public function index(Request $request)
     {
-        \Log::debug("creating ranking store service");
-        $job = new CreateRanking();
-        $job->handle();
-        \Log::debug("returning all ok");
-        return response()->json(new ReturnStatus('ok'));
+        $this->authorize('viewAny', Result::class);
+        $service = new AssessResultsService();
+        $total = $service->handle();
+
+        dispatch(new CreateRanking());
+
+        return response()->json(new Response('ok', null, ['total' => $total]));
     }
 }

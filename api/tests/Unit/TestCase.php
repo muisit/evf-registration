@@ -64,7 +64,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (! $this->app['session']->isStarted()) {
             $this->app['session']->start();
-            request()->setLaravelSession($this->app['session']);
+            request()->setLaravelSession($this->app['session']->driver());
         }
 
         return $this;

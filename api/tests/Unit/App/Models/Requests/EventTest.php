@@ -137,17 +137,25 @@ class EventTest extends TestCase
 
     private function baseTest($testData, $user)
     {
+        \Log::debug("setting request");
         $this->setRequest($testData);
+        \Log::debug("unsetting user");
         $this->unsetUser();
+        \Log::debug("setting session user");
         $this->session(['wpuser' => $user->getKey()]);
+        \Log::debug("running validate on request");
         return $this->createRequest()->validate(request());
     }
 
     public function testUpdate()
     {
+        \Log::debug("event test update");
         $testData = $this->testData();
+        \Log::debug("getting user");
         $user = WPUser::where('ID', UserData::TESTUSER)->first();
+        \Log::debug("running base test");
         $model = $this->baseTest($testData, $user);
+        \Log::debug("asserting result");
         $this->assertNotEmpty($model);
         $this->dataEquals($testData, $this->modelToData($model));
         $this->modelsEqual($model, Event::where('event_id', $model->getKey())->first());
@@ -1041,12 +1049,12 @@ class EventTest extends TestCase
         unset($data['payments']);
         $this->setRequest($data);
         $validator = $request->createValidator(request());
-        $this->assertFalse($validator->passes());
+        $this->assertTrue($validator->passes());
 
         $data['payments'] = '';
         $this->setRequest($data);
         $validator = $request->createValidator(request());
-        $this->assertFalse($validator->passes());
+        $this->assertTrue($validator->passes());
 
         $data['payments'] = 'a';
         $this->setRequest($data);

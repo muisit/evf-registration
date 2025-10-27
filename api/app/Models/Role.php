@@ -5,13 +5,10 @@ namespace App\Models;
 use App\Support\Contracts\AccreditationRelation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Kirschbaum\PowerJoins\PowerJoins;
 use Illuminate\Database\Query\Builder;
 
 class Role extends Model implements AccreditationRelation
 {
-    use PowerJoins;
-
     protected $table = 'TD_Role';
     protected $primaryKey = 'role_id';
     public $timestamps = false;
@@ -23,6 +20,15 @@ class Role extends Model implements AccreditationRelation
     public const VOLUNTEER = 11;
     public const DIRECTOR = 14;
     public const DT = 18;
+
+    public static function rules()
+    {
+        return [
+            'role_id' => ['required', 'int', 'min:0'],
+            'role_name' => ['required','max:45','min:2'],
+            'role_type' => ['required', 'exists:TD_RoleType,role_type_id']
+        ];
+    }
 
     public function type(): BelongsTo
     {

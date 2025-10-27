@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Carbon\Carbon;
 use App\Support\Services\OverviewService;
 use App\Support\Services\AccreditationOverviewService;
+use Illuminate\Validation\Rule;
 
 class Event extends Model
 {
@@ -14,6 +15,36 @@ class Event extends Model
     protected $primaryKey = 'event_id';
     protected $guarded = [];
     public $timestamps = false;
+
+    public static function rules(): array
+    {
+        return [
+            'event_id' => ['required', 'integer', 'min:0'],
+            'event_name' => ['required', 'string', 'max:100','min:2'],
+            'event_opens' => ['required', 'date_format:Y-m-d'],
+            'event_reg_open' => ['nullable', 'date_format:Y-m-d'],
+            'event_reg_close' => ['nullable', 'date_format:Y-m-d'],
+            'event_year' => ['required', 'integer', 'min:2020', 'max:2090'],
+            'event_duration' => ['required', 'integer', 'min:1', 'max:20'],
+            'event_email' => ['nullable', 'email'],
+            'event_web' => ['nullable', 'url'],
+            'event_location' => ['nullable', 'string', 'max:45'],
+            'event_country' => ['required', 'exists:TD_Country,country_id'],
+            'event_type' => ['nullable', 'exists:TD_Event_Type,event_type_id'],
+            'event_config' => ['nullable', 'json'],
+            'event_payments' => ['nullable', Rule::in(['all', 'group', 'individual'])],
+            'event_symbol' => ['nullable', 'string', 'max:10'],
+            'event_currency' => ['nullable', 'string', 'max:30'],
+            'event_bank' => ['nullable', 'string', 'max:100'],
+            'event_account' => ['nullable', 'string', 'max:100'],
+            'event_address' => ['nullable', 'string'],
+            'event_iban' => ['nullable', 'string', 'max:40'],
+            'event_swift' => ['nullable', 'string', 'max:20'],
+            'event_reference' => ['nullable', 'string', 'max:255'],
+            'event_base_fee' => ['nullable', 'numeric', 'min:0'],
+            'event_competition_fee' => ['nullable', 'numeric', 'min:0'],
+        ];
+    }
 
     public function type(): BelongsTo
     {

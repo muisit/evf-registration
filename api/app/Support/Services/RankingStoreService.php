@@ -19,12 +19,14 @@ class RankingStoreService
         // only create rankings for the Individual categories, and for age groups 1, 2, 3 and 4
         $categories = Category::where('category_type', 'I')->whereIn('category_value', [1,2,3,4])->get();
 
+        \Log::debug('building cache');
         $this->buildCache();
 
         foreach ($weapons as $weapon) {
             foreach ($categories as $category) {
                 $event = $this->findMostRecentEvent($weapon);
                 if (!empty($event)) {
+                    \Log::debug("most recent event is " . json_encode($event));
                     $ranking = $this->findOrCreateEventRanking($event, $category, $weapon);
                     // clear the current ranking
                     RankingPosition::where('ranking_id', $ranking->getKey())->delete();
@@ -32,6 +34,9 @@ class RankingStoreService
                     $service = new RankingService($category, $weapon);
                     $positions = $service->generate();
                     $this->storePositionsOnRanking($ranking, $weapon, $positions);
+                }
+                else {
+                    \Log::debug("no recent event found");
                 }
             }
         }
