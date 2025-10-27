@@ -3,11 +3,11 @@
 WD=$1
 HOME=`pwd`
 ARCHIVE="$HOME/$WD.zip"
-VERSION=`php --version | grep '^PHP' | sed 's/PHP \([0-9]*\.[0-9]*\).*/\1/'`
+VERSION=`php -d date.timezone='UTC' --version | grep '^PHP' | sed 's/PHP \([0-9]*\.[0-9]*\).*/\1/'`
 
-if [[ ! "x$VERSION" = "x8.2" ]]
+if [[ ! "x$VERSION" = "x8.4" ]]
 then
-    echo "Expecting PHP version 8.2, received $VERSION"
+    echo "Expecting PHP version 8.4, received $VERSION"
     exit 1
 fi
 
@@ -85,18 +85,18 @@ ln -sf $HOME/api_storage storage
 
 echo "Migrating database"
 cd $HOME/releases/$WD/api
-php ./artisan migrate --force
+php -d date.timezone='UTC' ./artisan migrate --force
 
 # clear cache first, then restart the queue
 # the queue-restart signal is stored on the cache
 echo "Clearing caches"
-php ./artisan cache:clear
+php -d date.timezone='UTC' ./artisan cache:clear
 
 echo "Restarting queue"
-php artisan queue:restart
+php -d date.timezone='UTC' ./artisan queue:restart
 
 echo "Testing mail setup"
-php artisan evf:report
+php -d date.timezone='UTC' ./artisan evf:report
 
 echo "Switching releases"
 cd $HOME/register.veteransfencing.eu
