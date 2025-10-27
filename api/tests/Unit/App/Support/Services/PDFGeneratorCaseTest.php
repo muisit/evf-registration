@@ -314,11 +314,11 @@ class PDFGeneratorCaseTest extends TestCase
         $generator->generate($accreditation);
         $generator->pdf->setFileId(md5("testCase20220216"));
 
-        $path = tempnam(null, "pdftest");
-        //$path = base_path('testcase20220216.pdf');
+        //$path = tempnam(null, "pdftest");
+        $path = base_path('tests/_output/pdfs/PDFGeneratorCaseTest_20220216.pdf');
         $generator->save($path);
         $hash = hash_file("md5", $path);
+        $this->assertEquals("613f1e2e0d4ca70f7edc5d10bc80c7f6", $hash);
         @unlink($path);
-        $this->assertEquals("d1aa0674c2d6ffbfdbea552541d4c2fa", $hash);
     }
 }

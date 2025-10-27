@@ -40,9 +40,9 @@ class ImportCheckServiceTest extends TestCase
         $this->assertCount(3, $results);
         foreach ($results as $res) {
             $this->assertTrue(isset($res['fencer']));
-            $this->assertTrue(isset($res['fencer']['fencer_firstname']));
-            $this->assertEquals('Lee', $res['fencer']['fencer_firstname']);
-            $this->assertEquals(1, $res['fencer']['fencer_country']);
+            $this->assertTrue(isset($res['fencer']->firstname));
+            $this->assertEquals('Lee', $res['fencer']->firstname);
+            $this->assertEquals(1, $res['fencer']->country_id);
             $this->assertTrue(isset($res['checks']));
             $this->assertTrue(is_array($res['checks']));
             $this->assertCount(1, $res['checks']);
@@ -64,7 +64,6 @@ class ImportCheckServiceTest extends TestCase
         $this->assertCount(4, $results);
 
         $results = $service->findEntryForName('Lee', 'Wilde', $gbr);
-        \Log::debug("results is " . json_encode($results));
         $this->assertCount(1, $results); // one from exactly this age group, breaks from the internal loop
     }
 

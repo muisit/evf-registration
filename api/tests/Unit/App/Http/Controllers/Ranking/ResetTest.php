@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Carbon\Carbon;
 
-class CreateTest extends TestCase
+class ResetTest extends TestCase
 {
     public function testRoute()
     {
@@ -21,23 +21,18 @@ class CreateTest extends TestCase
         DB::table(env('WPDBPREFIX', 'wp_') . 'options')
             ->insert(['option_id' => 3, 'option_name' => 'evf_internal_key', 'option_value' => 'aaaa']);
 
-        $response = $this->post('/fe/ranking/create', [], ['Authorization' => 'Bearer aaaa'])->assertStatus(200);
+        $response = $this->post('/fe/ranking/reset', [], ['Authorization' => 'Bearer aaaa'])->assertStatus(200);
         $output = $response->json();
         $this->assertTrue($output !== false);
         $this->assertTrue(is_array($output));
         $this->assertTrue(isset($output['status']));
         $this->assertEquals("ok", $output['status']);
-        $this->assertEmpty($output['message']);
+        $this->assertTrue(!isset($output['message']));
 
         $date = Carbon::now()->addDays(35)->toDateString();
         $ranking = Ranking::where('id', '>', 0)->orderBy('category_id')->orderBy('weapon_id')->get();
-        $this->assertCount(8, $ranking); // mens foil, womens sabre, all categories
-        $this->assertCount(3, $ranking[0]->positions);
-        $this->assertEquals(EventData::EVENT1, $ranking[0]->event->getKey());
-        $this->assertEquals($date, (new Carbon($ranking[0]->ranking_date))->toDateString());
-
-        // now handled synchronously
-        //Queue::assertPushed(CreateRanking::class, 1);
+        $this->assertCount(0, $ranking); // nothing created yet
+        Queue::assertPushed(CreateRanking::class, 1);
     }
 
     public function testAuth()
@@ -47,6 +42,6 @@ class CreateTest extends TestCase
         DB::table(env('WPDBPREFIX', 'wp_') . 'options')
             ->insert(['option_id' => 3, 'option_name' => 'evf_internal_key', 'option_value' => 'bbbb']);
 
-        $this->post('/fe/ranking/create', [], ['Authorization' => 'Bearer aaaa'])->assertStatus(401);
+        $this->post('/fe/ranking/reset', [], ['Authorization' => 'Bearer aaaa'])->assertStatus(401);
     }
 }

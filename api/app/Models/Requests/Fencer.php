@@ -75,10 +75,6 @@ class Fencer extends Base
     protected function updateModel(array $data): ?Model
     {
         if ($this->model) {
-            // make sure the labels update along with the model
-            $service = new FencerLabelService();
-            $service->updateFencer($this->model, $data['fencer']['firstName'], $data['fencer']['lastName']);
-
             $this->model->fencer_firstname = $data['fencer']['firstName'];
             $this->model->fencer_surname = $data['fencer']['lastName'];
             $this->model->fencer_gender = $data['fencer']['gender'];
@@ -90,5 +86,26 @@ class Fencer extends Base
             }
         }
         return $this->model;
+    }
+
+    protected function postProcess()
+    {
+        if (!empty($this->model)) {
+            $service = new FencerLabelService();
+            if (!$this->model->exists) {
+                $this->model->save();
+
+                // create labels, but only after we saved the model, so we have an ID
+                $service->updateFencer($this->model, $this->model->fencer_firstname, $this->model->fencer_surname);
+            }
+            else {
+                // get the old model, so we can change the old labels to the right new labels
+                $fencer = FencerModel::find($this->model->getKey());
+                $service->updateFencer($fencer, $this->model->fencer_firstname, $this->model->fencer_surname);
+
+                // now save the model, so we persist the new preferred first/last name
+                $this->model->save();
+            }
+        }
     }
 }
