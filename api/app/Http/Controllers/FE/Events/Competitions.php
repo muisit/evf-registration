@@ -19,8 +19,6 @@ class Competitions extends Controller
      */
     public function index(Request $request)
     {
-        $form = new FERequest($this);
-        $form->validate($request);
         if ($request->get('path') != '/events/competitions') {
             $this->authorize('not/ever');
         }
@@ -34,8 +32,7 @@ class Competitions extends Controller
             $this->authorize('not/ever');
         }
 
-        $this->authorize('view', $event);
-        $competitions = $event->competitions->map(function ($c) {
+        $competitions = $event->competitions()->orderBy('competition_weapon')->orderBy('competition_category')->get()->map(function ($c) {
             $c->result_total = $c->results()->count();
             return $c;
         });

@@ -1,9 +1,18 @@
 <?php
 
 // unauthenticated routes
-Route::post('/fe/ranking/list', 'FE\Ranking\Index@index')->name('fe.ranking.index');
-Route::post('/fe/ranking/detail', 'FE\Ranking\Detail@index')->name('fe.detail.index');
-Route::post('/fe/events', 'FE\Events\Index@index')->name('fe.events.index');
+Route::group(
+    ['prefix' => '/fe'],
+    function () {
+        Route::post('/ranking/list', 'FE\Ranking\Index@index')->name('fe.ranking.index');
+        Route::post('/ranking/detail', 'FE\Ranking\Detail@index')->name('fe.detail.index');
+        Route::post('/events', 'FE\Events\Index@index')->name('fe.events.index');
+        Route::post('/events/competitions', 'FE\Events\Competitions@index')->name('fe.events.competitions');
+        Route::post('/results/{competitionId}', 'FE\Results\Index@index')->name('fe.results.index')->where('competitionId', '[0-9]+');
+        Route::post('/categories', 'FE\Categories@index')->name('fe.categories.index');
+        Route::post('/weapons', 'FE\Weapons@index')->name('fe.weapons.index');
+    }
+);
 
 Route::group(
     [
@@ -21,9 +30,7 @@ Route::group(
         Route::post('/events/save', 'FE\Events\Save@index')->name('fe.events.save');
         Route::post('/events/delete', 'FE\Events\Delete@index')->name('fe.events.delete');
         Route::post('/events/ranking', 'FE\Events\Ranking@index')->name('fe.events.ranking');
-        Route::post('/events/competitions', 'FE\Events\Competitions@index')->name('fe.events.competitions');
 
-        Route::post('/results/{competitionId}', 'FE\Results\Index@index')->name('fe.results.index')->where('competitionId', '[0-9]+');
         Route::post('/results/{competitionId}/save', 'FE\Results\Save@index')->name('fe.results.save')->where('competitionId', '[0-9]+');
         Route::post('/results/{competitionId}/delete', 'FE\Results\Delete@index')->name('fe.results.delete')->where('competitionId', '[0-9]+');
         Route::post('/results/{competitionId}/clear', 'FE\Results\Clear@index')->name('fe.results.clear')->where('competitionId', '[0-9]+');
@@ -52,8 +59,6 @@ Route::group(
         Route::post('/registrars/save', 'FE\Registrars\Save@index')->name('fe.registrars.save');
         Route::post('/registrars/delete', 'FE\Registrars\Delete@index')->name('fe.registrars.delete');
 
-        Route::post('/categories', 'FE\Categories@index')->name('fe.categories.index');
-        Route::post('/weapons', 'FE\Weapons@index')->name('fe.weapons.index');
         Route::post('/types', 'FE\EventTypes@index')->name('fe.types.index');
         Route::post('/users', 'FE\Users@index')->name('fe.users.index');
     }

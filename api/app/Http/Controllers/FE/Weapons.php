@@ -19,9 +19,6 @@ class Weapons extends Controller
         if ($request->get('path') != '/weapons') {
             $this->authorize('not/ever');
         }
-
-        $this->authorize('viewAny', Model::class);
-
         $qry = Model::where('weapon_id', '>', 0)->orderBy('weapon_name', 'asc');
         $total = $qry->count();
         $data = $qry->get()->map(fn ($i) => new Schema($i))->toArray();
