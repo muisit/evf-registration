@@ -23,8 +23,6 @@ class Index extends Controller
      */
     public function index(Request $request, $competitionId)
     {
-        $form = new FERequest($this);
-        $form->validate($request);
         if ($request->get('path') != '/results/' . $competitionId) {
             $this->authorize('not/ever');
         }
@@ -34,20 +32,20 @@ class Index extends Controller
             $this->authorize('not/ever');
         }
 
-        $this->authorize('viewAny', Model::class);
         $filter = $model->filter;
         $obj = null;
         if ($filter && isset($filter["fencer"]) && $filter["fencer"] === true) {
             $obj = Fencer::find($competitionId);
+            $this->authorize('view', $obj);
         }
         else {
             $obj = Competition::find($competitionId);
+            // anyone can view a competition result
         }
 
         if (empty($obj)) {
             $this->authorize('not/ever');
         }
-        $this->authorize('view', $obj);
 
         $limit = $model->pagesize ?? 20;
         $offset = $model->offset ?? 0;
