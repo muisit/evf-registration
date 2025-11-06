@@ -29,8 +29,8 @@ class View extends Controller
             $this->authorize('not/ever');
         }
 
-        $this->authorize('view', $fencer);
         $fencer = Fencer::where('fencer_id', $model->id)->with('country')->first();
+        $this->authorize('view', $fencer);
         if (empty($fencer)) {
             return response(404);
         }

@@ -11,7 +11,6 @@ use App\Models\Country;
 use App\Models\Fencer;
 use App\Models\Result as Model;
 use App\Models\Weapon;
-use App\Models\Requests\FERequest;
 use App\Models\Schemas\FE\Result as Schema;
 use App\Models\Schemas\FE\WPResponse;
 use DB;
@@ -36,7 +35,6 @@ class Index extends Controller
         $obj = null;
         if ($filter && isset($filter["fencer"]) && $filter["fencer"] === true) {
             $obj = Fencer::find($competitionId);
-            $this->authorize('view', $obj);
         }
         else {
             $obj = Competition::find($competitionId);
