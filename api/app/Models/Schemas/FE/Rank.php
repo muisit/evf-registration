@@ -21,7 +21,7 @@ class Rank
         $this->firstname = $pos->fencer->fencer_firstname;
         $this->country = $pos->fencer->country->country_abbr;
         $this->points = $pos->points;
-        $this->pos = $pos->position;
+        $this->pos = intval($pos->position);
 
         if ($doExtended) {
             $this->dob = $pos->fencer->fencer_birthdate;
