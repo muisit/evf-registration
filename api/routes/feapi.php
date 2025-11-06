@@ -61,6 +61,9 @@ Route::group(
 
         Route::post('/types', 'FE\EventTypes@index')->name('fe.types.index');
         Route::post('/users', 'FE\Users@index')->name('fe.users.index');
+
+        Route::post('/workflow/upload', 'FE\Workflow\Upload@index')->name('fe.workflow.upload');
+        Route::post('/workflow/step', 'FE\Workflow\Step@index')->name('fe.workflow.step');
     }
 );
 

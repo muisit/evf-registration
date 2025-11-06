@@ -58,6 +58,7 @@ class AuthServiceProvider extends ServiceProvider
         Gate::policy(\App\Models\AccreditationDocument::class, \App\Models\Policies\AccreditationDocument::class);
         Gate::policy(\App\Models\AccreditationTemplate::class, \App\Models\Policies\AccreditationTemplate::class);
         Gate::policy(\App\Models\AccreditationUser::class, \App\Models\Policies\AccreditationUser::class);
+        Gate::policy(\App\Models\Workflow::class, \App\Models\Policies\Workflow::class);
         Gate::policy(\App\Models\WPUser::class, \App\Models\Policies\WPUser::class);
 
         // subscribe authentications. Each channel is linked to a front-end functionality
