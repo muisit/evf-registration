@@ -19,7 +19,7 @@ class Result
     public $fencer_firstname;
     public $fencer_surname;
     public $fencer_dob;
-    public $country_abr;
+    public $country_abbr;
     public $country_id;
     public $event_name;
     public $event_country;
