@@ -12,6 +12,7 @@ use App\Console\Commands\QueueCheckDirtyBadges;
 use App\Console\Commands\QueueCheckDirtyDocuments;
 use App\Console\Commands\QueueRecreateDocuments;
 use App\Console\Commands\SendGeneralNotification;
+use App\Console\Commands\ParseXMLFile;
 
 class Kernel extends ConsoleKernel
 {
@@ -25,7 +26,8 @@ class Kernel extends ConsoleKernel
         QueueCheckDirtyBadges::class,
         QueueCheckDirtyDocuments::class,
         QueueRecreateDocuments::class,
-        SendGeneralNotification::class
+        SendGeneralNotification::class,
+        ParseXMLFile::class
     ];
 
     /**

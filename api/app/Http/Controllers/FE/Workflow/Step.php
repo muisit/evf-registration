@@ -35,11 +35,16 @@ class Step extends Controller
 
         try {
             $service = new WorkflowService($workflow);
-            $service->handle();
-            return response()->json(new Response("ok", null, new Schema($workflow)));
+            $workflow = $service->handle($model);
+            if (!empty($workflow)) {
+                return response()->json(new Response("ok", null, new Schema($workflow)));
+            }
+            else {
+                return response()->json(new Response("ok", null, []));
+            }
         }
         catch (e) {
         }
-        return response()->json(new Response("error", ["error processing workflow step"]));
+        return response()->json(new Response("error", "error processing workflow step"));
     }
 }

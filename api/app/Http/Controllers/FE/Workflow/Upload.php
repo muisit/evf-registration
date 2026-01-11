@@ -27,7 +27,7 @@ class Upload extends Controller
             $request->file('picture')->move(storage_path('app/files'), $filename . '.dat');
 
             if (file_exists($destination)) {
-                $workflow->addFile($destination, ["id" => $filename]);
+                $workflow->addFile($destination, ["id" => $filename, 'name' => $request->file('picture')->getClientOriginalName()]);
                 $workflow->save();
                 \Log::debug("returning " . $workflow->getKey() . "/" . $filename);
                 return response()->json(new WPResponse(["model" => ["id" => $workflow->getKey(), "file_id" => $filename]]));

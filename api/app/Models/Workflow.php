@@ -24,15 +24,18 @@ class Workflow extends Model
     public function addFile($path, $data)
     {
         $files = $this->sandbox['files'] ?? [];
-        $fileData = collect($files)->filter(fn ($f) => ($f['path'] ?? '') == $path);
-        if ($fileData->count() == 0 || empty($fileData[0])) {
+        $fileData = collect($files)->filter(function ($f) use ($path) {
+            return (($f['path'] ?? '') == $path);
+        })->values();
+
+        if (count($fileData) == 0 || empty($fileData[0])) {
             $fileData = $data;
             $fileData['path'] = $path;
             $files[] = $fileData;
         }
         else {
-            $fileData = array_merge($fileData[0], $data); // data overrides fileData
-            $files = collect($files)->map(fn ($i) => $i['path'] == $path ? $fileData : $i)->toArray();
+            $resultData = array_merge($fileData[0], $data); // data overrides fileData
+            $files = collect($files)->map(fn ($i) => $i['path'] == $path ? $resultData : $i)->toArray();
         }
         $sb = $this->sandbox;
         $sb['files'] = $files;
@@ -50,11 +53,11 @@ class Workflow extends Model
                 }
             }
             else {
-                $files[] = $file;
+                $newFiles[] = $file;
             }
         }
         $sb = $this->sandbox;
-        $sb['files'] = $files;
+        $sb['files'] = $newFiles;
         $this->sandbox = $sb;
     }
 }
