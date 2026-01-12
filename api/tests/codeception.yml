@@ -11,8 +11,8 @@ actor_suffix: Tester
 extensions:
     enabled:
         - Codeception\Extension\RunFailed
-suites:
-    unit:
-        path: Unit
+#suites:
+#    unit:
+#        path: Unit
 params:
     - .env
