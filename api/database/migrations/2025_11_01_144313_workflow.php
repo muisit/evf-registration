@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->text('sandbox');
         });
-        DB::statement("ALTER TABLE evfregistration.TD_Result MODIFY COLUMN result_in_ranking enum('Y','N','E','D') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT 'N' NULL;");
+        DB::statement("ALTER TABLE TD_Result MODIFY COLUMN result_in_ranking enum('Y','N','E','D') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT 'N' NULL;");
     }
 
     /**
