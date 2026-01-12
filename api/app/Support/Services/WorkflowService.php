@@ -150,6 +150,10 @@ class WorkflowService
         })->sortBy('result')->values()->all();
 
         $this->workflow->sandbox = $sb;
+
+        $this->workflow->addFile($file['path'], [
+            'competition' => $service->competition['weapon']?->weapon_name . ' ' . $service->competition['category']?->category_name
+        ]);
     }
 
     private function selectCompetition($service, $competitions)
@@ -173,7 +177,7 @@ class WorkflowService
 
     private function saveCompetition($data)
     {
-        if ($data->skip === true) {
+        if (($data?->skip ?? false) === true) {
             $sb = $this->workflow->sandbox;
             $sb['step'] = 'Prepare Import';
             $sb['fencers'] = null; // clear the imported fencers
@@ -217,6 +221,11 @@ class WorkflowService
         $sb['category'] = $competition->competition_category;
 
         $this->workflow->sandbox = $sb;
+
+        $file = $this->selectFile($sb['file_id'] ?? -1);
+        if (!empty($file)) {
+            $this->workflow->addFile($file['path'], ['competition' => $competition->weapon->weapon_name . ' ' . $competition->category->category_name]);
+        }
     }
 
     private function saveEvent($data)
@@ -301,7 +310,7 @@ class WorkflowService
                 $eventData['category'] = $eventData['category']?->getKey() ?? -1;
                 $eventData['date'] = $eventData['date']?->format('Y-m-d') ?? '';
 
-                if (isset($service->competition['weapon']) && isset($service->competition['category']) && isset($service->competition['date'])) {
+                if (isset($service->competition['date'])) {
                     \Log::debug("looking through events searching for " . $service->competition['date']->format('Y-m-d'));
                     foreach ($events as $event) {
                         $date = new Carbon($event->event_open);
