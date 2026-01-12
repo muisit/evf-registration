@@ -10,6 +10,7 @@ use App\Models\Country;
 use App\Models\Fencer;
 use App\Models\FencerLabel;
 use App\Models\Result;
+use App\Models\RankingPosition;
 use App\Models\Schemas\FE\Fencer as FencerSchema;
 use App\Models\Schemas\FE\WPResponse;
 use App\Models\Requests\FERequest;
@@ -65,6 +66,7 @@ class Merge extends Controller
         Result::where('result_fencer', $fencer2->getKey())->update([
             "result_fencer" => $fencer1->getKey()
         ]);
+        RankingPosition::where('fencer_id', $fencer2->getKey())->delete();
 
         if (file_exists($fencer1->image())) {
             if (file_exists($fencer2->image())) {

@@ -50,6 +50,7 @@ class ImportService
 
         $start = 0;
         foreach ($ranking as $position) {
+            \Log::debug("checking position " . json_encode($position));
             $fencer = Fencer::find($position['fencer_id']);
             if (empty($fencer)) {
                 $this->messages[] = 'Fencer ' . $position['fencer_id'] . ' (' . $position['name'] . ', ' . $position['firstname'] . ') not found';
@@ -86,6 +87,16 @@ class ImportService
         $result->result_fencer = $position['fencer']->getKey();
         $result->result_place = $position['pos'];
         $result->result_entry = $total;
+
+        // depending on the status of the fencer, mark the result immediately as Excluded or DNF
+        if ($position['status'] == 'exclude') {
+            $result->result_in_ranking = 'E';
+        }
+        // people without a ranking are considered DNF
+        if ($result->result_place >= 9999) {
+            $result->result_in_ranking = 'D';
+        }
+        // skip any DNF status from the front-end: if they have a ranking, they are included
 
         $this->resultService->recalculateResult($result, $this->factor);
 

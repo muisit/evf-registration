@@ -126,7 +126,7 @@ class Event extends Model
     public function isFinished()
     {
         $now = Carbon::now();
-        $dateEnd = (new Carbon($this->event_open))->addDays($this->event_duration);
+        $dateEnd = (new Carbon($this->event_open))->addDays(intval($this->event_duration));
         return $now->greaterThan($dateEnd);
     }
 
