@@ -61,6 +61,7 @@ class FIEXMLService
 
     private function parseCompetition($parent)
     {
+        $this->competition['name'] = '';
         foreach ($parent->attributes as $name => $attr) {
             $value = $attr->value;
             switch (strtolower($name)) {
@@ -79,8 +80,10 @@ class FIEXMLService
                 case 'lieu':
                     $this->competition['location'] = $this->convertString($value);
                     break;
+                case 'altname': // used by FT, BVF uses this to hide the category...
+                case 'titrelong':
                 case 'titrelongtournoi':
-                    $this->competition['name'] = $this->convertString($value);
+                    $this->competition['name'] .= $this->convertString($value) . '/';
                     break;
                 case 'federation':
                     $this->competition['country'] = $this->convertCountry($value);
