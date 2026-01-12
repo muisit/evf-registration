@@ -142,6 +142,7 @@ class ImportCheckService
     public function findAllByLabelSound($type, $label)
     {
         return Fencer::whereExists(function ($query) use ($type, $label) {
+            $label = str_replace("'", "\\'", $label);
             return $query->select(DB::Raw('*'))->from(FencerLabel::tableName())
                 ->where("type", $type)
                 ->whereColumn(FencerLabel::tableName() . '.fencer_id', Fencer::tableName() . '.fencer_id')
