@@ -119,6 +119,7 @@ class WorkflowService
         $sb['weapon'] = $service->competition['weapon']?->getKey() ?? -1;
         $sb['category'] = $service->competition['category']?->getKey() ?? -1;
         $sb['date'] = $service->competition['date']?->format('Y-m-d') ?? '';
+        $sb['competition_name'] = $service->competition['name'] ?? 'none found';
 
         $sb['fencers'] = collect($service->fencers)->map(function ($item, $idx) {
             return [
@@ -195,6 +196,8 @@ class WorkflowService
         $sb['competitions'] = $this->setCompetitionsInSandbox($event);
         $sb['selectedCompetition'] = $competition->getKey();
         $sb['step'] = 'Import Fencers';
+        $sb['weapon'] = $competition->competition_weapon;
+        $sb['category'] = $competition->competition_category;
 
         $this->workflow->sandbox = $sb;
     }
