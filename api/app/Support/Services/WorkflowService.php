@@ -86,7 +86,6 @@ class WorkflowService
 
         // the front end will try to find the next file after this one
         // we set the 'processed' attribute on the file to indicate it was in fact processed
-        \Log::debug('selectinf file ' . $sb['file_id']);
         $file = $this->selectFile($sb['file_id'] ?? -1);
         if (!empty($file)) {
             $this->workflow->addFile($file['path'], ['processed' => true]);
@@ -174,6 +173,24 @@ class WorkflowService
 
     private function saveCompetition($data)
     {
+        if ($data->skip === true) {
+            $sb = $this->workflow->sandbox;
+            $sb['step'] = 'Prepare Import';
+            $sb['fencers'] = null; // clear the imported fencers
+            $sb['selectedCompetition'] = null; // clear the competition
+            $sb['gender'] = null;
+            $sb['weapon'] = null;
+            $sb['category'] = null;
+            $sb['date'] = null;
+            $this->workflow->sandbox = $sb;
+
+            $file = $this->selectFile($sb['file_id'] ?? -1);
+            if (!empty($file)) {
+                $this->workflow->addFile($file['path'], ['processed' => true]);
+            }
+            return;
+        }
+
         $event = Event::find($this->workflow->sandbox['selectedEvent']);
         if (empty($event)) {
             throw new \Exception("missing event while saving competitions");
