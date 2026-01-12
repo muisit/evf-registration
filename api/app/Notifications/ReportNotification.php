@@ -22,9 +22,9 @@ class ReportNotification extends MailNotification
             $baselink = htmlentities($url, ENT_QUOTES, 'utf-8');
 
             return (new MailMessage())
-                ->subject('[EVF] General Notification')
-                ->view('notifications.general', [
-                    "subject" => '[EVF] General Notification',
+                ->subject('[EVF] Report Notification')
+                ->view('notifications.report', [
+                    "subject" => '[EVF] Report Notification',
                     "content" => (new GeneralNotificationService())->generate(),
                     "baselink" => "<a href='" . $baselink . "'>Application</a>",
                 ]);

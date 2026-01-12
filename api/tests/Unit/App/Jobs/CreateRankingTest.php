@@ -7,12 +7,14 @@ use App\Jobs\CreateRanking;
 use Tests\Support\Data\Event as EventData;
 use Tests\Unit\TestCase;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Notification;
 use Carbon\Carbon;
 
 class CreateRankingTest extends TestCase
 {
     public function testBasicJob()
     {
+        Notification::fake();
         $job = new CreateRanking();
         $job->handle();
 
@@ -22,6 +24,7 @@ class CreateRankingTest extends TestCase
         $this->assertCount(3, $ranking[0]->positions);
         $this->assertEquals(EventData::EVENT1, $ranking[0]->event->getKey());
         $this->assertEquals($date, (new Carbon($ranking[0]->ranking_date))->toDateString());
+        Notification::assertCount(1);
     }
 
     public function testUnique()

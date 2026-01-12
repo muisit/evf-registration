@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Notifications\GenericNotification;
+use Illuminate\Support\Facades\Notification;
 use App\Support\Services\RankingStoreService;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
@@ -30,6 +32,21 @@ class CreateRanking extends Job implements ShouldBeUnique
     public function handle()
     {
         $service = new RankingStoreService();
-        $service->handle();
+        $results = $service->handle();
+
+        $content = "New rankings were calculated for the different categories:<br/><ul>";
+        foreach ($results as $ranking) {
+            $count = $ranking->positions()->count();
+            $event = $ranking->event->event_name;
+            $date = $ranking->created_at->format('Y-m-d');
+            $cat = $ranking->category->category_abbr;
+            $wpn = $ranking->weapon->weapon_abbr;
+
+            $content .= "<li>$wpn$cat: $event at $date: $count entries</li>";
+        }
+        $content .= "</ul>";
+
+        $notification = new GenericNotification($content);
+        Notification::route('mail', 'webmaster@veteransfencing.eu')->notify($notification);
     }
 }

@@ -22,6 +22,7 @@ class RankingStoreService
         \Log::debug('building cache');
         $this->buildCache();
 
+        $results = [];
         foreach ($weapons as $weapon) {
             foreach ($categories as $category) {
                 $event = $this->findMostRecentEvent($weapon);
@@ -34,12 +35,14 @@ class RankingStoreService
                     $service = new RankingService($category, $weapon);
                     $positions = $service->generate();
                     $this->storePositionsOnRanking($ranking, $weapon, $positions);
+                    $results[] = $ranking;
                 }
                 else {
                     \Log::debug("no recent event found");
                 }
             }
         }
+        return $results;
     }
 
     private function storePositionsOnRanking(Ranking $ranking, Weapon $weapon, array $positions)
