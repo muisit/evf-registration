@@ -144,7 +144,8 @@ class WorkflowService
                 "all_text" => '',
                 "fencer_id" => -1,
                 "country_id" => isset($item['country']) ? $item['country']->country_id : -1,
-                "suggestions" => []
+                "suggestions" => [],
+                "status" => $item['status'] ?? 'normal'
             ];
         })->sortBy('result')->values()->all();
 

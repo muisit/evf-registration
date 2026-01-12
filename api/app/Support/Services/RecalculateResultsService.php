@@ -44,7 +44,7 @@ class RecalculateResultsService
         // Points for surviving each round of DE
         $round_bonus = 10;
         $factor = 0;
-        if ($pos > 0 && $total > 1) {
+        if ($pos > 0 && $total > 1 && $pos <= $total) {
             $factor = ceil(log($total, 2)) - ceil(log($pos, 2));
         }
         return $factor * $round_bonus;
@@ -74,7 +74,7 @@ class RecalculateResultsService
     {
         $max_points = 50;
         $points = 0;
-        if ($pos > 0) {
+        if ($pos > 0 && $pos <= $total) {
             // Place factor: 1st place gets Max_points, last place (= size of entry) gets one point)
             // Intermediate places are log curve = MP - (MP-1) * log(x)/log(N)
             if (($total <= 1) && ($pos == 1)) {
@@ -83,6 +83,10 @@ class RecalculateResultsService
             else {
                 $points = $max_points - ($max_points - 1) * log($pos) / log($total);
             }
+        }
+        else {
+            // DNF fencers always receive 1 point
+            $points = 1;
         }
         return $points;
     }

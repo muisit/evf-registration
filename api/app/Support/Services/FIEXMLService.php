@@ -137,7 +137,7 @@ class FIEXMLService
     private function parseFencer($node)
     {
         //\Log::debug("parsing fencer node");
-        $fencer = [];
+        $fencer = ["status" => "normal"];
         foreach ($node->attributes as $name => $attr) {
             $value = $attr->value;
             //\Log::debug("fencer node attribute " . $name . ' = ' . $value);
@@ -164,12 +164,23 @@ class FIEXMLService
                     $fencer['country'] = $this->convertCountry($value);
                     break;
                 case 'classement':
+                    // It seems the final result is put in this field, although the spec says
+                    // 'official FIE or national ranking before the competition'
+                    // Alternatively, we could look for the PhaseDeTableaux and get
+                    // the RangFinal there
                     $fencer['result'] = intval($value);
                     break;
+                case 'statut':
+                    // can be E(xclude), A(bandon), F(orfeit)
+                    // the fencer may or may not have a valid result
+                    $fencer['status'] = ($value == 'E') ? 'exclude' : 'dnf';
+                    if (!isset($fencer['result'])) {
+                        $fencer['result'] = 9999;
+                    }
             }
         }
         // it seems Ophardt keeps scratched fencers in the entry list
-        // or they may be drop-outs from a combined earlier round, but we 
+        // or they may be drop-outs from a combined earlier round, but we
         // do not have the results of the combined round in this simple XML probably
         if (!empty($fencer['result']) && intval($fencer['result']) > 0) {
             //\Log::debug("adding fencer to list of fencers");
