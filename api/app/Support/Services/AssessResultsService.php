@@ -34,25 +34,28 @@ class AssessResultsService
         $allresults = array();
         $totalresults = 0;
         foreach ($results as $r) {
-            $fid = intval($r->fencer_id);
-            $wid = intval($r->weapon_id);
+            if ($r->result_in_ranking == 'N') {
+                $fid = intval($r->fencer_id);
+                $wid = intval($r->weapon_id);
 
-            // change in fencer means a change in weapon as well
-            if ($current_fencer === null || $current_fencer != $fid) {
-                $current_fencer = $fid;
-                $current_weapon = null;
-            }
-            // change in weapon means we start counting anew
-            if ($current_weapon === null || $current_weapon != $wid) {
-                $current_weapon = $wid;
-                $cnt = 0;
-            }
+                // change in fencer means a change in weapon as well
+                if ($current_fencer === null || $current_fencer != $fid) {
+                    $current_fencer = $fid;
+                    $current_weapon = null;
+                }
+                // change in weapon means we start counting anew
+                if ($current_weapon === null || $current_weapon != $wid) {
+                    $current_weapon = $wid;
+                    $cnt = 0;
+                }
 
-            if ($cnt < $this->cutoff) {
-                $allresults[] = $r->result_id;
-                $cnt += 1;
+                if ($cnt < $this->cutoff) {
+                    $allresults[] = $r->result_id;
+                    $cnt += 1;
+                }
+                // else skip this result, it is not used for the ranking at this point
             }
-            // else skip this result, it is not used for the ranking at this point
+            // else this is an Excluded result, or it was already taken into account (which is odd...)
 
             if (sizeof($allresults) > 100) {
                 $totalresults += sizeof($allresults);
